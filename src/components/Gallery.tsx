@@ -6,7 +6,6 @@ import { MobileIcon } from "@/lib/icons/mobile";
 import { ServerIcon } from "@/lib/icons/server";
 import type { DragEvent } from "react";
 import { Lead } from "./ui/typography";
-import { Separator } from "./ui/separator";
 
 type NodeType =
   | "Client"

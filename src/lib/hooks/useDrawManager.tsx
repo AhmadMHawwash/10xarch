@@ -67,9 +67,9 @@ const componentTargets: Record<
   Client: ["Server", "Load Balancer", "CDN"],
   CDN: ["Load Balancer", "Server"],
   "Load Balancer": ["Server"],
-  Server: ["Cache", "Database"],
+  Server: ["Cache", "SQL Database"],
   Cache: [],
-  Database: [],
+  "SQL Database": [],
 };
 
 export const DrawManagerProvider = ({ children }: PropsWithChildren) => {

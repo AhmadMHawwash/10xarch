@@ -13,7 +13,7 @@ type NodeType =
   | "Load Balancer"
   | "Cache"
   | "CDN"
-  | "Database";
+  | "SQL Database";
 
 export type SystemComponent = {
   name: NodeType;
@@ -51,7 +51,7 @@ const components: SystemComponent[] = [
     icon: CDNIcon,
   },
   {
-    name: "Database",
+    name: "SQL Database",
     description: "A database is a device that stores data for future use.",
     icon: DatabaseIcon,
   },

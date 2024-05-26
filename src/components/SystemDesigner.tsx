@@ -23,6 +23,7 @@ import Gallery from "./Gallery";
 import SystemComponentNode from "./SystemComponentNode";
 import { Dashboard } from "./SystemDashboard";
 import { Button } from "./ui/button";
+
 const nodeTypes: Record<string, ComponentType<NodeProps>> = {
   SystemComponentNode: SystemComponentNode,
 };
@@ -31,7 +32,7 @@ const edgeTypes: Record<string, ComponentType<EdgeProps>> = {
   CustomEdge: CustomEdge,
 };
 
-const DnDFlow = () => {
+const SystemDesigner = () => {
   const {
     nodes,
     edges,
@@ -102,7 +103,7 @@ export default function SystemBuilder() {
     <ReactFlowProvider>
       <DrawManagerProvider>
         <div className="flex h-full flex-grow flex-col">
-          <DnDFlow />
+          <SystemDesigner />
         </div>
       </DrawManagerProvider>
     </ReactFlowProvider>

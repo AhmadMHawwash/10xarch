@@ -5,6 +5,8 @@ import { LoadBalancerIcon } from "@/lib/icons/load-balancer";
 import { MobileIcon } from "@/lib/icons/mobile";
 import { ServerIcon } from "@/lib/icons/server";
 import type { DragEvent } from "react";
+import { Lead } from "./ui/typography";
+import { Separator } from "./ui/separator";
 
 type NodeType =
   | "Client"
@@ -63,13 +65,12 @@ const Gallery = () => {
   };
 
   return (
-    <div className="absolute left-0 top-0 m-2 h-fit w-fit flex-col rounded-md border border-gray-400 bg-gray-200 bg-opacity-70 p-2">
-      <div className="h-fit">Components</div>
-      <div />
+    <div className="absolute left-0 top-0 m-2 h-fit w-fit flex-col rounded-md border border-gray-200 bg-gray-50 bg-opacity-70 p-2">
+      <Lead className="h-fit">Components</Lead>
       {components.map(({ name, icon: Icon }) => (
         <div
           key={name}
-          className="my-1 flex cursor-grab items-center rounded-md border border-gray-400 bg-gray-200 bg-opacity-70 p-2"
+          className="my-1 flex cursor-grab items-center rounded-md border border-gray-200 bg-gray-50 bg-opacity-70 p-2"
           onDragStart={(event) => onDragStart(event, name)}
           draggable
         >

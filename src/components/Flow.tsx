@@ -79,7 +79,7 @@ const DnDFlow = () => {
             selectionOnDrag
             panOnDrag={false}
             selectionMode={SelectionMode.Partial}
-            fitView
+            fitView={false}
           >
             <Background variant={BackgroundVariant.Dots} color="black" />
             <Panel position="top-right">

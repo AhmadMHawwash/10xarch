@@ -1,6 +1,8 @@
-'use client'
-import { DrawManagerProvider, useDrawManager } from "@/lib/hooks/useDrawManager";
-import { useLevelsManager } from "@/lib/hooks/useLevelsManager";
+"use client";
+import {
+  DrawManagerProvider,
+  useDrawManager,
+} from "@/lib/hooks/useDrawManager";
 import { type ComponentType } from "react";
 import ReactFlow, {
   Background,
@@ -16,10 +18,11 @@ import ReactFlow, {
   type OnConnect,
 } from "reactflow";
 import "reactflow/dist/style.css";
-import SystemComponentNode from "./SystemComponentNode";
 import { CustomEdge } from "./CustomEdge";
-import { Dashboard } from "./SystemDashboard";
 import Gallery from "./Gallery";
+import SystemComponentNode from "./SystemComponentNode";
+import { Dashboard } from "./SystemDashboard";
+import { Button } from "./ui/button";
 const nodeTypes: Record<string, ComponentType<NodeProps>> = {
   SystemComponentNode: SystemComponentNode,
 };
@@ -41,6 +44,7 @@ const DnDFlow = () => {
     onDrop,
     onConnectStart,
     onConnectEnd,
+    onSave,
   } = useDrawManager();
 
   // const { updateUserSolution } = useLevelsManager();
@@ -54,50 +58,53 @@ const DnDFlow = () => {
   };
 
   return (
-    <div className="flex h-full flex-grow flex-col">
-      <ReactFlowProvider>
-        <div className="relative h-full flex-grow" ref={initWrapper}>
-          <ReactFlow
-            nodes={nodes}
-            edges={edges}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            onConnect={handleConnect}
-            onConnectStart={onConnectStart}
-            onConnectEnd={onConnectEnd}
-            onInit={initInstance}
-            onDrop={onDrop}
-            onDragOver={onDragOver}
-            nodeTypes={nodeTypes}
-            edgeTypes={edgeTypes}
-            defaultEdgeOptions={{
-              markerEnd: { type: MarkerType.ArrowClosed },
-              animated: true,
-            }}
-            connectionMode={ConnectionMode.Loose}
-            panOnScroll
-            selectionOnDrag
-            panOnDrag={false}
-            selectionMode={SelectionMode.Partial}
-            fitView={false}
-          >
-            <Background variant={BackgroundVariant.Dots} color="black" />
-            <Panel position="top-right">
-              <Dashboard />
-            </Panel>
-            <Controls />
-          </ReactFlow>
-          <Gallery />
-        </div>
-      </ReactFlowProvider>
+    <div className="relative h-full flex-grow" ref={initWrapper}>
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        onConnect={handleConnect}
+        onConnectStart={onConnectStart}
+        onConnectEnd={onConnectEnd}
+        onInit={initInstance}
+        onDrop={onDrop}
+        onDragOver={onDragOver}
+        nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
+        defaultEdgeOptions={{
+          markerEnd: { type: MarkerType.ArrowClosed },
+          animated: true,
+        }}
+        connectionMode={ConnectionMode.Loose}
+        panOnScroll
+        selectionOnDrag
+        panOnDrag={false}
+        selectionMode={SelectionMode.Partial}
+        fitView={false}
+      >
+        <Background variant={BackgroundVariant.Dots} color="black" />
+        <Panel position="top-right">
+          <Dashboard />
+        </Panel>
+        <Panel position="bottom-right">
+          <Button onClick={onSave}>Check solution</Button>
+        </Panel>
+        <Controls />
+      </ReactFlow>
+      <Gallery />
     </div>
   );
 };
 
 export default function SystemBuilder() {
   return (
-    <DrawManagerProvider>
-      <DnDFlow />
-    </DrawManagerProvider>
+    <ReactFlowProvider>
+      <DrawManagerProvider>
+        <div className="flex h-full flex-grow flex-col">
+          <DnDFlow />
+        </div>
+      </DrawManagerProvider>
+    </ReactFlowProvider>
   );
 }

@@ -14,10 +14,10 @@ import { type SystemComponent } from "@/components/Gallery";
 //   successRate: Metric
 // }
 
-// type Connection = {
-//   source: string;
-//   target: string;
-// };
+type Connection<T = string> = {
+  source: T;
+  target: T;
+};
 
 // type SystemStats = {
 //   numberOfActiveUsers: number;
@@ -45,6 +45,7 @@ export type Level = {
   name: string;
   title: string;
   description: string;
+  preConnectedComponents: Connection<SystemComponent["name"]>[];
   // readingMaterial: string;
   components: SystemComponent["name"][];
   dashboard: Dashboard;

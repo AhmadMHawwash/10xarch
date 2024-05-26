@@ -1,4 +1,5 @@
 import "@/styles/globals.css";
+import "reactflow/dist/style.css";
 
 import { GeistSans } from "geist/font/sans";
 
@@ -18,7 +19,11 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${GeistSans.variable}`}>
       <body>
-        <TRPCReactProvider>{children}</TRPCReactProvider>
+        <TRPCReactProvider>
+          {/* <ReactFlowProvider> */}
+          {children}
+          {/* </ReactFlowProvider> */}
+        </TRPCReactProvider>
       </body>
     </html>
   );

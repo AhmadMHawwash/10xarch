@@ -1,0 +1,241 @@
+import { getSystemComponent, type SystemComponent } from "@/components/Gallery";
+import type { SystemComponentNodeDataProps } from "@/components/SystemComponentNode";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useRef,
+  useState,
+  type DragEventHandler,
+  type PropsWithChildren,
+} from "react";
+import {
+  addEdge,
+  applyEdgeChanges,
+  applyNodeChanges,
+  type Edge,
+  type Node,
+  type NodeChange,
+  type OnConnect,
+  type OnConnectEnd,
+  type OnConnectStart,
+  type OnEdgesChange,
+  type OnNodesChange,
+  type ReactFlowInstance,
+} from "reactflow";
+import { noop } from "@/lib/utils";
+
+interface DrawManagerState {
+  nodes: Node<SystemComponentNodeDataProps>[];
+  edges: Edge[];
+  initInstance: (instance: ReactFlowInstance) => void;
+  initWrapper: (wrapper: HTMLDivElement) => void;
+  initNodes: (nodes: Node[]) => void;
+  initEdges: (edges: Edge[]) => void;
+  onConnect: OnConnect;
+  onDragOver: DragEventHandler;
+  onDrop: DragEventHandler;
+  onNodesChange: OnNodesChange;
+  onEdgesChange: OnEdgesChange;
+  onConnectStart: OnConnectStart;
+  onConnectEnd: OnConnectEnd;
+}
+
+const DrawManagerContext = createContext<DrawManagerState>({
+  nodes: [],
+  edges: [],
+  initEdges: noop,
+  initNodes: noop,
+  initInstance: noop,
+  initWrapper: noop,
+  onConnect: noop,
+  onDragOver: noop,
+  onDrop: noop,
+  onNodesChange: noop,
+  onEdgesChange: noop,
+  onConnectStart: noop,
+  onConnectEnd: noop,
+});
+
+let id = 0;
+const getId = () => `dndnode_${id++}`;
+
+const componentTargets: Record<
+  SystemComponent["name"],
+  SystemComponent["name"][]
+> = {
+  Client: ["Server", "Load Balancer", "CDN"],
+  CDN: ["Load Balancer", "Server"],
+  "Load Balancer": ["Server"],
+  Server: ["Cache", "Database"],
+  Cache: [],
+  Database: [],
+};
+
+export const DrawManagerProvider = ({ children }: PropsWithChildren) => {
+  const reactFlowWrapper = useRef<HTMLDivElement>(null);
+  const [nodes, setNodes] = useState<Node<SystemComponentNodeDataProps>[]>([]);
+  const [edges, setEdges] = useState<Edge[]>([]);
+  const [reactFlowInstance, setReactFlowInstance] =
+    useState<ReactFlowInstance | null>(null);
+
+  const toast = (_x: unknown) => null;
+  // const toast = useToast();
+
+  const onConnect: OnConnect = useCallback(
+    (params) => {
+      const { source, target } = params;
+      const sourceNode = nodes.find((node) => node.id === source);
+      const targetNode = nodes.find((node) => node.id === target);
+
+      if (!sourceNode || !targetNode) return;
+
+      const targets = componentTargets[sourceNode?.data.name];
+      if (!targets.includes(targetNode?.data.name)) {
+        // toast(
+        //   warning({
+        //     title: `You cannot connect ${sourceNode?.data.name} to ${targetNode?.data.name}`,
+        //     position: "bottom",
+        //   }),
+        // );
+        return;
+      }
+
+      return setEdges((eds: Edge[]) =>
+        addEdge({ ...params, type: "CustomEdge" }, eds),
+      );
+    },
+    [nodes, toast],
+  );
+
+  const onConnectStart: OnConnectStart = useCallback(
+    (event, data) => {
+      const sourceNode = nodes.find((node) => node.id === data.nodeId);
+      if (!sourceNode) return;
+      const targets = componentTargets[sourceNode?.data.name];
+      const newNodes = nodes.map((node) => ({
+        ...node,
+        data: {
+          ...node.data,
+          withTargetHandle: targets.includes(node.data.name),
+        },
+      }));
+      setNodes(newNodes);
+    },
+    [nodes],
+  );
+
+  const onConnectEnd = useCallback(() => {
+    const newNodes = nodes.map((node) => ({
+      ...node,
+      data: {
+        ...node.data,
+        withTargetHandle: true,
+      },
+    }));
+    setNodes(newNodes);
+  }, [nodes]);
+
+  const onDragOver: DragEventHandler = useCallback((event) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move" as DataTransfer["dropEffect"];
+  }, []);
+
+  const onDrop: DragEventHandler = useCallback(
+    (event) => {
+      event.preventDefault();
+
+      if (!reactFlowInstance) return;
+
+      const reactFlowBounds = reactFlowWrapper.current?.getBoundingClientRect();
+      if (!reactFlowBounds) return;
+
+      const type: SystemComponent["name"] = event.dataTransfer.getData(
+        "application/reactflow",
+      ) as SystemComponent["name"];
+
+      // check if the dropped element is valid
+      if (!type) return;
+
+      const position = reactFlowInstance?.project({
+        x: event.clientX - reactFlowBounds.left,
+        y: event.clientY - reactFlowBounds.top,
+      });
+
+      const component = getSystemComponent(type);
+      if (!component) return;
+
+      const data: SystemComponentNodeDataProps = {
+        name: type,
+        icon: component.icon,
+        withTargetHandle: true,
+      };
+
+      const newNode = {
+        id: getId(),
+        type: "SystemComponentNode",
+        position,
+        data,
+      };
+
+      setNodes((nds) => nds.concat(newNode));
+    },
+    [reactFlowInstance],
+  );
+
+  const initNodes = useCallback((nodes: Node[]) => {
+    setNodes(nodes);
+  }, []);
+
+  const initEdges = useCallback((edges: Edge[]) => {
+    setEdges(edges);
+  }, []);
+
+  const initInstance = useCallback((instance: ReactFlowInstance) => {
+    setReactFlowInstance(instance);
+  }, []);
+
+  const initWrapper = useCallback((wrapper: HTMLDivElement) => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    reactFlowWrapper.current = wrapper;
+  }, []);
+
+  const onNodesChange: OnNodesChange = (changes: NodeChange[]) => {
+    const newNodes = applyNodeChanges(changes, nodes);
+
+    setNodes(newNodes);
+  };
+
+  const onEdgesChange: OnEdgesChange = (changes) => {
+    const newEdges = applyEdgeChanges(changes, edges);
+
+    setEdges(newEdges);
+  };
+
+  return (
+    <DrawManagerContext.Provider
+      value={{
+        onConnect,
+        onDragOver,
+        onDrop,
+        initInstance,
+        initNodes,
+        initEdges,
+        initWrapper,
+        onEdgesChange,
+        onNodesChange,
+        onConnectStart,
+        onConnectEnd,
+        edges,
+        nodes,
+      }}
+    >
+      {children}
+    </DrawManagerContext.Provider>
+  );
+};
+
+export const useDrawManager = () => {
+  return useContext(DrawManagerContext);
+};

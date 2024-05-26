@@ -13,6 +13,7 @@ import {
   addEdge,
   applyEdgeChanges,
   applyNodeChanges,
+  type ReactFlowJsonObject,
   type Edge,
   type Node,
   type NodeChange,
@@ -22,6 +23,7 @@ import {
   type OnEdgesChange,
   type OnNodesChange,
   type ReactFlowInstance,
+  useReactFlow,
 } from "reactflow";
 import { noop } from "@/lib/utils";
 
@@ -39,6 +41,8 @@ interface DrawManagerState {
   onEdgesChange: OnEdgesChange;
   onConnectStart: OnConnectStart;
   onConnectEnd: OnConnectEnd;
+  onSave: () => void;
+  onRestore: () => void;
 }
 
 const DrawManagerContext = createContext<DrawManagerState>({
@@ -55,6 +59,8 @@ const DrawManagerContext = createContext<DrawManagerState>({
   onEdgesChange: noop,
   onConnectStart: noop,
   onConnectEnd: noop,
+  onSave: noop,
+  onRestore: noop,
 });
 
 let id = 0;
@@ -78,6 +84,7 @@ export const DrawManagerProvider = ({ children }: PropsWithChildren) => {
   const [edges, setEdges] = useState<Edge[]>([]);
   const [reactFlowInstance, setReactFlowInstance] =
     useState<ReactFlowInstance | null>(null);
+  const { setViewport } = useReactFlow();
 
   const toast = (_x: unknown) => null;
   // const toast = useToast();
@@ -213,6 +220,31 @@ export const DrawManagerProvider = ({ children }: PropsWithChildren) => {
     setEdges(newEdges);
   };
 
+  const onSave = useCallback(() => {
+    if (reactFlowInstance) {
+      const flow = reactFlowInstance.toObject();
+      localStorage.setItem("reactflow", JSON.stringify(flow));
+      console.log(flow);
+    }
+  }, [reactFlowInstance]);
+
+  const onRestore = useCallback(() => {
+    const restoreFlow = async () => {
+      const flow: ReactFlowJsonObject = JSON.parse(
+        localStorage.getItem("reactflow") ?? "{}",
+      ) as ReactFlowJsonObject;
+
+      if (flow) {
+        const { x = 0, y = 0, zoom = 1 } = flow.viewport;
+        setNodes(flow.nodes || []);
+        setEdges(flow.edges || []);
+        setViewport({ x, y, zoom });
+      }
+    };
+
+    restoreFlow().catch(console.error);
+  }, [setViewport]);
+
   return (
     <DrawManagerContext.Provider
       value={{
@@ -227,6 +259,8 @@ export const DrawManagerProvider = ({ children }: PropsWithChildren) => {
         onNodesChange,
         onConnectStart,
         onConnectEnd,
+        onSave,
+        onRestore,
         edges,
         nodes,
       }}

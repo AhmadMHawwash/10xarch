@@ -38,6 +38,7 @@ export const SystemComponentNode: FC<
         className={cn(
           "flex flex-col items-center justify-center rounded-sm border border-gray-400 p-2",
           selected ? "bg-gray-300" : "bg-gray-100",
+          isEdgeBeingConnected && !withTargetHandle && "opacity-50",
         )}
       >
         {Icon && <Icon height="20px" width="20px" fill="#000" />}

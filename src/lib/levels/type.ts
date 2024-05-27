@@ -42,10 +42,15 @@ type Dashboard = {
 // };
 
 export type Level = {
+  id: string;
   name: string;
   title: string;
   description: string;
-  preConnectedComponents: Connection<SystemComponent["name"]>[];
+  preConnectedComponents: { type: SystemComponent["name"]; id: number }[];
+  preConnectedConnections: Connection<{
+    type: SystemComponent["name"];
+    id: number;
+  }>[];
   // readingMaterial: string;
   components: SystemComponent["name"][];
   dashboard: Dashboard;

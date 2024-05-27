@@ -1,5 +1,9 @@
-import { getSystemComponent, type SystemComponent } from "@/components/Gallery";
+import {
+  getSystemComponent,
+  type SystemComponent
+} from "@/components/Gallery";
 import type { SystemComponentNodeDataProps } from "@/components/SystemComponentNode";
+import { noop } from "@/lib/utils";
 import {
   createContext,
   useCallback,
@@ -13,7 +17,7 @@ import {
   addEdge,
   applyEdgeChanges,
   applyNodeChanges,
-  type ReactFlowJsonObject,
+  useReactFlow,
   type Edge,
   type Node,
   type NodeChange,
@@ -23,9 +27,10 @@ import {
   type OnEdgesChange,
   type OnNodesChange,
   type ReactFlowInstance,
-  useReactFlow,
+  type ReactFlowJsonObject,
 } from "reactflow";
-import { noop } from "@/lib/utils";
+import { create } from "zustand";
+import { SYSTEM_COMPONENT_NODE } from "./useLevelsManager";
 
 interface DrawManagerState {
   nodes: Node<SystemComponentNodeDataProps>[];
@@ -63,8 +68,19 @@ const DrawManagerContext = createContext<DrawManagerState>({
   onRestore: noop,
 });
 
-let id = 0;
-const getId = () => `dndnode_${id++}`;
+export const nodesNumberingStore = create<{
+  nodesCount: number;
+  getNextNodeId: () => number;
+  setNodesCount: (_x: number) => void;
+}>((set, get) => ({
+  nodesCount: 1,
+  getNextNodeId: () => {
+    const id = get().nodesCount;
+    set((state) => ({ nodesCount: state.nodesCount + 1 }));
+    return id;
+  },
+  setNodesCount: (count) => set({ nodesCount: count }),
+}));
 
 const componentTargets: Record<
   SystemComponent["name"],
@@ -115,6 +131,7 @@ export const DrawManagerProvider = ({ children }: PropsWithChildren) => {
     [nodes, toast],
   );
 
+  console.log(edges);
   const onConnectStart: OnConnectStart = useCallback(
     (event, data) => {
       const sourceNode = nodes.find((node) => node.id === data.nodeId);
@@ -157,30 +174,30 @@ export const DrawManagerProvider = ({ children }: PropsWithChildren) => {
       const reactFlowBounds = reactFlowWrapper.current?.getBoundingClientRect();
       if (!reactFlowBounds) return;
 
-      const type: SystemComponent["name"] = event.dataTransfer.getData(
+      const componentName: SystemComponent["name"] = event.dataTransfer.getData(
         "application/reactflow",
       ) as SystemComponent["name"];
 
-      // check if the dropped element is valid
-      if (!type) return;
+      if (!componentName) return;
 
       const position = reactFlowInstance?.project({
         x: event.clientX - reactFlowBounds.left,
         y: event.clientY - reactFlowBounds.top,
       });
 
-      const component = getSystemComponent(type);
+      const component = getSystemComponent(componentName);
       if (!component) return;
 
       const data: SystemComponentNodeDataProps = {
-        name: type,
+        name: componentName,
         icon: component.icon,
         withTargetHandle: true,
       };
 
-      const newNode = {
-        id: getId(),
-        type: "SystemComponentNode",
+      const newNode: Node<SystemComponentNodeDataProps> = {
+        id: nodesNumberingStore.getState().getNextNodeId().toString(),
+        // name: SYSTEM_COMPONENT_NODE,
+        type: SYSTEM_COMPONENT_NODE,
         position,
         data,
       };

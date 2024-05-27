@@ -6,8 +6,9 @@ import { MobileIcon } from "@/lib/icons/mobile";
 import { ServerIcon } from "@/lib/icons/server";
 import type { DragEvent } from "react";
 import { Lead } from "./ui/typography";
+import { type Level } from "@/lib/levels/type";
 
-type NodeType =
+export type SystemComponentName =
   | "Client"
   | "Server"
   | "Load Balancer"
@@ -16,7 +17,7 @@ type NodeType =
   | "SQL Database";
 
 export type SystemComponent = {
-  name: NodeType;
+  name: SystemComponentName;
   description: string;
   icon?: typeof MobileIcon;
 };
@@ -58,7 +59,7 @@ const components: SystemComponent[] = [
 ];
 
 const Gallery = () => {
-  const onDragStart = (event: DragEvent, nodeType: NodeType) => {
+  const onDragStart = (event: DragEvent, nodeType: SystemComponentName) => {
     event.dataTransfer.setData("application/reactflow", nodeType);
     event.dataTransfer.effectAllowed = "move";
   };
@@ -83,9 +84,9 @@ const Gallery = () => {
 
 export default Gallery;
 
-export const getSystemComponent = (name: SystemComponent["name"]) => {
+export const getSystemComponent = (type: SystemComponentName) => {
   const ComponentDetails = components.find(
-    (component) => component.name === name,
+    (component) => component.name === type,
   );
 
   return ComponentDetails;

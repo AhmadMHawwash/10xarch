@@ -1,63 +1,65 @@
-import { useMemo, useState } from "react";
+import { getSystemComponent, type SystemComponent } from "@/components/Gallery";
+import { useEffect, useRef, useState } from "react";
+import { MarkerType, type Edge, type Node } from "reactflow";
 import levels from "../levels";
-import { useDrawManager } from "./useDrawManager";
+import { type Level } from "../levels/type";
+import { nodesNumberingStore, useDrawManager } from "./useDrawManager";
 
+export const SYSTEM_COMPONENT_NODE = "SystemComponentNode";
 export const useLevelsManager = () => {
-  // const [userSolution, setUserSolution] = useState<
-  //   (typeof levels)[number]["solution"]["connect"]
-  // >([]);
-  const [currentLevel, setCurrentLevel] = useState(levels[0]);
-  const { nodes } = useDrawManager();
-  const nodesById = useMemo(
-    () =>
-      nodes.reduce(
-        (acc, node) => {
-          acc[node.id] = node;
-          return acc;
-        },
-        {} as Record<string, (typeof nodes)[number]>,
-      ),
-    [nodes],
+  const [currentLevel, setCurrentLevel] = useState<Level | undefined>(
+    levels[0],
   );
+  const isInitializedLevel = useRef<boolean>(false);
+  const { initNodes, initEdges } = useDrawManager();
 
-  const updateUserSolution = (connection: {
-    source: string;
-    target: string;
-  }) => {
-    // const levelId = currentLevel?.id;
-    // const level = levels.find((level) => level.id === levelId);
-    // if (!level) return;
+  useEffect(() => {
+    if (isInitializedLevel.current) return;
 
-    // setUserSolution((userSolution) => {
-    //   const updatedSolution = [...userSolution, connection];
-    //   if (updatedSolution.length === level.solution.connect.length) {
-    //     debugger;
-    //     const isLevelSolved = updatedSolution.every((connection) => {
-    //       const sourceNodeType = nodesById[connection.source]?.data?.name;
-    //       const targetNodeType = nodesById[connection.target]?.data?.name;
-    //       return level.solution.connect.find(
-    //         (solutionConnection) =>
-    //           solutionConnection.source === sourceNodeType &&
-    //           solutionConnection.target === targetNodeType,
-    //       );
-    //     });
-    //     console.log({ isLevelSolved });
-    //     // if (isLevelSolved) {
-    //     //   const nextLevel = levels.find(
-    //     //     (level) => level.id === currentLevel?.nextLevelId
-    //     //   );
-    //     //   if (nextLevel) {
-    //     //     setCurrentLevel(nextLevel);
-    //     //     setUserSolution([]);
-    //     //   }
-    //     // }
-    //   }
-    //   return updatedSolution;
-    // });
-  };
+    isInitializedLevel.current = true;
+
+    const nodes: Node<{
+      name: SystemComponent["name"];
+      icon: unknown;
+      id: number;
+      withTargetHandle: boolean;
+    }>[] =
+      currentLevel?.preConnectedComponents.map((component, index) => {
+        const systemComponent = getSystemComponent(component.type)!;
+
+        return {
+          data: {
+            id: component.id,
+            name: systemComponent?.name,
+            icon: systemComponent?.icon,
+            withTargetHandle: true,
+          },
+          id: `${systemComponent?.name}_${nodesNumberingStore.getState().getNextNodeId()}`,
+          type: SYSTEM_COMPONENT_NODE,
+          position: { x: 100 + index * 100, y: 100 },
+        };
+      }) ?? [];
+    initNodes(nodes);
+    const edges: Edge[] =
+      currentLevel?.preConnectedConnections.map(({ source, target }) => {
+        const x = `${source.type}_${source.id}`;
+        const y = `${target.type}_${target.id}`;
+        return {
+          id: `${x} -to- ${y}`,
+          source: x,
+          target: y,
+          type: "CustomEdge",
+          animated: true,
+          markerEnd: { type: MarkerType.ArrowClosed },
+        };
+      }) ?? [];
+
+    initEdges(edges);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return {
-    updateUserSolution,
     level: currentLevel,
+    toNextLevel: () => setCurrentLevel(levels[1]),
   };
 };

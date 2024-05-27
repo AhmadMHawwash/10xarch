@@ -23,6 +23,7 @@ import Gallery from "./Gallery";
 import SystemComponentNode from "./SystemComponentNode";
 import { Dashboard } from "./SystemDashboard";
 import { Button } from "./ui/button";
+import { useLevelsManager } from "@/lib/hooks/useLevelsManager";
 
 const nodeTypes: Record<string, ComponentType<NodeProps>> = {
   SystemComponentNode: SystemComponentNode,
@@ -48,7 +49,7 @@ const SystemDesigner = () => {
     onSave,
   } = useDrawManager();
 
-  // const { updateUserSolution } = useLevelsManager();
+  const { level } = useLevelsManager();
 
   const handleConnect: OnConnect = (params) => {
     const { source, target } = params;
@@ -59,7 +60,7 @@ const SystemDesigner = () => {
   };
 
   return (
-    <div className="relative h-full flex-grow" ref={initWrapper}>
+    <div className="relative flex h-full flex-grow flex-col" ref={initWrapper}>
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -102,9 +103,7 @@ export default function SystemBuilder() {
   return (
     <ReactFlowProvider>
       <DrawManagerProvider>
-        <div className="flex h-full flex-grow flex-col">
-          <SystemDesigner />
-        </div>
+        <SystemDesigner />
       </DrawManagerProvider>
     </ReactFlowProvider>
   );

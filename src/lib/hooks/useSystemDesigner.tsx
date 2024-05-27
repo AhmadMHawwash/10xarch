@@ -1,7 +1,4 @@
-import {
-  getSystemComponent,
-  type SystemComponent
-} from "@/components/Gallery";
+import { getSystemComponent, type SystemComponent } from "@/components/Gallery";
 import type { SystemComponentNodeDataProps } from "@/components/SystemComponentNode";
 import { noop } from "@/lib/utils";
 import {
@@ -32,7 +29,7 @@ import {
 import { create } from "zustand";
 import { SYSTEM_COMPONENT_NODE } from "./useLevelsManager";
 
-interface DrawManagerState {
+interface SystemDesignerState {
   nodes: Node<SystemComponentNodeDataProps>[];
   edges: Edge[];
   initInstance: (instance: ReactFlowInstance) => void;
@@ -48,9 +45,10 @@ interface DrawManagerState {
   onConnectEnd: OnConnectEnd;
   onSave: () => void;
   onRestore: () => void;
+  isEdgeBeingConnected?: boolean;
 }
 
-const DrawManagerContext = createContext<DrawManagerState>({
+const SystemDesignerContext = createContext<SystemDesignerState>({
   nodes: [],
   edges: [],
   initEdges: noop,
@@ -94,13 +92,14 @@ const componentTargets: Record<
   "SQL Database": [],
 };
 
-export const DrawManagerProvider = ({ children }: PropsWithChildren) => {
+export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [nodes, setNodes] = useState<Node<SystemComponentNodeDataProps>[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
   const [reactFlowInstance, setReactFlowInstance] =
     useState<ReactFlowInstance | null>(null);
   const { setViewport } = useReactFlow();
+  const [isEdgeBeingConnected, setIsEdgeBeingConnected] = useState(false);
 
   const toast = (_x: unknown) => null;
   // const toast = useToast();
@@ -131,7 +130,6 @@ export const DrawManagerProvider = ({ children }: PropsWithChildren) => {
     [nodes, toast],
   );
 
-  console.log(edges);
   const onConnectStart: OnConnectStart = useCallback(
     (event, data) => {
       const sourceNode = nodes.find((node) => node.id === data.nodeId);
@@ -145,6 +143,7 @@ export const DrawManagerProvider = ({ children }: PropsWithChildren) => {
         },
       }));
       setNodes(newNodes);
+      setIsEdgeBeingConnected(true);
     },
     [nodes],
   );
@@ -158,6 +157,7 @@ export const DrawManagerProvider = ({ children }: PropsWithChildren) => {
       },
     }));
     setNodes(newNodes);
+    setIsEdgeBeingConnected(false);
   }, [nodes]);
 
   const onDragOver: DragEventHandler = useCallback((event) => {
@@ -196,7 +196,6 @@ export const DrawManagerProvider = ({ children }: PropsWithChildren) => {
 
       const newNode: Node<SystemComponentNodeDataProps> = {
         id: nodesNumberingStore.getState().getNextNodeId().toString(),
-        // name: SYSTEM_COMPONENT_NODE,
         type: SYSTEM_COMPONENT_NODE,
         position,
         data,
@@ -263,7 +262,7 @@ export const DrawManagerProvider = ({ children }: PropsWithChildren) => {
   }, [setViewport]);
 
   return (
-    <DrawManagerContext.Provider
+    <SystemDesignerContext.Provider
       value={{
         onConnect,
         onDragOver,
@@ -280,13 +279,14 @@ export const DrawManagerProvider = ({ children }: PropsWithChildren) => {
         onRestore,
         edges,
         nodes,
+        isEdgeBeingConnected,
       }}
     >
       {children}
-    </DrawManagerContext.Provider>
+    </SystemDesignerContext.Provider>
   );
 };
 
-export const useDrawManager = () => {
-  return useContext(DrawManagerContext);
+export const useSystemDesigner = () => {
+  return useContext(SystemDesignerContext);
 };

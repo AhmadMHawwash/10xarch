@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { MarkerType, type Edge, type Node } from "reactflow";
 import levels from "../levels";
 import { type Level } from "../levels/type";
-import { nodesNumberingStore, useDrawManager } from "./useDrawManager";
+import { nodesNumberingStore, useSystemDesigner } from "./useSystemDesigner";
 
 export const SYSTEM_COMPONENT_NODE = "SystemComponentNode";
 export const useLevelsManager = () => {
@@ -11,7 +11,7 @@ export const useLevelsManager = () => {
     levels[0],
   );
   const isInitializedLevel = useRef<boolean>(false);
-  const { initNodes, initEdges } = useDrawManager();
+  const { initNodes, initEdges } = useSystemDesigner();
 
   useEffect(() => {
     if (isInitializedLevel.current) return;

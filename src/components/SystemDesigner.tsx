@@ -1,8 +1,8 @@
 "use client";
 import {
-  DrawManagerProvider,
-  useDrawManager,
-} from "@/lib/hooks/useDrawManager";
+  SystemDesignerProvider,
+  useSystemDesigner as useSystemDesigner,
+} from "@/lib/hooks/useSystemDesigner";
 import { type ComponentType } from "react";
 import ReactFlow, {
   Background,
@@ -47,7 +47,7 @@ const SystemDesigner = () => {
     onConnectStart,
     onConnectEnd,
     onSave,
-  } = useDrawManager();
+  } = useSystemDesigner();
 
   const { level } = useLevelsManager();
 
@@ -102,9 +102,9 @@ const SystemDesigner = () => {
 export default function SystemBuilder() {
   return (
     <ReactFlowProvider>
-      <DrawManagerProvider>
+      <SystemDesignerProvider>
         <SystemDesigner />
-      </DrawManagerProvider>
+      </SystemDesignerProvider>
     </ReactFlowProvider>
   );
 }

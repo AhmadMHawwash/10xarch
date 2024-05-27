@@ -132,14 +132,27 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
 
   const onConnectStart: OnConnectStart = useCallback(
     (event, data) => {
+      console.log(data);
       const sourceNode = nodes.find((node) => node.id === data.nodeId);
       if (!sourceNode) return;
+      const isSource = data.handleType === "source";
+      const isTarget = !isSource;
+
       const targets = componentTargets[sourceNode?.data.name];
+      const sources = Object.entries(componentTargets).reduce(
+        (acc, [key, value]) => {
+          if (value.includes(sourceNode.data.name)) acc.push(key);
+          return acc;
+        },
+        [] as string[],
+      );
+
       const newNodes = nodes.map((node) => ({
         ...node,
         data: {
           ...node.data,
-          withTargetHandle: targets.includes(node.data.name),
+          withTargetHandle: isSource && targets.includes(node.data.name),
+          withSourceHandle: isTarget && sources.includes(node.data.name),
         },
       }));
       setNodes(newNodes);
@@ -154,6 +167,7 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
       data: {
         ...node.data,
         withTargetHandle: true,
+        withSourceHandle: true,
       },
     }));
     setNodes(newNodes);
@@ -188,14 +202,17 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
       const component = getSystemComponent(componentName);
       if (!component) return;
 
+      const nextNodeId = nodesNumberingStore.getState().getNextNodeId();
       const data: SystemComponentNodeDataProps = {
         name: componentName,
         icon: component.icon,
         withTargetHandle: true,
+        withSourceHandle: true,
+        id: nextNodeId,
       };
 
       const newNode: Node<SystemComponentNodeDataProps> = {
-        id: nodesNumberingStore.getState().getNextNodeId().toString(),
+        id: nextNodeId.toString(),
         type: SYSTEM_COMPONENT_NODE,
         position,
         data,
@@ -240,7 +257,6 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
     if (reactFlowInstance) {
       const flow = reactFlowInstance.toObject();
       localStorage.setItem("reactflow", JSON.stringify(flow));
-      console.log(flow);
     }
   }, [reactFlowInstance]);
 

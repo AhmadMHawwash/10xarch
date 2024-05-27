@@ -1,6 +1,12 @@
-import { getSystemComponent, type SystemComponent } from "@/components/Gallery";
+import { getSystemComponent } from "@/components/Gallery";
+import { type SystemComponentNodeDataProps } from "@/components/SystemComponentNode";
 import { useEffect, useRef, useState } from "react";
-import { MarkerType, type Edge, type Node } from "reactflow";
+import {
+  MarkerType,
+  type Edge,
+  type Node,
+  type ReactFlowJsonObject,
+} from "reactflow";
 import levels from "../levels";
 import { type Level } from "../levels/type";
 import { nodesNumberingStore, useSystemDesigner } from "./useSystemDesigner";
@@ -11,19 +17,14 @@ export const useLevelsManager = () => {
     levels[0],
   );
   const isInitializedLevel = useRef<boolean>(false);
-  const { initNodes, initEdges } = useSystemDesigner();
+  const { initNodes, initEdges, nodes, edges } = useSystemDesigner();
 
   useEffect(() => {
     if (isInitializedLevel.current) return;
 
     isInitializedLevel.current = true;
 
-    const nodes: Node<{
-      name: SystemComponent["name"];
-      icon: unknown;
-      id: number;
-      withTargetHandle: boolean;
-    }>[] =
+    const nodes: Node<SystemComponentNodeDataProps>[] =
       currentLevel?.preConnectedComponents.map((component, index) => {
         const systemComponent = getSystemComponent(component.type)!;
 
@@ -33,6 +34,7 @@ export const useLevelsManager = () => {
             name: systemComponent?.name,
             icon: systemComponent?.icon,
             withTargetHandle: true,
+            withSourceHandle: true,
           },
           id: `${systemComponent?.name}_${nodesNumberingStore.getState().getNextNodeId()}`,
           type: SYSTEM_COMPONENT_NODE,
@@ -58,8 +60,31 @@ export const useLevelsManager = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const checkSolution = () => {
+    const cleaned = cleanup({ nodes, edges });
+
+    console.log(JSON.stringify({ ...currentLevel, userProvidedSolution: cleaned }));
+  };
+
   return {
     level: currentLevel,
     toNextLevel: () => setCurrentLevel(levels[1]),
+    checkSolution,
   };
+};
+
+const cleanup = (
+  flow: Omit<ReactFlowJsonObject<SystemComponentNodeDataProps>, "viewport">,
+) => {
+  const nodes = flow.nodes.map((node) => ({
+    type: node.data.name,
+    id: node.id,
+  }));
+
+  const edges = flow.edges.map((edge) => ({
+    sourceId: edge.source,
+    targetId: edge.target,
+  }));
+
+  return { nodes, edges };
 };

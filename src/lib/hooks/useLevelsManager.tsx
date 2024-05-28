@@ -9,7 +9,13 @@ import {
 } from "reactflow";
 import levels from "../levels";
 import { type Level } from "../levels/type";
-import { nodesNumberingStore, useSystemDesigner } from "./useSystemDesigner";
+import {
+  extractIdAndType,
+  makeKey,
+  nodesNumberingStore,
+  useSystemDesigner,
+} from "./useSystemDesigner";
+import { api } from "@/trpc/react";
 
 export const SYSTEM_COMPONENT_NODE = "SystemComponentNode";
 export const useLevelsManager = () => {
@@ -32,11 +38,15 @@ export const useLevelsManager = () => {
           data: {
             id: component.id,
             name: systemComponent?.name,
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             icon: systemComponent?.icon,
             withTargetHandle: true,
             withSourceHandle: true,
           },
-          id: `${systemComponent?.name}_${nodesNumberingStore.getState().getNextNodeId()}`,
+          id: makeKey(
+            nodesNumberingStore.getState().getNextNodeId(),
+            systemComponent?.name,
+          ),
           type: SYSTEM_COMPONENT_NODE,
           position: { x: 100 + index * 100, y: 100 },
         };
@@ -44,8 +54,8 @@ export const useLevelsManager = () => {
     initNodes(nodes);
     const edges: Edge[] =
       currentLevel?.preConnectedConnections.map(({ source, target }) => {
-        const x = `${source.type}_${source.id}`;
-        const y = `${target.type}_${target.id}`;
+        const x = source.id;
+        const y = target.id;
         return {
           id: `${x} -to- ${y}`,
           source: x,
@@ -59,11 +69,16 @@ export const useLevelsManager = () => {
     initEdges(edges);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  const { data, mutate } = api.ai.hello.useMutation();
+  console.log(data?.content)
 
-  const checkSolution = () => {
+  const checkSolution = async () => {
     const cleaned = cleanup({ nodes, edges });
 
-    console.log(JSON.stringify({ ...currentLevel, userProvidedSolution: cleaned }));
+    mutate({
+      level: currentLevel!,
+      userSolution: { components: cleaned.nodes, connections: cleaned.edges },
+    });
   };
 
   return {
@@ -74,17 +89,27 @@ export const useLevelsManager = () => {
 };
 
 const cleanup = (
-  flow: Omit<ReactFlowJsonObject<SystemComponentNodeDataProps>, "viewport">,
+  flow: Omit<
+    ReactFlowJsonObject<SystemComponentNodeDataProps, { name: string }>,
+    "viewport"
+  >,
 ) => {
   const nodes = flow.nodes.map((node) => ({
     type: node.data.name,
     id: node.id,
   }));
 
-  const edges = flow.edges.map((edge) => ({
-    sourceId: edge.source,
-    targetId: edge.target,
-  }));
+  const edges = flow.edges.map((edge) => {
+    const { id: targetId, type: targetType } = extractIdAndType(edge.target);
+    const { id: sourceId, type: sourceType } = extractIdAndType(edge.source);
+    return {
+      source: {
+        id: sourceId,
+        type: sourceType,
+      },
+      target: { id: targetId, type: targetType },
+    };
+  });
 
   return { nodes, edges };
 };

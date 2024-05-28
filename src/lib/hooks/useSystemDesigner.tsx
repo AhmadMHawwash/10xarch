@@ -1,4 +1,4 @@
-import { getSystemComponent, type SystemComponent } from "@/components/Gallery";
+import { getSystemComponent } from "@/components/Gallery";
 import type { SystemComponentNodeDataProps } from "@/components/SystemComponentNode";
 import { noop } from "@/lib/utils";
 import {
@@ -28,6 +28,7 @@ import {
 } from "reactflow";
 import { create } from "zustand";
 import { SYSTEM_COMPONENT_NODE } from "./useLevelsManager";
+import { type SystemComponent } from "../levels/type";
 
 interface SystemDesignerState {
   nodes: Node<SystemComponentNodeDataProps>[];
@@ -65,6 +66,17 @@ const SystemDesignerContext = createContext<SystemDesignerState>({
   onSave: noop,
   onRestore: noop,
 });
+
+export const makeKey = (id: number, type: string) => `${type}_${id}`;
+export const extractIdAndType = (
+  key: string,
+): {
+  id: string;
+  type: SystemComponent["name"];
+} => {
+  const [type, id] = key.split("_");
+  return { id: id!, type: type as SystemComponent["name"] };
+};
 
 export const nodesNumberingStore = create<{
   nodesCount: number;
@@ -132,7 +144,6 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
 
   const onConnectStart: OnConnectStart = useCallback(
     (event, data) => {
-      console.log(data);
       const sourceNode = nodes.find((node) => node.id === data.nodeId);
       if (!sourceNode) return;
       const isSource = data.handleType === "source";
@@ -205,14 +216,15 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
       const nextNodeId = nodesNumberingStore.getState().getNextNodeId();
       const data: SystemComponentNodeDataProps = {
         name: componentName,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         icon: component.icon,
         withTargetHandle: true,
         withSourceHandle: true,
-        id: nextNodeId,
+        id: makeKey(nextNodeId, componentName),
       };
 
       const newNode: Node<SystemComponentNodeDataProps> = {
-        id: nextNodeId.toString(),
+        id: makeKey(nextNodeId, componentName),
         type: SYSTEM_COMPONENT_NODE,
         position,
         data,

@@ -1,67 +1,65 @@
-import { type SystemComponent } from "@/components/Gallery";
+import { z } from "zod";
 
-// type Metric = {
-//   value: number;
-//   label: string;
-// };
-
-// type DashboardContent = {
-//   status?: "red" | "green" | "recovering";
-//   info?: string;
-//   components?: DashboardContent[];
-//   responseTimeInSec: Metric
-//   requestsPerSec: Metric
-//   successRate: Metric
-// }
-
-type Connection<T = string> = {
+export type Connection<T = string> = {
   source: T;
   target: T;
 };
 
-// type SystemStats = {
-//   numberOfActiveUsers: number;
-//   numberOfCountries: number;
-//   costForCurrentSystemDesign: string;
-// };
+const componentsListSchema = z.enum([
+  "Client",
+  "Server",
+  "Load Balancer",
+  "Cache",
+  "CDN",
+  "SQL Database",
+]);
 
-// type GenericStats = {
-//   requestsPerSec: number;
-//   successRate: string;
-//   latency: string;
-// };
+const keyValueSchema = z.object({
+  key: z.string(),
+  value: z.string(),
+});
 
-type Dashboard = {
-  // currentSystemStats: SystemStats;
-  problems: string[];
-  // genericStats: GenericStats;
-};
+const componentSchema = z.object({
+  id: z.string(),
+  type: componentsListSchema,
+});
 
-// type Solution = {
-//   connect: Connection[];
-// };
+const connectionSchema = z.object({
+  source: componentSchema,
+  target: componentSchema,
+});
 
-export type Level = {
-  id: string;
-  name: string;
-  title: string;
-  description: string;
-  preConnectedComponents: { type: SystemComponent["name"]; id: number }[];
-  preConnectedConnections: Connection<{
-    type: SystemComponent["name"];
-    id: number;
-  }>[];
-  // readingMaterial: string;
-  components: SystemComponent["name"][];
-  dashboard: Dashboard;
-  // solution: Solution;
-  // updatedDashboard: {
-  //   numberOfActiveUsers: number;
-  //   serverUtilization: string[];
-  //   cacheUtilization?: string;
-  //   databaseUtilization: string;
-  //   cdnUtilization?: string;
-  //   costForCurrentSystemDesign: string;
-  //   latency: string;
-  // };
-};
+export const levelSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  title: z.string(),
+  description: z.string(),
+  preConnectedComponents: z.array(componentSchema),
+  preConnectedConnections: z.array(connectionSchema),
+  components: z.array(z.string()),
+  dashboard: z.object({
+    beforeStartingLevel: z.object({
+      reports: z.array(keyValueSchema),
+      stats: z.array(keyValueSchema),
+    }),
+    afterStartingLevel: z.object({
+      reports: z.array(keyValueSchema),
+      stats: z.array(keyValueSchema),
+    }),
+  }),
+});
+
+export const userSolutionSchema = z.object({
+  components: z.array(componentSchema),
+  connections: z.array(connectionSchema),
+});
+
+const systemComponentSchema = z.object({
+  name: componentsListSchema,
+  description: z.string(),
+  icon: z.any(),
+});
+
+export type Level = z.infer<typeof levelSchema>;
+export type UserSolution = z.infer<typeof userSolutionSchema>;
+export type SystemComponent = z.infer<typeof systemComponentSchema>;

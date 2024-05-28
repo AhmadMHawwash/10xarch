@@ -4,9 +4,9 @@ import { DatabaseIcon } from "@/lib/icons/database";
 import { LoadBalancerIcon } from "@/lib/icons/load-balancer";
 import { MobileIcon } from "@/lib/icons/mobile";
 import { ServerIcon } from "@/lib/icons/server";
+import { type SystemComponent } from "@/lib/levels/type";
 import type { DragEvent } from "react";
 import { Lead } from "./ui/typography";
-import { type Level } from "@/lib/levels/type";
 
 export type SystemComponentName =
   | "Client"
@@ -15,12 +15,6 @@ export type SystemComponentName =
   | "Cache"
   | "CDN"
   | "SQL Database";
-
-export type SystemComponent = {
-  name: SystemComponentName;
-  description: string;
-  icon?: typeof MobileIcon;
-};
 
 const components: SystemComponent[] = [
   {

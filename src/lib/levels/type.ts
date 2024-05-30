@@ -46,7 +46,7 @@ export const levelSchema = z.object({
       reports: z.array(keyValueSchema),
       stats: z.array(keyValueSchema),
     }),
-  }),
+  }).optional(),
 });
 
 export const userSolutionSchema = z.object({

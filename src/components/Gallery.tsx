@@ -16,41 +16,41 @@ export type SystemComponentName =
   | "CDN"
   | "SQL Database";
 
-const components: SystemComponent[] = [
-  {
+const components: Record<SystemComponentName, SystemComponent> = {
+  Client: {
     name: "Client",
     description:
       "A client is a device that connects to the server and requests data from it.",
     icon: MobileIcon,
   },
-  {
+  Server: {
     name: "Server",
     description:
       "A server is a device that receives requests from clients and sends data back to them.",
     icon: ServerIcon,
   },
-  {
+  "Load Balancer": {
     name: "Load Balancer",
     description:
       "A load balancer is a device that distributes incoming network traffic across multiple servers.",
     icon: LoadBalancerIcon,
   },
-  {
+  Cache: {
     name: "Cache",
     description: "A cache is a device that stores data for future use.",
     icon: CacheIcon,
   },
-  {
+  CDN: {
     name: "CDN",
     description: "A cache is a device that stores data for future use.",
     icon: CDNIcon,
   },
-  {
+  "SQL Database": {
     name: "SQL Database",
     description: "A database is a device that stores data for future use.",
     icon: DatabaseIcon,
   },
-];
+};
 
 const Gallery = () => {
   const onDragStart = (event: DragEvent, nodeType: SystemComponentName) => {
@@ -61,7 +61,7 @@ const Gallery = () => {
   return (
     <div className="absolute left-0 top-0 m-2 h-fit w-fit flex-col rounded-md border border-gray-200 bg-gray-50 bg-opacity-70 p-2">
       <Lead className="h-fit">Components</Lead>
-      {components.map(({ name, icon: Icon }) => (
+      {Object.values(components).map(({ name, icon: Icon }) => (
         <div
           key={name}
           className="my-1 flex cursor-grab items-center rounded-md border border-gray-200 bg-gray-50 bg-opacity-70 p-2"
@@ -79,9 +79,5 @@ const Gallery = () => {
 export default Gallery;
 
 export const getSystemComponent = (type: SystemComponentName) => {
-  const ComponentDetails = components.find(
-    (component) => component.name === type,
-  );
-
-  return ComponentDetails;
+  return components[type];
 };

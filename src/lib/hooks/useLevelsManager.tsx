@@ -1,5 +1,6 @@
 import { getSystemComponent } from "@/components/Gallery";
 import { type SystemComponentNodeDataProps } from "@/components/SystemComponentNode";
+import { api } from "@/trpc/react";
 import { useEffect, useRef, useState } from "react";
 import {
   MarkerType,
@@ -9,13 +10,7 @@ import {
 } from "reactflow";
 import levels from "../levels";
 import { type Level } from "../levels/type";
-import {
-  extractIdAndType,
-  makeKey,
-  nodesNumberingStore,
-  useSystemDesigner,
-} from "./useSystemDesigner";
-import { api } from "@/trpc/react";
+import { extractIdAndType, useSystemDesigner } from "./useSystemDesigner";
 
 export const SYSTEM_COMPONENT_NODE = "SystemComponentNode";
 export const useLevelsManager = () => {
@@ -31,35 +26,33 @@ export const useLevelsManager = () => {
     isInitializedLevel.current = true;
 
     const nodes: Node<SystemComponentNodeDataProps>[] =
-      currentLevel?.preConnectedComponents.map((component, index) => {
-        const systemComponent = getSystemComponent(component.type)!;
+      currentLevel?.preConnectedComponents
+        .filter((x) => x.type)
+        .map((component, index) => {
+          const systemComponent = getSystemComponent(component.type);
 
-        return {
-          data: {
-            id: component.id,
-            name: systemComponent?.name,
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            icon: systemComponent?.icon,
-            withTargetHandle: true,
-            withSourceHandle: true,
-          },
-          id: makeKey(
-            nodesNumberingStore.getState().getNextNodeId(),
-            systemComponent?.name,
-          ),
-          type: SYSTEM_COMPONENT_NODE,
-          position: { x: 100 + index * 100, y: 100 },
-        };
-      }) ?? [];
+          const id = component.id;
+          return {
+            data: {
+              id,
+              name: systemComponent?.name,
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+              icon: systemComponent?.icon,
+              withTargetHandle: true,
+              withSourceHandle: true,
+            },
+            id,
+            type: SYSTEM_COMPONENT_NODE,
+            position: { x: 100 + index * 100, y: 100 },
+          };
+        }) ?? [];
     initNodes(nodes);
     const edges: Edge[] =
       currentLevel?.preConnectedConnections.map(({ source, target }) => {
-        const x = source.id;
-        const y = target.id;
         return {
-          id: `${x} -to- ${y}`,
-          source: x,
-          target: y,
+          id: `${source.id} -> ${target.id}`,
+          source: source.id,
+          target: target.id,
           type: "CustomEdge",
           animated: true,
           markerEnd: { type: MarkerType.ArrowClosed },
@@ -70,14 +63,22 @@ export const useLevelsManager = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const { data, mutate } = api.ai.hello.useMutation();
-  console.log(data?.content)
+  navigator.clipboard.writeText(JSON.stringify(data));
+  console.log(data);
 
   const checkSolution = async () => {
     const cleaned = cleanup({ nodes, edges });
 
+    // await navigator.clipboard.writeText(
+    //   JSON.stringify({
+    //     level: currentLevel!,
+    //     userSolution: { components: cleaned.nodes, connections: cleaned.edges },
+    //   }),
+    // );
     mutate({
       level: currentLevel!,
       userSolution: { components: cleaned.nodes, connections: cleaned.edges },
+      tree: cleaned.edges,
     });
   };
 
@@ -100,16 +101,67 @@ const cleanup = (
   }));
 
   const edges = flow.edges.map((edge) => {
-    const { id: targetId, type: targetType } = extractIdAndType(edge.target);
-    const { id: sourceId, type: sourceType } = extractIdAndType(edge.source);
+    const { type: targetType } = extractIdAndType(edge.target);
+    const { type: sourceType } = extractIdAndType(edge.source);
     return {
       source: {
-        id: sourceId,
+        id: edge.source,
         type: sourceType,
       },
-      target: { id: targetId, type: targetType },
+      target: { id: edge.target, type: targetType },
     };
   });
 
   return { nodes, edges };
 };
+
+// interface Node {
+//   id: string;
+//   type: string;
+//   children: Node[];
+// }
+
+// interface Edge {
+//   source: { id: string; type: string };
+//   target: { id: string; type: string };
+// }
+
+// function buildTree(edges: Edge[]): Node[] {
+//   const nodesMap = new Map<string, Node>();
+
+//   // Create nodes
+//   edges.forEach(({ source, target }) => {
+//     if (!nodesMap.has(source.id)) {
+//       nodesMap.set(source.id, {
+//         id: source.id,
+//         type: source.type,
+//         children: [],
+//       });
+//     }
+//     if (!nodesMap.has(target.id)) {
+//       nodesMap.set(target.id, {
+//         id: target.id,
+//         type: target.type,
+//         children: [],
+//       });
+//     }
+//   });
+
+//   // Build tree
+//   edges.forEach(({ source, target }) => {
+//     const sourceNode = nodesMap.get(source.id)!;
+//     const targetNode = nodesMap.get(target.id)!;
+//     sourceNode.children.push(targetNode);
+//   });
+
+//   // Find roots
+//   const roots: Node[] = [];
+//   nodesMap.forEach((node) => {
+//     const isRoot = edges.every(({ target }) => target.id !== node.id);
+//     if (isRoot) {
+//       roots.push(node);
+//     }
+//   });
+
+//   return roots;
+// }

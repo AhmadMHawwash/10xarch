@@ -26,9 +26,9 @@ import {
   type ReactFlowInstance,
   type ReactFlowJsonObject,
 } from "reactflow";
-import { create } from "zustand";
-import { SYSTEM_COMPONENT_NODE } from "./useLevelsManager";
+import { componentsNumberingStore } from "../levels/loadBalancing";
 import { type SystemComponent } from "../levels/type";
+import { SYSTEM_COMPONENT_NODE } from "./useLevelsManager";
 
 interface SystemDesignerState {
   nodes: Node<SystemComponentNodeDataProps>[];
@@ -67,30 +67,16 @@ const SystemDesignerContext = createContext<SystemDesignerState>({
   onRestore: noop,
 });
 
-export const makeKey = (id: number, type: string) => `${type}_${id}`;
+export const makeKey = (id: number, type: string) => `${type}-${id}`;
 export const extractIdAndType = (
   key: string,
 ): {
   id: string;
   type: SystemComponent["name"];
 } => {
-  const [type, id] = key.split("_");
+  const [type, id] = key.split("-");
   return { id: id!, type: type as SystemComponent["name"] };
 };
-
-export const nodesNumberingStore = create<{
-  nodesCount: number;
-  getNextNodeId: () => number;
-  setNodesCount: (_x: number) => void;
-}>((set, get) => ({
-  nodesCount: 1,
-  getNextNodeId: () => {
-    const id = get().nodesCount;
-    set((state) => ({ nodesCount: state.nodesCount + 1 }));
-    return id;
-  },
-  setNodesCount: (count) => set({ nodesCount: count }),
-}));
 
 const componentTargets: Record<
   SystemComponent["name"],
@@ -213,18 +199,18 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
       const component = getSystemComponent(componentName);
       if (!component) return;
 
-      const nextNodeId = nodesNumberingStore.getState().getNextNodeId();
+      const id = componentsNumberingStore.getState().getNextId(componentName);
       const data: SystemComponentNodeDataProps = {
         name: componentName,
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         icon: component.icon,
         withTargetHandle: true,
         withSourceHandle: true,
-        id: makeKey(nextNodeId, componentName),
+        id,
       };
 
       const newNode: Node<SystemComponentNodeDataProps> = {
-        id: makeKey(nextNodeId, componentName),
+        id,
         type: SYSTEM_COMPONENT_NODE,
         position,
         data,
@@ -235,6 +221,7 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
     [reactFlowInstance],
   );
 
+  console.log({ nodes, edges });
   const initNodes = useCallback((nodes: Node[]) => {
     setNodes(nodes);
   }, []);

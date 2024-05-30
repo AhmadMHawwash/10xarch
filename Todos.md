@@ -10,3 +10,4 @@ Todos:
 [ ] Buy credit hints (AI hints)
 [ ] auto local save
 [ ] what could happen if I modified this or that? (ask AI so it helps you understand more the system design)
+[ ] wait list (so we can scale gracefully)

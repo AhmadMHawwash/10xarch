@@ -122,7 +122,14 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
       }
 
       return setEdges((eds: Edge[]) =>
-        addEdge({ ...params, type: "CustomEdge" }, eds),
+        addEdge(
+          {
+            ...params,
+            id: `${sourceNode.id} -> ${targetNode.id}`,
+            type: "CustomEdge",
+          },
+          eds,
+        ),
       );
     },
     [nodes, toast],

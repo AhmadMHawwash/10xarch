@@ -63,8 +63,9 @@ export const useLevelsManager = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const { data, mutate } = api.ai.hello.useMutation();
-  navigator.clipboard.writeText(JSON.stringify(data));
-  console.log(data);
+  setTimeout(() => {
+    void navigator.clipboard.writeText(JSON.stringify(data));
+  }, 1000);
 
   const checkSolution = async () => {
     const cleaned = cleanup({ nodes, edges });

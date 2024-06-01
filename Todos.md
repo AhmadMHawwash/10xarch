@@ -11,3 +11,6 @@ Todos:
 [ ] auto local save
 [ ] what could happen if I modified this or that? (ask AI so it helps you understand more the system design)
 [ ] wait list (so we can scale gracefully)
+[ ] Train AI to do System design stuff (Or upload files and specific cases)
+[ ] Tell the AI to behave like backend for stats and reports
+[ ] Tell AI to behave like a System design interviewer

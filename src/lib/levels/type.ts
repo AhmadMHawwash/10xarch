@@ -34,6 +34,7 @@ export const levelSchema = z.object({
   name: z.string(),
   title: z.string(),
   description: z.string(),
+  metaInstructions: z.string(),
   preConnectedComponents: z.array(componentSchema),
   preConnectedConnections: z.array(connectionSchema),
   components: z.array(z.string()),

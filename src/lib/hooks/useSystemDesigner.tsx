@@ -26,7 +26,7 @@ import {
   type ReactFlowInstance,
   type ReactFlowJsonObject,
 } from "reactflow";
-import { componentsNumberingStore } from "../levels/loadBalancing";
+import { componentsNumberingStore } from "../levels/loadBalancing/challenge";
 import { type SystemComponent } from "../levels/type";
 import { SYSTEM_COMPONENT_NODE } from "./useLevelsManager";
 
@@ -86,7 +86,7 @@ const componentTargets: Record<
   CDN: ["Load Balancer", "Server"],
   "Load Balancer": ["Server"],
   Server: ["Cache", "SQL Database"],
-  Cache: [],
+  Cache: ["SQL Database"],
   "SQL Database": [],
 };
 

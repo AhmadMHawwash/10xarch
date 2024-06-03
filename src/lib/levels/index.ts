@@ -1,4 +1,4 @@
-import { loadBalancing } from "./loadBalancing";
+import { loadBalancing } from "./loadBalancing/challenge";
 
 const levels = [loadBalancing];
 

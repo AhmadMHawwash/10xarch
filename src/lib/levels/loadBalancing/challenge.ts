@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { type Level, type SystemComponent } from "./type";
+import { type Level, type SystemComponent } from "../type";
 
 export const componentsNumberingStore = create<{
   getNextId: (componentName: SystemComponent["name"]) => string;
@@ -31,6 +31,12 @@ export const loadBalancing: Level = {
   id: "load-balancing",
   name: "Load Balancing",
   title: "Distribute Load Across Multiple Servers",
+  metaInstructions: `
+  Strict rules:
+    Don't ask to configure the load balancers.
+    Don't ask for concurrent connections.
+    Don't ask to distribute traffic between servers properly through load balancer.
+  `,
   preConnectedComponents: [
     {
       type: "Client",
@@ -56,7 +62,7 @@ export const loadBalancing: Level = {
     },
   ],
   description:
-    "Your user base has grown significantly, and a single server is no longer able to handle the increased load. Add additional servers and a load balancer to distribute traffic efficiently.",
+    "Your user base has grown significantly, and a single server is no longer able to handle the increased load.",
   components: ["Client", "SQL Database", "Server", "Load Balancer"],
   // dashboard: {
   //   beforeStartingLevel: {
@@ -137,3 +143,5 @@ export const loadBalancing: Level = {
   //   },
   // },
 };
+
+console.log(loadBalancing)

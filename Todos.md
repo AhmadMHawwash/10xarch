@@ -14,3 +14,4 @@ Todos:
 [ ] Train AI to do System design stuff (Or upload files and specific cases)
 [ ] Tell the AI to behave like backend for stats and reports
 [ ] Tell AI to behave like a System design interviewer
+[ ] Add "In beta" for "hints engine", so people can understand it's still a work in progress and not 100% reliable

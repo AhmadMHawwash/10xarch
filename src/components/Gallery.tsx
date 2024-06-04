@@ -1,10 +1,12 @@
-import { CacheIcon } from "@/lib/icons/cache";
-import { CDNIcon } from "@/lib/icons/cdn";
-import { DatabaseIcon } from "@/lib/icons/database";
-import { LoadBalancerIcon } from "@/lib/icons/load-balancer";
-import { MobileIcon } from "@/lib/icons/mobile";
-import { ServerIcon } from "@/lib/icons/server";
 import { type SystemComponent } from "@/lib/levels/type";
+import {
+  Database,
+  DatabaseZap,
+  Globe,
+  MonitorSmartphone,
+  Network,
+  Server,
+} from "lucide-react";
 import type { DragEvent } from "react";
 import { Lead } from "./ui/typography";
 
@@ -21,34 +23,34 @@ const components: Record<SystemComponentName, SystemComponent> = {
     name: "Client",
     description:
       "A client is a device that connects to the server and requests data from it.",
-    icon: MobileIcon,
+    icon: MonitorSmartphone,
   },
   Server: {
     name: "Server",
     description:
       "A server is a device that receives requests from clients and sends data back to them.",
-    icon: ServerIcon,
+    icon: Server,
   },
   "Load Balancer": {
     name: "Load Balancer",
     description:
       "A load balancer is a device that distributes incoming network traffic across multiple servers.",
-    icon: LoadBalancerIcon,
+    icon: Network,
   },
   Cache: {
     name: "Cache",
     description: "A cache is a device that stores data for future use.",
-    icon: CacheIcon,
+    icon: DatabaseZap,
   },
   CDN: {
     name: "CDN",
     description: "A cache is a device that stores data for future use.",
-    icon: CDNIcon,
+    icon: Globe,
   },
   "SQL Database": {
     name: "SQL Database",
     description: "A database is a device that stores data for future use.",
-    icon: DatabaseIcon,
+    icon: Database,
   },
 };
 
@@ -68,7 +70,7 @@ const Gallery = () => {
           onDragStart={(event) => onDragStart(event, name)}
           draggable
         >
-          {Icon && <Icon height="20px" width="20px" fill="#000" />}
+          {Icon && <Icon size={20} />}
           <div className="ml-2">{name}</div>
         </div>
       ))}

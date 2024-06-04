@@ -13,7 +13,7 @@ import { type Level } from "../levels/type";
 import { extractIdAndType, useSystemDesigner } from "./useSystemDesigner";
 
 export const SYSTEM_COMPONENT_NODE = "SystemComponentNode";
-export const useLevelsManager = () => {
+export const useLevelManager = () => {
   const [currentLevel, setCurrentLevel] = useState<Level | undefined>(
     levels[0],
   );
@@ -62,7 +62,10 @@ export const useLevelsManager = () => {
     initEdges(edges);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
   const { data, mutate } = api.ai.hello.useMutation();
+  console.log(data);
+
   setTimeout(() => {
     void navigator.clipboard.writeText(JSON.stringify(data));
   }, 1000);
@@ -70,12 +73,6 @@ export const useLevelsManager = () => {
   const checkSolution = async () => {
     const cleaned = cleanup({ nodes, edges });
 
-    // await navigator.clipboard.writeText(
-    //   JSON.stringify({
-    //     level: currentLevel!,
-    //     userSolution: { components: cleaned.nodes, connections: cleaned.edges },
-    //   }),
-    // );
     mutate({
       level: currentLevel!,
       userSolution: { components: cleaned.nodes, connections: cleaned.edges },
@@ -116,53 +113,3 @@ const cleanup = (
   return { nodes, edges };
 };
 
-// interface Node {
-//   id: string;
-//   type: string;
-//   children: Node[];
-// }
-
-// interface Edge {
-//   source: { id: string; type: string };
-//   target: { id: string; type: string };
-// }
-
-// function buildTree(edges: Edge[]): Node[] {
-//   const nodesMap = new Map<string, Node>();
-
-//   // Create nodes
-//   edges.forEach(({ source, target }) => {
-//     if (!nodesMap.has(source.id)) {
-//       nodesMap.set(source.id, {
-//         id: source.id,
-//         type: source.type,
-//         children: [],
-//       });
-//     }
-//     if (!nodesMap.has(target.id)) {
-//       nodesMap.set(target.id, {
-//         id: target.id,
-//         type: target.type,
-//         children: [],
-//       });
-//     }
-//   });
-
-//   // Build tree
-//   edges.forEach(({ source, target }) => {
-//     const sourceNode = nodesMap.get(source.id)!;
-//     const targetNode = nodesMap.get(target.id)!;
-//     sourceNode.children.push(targetNode);
-//   });
-
-//   // Find roots
-//   const roots: Node[] = [];
-//   nodesMap.forEach((node) => {
-//     const isRoot = edges.every(({ target }) => target.id !== node.id);
-//     if (isRoot) {
-//       roots.push(node);
-//     }
-//   });
-
-//   return roots;
-// }

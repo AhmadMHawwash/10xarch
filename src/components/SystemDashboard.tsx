@@ -4,11 +4,11 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { useLevelsManager } from "@/lib/hooks/useLevelsManager";
+import { useLevelManager } from "@/lib/hooks/useLevelManager";
 import { H4, P } from "./ui/typography";
 
 export const Dashboard = () => {
-  const { level } = useLevelsManager();
+  const { level } = useLevelManager();
 
   return (
     <Accordion className="w-[20rem]" type="single" collapsible>

@@ -28,7 +28,7 @@ import {
 } from "reactflow";
 import { componentsNumberingStore } from "../levels/loadBalancing/challenge";
 import { type SystemComponent } from "../levels/type";
-import { SYSTEM_COMPONENT_NODE } from "./useLevelsManager";
+import { SYSTEM_COMPONENT_NODE } from "./useLevelManager";
 
 interface SystemDesignerState {
   nodes: Node<SystemComponentNodeDataProps>[];

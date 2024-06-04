@@ -23,7 +23,7 @@ import Gallery from "./Gallery";
 import SystemComponentNode from "./SystemComponentNode";
 import { Dashboard } from "./SystemDashboard";
 import { Button } from "./ui/button";
-import { useLevelsManager } from "@/lib/hooks/useLevelsManager";
+import { useLevelManager } from "@/lib/hooks/useLevelManager";
 
 const nodeTypes: Record<string, ComponentType<NodeProps>> = {
   SystemComponentNode: SystemComponentNode,
@@ -48,7 +48,7 @@ const SystemDesigner = () => {
     onConnectEnd,
   } = useSystemDesigner();
 
-  const { checkSolution } = useLevelsManager();
+  const { checkSolution } = useLevelManager();
 
   const handleConnect: OnConnect = (params) => {
     const { source, target } = params;

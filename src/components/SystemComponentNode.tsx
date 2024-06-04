@@ -4,6 +4,8 @@ import { type SystemComponent } from "@/lib/levels/type";
 import { cn } from "@/lib/utils";
 import { memo, type FC } from "react";
 import { Handle, Position, type NodeProps } from "reactflow";
+import { Small } from "./ui/typography";
+import { SQLDatabase } from "./SystemComponents/SQLDatabase";
 
 export type SystemComponentNodeDataProps = {
   icon?: typeof MobileIcon;
@@ -11,12 +13,13 @@ export type SystemComponentNodeDataProps = {
   name: SystemComponent["name"];
   withTargetHandle?: boolean;
   withSourceHandle?: boolean;
+  configs: Record<string, unknown>;
 };
 
 export const SystemComponentNode: FC<
   NodeProps<SystemComponentNodeDataProps>
 > = ({
-  data: { icon: Icon, name, withTargetHandle, withSourceHandle },
+  data: { icon: Icon, name, id, withTargetHandle, withSourceHandle },
   selected,
 }) => {
   const { isEdgeBeingConnected } = useSystemDesigner();
@@ -34,12 +37,18 @@ export const SystemComponentNode: FC<
           "flex flex-col items-center justify-center rounded-sm border border-gray-400 p-2",
           selected ? "bg-gray-300" : "bg-gray-100",
           isEdgeBeingConnected &&
-            !(withTargetHandle || withSourceHandle) &&
+            !(withTargetHandle ?? withSourceHandle) &&
             "opacity-50",
         )}
       >
-        {Icon && <Icon height="20px" width="20px" fill="#000" />}
-        <div>{name}</div>
+        {name === "SQL Database" ? (
+          <SQLDatabase name={id} Icon={Icon} />
+        ) : (
+          <>
+            {Icon && <Icon height="20px" width="20px" />}
+            <Small>{id}</Small>
+          </>
+        )}
       </div>
 
       <Handle
@@ -55,3 +64,8 @@ export const SystemComponentNode: FC<
 SystemComponentNode.displayName = "SystemComponentNode";
 
 export default memo(SystemComponentNode);
+
+export type ComponentNodeProps = {
+  name: string;
+  Icon: SystemComponentNodeDataProps["icon"];
+};

@@ -1,7 +1,7 @@
 import { getSystemComponent } from "@/components/Gallery";
 import { type SystemComponentNodeDataProps } from "@/components/SystemComponentNode";
 import { api } from "@/trpc/react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   MarkerType,
   type Edge,
@@ -11,19 +11,48 @@ import {
 import levels from "../levels";
 import { type Level } from "../levels/type";
 import { extractIdAndType, useSystemDesigner } from "./useSystemDesigner";
+import { create } from "zustand";
 
 export const SYSTEM_COMPONENT_NODE = "SystemComponentNode";
+
+const useLevelStore = create<{
+  level: Level | undefined;
+  toNextLevel: () => void;
+  isInitialised: boolean;
+  setIsInitialised: (isInitialised: boolean) => void;
+}>((set) => ({
+  level: levels[0],
+  toNextLevel: () => {
+    set((state) => {
+      const nextLevelIndex =
+        levels.findIndex((level) => level.id === state.level?.id) + 1;
+      return {
+        ...state,
+        level: levels[nextLevelIndex],
+      };
+    });
+  },
+  isInitialised: false,
+  setIsInitialised: (isInitialised: boolean) => {
+    set({ isInitialised });
+  },
+}));
+
 export const useLevelManager = () => {
-  const [currentLevel, setCurrentLevel] = useState<Level | undefined>(
-    levels[0],
-  );
-  const isInitializedLevel = useRef<boolean>(false);
-  const { initNodes, initEdges, nodes, edges } = useSystemDesigner();
+  const {
+    level: currentLevel,
+    toNextLevel,
+    isInitialised,
+    setIsInitialised,
+  } = useLevelStore((state) => state);
 
+  const { updateNodes, updateEdges, nodes, edges } = useSystemDesigner();
+
+  // console.log(nodes, edges);
   useEffect(() => {
-    if (isInitializedLevel.current) return;
+    if (isInitialised) return;
 
-    isInitializedLevel.current = true;
+    setIsInitialised(true);
 
     const nodes: Node<SystemComponentNodeDataProps>[] =
       currentLevel?.preConnectedComponents
@@ -40,13 +69,16 @@ export const useLevelManager = () => {
               icon: systemComponent?.icon,
               withTargetHandle: true,
               withSourceHandle: true,
+              configs: {},
             },
             id,
             type: SYSTEM_COMPONENT_NODE,
             position: { x: 100 + index * 100, y: 100 },
           };
         }) ?? [];
-    initNodes(nodes);
+
+    updateNodes(nodes);
+
     const edges: Edge[] =
       currentLevel?.preConnectedConnections.map(({ source, target }) => {
         return {
@@ -59,31 +91,61 @@ export const useLevelManager = () => {
         };
       }) ?? [];
 
-    initEdges(edges);
+    updateEdges(edges);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const { data, mutate } = api.ai.hello.useMutation();
-  console.log(data);
+  // const { data, mutate } = api.ai.hello.useMutation();
+  // console.log(data);
 
   setTimeout(() => {
-    void navigator.clipboard.writeText(JSON.stringify(data));
+    // void navigator.clipboard.writeText(JSON.stringify(data));
   }, 1000);
 
   const checkSolution = async () => {
     const cleaned = cleanup({ nodes, edges });
 
-    mutate({
-      level: currentLevel!,
-      userSolution: { components: cleaned.nodes, connections: cleaned.edges },
-      tree: cleaned.edges,
-    });
+    // mutate({
+    //   level: currentLevel!,
+    //   userSolution: { components: cleaned.nodes, connections: cleaned.edges },
+    //   tree: cleaned.edges,
+    // });
   };
+
+  const makeComponentConfigSlice = useCallback(
+    <T,>(componentId: string, configKey: string) => {
+      return {
+        get: () => {
+          const component = nodes.find((node) => node.id === componentId);
+          return (component?.data.configs?.[configKey] ?? undefined) as T;
+        },
+        set: (configValue: T) => {
+          const updatedNodes = nodes.map((node) => {
+            if (node.id === componentId) {
+              return {
+                ...node,
+                data: {
+                  ...node.data,
+                  configs: {
+                    [configKey]: configValue,
+                  },
+                },
+              };
+            }
+            return node;
+          });
+          updateNodes(updatedNodes);
+        },
+      };
+    },
+    [nodes, updateNodes],
+  );
 
   return {
     level: currentLevel,
-    toNextLevel: () => setCurrentLevel(levels[1]),
+    // toNextLevel: () => setCurrentLevel(levels[1]),
     checkSolution,
+    makeComponentConfigSlice,
   };
 };
 
@@ -112,4 +174,3 @@ const cleanup = (
 
   return { nodes, edges };
 };
-

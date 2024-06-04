@@ -35,8 +35,8 @@ interface SystemDesignerState {
   edges: Edge[];
   initInstance: (instance: ReactFlowInstance) => void;
   initWrapper: (wrapper: HTMLDivElement) => void;
-  initNodes: (nodes: Node[]) => void;
-  initEdges: (edges: Edge[]) => void;
+  updateNodes: (nodes: Node[]) => void;
+  updateEdges: (edges: Edge[]) => void;
   onConnect: OnConnect;
   onDragOver: DragEventHandler;
   onDrop: DragEventHandler;
@@ -52,8 +52,8 @@ interface SystemDesignerState {
 const SystemDesignerContext = createContext<SystemDesignerState>({
   nodes: [],
   edges: [],
-  initEdges: noop,
-  initNodes: noop,
+  updateEdges: noop,
+  updateNodes: noop,
   initInstance: noop,
   initWrapper: noop,
   onConnect: noop,
@@ -214,6 +214,7 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
         withTargetHandle: true,
         withSourceHandle: true,
         id,
+        configs: {},
       };
 
       const newNode: Node<SystemComponentNodeDataProps> = {
@@ -228,12 +229,12 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
     [reactFlowInstance],
   );
 
-  console.log({ nodes, edges });
-  const initNodes = useCallback((nodes: Node[]) => {
+  // console.log({ nodes, edges });
+  const updateNodes = useCallback((nodes: Node[]) => {
     setNodes(nodes);
   }, []);
 
-  const initEdges = useCallback((edges: Edge[]) => {
+  const updateEdges = useCallback((edges: Edge[]) => {
     setEdges(edges);
   }, []);
 
@@ -290,8 +291,8 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
         onDragOver,
         onDrop,
         initInstance,
-        initNodes,
-        initEdges,
+        updateNodes,
+        updateEdges,
         initWrapper,
         onEdgesChange,
         onNodesChange,

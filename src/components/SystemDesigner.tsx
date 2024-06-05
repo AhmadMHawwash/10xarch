@@ -48,7 +48,7 @@ const SystemDesigner = () => {
     onConnectEnd,
   } = useSystemDesigner();
 
-  const { checkSolution } = useLevelManager();
+  const { checkSolution, toNextLevel } = useLevelManager();
 
   const handleConnect: OnConnect = (params) => {
     const { source, target } = params;
@@ -90,6 +90,7 @@ const SystemDesigner = () => {
         </Panel>
         <Panel position="bottom-right">
           <Button onClick={checkSolution}>Check solution</Button>
+          <Button onClick={toNextLevel}>To next level</Button>
         </Panel>
         <Controls />
       </ReactFlow>

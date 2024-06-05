@@ -35,24 +35,28 @@ const SQLDatabaseSettings = ({ name }: { name: string }) => {
 
   return (
     <WithSettings name={name}>
-      <Label htmlFor="database-type" className="mr-2">
-        Database type
-      </Label>
-      <Select
-        value={databaseType}
-        onValueChange={(x: DatabaseType) => set(x)}
-        name="database-type"
-        defaultValue="Read/Write"
-      >
-        <SelectTrigger className="w-fit">
-          <SelectValue placeholder="Database type" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="Master (Write)">Master (Write)</SelectItem>
-          <SelectItem value="Replica (Read)">Replica (Read)</SelectItem>
-          <SelectItem value="Read/Write">Read/Write</SelectItem>
-        </SelectContent>
-      </Select>
+      <div className="grid w-full grid-flow-col">
+        <Label htmlFor="database-type" className="mr-2 grid-cols-1 my-auto ml-auto">
+          Database type
+        </Label>
+        <div className="grid-cols-1">
+          <Select
+            value={databaseType}
+            onValueChange={(x: DatabaseType) => set(x)}
+            name="database-type"
+            defaultValue="Read/Write"
+          >
+            <SelectTrigger className="w-fit">
+              <SelectValue placeholder="Database type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Master (Write)">Master (Write)</SelectItem>
+              <SelectItem value="Replica (Read)">Replica (Read)</SelectItem>
+              <SelectItem value="Read/Write">Read/Write</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
     </WithSettings>
   );
 };

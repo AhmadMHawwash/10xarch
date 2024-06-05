@@ -22,6 +22,7 @@ const keyValueSchema = z.object({
 const componentSchema = z.object({
   id: z.string(),
   type: componentsListSchema,
+  configs: z.unknown().optional(),
 });
 
 const connectionSchema = z.object({
@@ -34,20 +35,21 @@ export const levelSchema = z.object({
   name: z.string(),
   title: z.string(),
   description: z.string(),
-  metaInstructions: z.string(),
   preConnectedComponents: z.array(componentSchema),
   preConnectedConnections: z.array(connectionSchema),
   components: z.array(z.string()),
-  dashboard: z.object({
-    beforeStartingLevel: z.object({
-      reports: z.array(keyValueSchema),
-      stats: z.array(keyValueSchema),
-    }),
-    afterStartingLevel: z.object({
-      reports: z.array(keyValueSchema),
-      stats: z.array(keyValueSchema),
-    }),
-  }).optional(),
+  dashboard: z
+    .object({
+      beforeStartingLevel: z.object({
+        reports: z.array(keyValueSchema),
+        stats: z.array(keyValueSchema),
+      }),
+      afterStartingLevel: z.object({
+        reports: z.array(keyValueSchema),
+        stats: z.array(keyValueSchema),
+      }),
+    })
+    .optional(),
 });
 
 export const userSolutionSchema = z.object({

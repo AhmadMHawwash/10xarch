@@ -1,17 +1,17 @@
 import { getSystemComponent } from "@/components/Gallery";
 import { type SystemComponentNodeDataProps } from "@/components/SystemComponentNode";
-import { api } from "@/trpc/react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect } from "react";
 import {
   MarkerType,
   type Edge,
   type Node,
   type ReactFlowJsonObject,
 } from "reactflow";
+import { create } from "zustand";
 import levels from "../levels";
 import { type Level } from "../levels/type";
 import { extractIdAndType, useSystemDesigner } from "./useSystemDesigner";
-import { create } from "zustand";
+import { api } from "@/trpc/react";
 
 export const SYSTEM_COMPONENT_NODE = "SystemComponentNode";
 
@@ -48,7 +48,6 @@ export const useLevelManager = () => {
 
   const { updateNodes, updateEdges, nodes, edges } = useSystemDesigner();
 
-  // console.log(nodes, edges);
   useEffect(() => {
     if (isInitialised) return;
 
@@ -93,10 +92,10 @@ export const useLevelManager = () => {
 
     updateEdges(edges);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [currentLevel]);
 
-  // const { data, mutate } = api.ai.hello.useMutation();
-  // console.log(data);
+  const { data, mutate } = api.ai.hello.useMutation();
+  console.log(data);
 
   setTimeout(() => {
     // void navigator.clipboard.writeText(JSON.stringify(data));
@@ -105,11 +104,11 @@ export const useLevelManager = () => {
   const checkSolution = async () => {
     const cleaned = cleanup({ nodes, edges });
 
-    // mutate({
-    //   level: currentLevel!,
-    //   userSolution: { components: cleaned.nodes, connections: cleaned.edges },
-    //   tree: cleaned.edges,
-    // });
+    mutate({
+      level: currentLevel!,
+      userSolution: { components: cleaned.nodes, connections: cleaned.edges },
+      tree: cleaned.edges,
+    });
   };
 
   const makeComponentConfigSlice = useCallback(
@@ -143,7 +142,10 @@ export const useLevelManager = () => {
 
   return {
     level: currentLevel,
-    // toNextLevel: () => setCurrentLevel(levels[1]),
+    toNextLevel: () => {
+      setIsInitialised(false);
+      toNextLevel();
+    },
     checkSolution,
     makeComponentConfigSlice,
   };
@@ -158,6 +160,7 @@ const cleanup = (
   const nodes = flow.nodes.map((node) => ({
     type: node.data.name,
     id: node.id,
+    configs: node.data.configs,
   }));
 
   const edges = flow.edges.map((edge) => {

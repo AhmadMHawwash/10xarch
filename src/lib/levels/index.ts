@@ -1,5 +1,6 @@
-import { loadBalancing } from "./loadBalancing/challenge";
+import { databaseReplicationLevelMaker } from "./databaseReplication/challenge";
+import { loadBalancingLevelMaker } from "./loadBalancing/challenge";
 
-const levels = [loadBalancing];
+const levels = [loadBalancingLevelMaker(), databaseReplicationLevelMaker()];
 
 export default levels;

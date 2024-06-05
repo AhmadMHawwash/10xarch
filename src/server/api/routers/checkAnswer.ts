@@ -1,13 +1,8 @@
 import { z } from "zod";
-
+import { constraints } from "@/lib/levels/loadBalancing/solutions";
 import { levelSchema, userSolutionSchema } from "@/lib/levels/type";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import { OpenAI } from "openai";
-import {
-  notes,
-  solutions,
-  constraints,
-} from "@/lib/levels/loadBalancing/solutions";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -64,10 +59,28 @@ export const checkSolution = createTRPCRouter({
             `${connection.source.id} connected to ${connection.target.id}`,
         );
 
-        return `the design challenge is: ${level.title}, ${level.description}. And this level has some constraints: ${constraints.join(', ')}.
-        The components I have in my design./ ${userSolution.components.map((c) => c.id).join(", ")}. 
-        And they are connected like this: ${connectionsInText.join(", ")}. And that represents components and connections between them.
-        `;
+        const getComponentConfig = (c: (typeof userSolution.components)[0]) => {
+          return Object.entries((c.configs as object) ?? {}).map(
+            ([key, value], index) => `${index + 1}. ${key} is configured as ${value}`,
+          );
+        };
+
+        const getKnowingThat = (c: (typeof userSolution.components)[0]) => {
+          return ` ${c.id} has these configs:
+           ${getComponentConfig(c).join("\n")}`;
+        };
+
+        return `The design challenge is: ${level.title}, ${level.description}. And this level has some constraints: ${constraints.join(", ")}.
+        The components I have in my design solution are: [${userSolution.components.map((c) => c.id).join(", ")}].
+
+        And they are connected like this: 
+        ${connectionsInText.join("\n")}.
+        
+        Knowing that:
+        ${userSolution.components
+          .filter((c) => Object.values(c.configs ?? {}).length > 0)
+          .map(getKnowingThat)
+          .join("\n And also, ")}`;
         return [
           //         {
           //           role: "system",

@@ -106,8 +106,10 @@ export const useLevelManager = () => {
 
     mutate({
       level: currentLevel!,
-      userSolution: { components: cleaned.nodes, connections: cleaned.edges },
-      tree: cleaned.edges,
+      userSolution: {
+        components: cleaned.nodes,
+        connections: cleaned.edges,
+      },
     });
   };
 

@@ -11,7 +11,7 @@ const componentsListSchema = z.enum([
   "Load Balancer",
   "Cache",
   "CDN",
-  "SQL Database",
+  "Database",
 ]);
 
 const keyValueSchema = z.object({
@@ -38,6 +38,7 @@ export const levelSchema = z.object({
   preConnectedComponents: z.array(componentSchema),
   preConnectedConnections: z.array(connectionSchema),
   components: z.array(z.string()),
+  citeria: z.array(z.string()),
   dashboard: z
     .object({
       beforeStartingLevel: z.object({

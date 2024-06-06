@@ -8,7 +8,7 @@ export const componentsNumberingStore = create<{
   componentsToCount: {
     Client: 1,
     Server: 1,
-    "SQL Database": 1,
+    "Database": 1,
     "Load Balancer": 1,
     Cache: 1,
     CDN: 1,

@@ -1,8 +1,9 @@
-import { z } from "zod";
+import { generalCriteria } from "@/lib/levels/criteria";
 import { constraints } from "@/lib/levels/loadBalancing/solutions";
 import { levelSchema, userSolutionSchema } from "@/lib/levels/type";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import { OpenAI } from "openai";
+import { z } from "zod";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -60,27 +61,35 @@ export const checkSolution = createTRPCRouter({
         );
 
         const getComponentConfig = (c: (typeof userSolution.components)[0]) => {
-          return Object.entries((c.configs as object) ?? {}).map(
-            ([key, value], index) => `${index + 1}. ${key} is configured as ${value}`,
+          return Object.values((c.configs as object) ?? {}).map(
+            (value) => `${c.id} is configured as ${value} ${c.type}`,
           );
         };
 
         const getKnowingThat = (c: (typeof userSolution.components)[0]) => {
-          return ` ${c.id} has these configs:
-           ${getComponentConfig(c).join("\n")}`;
+          return getComponentConfig(c).map(toBullets).join("\n");
         };
 
-        return `The design challenge is: ${level.title}, ${level.description}. And this level has some constraints: ${constraints.join(", ")}.
-        The components I have in my design solution are: [${userSolution.components.map((c) => c.id).join(", ")}].
+        const toBullets = (s: string) => `- ${s}`;
 
-        And they are connected like this: 
-        ${connectionsInText.join("\n")}.
-        
-        Knowing that:
-        ${userSolution.components
-          .filter((c) => Object.values(c.configs ?? {}).length > 0)
-          .map(getKnowingThat)
-          .join("\n And also, ")}`;
+        const componentsWithConfigs = userSolution.components.filter(
+          (c) => Object.values(c.configs ?? {}).length > 0,
+        );
+
+        return `The design challenge is: ${level.title}, ${level.description}. And this level has some constraints: ${constraints.join(", ")}.
+The design challenge can be considered has a "Correct" solution if it had this criteria:
+${[...level.citeria, ...generalCriteria].map(toBullets).join("\n")}.
+
+Then we can consider the solution is correct.
+
+The components I have in my design solution are: 
+${userSolution.components.map((c) => toBullets(c.id)).join("\n")}.
+
+And they are connected like this: 
+${connectionsInText.map(toBullets).join("\n")}.
+
+${componentsWithConfigs.length > 0 ? "Knowing that:" : ""}
+${componentsWithConfigs.map(getKnowingThat).join("\n")}`;
         return [
           //         {
           //           role: "system",

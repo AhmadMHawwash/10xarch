@@ -1,5 +1,6 @@
 import { type Level } from "../type";
 import { componentsNumberingStore } from "../utils";
+import { solutionDesignShouldHave } from "./solutions";
 
 const componentsNumberingStoreInstance = componentsNumberingStore.getState();
 
@@ -9,8 +10,7 @@ export const databaseReplicationLevelMaker = () => {
     componentsNumberingStoreInstance.getNextId("Load Balancer");
   const server1 = componentsNumberingStoreInstance.getNextId("Server");
   const server2 = componentsNumberingStoreInstance.getNextId("Server");
-  const sqlDatabase1 =
-    componentsNumberingStoreInstance.getNextId("SQL Database");
+  const sqlDatabase1 = componentsNumberingStoreInstance.getNextId("Database");
 
   const databaseReplication: Level = {
     id: "database-replication",
@@ -34,7 +34,7 @@ export const databaseReplicationLevelMaker = () => {
         id: server2,
       },
       {
-        type: "SQL Database",
+        type: "Database",
         id: sqlDatabase1,
       },
     ],
@@ -53,22 +53,23 @@ export const databaseReplicationLevelMaker = () => {
       },
       {
         source: { id: server1, type: "Server" },
-        target: { id: sqlDatabase1, type: "SQL Database" },
+        target: { id: sqlDatabase1, type: "Database" },
       },
       {
         source: { id: server2, type: "Server" },
-        target: { id: sqlDatabase1, type: "SQL Database" },
+        target: { id: sqlDatabase1, type: "Database" },
       },
     ],
     description:
-      "The single SQL database has become a bottleneck. Implement database replication to handle more read requests and ensure high availability.",
+      "The single Database has become a bottleneck. Implement database replication to handle more read requests and ensure high availability.",
     components: [
       "Client",
       "Load Balancer",
       "Server",
-      "Primary SQL Database",
-      "Secondary SQL Database",
+      "Primary Database",
+      "Secondary Database",
     ],
+    citeria: solutionDesignShouldHave,
   };
 
   return databaseReplication;

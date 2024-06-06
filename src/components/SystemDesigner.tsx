@@ -26,11 +26,11 @@ import { Button } from "./ui/button";
 import { useLevelManager } from "@/lib/hooks/useLevelManager";
 
 const nodeTypes: Record<string, ComponentType<NodeProps>> = {
-  SystemComponentNode: SystemComponentNode,
+  SystemComponentNode,
 };
 
 const edgeTypes: Record<string, ComponentType<EdgeProps>> = {
-  CustomEdge: CustomEdge,
+  CustomEdge,
 };
 
 const SystemDesigner = () => {

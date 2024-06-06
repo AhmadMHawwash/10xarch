@@ -11,8 +11,7 @@ import { Label } from "../ui/label";
 import { Small } from "../ui/typography";
 import { WithSettings } from "./WithSettings";
 import { useMemo } from "react";
-
-type DatabaseType = "Master (Write)" | "Replica (Read)" | "Read/Write";
+import { useSystemDesigner } from "@/lib/hooks/useSystemDesigner";
 
 export const SQLDatabase = ({ name, Icon }: ComponentNodeProps) => {
   return (
@@ -24,38 +23,87 @@ export const SQLDatabase = ({ name, Icon }: ComponentNodeProps) => {
   );
 };
 
-const SQLDatabaseSettings = ({ name }: { name: string }) => {
+type Primary = "Primary (Write)";
+type Replica = "Replica (Read only)" | `Replica (Read only) of ${string}`;
+type ReadWrite = "Read/Write";
+
+type DatabaseType = Primary | Replica | ReadWrite;
+
+const SQLDatabaseSettings = ({ name: id }: { name: string }) => {
+  const { nodes } = useSystemDesigner();
   const { makeComponentConfigSlice } = useLevelManager();
 
+  const databaseNodes = nodes
+    .filter((node) => node.data.name === "Database")
+    .filter((node) => node.id !== id);
+
   const { get, set } = useMemo(
-    () => makeComponentConfigSlice<DatabaseType>(name, "databaseType"),
-    [name, makeComponentConfigSlice],
+    () => makeComponentConfigSlice<DatabaseType>(id, "type"),
+    [id, makeComponentConfigSlice],
   );
-  const databaseType = get();
+  let databaseType = get() ?? "Read/Write";
+  let databaseId: string | undefined = undefined;
+  console.log(databaseType);
+  if (databaseType.startsWith("Replica")) {
+    const [x, y] = (databaseType as Replica).split(" of ");
+    databaseType = x as Replica;
+    databaseId = y!;
+  }
 
   return (
-    <WithSettings name={name}>
-      <div className="grid w-full grid-flow-col">
-        <Label htmlFor="database-type" className="mr-2 grid-cols-1 my-auto ml-auto">
-          Database type
-        </Label>
-        <div className="grid-cols-1">
-          <Select
-            value={databaseType}
-            onValueChange={(x: DatabaseType) => set(x)}
-            name="database-type"
-            defaultValue="Read/Write"
-          >
-            <SelectTrigger className="w-fit">
-              <SelectValue placeholder="Database type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Master (Write)">Master (Write)</SelectItem>
-              <SelectItem value="Replica (Read)">Replica (Read)</SelectItem>
-              <SelectItem value="Read/Write">Read/Write</SelectItem>
-            </SelectContent>
-          </Select>
+    <WithSettings name={id}>
+      <div className="grid w-full grid-flow-row grid-cols-1 gap-2">
+        <div className="grid grid-flow-col grid-cols-2">
+          <Label htmlFor="database-type" className=" col-span-1 my-auto">
+            Database type
+          </Label>
+          <div className="col-span-1">
+            <Select
+              value={databaseType}
+              onValueChange={(x: DatabaseType) => set(x)}
+              name="database-type"
+              defaultValue="Read/Write"
+            >
+              <SelectTrigger className="w-fit">
+                <SelectValue placeholder="Database type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Primary (Write)">Primary (Write)</SelectItem>
+                <SelectItem value="Replica (Read only)">
+                  Replica (Read only)
+                </SelectItem>
+                <SelectItem value="Read/Write">Read/Write</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
+        {databaseType.startsWith("Replica") && (
+          <div className="grid grid-flow-col grid-cols-2">
+            <Label htmlFor="replica-of" className="col-span-1 my-auto">
+              Replica of
+            </Label>
+            <div className="col-span-1">
+              <Select
+                value={databaseId}
+                onValueChange={(dbId: string) =>
+                  set(`${databaseType} of ${dbId}` as Replica)
+                }
+                name="replica-of"
+              >
+                <SelectTrigger className="w-fit">
+                  <SelectValue placeholder="Replica of" />
+                </SelectTrigger>
+                <SelectContent>
+                  {databaseNodes.map((node) => (
+                    <SelectItem key={node.id} value={node.id}>
+                      {node.data.id}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        )}
       </div>
     </WithSettings>
   );

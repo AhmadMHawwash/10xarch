@@ -41,7 +41,7 @@ export const SystemComponentNode: FC<
             "opacity-50",
         )}
       >
-        {name === "SQL Database" ? (
+        {name === "Database" ? (
           <SQLDatabase name={id} Icon={Icon} />
         ) : (
           <>
@@ -60,8 +60,6 @@ export const SystemComponentNode: FC<
     </>
   );
 };
-
-SystemComponentNode.displayName = "SystemComponentNode";
 
 export default memo(SystemComponentNode);
 

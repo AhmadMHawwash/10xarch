@@ -16,7 +16,7 @@ export type SystemComponentName =
   | "Load Balancer"
   | "Cache"
   | "CDN"
-  | "SQL Database";
+  | "Database";
 
 const components: Record<SystemComponentName, SystemComponent> = {
   Client: {
@@ -47,8 +47,8 @@ const components: Record<SystemComponentName, SystemComponent> = {
     description: "A cache is a device that stores data for future use.",
     icon: Globe,
   },
-  "SQL Database": {
-    name: "SQL Database",
+  "Database": {
+    name: "Database",
     description: "A database is a device that stores data for future use.",
     icon: Database,
   },

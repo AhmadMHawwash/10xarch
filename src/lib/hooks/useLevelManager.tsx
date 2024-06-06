@@ -68,7 +68,7 @@ export const useLevelManager = () => {
               icon: systemComponent?.icon,
               withTargetHandle: true,
               withSourceHandle: true,
-              configs: {},
+              configs: component.configs ?? {},
             },
             id,
             type: SYSTEM_COMPONENT_NODE,

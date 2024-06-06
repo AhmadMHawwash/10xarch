@@ -6,7 +6,7 @@ const componentsNumberingStoreInstance = componentsNumberingStore.getState();
 export const loadBalancingLevelMaker = () => {
   const client1 = componentsNumberingStoreInstance.getNextId("Client");
   const server1 = componentsNumberingStoreInstance.getNextId("Server");
-  const sqlDatabase1 = componentsNumberingStoreInstance.getNextId("Database");
+  const database1 = componentsNumberingStoreInstance.getNextId("Database");
 
   const loadBalancing: Level = {
     id: "load-balancing",
@@ -23,17 +23,17 @@ export const loadBalancingLevelMaker = () => {
       },
       {
         type: "Database",
-        id: sqlDatabase1,
+        id: database1,
       },
     ],
     preConnectedConnections: [
       {
-        source: { id: client1, type: "Client" },
-        target: { id: server1, type: "Server" },
+        source: { id: client1 },
+        target: { id: server1 },
       },
       {
-        source: { id: server1, type: "Server" },
-        target: { id: sqlDatabase1, type: "Database" },
+        source: { id: server1 },
+        target: { id: database1 },
       },
     ],
     citeria: [

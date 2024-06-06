@@ -26,8 +26,12 @@ const componentSchema = z.object({
 });
 
 const connectionSchema = z.object({
-  source: componentSchema,
-  target: componentSchema,
+  source: z.object({
+    id: z.string(),
+  }),
+  target: z.object({
+    id: z.string(),
+  }),
 });
 
 export const levelSchema = z.object({

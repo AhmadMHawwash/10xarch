@@ -9,7 +9,7 @@ export const databaseReplicationLevelMaker = () => {
     componentsNumberingStoreInstance.getNextId("Load Balancer");
   const server1 = componentsNumberingStoreInstance.getNextId("Server");
   const server2 = componentsNumberingStoreInstance.getNextId("Server");
-  const sqlDatabase1 = componentsNumberingStoreInstance.getNextId("Database");
+  const database1 = componentsNumberingStoreInstance.getNextId("Database");
 
   const databaseReplication: Level = {
     id: "database-replication",
@@ -34,29 +34,29 @@ export const databaseReplicationLevelMaker = () => {
       },
       {
         type: "Database",
-        id: sqlDatabase1,
+        id: database1,
       },
     ],
     preConnectedConnections: [
       {
-        source: { id: client1, type: "Client" },
-        target: { id: loadbalancer1, type: "Load Balancer" },
+        source: { id: client1 },
+        target: { id: loadbalancer1 },
       },
       {
-        source: { id: loadbalancer1, type: "Load Balancer" },
-        target: { id: server1, type: "Server" },
+        source: { id: loadbalancer1 },
+        target: { id: server1 },
       },
       {
-        source: { id: loadbalancer1, type: "Load Balancer" },
-        target: { id: server2, type: "Server" },
+        source: { id: loadbalancer1 },
+        target: { id: server2 },
       },
       {
-        source: { id: server1, type: "Server" },
-        target: { id: sqlDatabase1, type: "Database" },
+        source: { id: server1 },
+        target: { id: database1 },
       },
       {
-        source: { id: server2, type: "Server" },
-        target: { id: sqlDatabase1, type: "Database" },
+        source: { id: server2 },
+        target: { id: database1 },
       },
     ],
     description:
@@ -69,11 +69,11 @@ export const databaseReplicationLevelMaker = () => {
       "Secondary Database",
     ],
     citeria: [
-      'At least one client',
-      'At least one server',
-      'At least one load balancer for servers if more than one server is present',
-      'At least one primary database for writing',
-      'At least one replica database for reading',
+      "At least one client",
+      "At least one server",
+      "At least one load balancer for servers if more than one server is present",
+      "At least one primary database for writing",
+      "At least one replica database for reading",
     ],
   };
 

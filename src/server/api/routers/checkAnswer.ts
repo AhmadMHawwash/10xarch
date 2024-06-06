@@ -1,5 +1,4 @@
-import { generalCriteria } from "@/lib/levels/criteria";
-import { constraints } from "@/lib/levels/loadBalancing/solutions";
+import { constraints, generalCriteria } from "@/lib/levels/criteria";
 import { levelSchema, userSolutionSchema } from "@/lib/levels/type";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import { OpenAI } from "openai";
@@ -76,7 +75,7 @@ export const checkSolution = createTRPCRouter({
           (c) => Object.values(c.configs ?? {}).length > 0,
         );
 
-        return `The design challenge is: ${level.title}, ${level.description}. And this level has some constraints: ${constraints.join(", ")}.
+        return `The design challenge is: ${level.title}, ${level.description}. And this level has some constraints: ${constraints.map(toBullets).join("\n")}.
 The design challenge can be considered has a "Correct" solution if it had this criteria:
 ${[...level.citeria, ...generalCriteria].map(toBullets).join("\n")}.
 

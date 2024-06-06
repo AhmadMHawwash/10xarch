@@ -1,14 +1,12 @@
 import { type Level } from "../type";
 import { componentsNumberingStore } from "../utils";
-import { solutionDesignShouldHave } from "./solutions";
 
 const componentsNumberingStoreInstance = componentsNumberingStore.getState();
 
 export const loadBalancingLevelMaker = () => {
   const client1 = componentsNumberingStoreInstance.getNextId("Client");
   const server1 = componentsNumberingStoreInstance.getNextId("Server");
-  const sqlDatabase1 =
-    componentsNumberingStoreInstance.getNextId("Database");
+  const sqlDatabase1 = componentsNumberingStoreInstance.getNextId("Database");
 
   const loadBalancing: Level = {
     id: "load-balancing",
@@ -38,7 +36,11 @@ export const loadBalancingLevelMaker = () => {
         target: { id: sqlDatabase1, type: "Database" },
       },
     ],
-    citeria: solutionDesignShouldHave,
+    citeria: [
+      "At least 1 client",
+      "At least 2 server",
+      "At least 1 load balancer",
+    ],
     description:
       "Your user base has grown significantly, and a single server is no longer able to handle the increased load.",
     components: ["Client", "Database", "Server", "Load Balancer"],

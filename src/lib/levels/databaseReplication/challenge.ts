@@ -1,6 +1,5 @@
 import { type Level } from "../type";
 import { componentsNumberingStore } from "../utils";
-import { solutionDesignShouldHave } from "./solutions";
 
 const componentsNumberingStoreInstance = componentsNumberingStore.getState();
 
@@ -69,7 +68,13 @@ export const databaseReplicationLevelMaker = () => {
       "Primary Database",
       "Secondary Database",
     ],
-    citeria: solutionDesignShouldHave,
+    citeria: [
+      'At least one client',
+      'At least one server',
+      'At least one load balancer for servers if more than one server is present',
+      'At least one primary database for writing',
+      'At least one replica database for reading',
+    ],
   };
 
   return databaseReplication;

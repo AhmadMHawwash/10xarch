@@ -1,6 +1,11 @@
 export const generalCriteria = [
-  'Components should be connected starting from the client and ending at the database',
-  'Load balancers can only be used for servers, and can not be used for databases',
-  'Components should be connected in a good architectural sense',
-  'Connections should be made in a way that makes sense for the system',
-]
+  "Components should be connected starting from the client and ending at the database",
+  "Load balancers can only be used for servers, and can not be used for databases",
+  "Components should be connected in a good architectural sense",
+  "Connections should be made in a way that makes sense for the system",
+];
+
+export const constraints = [
+  "Load balancers can only be used for servers, and can not be used for databases",
+  "Make sure that components are connected starting from client ending up at the database",
+];

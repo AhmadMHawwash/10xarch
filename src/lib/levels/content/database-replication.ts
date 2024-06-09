@@ -60,14 +60,7 @@ export const databaseReplicationLevelMaker = () => {
       },
     ],
     description:
-      "The single Database has become a bottleneck. Implement database replication to handle more read requests and ensure high availability.",
-    components: [
-      "Client",
-      "Load Balancer",
-      "Server",
-      "Primary Database",
-      "Secondary Database",
-    ],
+      "The single SQL database becomes a bottleneck. Introduce a primary and secondary SQL database to handle read and write operations separately.",
     citeria: [
       "At least one client",
       "At least one server",

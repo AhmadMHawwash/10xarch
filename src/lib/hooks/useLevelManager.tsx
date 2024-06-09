@@ -12,6 +12,7 @@ import levels from "../levels";
 import { type Level } from "../levels/type";
 import { extractIdAndType, useSystemDesigner } from "./useSystemDesigner";
 import { api } from "@/trpc/react";
+import { componentsNumberingStore } from "../levels/utils";
 
 export const SYSTEM_COMPONENT_NODE = "SystemComponentNode";
 
@@ -20,21 +21,24 @@ const useLevelStore = create<{
   toNextLevel: () => void;
   isInitialised: boolean;
   setIsInitialised: (isInitialised: boolean) => void;
-}>((set) => ({
-  level: levels[0],
-  toNextLevel: () => {
-    set((state) => {
-      const nextLevelIndex =
-        levels.findIndex((level) => level.id === state.level?.id) + 1;
-      return {
-        ...state,
-        level: levels[nextLevelIndex],
-      };
-    });
-  },
+  currentLevelIndex: number;
+}>((set, get) => ({
+  currentLevelIndex: 0,
+  level: levels[0]?.(),
   isInitialised: false,
   setIsInitialised: (isInitialised: boolean) => {
     set({ isInitialised });
+  },
+  toNextLevel: () => {
+    set((state) => {
+      const nextLevelIndex = get().currentLevelIndex + 1;
+      componentsNumberingStore.getState().resetCounting();
+      return {
+        ...state,
+        currentLevelIndex: nextLevelIndex,
+        level: levels[nextLevelIndex]?.(),
+      };
+    });
   },
 }));
 
@@ -68,7 +72,7 @@ export const useLevelManager = () => {
               icon: systemComponent?.icon,
               withTargetHandle: true,
               withSourceHandle: true,
-              configs: component.configs ?? {},
+              configs: (component.configs as Record<string, unknown>) ?? {},
             },
             id,
             type: SYSTEM_COMPONENT_NODE,

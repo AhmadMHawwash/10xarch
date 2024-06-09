@@ -4,11 +4,12 @@ import { type SystemComponent } from "./type";
 export const componentsNumberingStore = create<{
   getNextId: (componentName: SystemComponent["name"]) => string;
   componentsToCount: Record<SystemComponent["name"], number>;
+  resetCounting: () => void;
 }>((set, get) => ({
   componentsToCount: {
     Client: 1,
     Server: 1,
-    "Database": 1,
+    Database: 1,
     "Load Balancer": 1,
     Cache: 1,
     CDN: 1,
@@ -22,5 +23,17 @@ export const componentsNumberingStore = create<{
       },
     }));
     return `${componentName}-${id}`;
+  },
+  resetCounting: () => {
+    set({
+      componentsToCount: {
+        Client: 1,
+        Server: 1,
+        Database: 1,
+        "Load Balancer": 1,
+        Cache: 1,
+        CDN: 1,
+      },
+    });
   },
 }));

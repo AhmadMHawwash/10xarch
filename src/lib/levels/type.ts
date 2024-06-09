@@ -41,7 +41,6 @@ export const levelSchema = z.object({
   description: z.string(),
   preConnectedComponents: z.array(componentSchema),
   preConnectedConnections: z.array(connectionSchema),
-  components: z.array(z.string()),
   citeria: z.array(z.string()),
   dashboard: z
     .object({

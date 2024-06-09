@@ -12,6 +12,8 @@ export const loadBalancingLevelMaker = () => {
     id: "load-balancing",
     name: "Load Balancing",
     title: "Distribute Load Across Multiple Servers",
+    description:
+      "Your user base has grown significantly, and a single server is no longer able to handle the increased load.",
     preConnectedComponents: [
       {
         type: "Client",
@@ -41,9 +43,6 @@ export const loadBalancingLevelMaker = () => {
       "At least 2 server",
       "At least 1 load balancer",
     ],
-    description:
-      "Your user base has grown significantly, and a single server is no longer able to handle the increased load.",
-    components: ["Client", "Database", "Server", "Load Balancer"],
     // dashboard: {
     //   beforeStartingLevel: {
     //     reports: [
@@ -128,3 +127,32 @@ export const loadBalancingLevelMaker = () => {
 };
 
 // console.log(loadBalancing)
+
+// - Requests Per Second is 1000
+// - Success Rate is 70%
+// - Latency is 800ms
+// - Server Utilization is 100%
+// - Number of Active Users is 700
+
+// You are going to be behaving as a system monitor in a system design game.
+
+// I give you:
+// - The system components 
+// - The current monitoring numbers per component
+// - The design challenge the user is trying to solve
+
+// You give me:
+// - Simulated monitoring numbers per component based on the design challenge the user is trying to solve.
+
+// Example:
+// Challenges: Due to increased number of users, server is under high load, and noticeable increase in latency during peak hours.
+// Current mointors:
+// - Requests Per Second is 1000
+// - Success Rate is 70%
+// - Latency is 800ms
+// - Server Utilization is 100%
+// - Number of Active Users is 700
+// Current components:
+// - 1 client
+// - 1 server
+// - 1 database

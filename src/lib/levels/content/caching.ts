@@ -80,14 +80,6 @@ export const cachingLevelMaker = () => {
     ],
     description:
       "To reduce database load and improve response time, introduce caching in your architecture.",
-    components: [
-      "Client",
-      "Load Balancer",
-      "Server",
-      "Primary Database",
-      "Secondary Database",
-      "Cache",
-    ],
     citeria: [
       "At least 1 client",
       "At least 1 server",

@@ -1,8 +1,8 @@
-import { basicLevelMaker } from "./content/basic";
-import { cachingLevelMaker } from "./content/caching";
-import { cdnLevelMaker } from "./content/cdn";
-import { databaseReplicationLevelMaker } from "./content/database-replication";
-import { loadBalancingLevelMaker } from "./content/load-balancing";
+import { basicLevelMaker } from "./content/1-basic";
+import { cachingLevelMaker } from "./content/5-caching";
+import { cdnLevelMaker } from "./content/4-cdn";
+import { databaseReplicationLevelMaker } from "./content/3-database-replication";
+import { loadBalancingLevelMaker } from "./content/2-load-balancing";
 
 const levels = [
   basicLevelMaker,

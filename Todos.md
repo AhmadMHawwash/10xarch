@@ -15,3 +15,6 @@ Todos:
 [ ] Tell the AI to behave like backend for stats and reports
 [ ] Tell AI to behave like a System design interviewer
 [ ] Add "In beta" for "hints engine", so people can understand it's still a work in progress and not 100% reliable
+[ ] Waiting list
+[ ] Having lots of databases? And lots of servers? Use clusters instead
+[ ] Your servers are under utilised? And at peak time you need more servers? Use "Pay as you go" arch (Same for replicas)

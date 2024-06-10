@@ -13,6 +13,7 @@ export const componentsNumberingStore = create<{
     "Load Balancer": 1,
     Cache: 1,
     CDN: 1,
+    "Message Queue": 1,
   },
   getNextId: (componentName) => {
     const id = get().componentsToCount[componentName];
@@ -33,6 +34,7 @@ export const componentsNumberingStore = create<{
         "Load Balancer": 1,
         Cache: 1,
         CDN: 1,
+        "Message Queue": 1,
       },
     });
   },

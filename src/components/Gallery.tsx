@@ -1,24 +1,17 @@
-import { type SystemComponent } from "@/lib/levels/type";
+import { type SystemComponent, type SystemComponentType } from "@/lib/levels/type";
 import {
   Database,
   DatabaseZap,
   Globe,
+  HardDriveDownload,
   MonitorSmartphone,
   Network,
-  Server,
+  Server
 } from "lucide-react";
 import type { DragEvent } from "react";
 import { Lead } from "./ui/typography";
 
-export type SystemComponentName =
-  | "Client"
-  | "Server"
-  | "Load Balancer"
-  | "Cache"
-  | "CDN"
-  | "Database";
-
-const components: Record<SystemComponentName, SystemComponent> = {
+const components: Record<SystemComponentType, SystemComponent> = {
   Client: {
     name: "Client",
     description:
@@ -47,15 +40,21 @@ const components: Record<SystemComponentName, SystemComponent> = {
     description: "A cache is a device that stores data for future use.",
     icon: Globe,
   },
-  "Database": {
+  Database: {
     name: "Database",
     description: "A database is a device that stores data for future use.",
     icon: Database,
   },
+  "Message Queue": {
+    name: "Message Queue",
+    description:
+      "A message queue is a device that queues asynchronous messages between system components.",
+    icon: HardDriveDownload,
+  },
 };
 
 const Gallery = () => {
-  const onDragStart = (event: DragEvent, nodeType: SystemComponentName) => {
+  const onDragStart = (event: DragEvent, nodeType: SystemComponentType) => {
     event.dataTransfer.setData("application/reactflow", nodeType);
     event.dataTransfer.effectAllowed = "move";
   };
@@ -80,6 +79,6 @@ const Gallery = () => {
 
 export default Gallery;
 
-export const getSystemComponent = (type: SystemComponentName) => {
+export const getSystemComponent = (type: SystemComponentType) => {
   return components[type];
 };

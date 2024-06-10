@@ -61,12 +61,13 @@ export const databaseReplicationLevelMaker = () => {
     ],
     description:
       "The single SQL database becomes a bottleneck. Introduce a primary and secondary SQL database to handle read and write operations separately.",
-    citeria: [
-      "At least one client",
-      "At least one server",
-      "At least one load balancer for servers if more than one server is present",
-      "At least one primary database for writing",
-      "At least one replica database for reading",
+    criteria: [
+      "At least 1 client",
+      "At least 2 servers",
+      "At least 1 load balancer for servers",
+      "At least 1 cache for session management",
+      "At least 1 primary database for writing",
+      "At least 1 replica database for reading",
     ],
   };
 

@@ -89,15 +89,17 @@ export const cachingLevelMaker = () => {
         target: { id: database2 },
       },
     ],
-    citeria: [
+    criteria: [
       "At least 1 client",
-      "At least 1 server",
-      "At least 1 load balancer for servers if more than 1 server is present",
+      "At least 2 servers",
+      "At least 1 load balancer for servers",
+      "At least 1 cache for session management",
       "At least 1 primary database for writing",
       "At least 1 replica database for reading",
-      "At least one CDN for caching static content",
+      "At least 1 CDN for caching static content",
+      "Clients can connect to CDNs and load balancers simultaneously",
       "1 cache to store frequently accessed data",
-      "Servers should be connected to the cache, if the server couldn't find the data in the cache, it will fetch it from the database",
+      "Servers can be connected to the cache directly to access data, if the server couldn't find the data in cache, it will fetch it from the database",
     ],
   };
 

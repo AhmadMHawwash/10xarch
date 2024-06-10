@@ -15,10 +15,13 @@
 [ ] Tell AI to behave like a System design interviewer
 [ ] Add "In beta" for "hints engine", so people can understand it's still a work in progress and not 100% reliable
 [ ] Join the waiting list (because we might hit the scale barrier and we don't want to pay lots of money on serverless)
+[ ] Book based game (You read a bit then design your solution (or vice versa))
+[ ] Move all static AI instructional content to the engine itself, so we don't consume lots of tokens (just send user solution through network, everything else that's static, then it should be inside the instructions)
 
 ## In game level ideas:
 [ ] Having lots of databases? And lots of servers? Use clusters instead
 [ ] Your servers are under utilised? And at peak time you need more servers? Use "Pay as you go" arch (Same for replicas)
+[ ] Cache replica (For high availability)
 
 ## Tracks:
 [ ] Free abstract learning

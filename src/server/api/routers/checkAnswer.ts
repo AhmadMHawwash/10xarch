@@ -77,7 +77,7 @@ export const checkSolution = createTRPCRouter({
 
         return `The design challenge is: ${level.title}, ${level.description}. And this level has some constraints: ${constraints.map(toBullets).join("\n")}.
 The design challenge can be considered has a "Correct" solution if it had this criteria:
-${[...level.citeria, ...generalCriteria].map(toBullets).join("\n")}.
+${[...level.criteria, ...generalCriteria].map(toBullets).join("\n")}.
 
 Then we can consider the solution is correct.
 

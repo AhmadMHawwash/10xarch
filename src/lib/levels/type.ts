@@ -41,7 +41,7 @@ export const levelSchema = z.object({
   description: z.string(),
   preConnectedComponents: z.array(componentSchema),
   preConnectedConnections: z.array(connectionSchema),
-  citeria: z.array(z.string()),
+  criteria: z.array(z.string()),
   dashboard: z
     .object({
       beforeStartingLevel: z.object({

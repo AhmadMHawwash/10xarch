@@ -38,7 +38,7 @@ export const loadBalancingLevelMaker = () => {
         target: { id: database1 },
       },
     ],
-    citeria: [
+    criteria: [
       "At least 1 client",
       "At least 2 server",
       "At least 1 load balancer",

@@ -80,13 +80,14 @@ export const cdnLevelMaker = () => {
           target: { id: database2 },
         },
       ],
-    citeria: [
-      "At least one client",
-      "At least one server",
-      "At least one load balancer for servers if more than one server is present",
-      "At least one primary database for writing",
-      "At least one replica database for reading",
-      "At least one CDN for caching static content",
+    criteria: [
+      "At least 1 client",
+      "At least 2 servers",
+      "At least 1 load balancer for servers",
+      "At least 1 cache for session management",
+      "At least 1 primary database for writing",
+      "At least 1 replica database for reading",
+      "At least 1 CDN for caching static content",
       "clients can connect to CDNs and load balancers simultaneously",
     ],
   };

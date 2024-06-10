@@ -1,14 +1,14 @@
 import { useSystemDesigner } from "@/lib/hooks/useSystemDesigner";
-import { type MobileIcon } from "@/lib/icons/mobile";
 import { type SystemComponent } from "@/lib/levels/type";
 import { cn } from "@/lib/utils";
+import { type Icon } from "lucide-react";
 import { memo, type FC } from "react";
 import { Handle, Position, type NodeProps } from "reactflow";
-import { Small } from "./ui/typography";
 import { SQLDatabase } from "./SystemComponents/SQLDatabase";
+import { Small } from "./ui/typography";
 
 export type SystemComponentNodeDataProps = {
-  icon?: typeof MobileIcon;
+  icon?: typeof Icon;
   id: string;
   name: SystemComponent["name"];
   withTargetHandle?: boolean;

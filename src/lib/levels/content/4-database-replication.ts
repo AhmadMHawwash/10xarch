@@ -10,6 +10,7 @@ export const databaseReplicationLevelMaker = () => {
   const server1 = componentsNumberingStoreInstance.getNextId("Server");
   const server2 = componentsNumberingStoreInstance.getNextId("Server");
   const database1 = componentsNumberingStoreInstance.getNextId("Database");
+  const sessionCache1 = componentsNumberingStoreInstance.getNextId("Cache");
 
   const databaseReplication: Level = {
     id: "database-replication",
@@ -31,6 +32,13 @@ export const databaseReplicationLevelMaker = () => {
       {
         type: "Server",
         id: server2,
+      },
+      {
+        type: "Cache",
+        id: sessionCache1,
+        configs: {
+          type: "User Session",
+        }
       },
       {
         type: "Database",
@@ -58,6 +66,14 @@ export const databaseReplicationLevelMaker = () => {
         source: { id: server2 },
         target: { id: database1 },
       },
+      {
+        source: { id: server1 },
+        target: { id: sessionCache1 },
+      },
+      {
+        source: { id: server2 },
+        target: { id: sessionCache1 },
+      },
     ],
     description:
       "The single SQL database becomes a bottleneck. Introduce a primary and secondary SQL database to handle read and write operations separately.",
@@ -65,7 +81,8 @@ export const databaseReplicationLevelMaker = () => {
       "At least 1 client",
       "At least 2 servers",
       "At least 1 load balancer for servers",
-      "At least 1 cache for session management",
+      "At least 1 cache with User Session configuration for session management",
+      "There has to be 1 cache that's explicitly configured for session management in the solution provided",
       "At least 1 primary database for writing",
       "At least 1 replica database for reading",
     ],

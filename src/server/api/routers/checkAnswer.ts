@@ -75,7 +75,8 @@ export const checkSolution = createTRPCRouter({
           (c) => Object.values(c.configs ?? {}).length > 0,
         );
 
-        return `The design challenge is: ${level.title}, ${level.description}. And this level has some constraints: ${constraints.map(toBullets).join("\n")}.
+        return `The design challenge is: ${level.title}, ${level.description}. And this level has some constraints: 
+${constraints.map(toBullets).join("\n")}.
 The design challenge can be considered has a "Correct" solution if it had this criteria:
 ${[...level.criteria, ...generalCriteria].map(toBullets).join("\n")}.
 
@@ -87,7 +88,7 @@ ${userSolution.components.map((c) => toBullets(c.id)).join("\n")}.
 And they are connected like this: 
 ${connectionsInText.map(toBullets).join("\n")}.
 
-${componentsWithConfigs.length > 0 ? "Knowing that:" : ""}
+${componentsWithConfigs.length > 0 ? "Configurations:" : ""}
 ${componentsWithConfigs.map(getKnowingThat).join("\n")}`;
         return [
           //         {

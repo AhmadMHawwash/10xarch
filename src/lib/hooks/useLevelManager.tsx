@@ -101,10 +101,6 @@ export const useLevelManager = () => {
   const { data, mutate } = api.ai.hello.useMutation();
   data && console.log(data);
 
-  setTimeout(() => {
-    // void navigator.clipboard.writeText(JSON.stringify(data));
-  }, 1000);
-
   const checkSolution = async () => {
     const cleaned = cleanup({ nodes, edges });
 

@@ -66,7 +66,8 @@ export const sessionManagementLevelMaker = () => {
       "At least 2 server",
       "At least 1 load balancer for servers",
       "At least 1 database",
-      "At least 1 cache that is designated for user session management",
+      "At least 1 cache with User Session configuration for session management",
+      "There has to be 1 cache that's explicitly configured for session management in the solution provided",
     ],
   };
 

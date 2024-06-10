@@ -11,6 +11,7 @@ export const cachingLevelMaker = () => {
   const server2 = componentsNumberingStoreInstance.getNextId("Server");
   const database1 = componentsNumberingStoreInstance.getNextId("Database");
   const database2 = componentsNumberingStoreInstance.getNextId("Database");
+  const sessionCache1 = componentsNumberingStoreInstance.getNextId("Cache");
   const cdn1 = componentsNumberingStoreInstance.getNextId("CDN");
 
   const databaseReplication: Level = {
@@ -39,6 +40,13 @@ export const cachingLevelMaker = () => {
       {
         type: "Server",
         id: server2,
+      },
+      {
+        type: "Cache",
+        id: sessionCache1,
+        configs: {
+          type: "User Session",
+        },
       },
       {
         type: "Database",
@@ -74,6 +82,14 @@ export const cachingLevelMaker = () => {
       },
       {
         source: { id: server1 },
+        target: { id: sessionCache1 },
+      },
+      {
+        source: { id: server2 },
+        target: { id: sessionCache1 },
+      },
+      {
+        source: { id: server1 },
         target: { id: database1 },
       },
       {
@@ -93,12 +109,16 @@ export const cachingLevelMaker = () => {
       "At least 1 client",
       "At least 2 servers",
       "At least 1 load balancer for servers",
-      "At least 1 cache for session management",
+      "At least 1 cache with User Session configuration for session management",
+      "There has to be 1 cache that's explicitly configured for session management in the solution provided",
       "At least 1 primary database for writing",
       "At least 1 replica database for reading",
       "At least 1 CDN for caching static content",
       "Clients can connect to CDNs and load balancers simultaneously",
-      "1 cache to store frequently accessed data",
+      "CDNs shouldn't be directly connected to servers",
+      "At least 1 cache has to have Database Read/Write cache configuration",
+      "There has to be 1 cache that's explicitly configured as Database Read/Write cache in the solution provided",
+      "In configurations section, all caches have to be configured to either be Database Read/Write or User Session caches, otherwise, the solution is invalid",
       "Servers can be connected to the cache directly to access data, if the server couldn't find the data in cache, it will fetch it from the database",
     ],
   };

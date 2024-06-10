@@ -16,7 +16,7 @@ import { useSystemDesigner } from "@/lib/hooks/useSystemDesigner";
 export const SQLDatabase = ({ name, Icon }: ComponentNodeProps) => {
   return (
     <div className="relative flex flex-col items-center">
-      {Icon && <Icon height="20px" width="20px" />}
+      {Icon && <Icon size={20} />}
       <Small>{name}</Small>
       <SQLDatabaseSettings name={name} />
     </div>
@@ -41,10 +41,10 @@ const SQLDatabaseSettings = ({ name: id }: { name: string }) => {
     () => makeComponentConfigSlice<DatabaseType>(id, "type"),
     [id, makeComponentConfigSlice],
   );
-  let databaseType = get() ?? "Read/Write";
+  let databaseType = get();
   let databaseId: string | undefined = undefined;
-  console.log(databaseType);
-  if (databaseType.startsWith("Replica")) {
+
+  if (databaseType?.startsWith("Replica")) {
     const [x, y] = (databaseType as Replica).split(" of ");
     databaseType = x as Replica;
     databaseId = y!;
@@ -62,7 +62,6 @@ const SQLDatabaseSettings = ({ name: id }: { name: string }) => {
               value={databaseType}
               onValueChange={(x: DatabaseType) => set(x)}
               name="database-type"
-              defaultValue="Read/Write"
             >
               <SelectTrigger className="w-fit">
                 <SelectValue placeholder="Database type" />
@@ -77,7 +76,7 @@ const SQLDatabaseSettings = ({ name: id }: { name: string }) => {
             </Select>
           </div>
         </div>
-        {databaseType.startsWith("Replica") && (
+        {databaseType?.startsWith("Replica") && (
           <div className="grid grid-flow-col grid-cols-2">
             <Label htmlFor="replica-of" className="col-span-1 my-auto">
               Replica of

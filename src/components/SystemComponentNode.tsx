@@ -1,14 +1,15 @@
 import { useSystemDesigner } from "@/lib/hooks/useSystemDesigner";
 import { type SystemComponent } from "@/lib/levels/type";
 import { cn } from "@/lib/utils";
-import { type Icon } from "lucide-react";
+import { type PiIcon } from "lucide-react";
 import { memo, type FC } from "react";
 import { Handle, Position, type NodeProps } from "reactflow";
 import { SQLDatabase } from "./SystemComponents/SQLDatabase";
 import { Small } from "./ui/typography";
+import { Cache } from "./SystemComponents/Cache";
 
 export type SystemComponentNodeDataProps = {
-  icon?: typeof Icon;
+  icon?: typeof PiIcon;
   id: string;
   name: SystemComponent["name"];
   withTargetHandle?: boolean;
@@ -43,6 +44,8 @@ export const SystemComponentNode: FC<
       >
         {name === "Database" ? (
           <SQLDatabase name={id} Icon={Icon} />
+        ) : name === "Cache" ? (
+          <Cache name={id} Icon={Icon} />
         ) : (
           <>
             {Icon && <Icon height="20px" width="20px" />}

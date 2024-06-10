@@ -120,7 +120,7 @@ export const useLevelManager = () => {
   const makeComponentConfigSlice = useCallback(
     <T,>(componentId: string, configKey: string) => {
       return {
-        get: () => {
+        get: (): T | undefined => {
           const component = nodes.find((node) => node.id === componentId);
           return (component?.data.configs?.[configKey] ?? undefined) as T;
         },

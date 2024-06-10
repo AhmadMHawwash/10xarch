@@ -3,7 +3,7 @@ import { componentsNumberingStore } from "../utils";
 
 const componentsNumberingStoreInstance = componentsNumberingStore.getState();
 
-export const databaseReplicationLevelMaker = () => {
+export const sessionManagementLevelMaker = () => {
   const client1 = componentsNumberingStoreInstance.getNextId("Client");
   const loadbalancer1 =
     componentsNumberingStoreInstance.getNextId("Load Balancer");
@@ -11,7 +11,7 @@ export const databaseReplicationLevelMaker = () => {
   const server2 = componentsNumberingStoreInstance.getNextId("Server");
   const database1 = componentsNumberingStoreInstance.getNextId("Database");
 
-  const databaseReplication: Level = {
+  const sessionManagement: Level = {
     id: "session-management",
     name: "Session Management",
     title: "Implement Session management for user experience consistency",
@@ -66,9 +66,9 @@ export const databaseReplicationLevelMaker = () => {
       "At least 2 server",
       "At least 1 load balancer for servers",
       "At least 1 database",
-      "At least 1 cache for session management",
+      "At least 1 cache that is designated for user session management",
     ],
   };
 
-  return databaseReplication;
+  return sessionManagement;
 };

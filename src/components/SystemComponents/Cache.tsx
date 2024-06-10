@@ -22,13 +22,13 @@ export const Cache = ({ name, Icon }: ComponentNodeProps) => {
   );
 };
 
-type CacheType = "Database Read/Write" | "User Session";
+type CachePurpose = "Database Read/Write" | "User Session";
 
 const CacheSettings = ({ name: id }: { name: string }) => {
   const { makeComponentConfigSlice } = useLevelManager();
 
   const { get, set } = useMemo(
-    () => makeComponentConfigSlice<CacheType>(id, "type"),
+    () => makeComponentConfigSlice<CachePurpose>(id, "type"),
     [id, makeComponentConfigSlice],
   );
 
@@ -38,17 +38,17 @@ const CacheSettings = ({ name: id }: { name: string }) => {
     <WithSettings name={id}>
       <div className="grid w-full grid-flow-row grid-cols-1 gap-2">
         <div className="grid grid-flow-col grid-cols-2">
-          <Label htmlFor="cache-type" className=" col-span-1 my-auto">
-            Cache type
+          <Label htmlFor="cache-purpose" className=" col-span-1 my-auto">
+            Cache purpose
           </Label>
           <div className="col-span-1">
             <Select
               value={cacheType}
-              onValueChange={(x: CacheType) => set(x)}
-              name="cache-type"
+              onValueChange={(x: CachePurpose) => set(x)}
+              name="cache-purpose"
             >
               <SelectTrigger className="w-fit">
-                <SelectValue placeholder="Cache type" />
+                <SelectValue placeholder="Cache purpose" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="Database Read/Write">

@@ -99,7 +99,7 @@ export const useLevelManager = () => {
   }, [currentLevel]);
 
   const { data, mutate } = api.ai.hello.useMutation();
-  console.log(data);
+  data && console.log(data);
 
   setTimeout(() => {
     // void navigator.clipboard.writeText(JSON.stringify(data));

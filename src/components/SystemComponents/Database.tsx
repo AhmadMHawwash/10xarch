@@ -13,12 +13,12 @@ import { WithSettings } from "./WithSettings";
 import { useMemo } from "react";
 import { useSystemDesigner } from "@/lib/hooks/useSystemDesigner";
 
-export const SQLDatabase = ({ name, Icon }: ComponentNodeProps) => {
+export const Database = ({ name, Icon }: ComponentNodeProps) => {
   return (
     <div className="relative flex flex-col items-center">
       {Icon && <Icon size={20} />}
       <Small>{name}</Small>
-      <SQLDatabaseSettings name={name} />
+      <DatabaseSettings name={name} />
     </div>
   );
 };
@@ -29,7 +29,7 @@ type ReadWrite = "Read/Write";
 
 type DatabaseType = Primary | Replica | ReadWrite;
 
-const SQLDatabaseSettings = ({ name: id }: { name: string }) => {
+const DatabaseSettings = ({ name: id }: { name: string }) => {
   const { nodes } = useSystemDesigner();
   const { makeComponentConfigSlice } = useLevelManager();
 

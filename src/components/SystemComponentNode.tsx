@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { type PiIcon } from "lucide-react";
 import { memo, type FC } from "react";
 import { Handle, Position, type NodeProps } from "reactflow";
-import { SQLDatabase } from "./SystemComponents/SQLDatabase";
+import { Database } from "./SystemComponents/Database";
 import { Small } from "./ui/typography";
 import { Cache } from "./SystemComponents/Cache";
 
@@ -43,7 +43,7 @@ export const SystemComponentNode: FC<
         )}
       >
         {name === "Database" ? (
-          <SQLDatabase name={id} Icon={Icon} />
+          <Database name={id} Icon={Icon} />
         ) : name === "Cache" ? (
           <Cache name={id} Icon={Icon} />
         ) : (

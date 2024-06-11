@@ -22,6 +22,8 @@
 [ ] Having lots of databases? And lots of servers? Use clusters instead
 [ ] Your servers are under utilised? And at peak time you need more servers? Use "Pay as you go" arch (Same for replicas)
 [ ] Cache replica (For high availability)
+[ ] Clusters
+[ ] Availability zones
 
 ## Tracks:
 [ ] Free abstract learning

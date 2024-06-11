@@ -1,4 +1,7 @@
-import { type SystemComponent, type SystemComponentType } from "@/lib/levels/type";
+import {
+  type SystemComponent,
+  type SystemComponentType,
+} from "@/lib/levels/type";
 import {
   Database,
   DatabaseZap,
@@ -6,7 +9,7 @@ import {
   HardDriveDownload,
   MonitorSmartphone,
   Network,
-  Server
+  Server,
 } from "lucide-react";
 import type { DragEvent } from "react";
 import { Lead } from "./ui/typography";
@@ -60,7 +63,7 @@ const Gallery = () => {
   };
 
   return (
-    <div className="absolute left-0 top-0 m-2 h-fit w-fit flex-col rounded-md border border-gray-200 bg-gray-50 bg-opacity-70 p-2">
+    <div className="m-2 h-fit w-fit flex-col rounded-md border border-gray-200 bg-gray-50 bg-opacity-70 p-2">
       <Lead className="h-fit">Components</Lead>
       {Object.values(components).map(({ name, icon: Icon }) => (
         <div

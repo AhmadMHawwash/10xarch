@@ -85,8 +85,11 @@ const SystemDesigner = () => {
         fitView={false}
       >
         <Background variant={BackgroundVariant.Dots} color="black" />
-        <Panel position="top-right">
+        <Panel position="top-left">
           <Dashboard />
+        </Panel>
+        <Panel position="top-right">
+          <Gallery />
         </Panel>
         <Panel position="bottom-right">
           <Button onClick={checkSolution}>Check solution</Button>
@@ -94,7 +97,6 @@ const SystemDesigner = () => {
         </Panel>
         <Controls />
       </ReactFlow>
-      <Gallery />
     </div>
   );
 };

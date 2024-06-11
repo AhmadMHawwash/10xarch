@@ -7,6 +7,8 @@ import { Handle, Position, type NodeProps } from "reactflow";
 import { Database } from "./SystemComponents/Database";
 import { Small } from "./ui/typography";
 import { Cache } from "./SystemComponents/Cache";
+import { DatabaseCluster } from "./SystemComponents/Clusters/Database";
+import { CacheCluster } from "./SystemComponents/Clusters/Cache";
 
 export type SystemComponentNodeDataProps = {
   icon?: typeof PiIcon;
@@ -25,6 +27,7 @@ export const SystemComponentNode: FC<
 }) => {
   const { isEdgeBeingConnected } = useSystemDesigner();
 
+  const Component = components[name] ?? DefaultComponent;
   return (
     <>
       <Handle
@@ -42,16 +45,7 @@ export const SystemComponentNode: FC<
             "opacity-50",
         )}
       >
-        {name === "Database" ? (
-          <Database name={id} Icon={Icon} />
-        ) : name === "Cache" ? (
-          <Cache name={id} Icon={Icon} />
-        ) : (
-          <>
-            {Icon && <Icon height="20px" width="20px" />}
-            <Small>{id}</Small>
-          </>
-        )}
+        <Component name={id} Icon={Icon} />
       </div>
 
       <Handle
@@ -70,3 +64,22 @@ export type ComponentNodeProps = {
   name: string;
   Icon: SystemComponentNodeDataProps["icon"];
 };
+
+const components: Partial<
+  Record<
+    SystemComponent["name"],
+    ({ name, Icon }: ComponentNodeProps) => React.ReactElement
+  >
+> = {
+  Database,
+  Cache,
+  "Database Cluster": DatabaseCluster,
+  "Cache Cluster": CacheCluster,
+};
+
+const DefaultComponent = ({ name, Icon }: ComponentNodeProps) => (
+  <>
+    {Icon && <Icon height="20px" width="20px" />}
+    <Small>{name}</Small>
+  </>
+);

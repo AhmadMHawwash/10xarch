@@ -6,14 +6,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useLevelManager } from "@/lib/hooks/useLevelManager";
-import { type ComponentNodeProps } from "../SystemComponentNode";
-import { Label } from "../ui/label";
-import { Small } from "../ui/typography";
-import { WithSettings } from "./WithSettings";
+import { type ComponentNodeProps } from "../../SystemComponentNode";
+import { Label } from "../../ui/label";
+import { Small } from "../../ui/typography";
+import { WithSettings } from "../WithSettings";
 import { useMemo } from "react";
 import { useSystemDesigner } from "@/lib/hooks/useSystemDesigner";
 
-export const Database = ({ name, Icon }: ComponentNodeProps) => {
+export const DatabaseCluster = ({ name, Icon }: ComponentNodeProps) => {
   return (
     <div className="relative flex flex-col items-center">
       {Icon && <Icon size={20} />}

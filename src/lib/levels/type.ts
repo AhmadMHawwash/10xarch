@@ -13,6 +13,8 @@ const componentsListSchema = z.enum([
   "CDN",
   "Database",
   "Message Queue",
+  "Database Cluster",
+  "Cache Cluster"
 ]);
 
 const DatabaseConfigs = z.object({

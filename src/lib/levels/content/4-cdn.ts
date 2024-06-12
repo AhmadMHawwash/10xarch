@@ -3,7 +3,7 @@ import { componentsNumberingStore } from "../utils";
 
 const componentsNumberingStoreInstance = componentsNumberingStore.getState();
 
-export const databaseReplicationLevelMaker = () => {
+export const cdnLevelMaker = () => {
   const client1 = componentsNumberingStoreInstance.getNextId("Client");
   const loadbalancer1 =
     componentsNumberingStoreInstance.getNextId("Load Balancer");
@@ -13,9 +13,11 @@ export const databaseReplicationLevelMaker = () => {
   const sessionCache1 = componentsNumberingStoreInstance.getNextId("Cache");
 
   const databaseReplication: Level = {
-    id: "database-replication",
-    name: "Database Replication",
-    title: "Implement Database Replication for High Availability",
+    id: "cdn",
+    name: "Caching Static Content",
+    title: "Implement a Content Delivery Network (CDN)",
+    description:
+      "Your website is slow to load for users in different parts of the world.",
     preConnectedComponents: [
       {
         type: "Client",
@@ -34,15 +36,15 @@ export const databaseReplicationLevelMaker = () => {
         id: server2,
       },
       {
+        type: "Database",
+        id: database1,
+      },
+      {
         type: "Cache",
         id: sessionCache1,
         configs: {
           type: "User Session",
-        }
-      },
-      {
-        type: "Database",
-        id: database1,
+        },
       },
     ],
     preConnectedConnections: [
@@ -60,31 +62,32 @@ export const databaseReplicationLevelMaker = () => {
       },
       {
         source: { id: server1 },
-        target: { id: database1 },
+        target: { id: sessionCache1 },
       },
       {
         source: { id: server2 },
-        target: { id: database1 },
+        target: { id: sessionCache1 },
       },
       {
         source: { id: server1 },
-        target: { id: sessionCache1 },
+        target: { id: database1 },
       },
       {
         source: { id: server2 },
-        target: { id: sessionCache1 },
+        target: { id: database1 },
       },
     ],
-    description:
-      "The single SQL database becomes a bottleneck. Introduce a primary and secondary SQL database to handle read and write operations separately.",
     criteria: [
       "At least 1 client",
       "At least 2 servers",
+      "At least 1 database",
       "At least 1 load balancer for servers",
       "At least 1 cache with User Session configuration for session management",
       "There has to be 1 cache that's explicitly configured for session management in the solution provided",
-      "At least 1 primary database for writing",
-      "At least 1 replica database for reading",
+
+      "At least 1 CDN for caching static content",
+      "Clients can connect to CDNs and load balancers simultaneously",
+      "CDNs shouldn't be directly connected to servers",
     ],
   };
 

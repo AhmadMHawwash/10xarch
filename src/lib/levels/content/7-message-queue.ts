@@ -14,7 +14,6 @@ export const messageQueueLevelMaker = () => {
   const cdn1 = componentsNumberingStoreInstance.getNextId("CDN");
   const sessionCache1 = componentsNumberingStoreInstance.getNextId("Cache");
   const databaseCache1 = componentsNumberingStoreInstance.getNextId("Cache");
-  const mq1 = componentsNumberingStoreInstance.getNextId("Message Queue");
 
   const messageQueue: Level = {
     id: "messege-queue",
@@ -128,15 +127,13 @@ export const messageQueueLevelMaker = () => {
       "At least 1 load balancer for servers",
       "At least 1 cache with User Session configuration for session management",
       "There has to be 1 cache that's explicitly configured for session management in the solution provided",
-      "At least 1 primary database for writing",
-      "At least 1 replica database for reading",
       "At least 1 CDN for caching static content",
       "Clients can connect to CDNs and load balancers simultaneously",
       "CDNs shouldn't be directly connected to servers",
       "At least 1 cache has to have Database Read/Write cache configuration",
       "There has to be 1 cache that's explicitly configured as Database Read/Write cache in the solution provided",
-      "In configurations section, all caches have to be configured to either be Database Read/Write or User Session caches, otherwise, the solution is invalid",
-      "Servers can be connected to the cache directly to access data, if the server couldn't find the data in cache, it will fetch it from the database",
+      "At least 1 primary database for writing",
+      "At least 1 replica database for reading",
 
       "At least 1 message queue",
       "Servers can push background jobs to the message queue",

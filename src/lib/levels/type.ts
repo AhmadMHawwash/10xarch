@@ -21,6 +21,7 @@ const DatabaseConfigs = z.object({
   type: z.union([
     z.literal("Primary (Write)"),
     z.literal("Replica (Read only)"),
+    // @ FIXME: This is making the type loose
     z.string().refine((val) => val.startsWith("Replica (Read only) of "), {
       message: "Must match 'Replica (Read only) of <something>'",
     }),

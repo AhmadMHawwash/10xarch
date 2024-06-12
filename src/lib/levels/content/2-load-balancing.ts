@@ -41,7 +41,9 @@ export const loadBalancingLevelMaker = () => {
     criteria: [
       "At least 1 client",
       "At least 2 server",
-      "At least 1 load balancer",
+      "At least 1 database",
+
+      "At least 1 load balancer for servers",
     ],
     // dashboard: {
     //   beforeStartingLevel: {

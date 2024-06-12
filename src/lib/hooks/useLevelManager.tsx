@@ -1,5 +1,6 @@
 import { getSystemComponent } from "@/components/Gallery";
 import { type SystemComponentNodeDataProps } from "@/components/SystemComponentNode";
+import { api } from "@/trpc/react";
 import { useCallback, useEffect } from "react";
 import {
   MarkerType,
@@ -10,9 +11,8 @@ import {
 import { create } from "zustand";
 import levels from "../levels";
 import { type Level } from "../levels/type";
-import { extractIdAndType, useSystemDesigner } from "./useSystemDesigner";
-import { api } from "@/trpc/react";
 import { componentsNumberingStore } from "../levels/utils";
+import { useSystemDesigner } from "./useSystemDesigner";
 
 export const SYSTEM_COMPONENT_NODE = "SystemComponentNode";
 
@@ -41,6 +41,23 @@ const useLevelStore = create<{
     });
   },
 }));
+
+// const initialConfigs: Partial<
+//   Record<SystemComponentType, Record<string, unknown>>
+// > = {
+//   "Cache Cluster": {
+//     type: "unknown",
+//   },
+//   "Database Cluster": {
+//     type: "unknown",
+//   },
+//   Cache: {
+//     type: "unknown",
+//   },
+//   Database: {
+//     type: "unknown",
+//   },
+// };
 
 export const useLevelManager = () => {
   const {
@@ -83,15 +100,15 @@ export const useLevelManager = () => {
     updateNodes(nodes);
 
     const edges: Edge[] =
-      currentLevel?.preConnectedConnections.map(({ source, target }) => {
-        return {
-          id: `${source.id} -> ${target.id}`,
-          source: source.id,
-          target: target.id,
+      currentLevel?.preConnectedComponents.flatMap(({ id, targets }) => {
+        return targets.map((targetId) => ({
+          id: `${id} -> ${targetId}`,
+          source: id,
+          target: targetId,
           type: "CustomEdge",
           animated: true,
           markerEnd: { type: MarkerType.ArrowClosed },
-        };
+        }));
       }) ?? [];
 
     updateEdges(edges);
@@ -106,10 +123,7 @@ export const useLevelManager = () => {
 
     mutate({
       level: currentLevel!,
-      userSolution: {
-        components: cleaned.nodes,
-        connections: cleaned.edges,
-      },
+      solutionComponents: cleaned,
     });
   };
 
@@ -162,23 +176,18 @@ const cleanup = (
     "viewport"
   >,
 ) => {
+  const findTargets = (sourceId: string) => {
+    return flow.edges
+      .filter((edge) => edge.source === sourceId)
+      .map((edge) => edge.target);
+  };
+
   const nodes = flow.nodes.map((node) => ({
     type: node.data.name,
     id: node.id,
     configs: node.data.configs,
+    targets: findTargets(node.id),
   }));
 
-  const edges = flow.edges.map((edge) => {
-    const { type: targetType } = extractIdAndType(edge.target);
-    const { type: sourceType } = extractIdAndType(edge.source);
-    return {
-      source: {
-        id: edge.source,
-        type: sourceType,
-      },
-      target: { id: edge.target, type: targetType },
-    };
-  });
-
-  return { nodes, edges };
+  return nodes;
 };

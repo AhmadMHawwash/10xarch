@@ -13,14 +13,14 @@ export const checkSolution = createTRPCRouter({
     .input(
       z.object({
         level: levelSchema,
-        userSolution: userSolutionSchema,
+        solutionComponents: userSolutionSchema,
         tree: z.any(),
       }),
     )
     .mutation(async ({ input }) => {
-      const { level, userSolution } = input;
+      const { level, solutionComponents } = input;
 
-      if (!level || !userSolution) {
+      if (!level || !solutionComponents) {
         return { error: "Missing required parameters" };
       }
 
@@ -42,7 +42,7 @@ export const checkSolution = createTRPCRouter({
         //       content: JSON.stringify(level),
         //     },
         //     { role: "assistant", content: "What is your solution?" },
-        //     { role: "user", content: JSON.stringify(userSolution) },
+        //     { role: "user", content: JSON.stringify(solutionComponents) },
         //     // { role: "user", content: `
         //     //   As a system design expert, I want you to look for all good and bad practices.
         //     //   ie: Components that can be connected to each other, and components shouldn't be connected to each other. ie, after adding load balancer a client shouldn't be able to talk directly to the server.
@@ -54,42 +54,34 @@ export const checkSolution = createTRPCRouter({
 
         // const responseMessage = response?.choices?.[0]?.message;
 
-        const connectionsInText = userSolution.connections.map(
-          (connection) =>
-            `${connection.source.id} connected to ${connection.target.id}`,
-        );
+        const getKnowingThat = (c: (typeof solutionComponents)[0]) => {
+          const componentConfigs = Object.values(c.configs ?? {});
+          if (componentConfigs.length === 0)
+            return `- ${c.id} is not configured\n`;
 
-        const getComponentConfig = (c: (typeof userSolution.components)[0]) => {
-          return Object.values((c.configs as object) ?? {}).map(
-            (value) => `${c.id} is configured as ${value} ${c.type}`,
-          );
+          return `- ${c.id} has these configs: \n${JSON.stringify(c.configs, null, 2)}\n`;
         };
 
-        const getKnowingThat = (c: (typeof userSolution.components)[0]) => {
-          return getComponentConfig(c).map(toBullets).join("\n");
+        const toBullet = (s: string) => `- ${s}`;
+
+        const getConnectedToText = (targets: string[]) => {
+          if (targets.length === 0)
+            return "and is not connected to any component.";
+          return `and is connected to ${targets.join(", ")}`;
         };
-
-        const toBullets = (s: string) => `- ${s}`;
-
-        const componentsWithConfigs = userSolution.components.filter(
-          (c) => Object.values(c.configs ?? {}).length > 0,
-        );
 
         return `The design challenge is: ${level.title}, ${level.description}. And this level has some constraints: 
-${constraints.map(toBullets).join("\n")}.
+${constraints.map(toBullet).join("\n")}.
 The design challenge can be considered has a "Correct" solution if it had this criteria:
-${[...level.criteria, ...generalCriteria].map(toBullets).join("\n")}.
+${[...level.criteria, ...generalCriteria].map(toBullet).join("\n")}.
 
 Then we can consider the solution is correct.
 
 The components I have in my design solution are: 
-${userSolution.components.map((c) => toBullets(c.id)).join("\n")}.
+${solutionComponents.map((c) => toBullet(`${c.id} ${getConnectedToText(c.targets)}`)).join("\n")}
 
-And they are connected like this: 
-${connectionsInText.map(toBullets).join("\n")}.
-
-${componentsWithConfigs.length > 0 ? "Configurations:" : ""}
-${componentsWithConfigs.map(getKnowingThat).join("\n")}`;
+Configurations:
+${solutionComponents.map(getKnowingThat).join("\n")}`;
         return [
           //         {
           //           role: "system",
@@ -124,14 +116,14 @@ ${componentsWithConfigs.map(getKnowingThat).join("\n")}`;
           //   content:
           //     "I'll provide you with a system design challenge I'm solving, and I need your assistance",
           // },
-          {
-            role: "user",
-            content: `the design challenge is: ${level.title}, ${level.description}`,
-          },
-          {
-            role: "user",
-            content: `The components I have are ${userSolution.components.map((c) => c.id).join(", ")}. And they are connected like this: ${connectionsInText.join(", ")}. And that represents components and connections between them.`,
-          },
+          // {
+          //   role: "user",
+          //   content: `the design challenge is: ${level.title}, ${level.description}`,
+          // },
+          // {
+          //   role: "user",
+          //   content: `The components I have are ${solutionComponents.map((c) => c.id).join(", ")}. And they are connected like this: ${connectionsInText.join(", ")}. And that represents components and connections between them.`,
+          // },
           // { role: "user", content: level.metaInstructions },
           // {
           //   role: "",
@@ -144,9 +136,7 @@ ${componentsWithConfigs.map(getKnowingThat).join("\n")}`;
           //   Give me one informative hint a time, that will allow me to fix the very first problem ahead and learn from it.
           //   `,
           // },
-
           // I need you to help me fix issues in my system design solution with high-level feedback, one hint at a time. Follow these strict rules:
-
           // Focus only on the scope of the current challenge.
           // Address components and their connections, not implementation details or configurations.
           // Provide one concise hint to fix the immediate issue without going into detail.
@@ -160,7 +150,6 @@ ${componentsWithConfigs.map(getKnowingThat).join("\n")}`;
           // - Ask for details already provided.
           // - Go beyond the scope of the challenge.
           // - Discuss configurations or implementation details such as handling connections, read/write access, load balancing strategies, or redundancy measures.
-
           // { role: "user", content: `
           // This is just a game and we're on a very high level conceptual game, and we can't configure components like load balancers or servers.
           //   As a system design expert, I want you to look for all good and bad practices.

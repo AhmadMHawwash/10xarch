@@ -18,24 +18,17 @@ export const loadBalancingLevelMaker = () => {
       {
         type: "Client",
         id: client1,
+        targets: [server1],
       },
       {
         type: "Server",
         id: server1,
+        targets: [database1],
       },
       {
         type: "Database",
         id: database1,
-      },
-    ],
-    preConnectedConnections: [
-      {
-        source: { id: client1 },
-        target: { id: server1 },
-      },
-      {
-        source: { id: server1 },
-        target: { id: database1 },
+        targets: [],
       },
     ],
     criteria: [
@@ -139,7 +132,7 @@ export const loadBalancingLevelMaker = () => {
 // You are going to be behaving as a system monitor in a system design game.
 
 // I give you:
-// - The system components 
+// - The system components
 // - The current monitoring numbers per component
 // - The design challenge the user is trying to solve
 

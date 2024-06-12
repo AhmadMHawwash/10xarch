@@ -22,22 +22,27 @@ export const cdnLevelMaker = () => {
       {
         type: "Client",
         id: client1,
+        targets: [loadbalancer1],
       },
       {
         type: "Load Balancer",
         id: loadbalancer1,
+        targets: [server1, server2],
       },
       {
         type: "Server",
         id: server1,
+        targets: [database1, sessionCache1],
       },
       {
         type: "Server",
         id: server2,
+        targets: [database1, sessionCache1],
       },
       {
         type: "Database",
         id: database1,
+        targets: [],
       },
       {
         type: "Cache",
@@ -45,36 +50,7 @@ export const cdnLevelMaker = () => {
         configs: {
           type: "User Session",
         },
-      },
-    ],
-    preConnectedConnections: [
-      {
-        source: { id: client1 },
-        target: { id: loadbalancer1 },
-      },
-      {
-        source: { id: loadbalancer1 },
-        target: { id: server1 },
-      },
-      {
-        source: { id: loadbalancer1 },
-        target: { id: server2 },
-      },
-      {
-        source: { id: server1 },
-        target: { id: sessionCache1 },
-      },
-      {
-        source: { id: server2 },
-        target: { id: sessionCache1 },
-      },
-      {
-        source: { id: server1 },
-        target: { id: database1 },
-      },
-      {
-        source: { id: server2 },
-        target: { id: database1 },
+        targets: [],
       },
     ],
     criteria: [
@@ -87,7 +63,6 @@ export const cdnLevelMaker = () => {
 
       "At least 1 CDN for caching static content",
       "Clients can connect to CDNs and load balancers simultaneously",
-      "CDNs shouldn't be directly connected to servers",
     ],
   };
 

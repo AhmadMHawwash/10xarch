@@ -23,26 +23,32 @@ export const cachingLevelMaker = () => {
       {
         type: "Client",
         id: client1,
+        targets: [loadbalancer1, cdn1],
       },
       {
         type: "CDN",
         id: cdn1,
+        targets: [],
       },
       {
         type: "Load Balancer",
         id: loadbalancer1,
+        targets: [server1, server2],
       },
       {
         type: "Server",
         id: server1,
+        targets: [sessionCache1, database1],
       },
       {
         type: "Server",
         id: server2,
+        targets: [sessionCache1, database1],
       },
       {
         type: "Database",
         id: database1,
+        targets: [],
       },
       {
         type: "Cache",
@@ -50,40 +56,7 @@ export const cachingLevelMaker = () => {
         configs: {
           type: "User Session",
         },
-      },
-    ],
-    preConnectedConnections: [
-      {
-        source: { id: client1 },
-        target: { id: loadbalancer1 },
-      },
-      {
-        source: { id: client1 },
-        target: { id: cdn1 },
-      },
-      {
-        source: { id: loadbalancer1 },
-        target: { id: server1 },
-      },
-      {
-        source: { id: loadbalancer1 },
-        target: { id: server2 },
-      },
-      {
-        source: { id: server1 },
-        target: { id: sessionCache1 },
-      },
-      {
-        source: { id: server2 },
-        target: { id: sessionCache1 },
-      },
-      {
-        source: { id: server1 },
-        target: { id: database1 },
-      },
-      {
-        source: { id: server2 },
-        target: { id: database1 },
+        targets: [],
       },
     ],
     criteria: [
@@ -95,7 +68,6 @@ export const cachingLevelMaker = () => {
       "There has to be 1 cache that's explicitly configured for session management in the solution provided",
       "At least 1 CDN for caching static content",
       "Clients can connect to CDNs and load balancers simultaneously",
-      "CDNs shouldn't be directly connected to servers",
 
       "At least 1 cache has to have Database Read/Write cache configuration",
       "There has to be 1 cache that's explicitly configured as Database Read/Write cache in the solution provided",

@@ -21,44 +21,27 @@ export const sessionManagementLevelMaker = () => {
       {
         type: "Client",
         id: client1,
+        targets: [loadbalancer1],
       },
       {
         type: "Load Balancer",
         id: loadbalancer1,
+        targets: [server1, server2],
       },
       {
         type: "Server",
         id: server1,
+        targets: [database1],
       },
       {
         type: "Server",
         id: server2,
+        targets: [database1],
       },
       {
         type: "Database",
         id: database1,
-      },
-    ],
-    preConnectedConnections: [
-      {
-        source: { id: client1 },
-        target: { id: loadbalancer1 },
-      },
-      {
-        source: { id: loadbalancer1 },
-        target: { id: server1 },
-      },
-      {
-        source: { id: loadbalancer1 },
-        target: { id: server2 },
-      },
-      {
-        source: { id: server1 },
-        target: { id: database1 },
-      },
-      {
-        source: { id: server2 },
-        target: { id: database1 },
+        targets: [],
       },
     ],
     criteria: [

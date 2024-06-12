@@ -82,10 +82,17 @@ const componentTargets: Record<
   SystemComponent["name"],
   SystemComponent["name"][]
 > = {
-  Client: ["Server", "Load Balancer", "CDN"],
-  CDN: ["Load Balancer", "Server"],
-  "Load Balancer": ["Server"],
+  Client: ["Server", "Server Cluster", "Load Balancer", "CDN"],
+  CDN: ["Load Balancer", "Server", "Server Cluster"],
+  "Load Balancer": ["Server", "Server Cluster"],
   Server: [
+    "Cache",
+    "Database",
+    "Cache Cluster",
+    "Database Cluster",
+    "Message Queue",
+  ],
+  "Server Cluster": [
     "Cache",
     "Database",
     "Cache Cluster",
@@ -94,7 +101,7 @@ const componentTargets: Record<
   ],
   Cache: ["Database", "Database Cluster"],
   Database: [],
-  "Message Queue": ["Server"],
+  "Message Queue": ["Server", "Server Cluster"],
   "Cache Cluster": ["Database Cluster", "Database"],
   "Database Cluster": [],
 };

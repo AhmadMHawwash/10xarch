@@ -75,6 +75,17 @@ const components: Record<SystemComponentType, SystemComponent> = {
         <DatabaseZap className="absolute left-0 top-0 bg-gray-50 bg-opacity-60 p-0" size={20} />
       </div>
     ),
+  },
+  "Server Cluster": {
+    name: "Server Cluster",
+    description:
+      "A server cluster is a group of servers that work together to serve data.",
+    icon: () => (
+      <div className="relative w-[20px] h-[20px]">
+        <Server className="absolute -left-1 -top-1" size={20} />
+        <Server className="absolute left-0 top-0 bg-gray-50 bg-opacity-60 p-0" size={20} />
+      </div>
+    ),
   }
 };
 

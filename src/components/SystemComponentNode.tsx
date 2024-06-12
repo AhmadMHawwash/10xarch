@@ -9,6 +9,7 @@ import { Small } from "./ui/typography";
 import { Cache } from "./SystemComponents/Cache";
 import { DatabaseCluster } from "./SystemComponents/Clusters/Database";
 import { CacheCluster } from "./SystemComponents/Clusters/Cache";
+import { ServerCluster } from "./SystemComponents/Clusters/Server";
 
 export type SystemComponentNodeDataProps = {
   icon?: typeof PiIcon;
@@ -76,6 +77,7 @@ const components: Partial<
   Cache,
   "Database Cluster": DatabaseCluster,
   "Cache Cluster": CacheCluster,
+  "Server Cluster": ServerCluster,
 };
 
 const DefaultComponent = ({ name, Icon }: ComponentNodeProps) => (

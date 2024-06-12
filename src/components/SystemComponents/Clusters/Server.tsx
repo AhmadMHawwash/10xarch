@@ -1,65 +1,52 @@
 import { Input } from "@/components/ui/input";
 import { useLevelManager } from "@/lib/hooks/useLevelManager";
+import { useSystemDesigner } from "@/lib/hooks/useSystemDesigner";
 import { useMemo } from "react";
 import { type ComponentNodeProps } from "../../SystemComponentNode";
 import { Label } from "../../ui/label";
 import { Small } from "../../ui/typography";
 import { WithSettings } from "../WithSettings";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
-export const CacheCluster = ({ name, Icon }: ComponentNodeProps) => {
+export const ServerCluster = ({ name, Icon }: ComponentNodeProps) => {
   return (
     <div className="relative flex flex-col items-center">
       {Icon && <Icon size={20} />}
       <Small>{name}</Small>
-      <CacheSettings name={name} />
+      {/* <DatabaseClusterSettings name={name} /> */}
     </div>
   );
 };
 
-type CachePurpose = "Database Read/Write" | "User Session";
+type Primary = "Primary (Write)";
+type Replica = "Replica (Read only)" | `Replica (Read only) of ${string}`;
+type ReadWrite = "Read/Write";
 
-const CacheSettings = ({ name: id }: { name: string }) => {
+type DatabaseType = Primary | Replica | ReadWrite;
+
+const DatabaseClusterSettings = ({ name: id }: { name: string }) => {
+  const { nodes } = useSystemDesigner();
   const { makeComponentConfigSlice } = useLevelManager();
 
+  const databaseNodes = nodes
+    .filter((node) => node.data.name === "Database")
+    .filter((node) => node.id !== id);
+
   const { get, set } = useMemo(
-    () => makeComponentConfigSlice<CachePurpose>(id, "type"),
+    () => makeComponentConfigSlice<DatabaseType>(id, "type"),
     [id, makeComponentConfigSlice],
   );
+  let databaseType = get();
+  let databaseId: string | undefined = undefined;
 
-  const cacheType = get();
+  if (databaseType?.startsWith("Replica")) {
+    const [x, y] = (databaseType as Replica).split(" of ");
+    databaseType = x as Replica;
+    databaseId = y!;
+  }
 
   return (
     <WithSettings name={id}>
       <div className="grid w-full grid-flow-row grid-cols-1 gap-2">
-        <div className="grid grid-flow-col grid-cols-2">
-          <Label htmlFor="cache-purpose" className=" col-span-1 my-auto">
-            Cache purpose
-          </Label>
-          <div className="col-span-1">
-            <Select
-              value={cacheType}
-              onValueChange={(x: CachePurpose) => set(x)}
-              name="cache-purpose"
-            >
-              <SelectTrigger className="w-fit">
-                <SelectValue placeholder="Cache purpose" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Database Read/Write">
-                  Database Read/Write
-                </SelectItem>
-                <SelectItem value="User Session">User Session</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
         <div className="grid grid-flow-col grid-cols-2">
           <Label htmlFor="database-type" className=" col-span-1 my-auto">
             Primary (Write)

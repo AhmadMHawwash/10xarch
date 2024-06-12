@@ -54,6 +54,28 @@ const components: Record<SystemComponentType, SystemComponent> = {
       "A message queue is a device that queues asynchronous messages between system components.",
     icon: HardDriveDownload,
   },
+  "Database Cluster": {
+    name: "Database Cluster",
+    description:
+      "A database cluster is a group of databases that work together to store and serve data.",
+    icon: () => (
+      <div className="relative w-[20px] h-[20px]">
+        <Database className="absolute -left-1 -top-1" size={20} />
+        <Database className="absolute left-0 top-0 bg-gray-50 bg-opacity-60 p-0" size={20} />
+      </div>
+    ),
+  },
+  "Cache Cluster": {
+    name: "Cache Cluster",
+    description:
+      "A cache cluster is a group of caches that work together to store and serve data.",
+    icon: () => (
+      <div className="relative w-[20px] h-[20px]">
+        <DatabaseZap className="absolute -left-1 -top-1" size={20} />
+        <DatabaseZap className="absolute left-0 top-0 bg-gray-50 bg-opacity-60 p-0" size={20} />
+      </div>
+    ),
+  }
 };
 
 const Gallery = () => {

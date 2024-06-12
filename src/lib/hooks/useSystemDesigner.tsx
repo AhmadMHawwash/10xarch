@@ -85,10 +85,18 @@ const componentTargets: Record<
   Client: ["Server", "Load Balancer", "CDN"],
   CDN: ["Load Balancer", "Server"],
   "Load Balancer": ["Server"],
-  Server: ["Cache", "Database", "Message Queue"],
-  Cache: ["Database"],
+  Server: [
+    "Cache",
+    "Database",
+    "Cache Cluster",
+    "Database Cluster",
+    "Message Queue",
+  ],
+  Cache: ["Database", "Database Cluster"],
   Database: [],
   "Message Queue": ["Server"],
+  "Cache Cluster": ["Database Cluster", "Database"],
+  "Database Cluster": [],
 };
 
 export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {

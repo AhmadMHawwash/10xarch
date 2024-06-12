@@ -11,6 +11,7 @@ import { type ComponentNodeProps } from "../../SystemComponentNode";
 import { Label } from "../../ui/label";
 import { Small } from "../../ui/typography";
 import { WithSettings } from "../WithSettings";
+import { Input } from "@/components/ui/input";
 
 export const CacheCluster = ({ name, Icon }: ComponentNodeProps) => {
   return (
@@ -38,26 +39,24 @@ const CacheSettings = ({ name: id }: { name: string }) => {
     <WithSettings name={id}>
       <div className="grid w-full grid-flow-row grid-cols-1 gap-2">
         <div className="grid grid-flow-col grid-cols-2">
-          <Label htmlFor="cache-purpose" className=" col-span-1 my-auto">
-            Cache purpose
+          <Label htmlFor="database-type" className=" col-span-1 my-auto">
+            Primary (Write)
           </Label>
-          <div className="col-span-1">
-            <Select
-              value={cacheType}
-              onValueChange={(x: CachePurpose) => set(x)}
-              name="cache-purpose"
-            >
-              <SelectTrigger className="w-fit">
-                <SelectValue placeholder="Cache purpose" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Database Read/Write">
-                  Database Read/Write
-                </SelectItem>
-                <SelectItem value="User Session">User Session</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          <Input
+            className="col-span-1"
+            placeholder="# of instances"
+            type="number"
+          />
+        </div>
+        <div className="grid grid-flow-col grid-cols-2">
+          <Label htmlFor="database-type" className=" col-span-1 my-auto">
+            Replica (Read only)
+          </Label>
+          <Input
+            className="col-span-1"
+            placeholder="# of instances"
+            type="number"
+          />
         </div>
       </div>
     </WithSettings>

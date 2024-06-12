@@ -41,7 +41,8 @@ export const SystemComponentNode: FC<
           "flex flex-col items-center justify-center rounded-sm border border-gray-400 p-2",
           selected ? "bg-gray-300" : "bg-gray-100",
           isEdgeBeingConnected &&
-            !(withTargetHandle ?? withSourceHandle) &&
+            // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+            !(withTargetHandle || withSourceHandle) &&
             "opacity-50",
         )}
       >

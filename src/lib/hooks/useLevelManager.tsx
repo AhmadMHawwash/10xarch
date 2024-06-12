@@ -113,14 +113,16 @@ export const useLevelManager = () => {
     });
   };
 
-  const makeComponentConfigSlice = useCallback(
-    <T,>(componentId: string, configKey: string) => {
-      return {
-        get: (): T | undefined => {
-          const component = nodes.find((node) => node.id === componentId);
-          return (component?.data.configs?.[configKey] ?? undefined) as T;
-        },
-        set: (configValue: T) => {
+  const useSystemComponentConfigSlice = useCallback(
+    <T,>(
+      componentId: string,
+      configKey: string,
+    ): [T, (configValue: T) => void] => {
+      const component = nodes.find((node) => node.id === componentId);
+
+      return [
+        (component?.data.configs?.[configKey] ?? undefined) as T,
+        (configValue: T) => {
           const updatedNodes = nodes.map((node) => {
             if (node.id === componentId) {
               return {
@@ -128,6 +130,7 @@ export const useLevelManager = () => {
                 data: {
                   ...node.data,
                   configs: {
+                    ...node.data.configs,
                     [configKey]: configValue,
                   },
                 },
@@ -137,7 +140,7 @@ export const useLevelManager = () => {
           });
           updateNodes(updatedNodes);
         },
-      };
+      ];
     },
     [nodes, updateNodes],
   );
@@ -149,7 +152,7 @@ export const useLevelManager = () => {
       toNextLevel();
     },
     checkSolution,
-    makeComponentConfigSlice,
+    useSystemComponentConfigSlice,
   };
 };
 

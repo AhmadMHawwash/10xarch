@@ -25,14 +25,12 @@ export const Cache = ({ name, Icon }: ComponentNodeProps) => {
 type CachePurpose = "Database Read/Write" | "User Session";
 
 const CacheSettings = ({ name: id }: { name: string }) => {
-  const { makeComponentConfigSlice } = useLevelManager();
+  const { useSystemComponentConfigSlice } = useLevelManager();
 
-  const { get, set } = useMemo(
-    () => makeComponentConfigSlice<CachePurpose>(id, "type"),
-    [id, makeComponentConfigSlice],
+  const [cacheType, setCacheType] = useSystemComponentConfigSlice<CachePurpose>(
+    id,
+    "type",
   );
-
-  const cacheType = get();
 
   return (
     <WithSettings name={id}>
@@ -44,7 +42,7 @@ const CacheSettings = ({ name: id }: { name: string }) => {
           <div className="col-span-1">
             <Select
               value={cacheType}
-              onValueChange={(x: CachePurpose) => set(x)}
+              onValueChange={(x: CachePurpose) => setCacheType(x)}
               name="cache-purpose"
             >
               <SelectTrigger className="w-fit">

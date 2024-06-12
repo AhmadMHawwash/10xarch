@@ -31,17 +31,16 @@ type DatabaseType = Primary | Replica | ReadWrite;
 
 const DatabaseSettings = ({ name: id }: { name: string }) => {
   const { nodes } = useSystemDesigner();
-  const { makeComponentConfigSlice } = useLevelManager();
+  const { useSystemComponentConfigSlice } = useLevelManager();
 
   const databaseNodes = nodes
     .filter((node) => node.data.name === "Database")
     .filter((node) => node.id !== id);
 
-  const { get, set } = useMemo(
-    () => makeComponentConfigSlice<DatabaseType>(id, "type"),
-    [id, makeComponentConfigSlice],
-  );
-  let databaseType = get();
+  // eslint-disable-next-line prefer-const
+  let [databaseType, setDatabaseType] =
+    useSystemComponentConfigSlice<DatabaseType>(id, "type");
+
   let databaseId: string | undefined = undefined;
 
   if (databaseType?.startsWith("Replica")) {
@@ -60,7 +59,7 @@ const DatabaseSettings = ({ name: id }: { name: string }) => {
           <div className="col-span-1">
             <Select
               value={databaseType}
-              onValueChange={(x: DatabaseType) => set(x)}
+              onValueChange={(x: DatabaseType) => setDatabaseType(x)}
               name="database-type"
             >
               <SelectTrigger className="w-fit">
@@ -85,7 +84,7 @@ const DatabaseSettings = ({ name: id }: { name: string }) => {
               <Select
                 value={databaseId}
                 onValueChange={(dbId: string) =>
-                  set(`${databaseType} of ${dbId}` as Replica)
+                  setDatabaseType(`${databaseType} of ${dbId}` as Replica)
                 }
                 name="replica-of"
               >

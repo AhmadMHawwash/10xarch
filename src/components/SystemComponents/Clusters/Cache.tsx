@@ -26,14 +26,16 @@ export const CacheCluster = ({ name, Icon }: ComponentNodeProps) => {
 type CachePurpose = "Database Read/Write" | "User Session";
 
 const CacheSettings = ({ name: id }: { name: string }) => {
-  const { makeComponentConfigSlice } = useLevelManager();
+  const { useSystemComponentConfigSlice } = useLevelManager();
 
-  const { get, set } = useMemo(
-    () => makeComponentConfigSlice<CachePurpose>(id, "type"),
-    [id, makeComponentConfigSlice],
+  const [cacheType, setCacheType] = useSystemComponentConfigSlice<CachePurpose>(
+    id,
+    "type",
   );
-
-  const cacheType = get();
+  const [primaryInstancesCount, setPrimaryInstancesCount] =
+    useSystemComponentConfigSlice<number>(id, "primary instances count");
+  const [replicaInstancesCount, setReplicaInstancesCount] =
+    useSystemComponentConfigSlice<number>(id, "replica instances count");
 
   return (
     <WithSettings name={id}>
@@ -45,7 +47,7 @@ const CacheSettings = ({ name: id }: { name: string }) => {
           <div className="col-span-1">
             <Select
               value={cacheType}
-              onValueChange={(x: CachePurpose) => set(x)}
+              onValueChange={(x: CachePurpose) => setCacheType(x)}
               name="cache-purpose"
             >
               <SelectTrigger className="w-fit">
@@ -61,20 +63,31 @@ const CacheSettings = ({ name: id }: { name: string }) => {
           </div>
         </div>
         <div className="grid grid-flow-col grid-cols-2">
-          <Label htmlFor="database-type" className=" col-span-1 my-auto">
+          <Label
+            htmlFor="primary-instances-count"
+            className=" col-span-1 my-auto"
+          >
             Primary (Write)
           </Label>
           <Input
+            value={primaryInstancesCount}
+            onChange={(e) => setPrimaryInstancesCount(parseInt(e.target.value))}
             className="col-span-1"
             placeholder="# of instances"
             type="number"
           />
         </div>
         <div className="grid grid-flow-col grid-cols-2">
-          <Label htmlFor="database-type" className=" col-span-1 my-auto">
+          <Label
+            htmlFor="replica-instances-count"
+            className="col-span-1 my-auto"
+          >
             Replica (Read only)
           </Label>
           <Input
+            value={replicaInstancesCount}
+            onChange={(e) => setReplicaInstancesCount(parseInt(e.target.value))}
+            name="replica-instances-count"
             className="col-span-1"
             placeholder="# of instances"
             type="number"

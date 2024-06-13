@@ -34,7 +34,7 @@ export const SystemComponentNode: FC<
       <Handle
         type="target"
         position={Position.Left}
-        style={{ background: "#aaa" }}
+        style={{ background: "#aaa", width: "10px", height: "10px" }}
         className="transition-all"
       />
       <div
@@ -53,7 +53,7 @@ export const SystemComponentNode: FC<
       <Handle
         type="source"
         position={Position.Right}
-        style={{ background: "#aaa" }}
+        style={{ background: "#aaa", width: "10px", height: "10px" }}
         className="transition-all"
       />
     </>

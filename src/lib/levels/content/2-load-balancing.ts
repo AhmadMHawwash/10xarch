@@ -37,6 +37,7 @@ export const loadBalancingLevelMaker = () => {
       "At least 1 database",
 
       "At least 1 load balancer for servers",
+      "Servers connected to load balancer should connect to the database.",
     ],
     // dashboard: {
     //   beforeStartingLevel: {

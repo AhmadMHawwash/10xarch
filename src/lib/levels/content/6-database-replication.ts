@@ -72,6 +72,7 @@ export const databaseReplicationLevelMaker = () => {
       "At least 1 client",
       "At least 2 servers",
       "At least 1 load balancer for servers",
+      "Servers connected to load balancer should connect to the database.",
       "At least 1 cache with User Session configuration for session management",
       "There has to be 1 cache that's explicitly configured for session management in the solution provided",
       "At least 1 CDN for caching static content",

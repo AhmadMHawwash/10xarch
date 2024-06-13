@@ -67,7 +67,7 @@ const CacheSettings = ({ name: id }: { name: string }) => {
             htmlFor="primary-instances-count"
             className=" col-span-1 my-auto"
           >
-            Primary (Write)
+            Read/Write
           </Label>
           <Input
             value={primaryInstancesCount}

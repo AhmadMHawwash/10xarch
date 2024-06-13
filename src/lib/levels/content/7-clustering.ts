@@ -59,7 +59,7 @@ export const clusteringLevelMaker = () => {
         type: "Database",
         id: database1,
         configs: {
-          type: "Primary (Write)",
+          type: "Read/Write",
         },
         targets: [],
       },

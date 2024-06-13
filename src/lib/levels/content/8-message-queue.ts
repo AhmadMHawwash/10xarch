@@ -53,7 +53,7 @@
 //         type: "Database",
 //         id: database1,
 //         configs: {
-//           type: "Primary (Write)",
+//           type: "Primary (Write/Read)",
 //         },
 //       },
 //       {

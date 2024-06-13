@@ -6,12 +6,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useLevelManager } from "@/lib/hooks/useLevelManager";
+import { useSystemDesigner } from "@/lib/hooks/useSystemDesigner";
 import { type ComponentNodeProps } from "../SystemComponentNode";
 import { Label } from "../ui/label";
 import { Small } from "../ui/typography";
 import { WithSettings } from "./WithSettings";
-import { useMemo } from "react";
-import { useSystemDesigner } from "@/lib/hooks/useSystemDesigner";
 
 export const Database = ({ name, Icon }: ComponentNodeProps) => {
   return (
@@ -23,11 +22,10 @@ export const Database = ({ name, Icon }: ComponentNodeProps) => {
   );
 };
 
-type Primary = "Primary (Write)";
 type Replica = "Replica (Read only)" | `Replica (Read only) of ${string}`;
 type ReadWrite = "Read/Write";
 
-type DatabaseType = Primary | Replica | ReadWrite;
+type DatabaseType = ReadWrite | Replica;
 
 const DatabaseSettings = ({ name: id }: { name: string }) => {
   const { nodes } = useSystemDesigner();
@@ -66,11 +64,10 @@ const DatabaseSettings = ({ name: id }: { name: string }) => {
                 <SelectValue placeholder="Database type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Primary (Write)">Primary (Write)</SelectItem>
+                <SelectItem value="Read/Write">Read/Write</SelectItem>
                 <SelectItem value="Replica (Read only)">
                   Replica (Read only)
                 </SelectItem>
-                <SelectItem value="Read/Write">Read/Write</SelectItem>
               </SelectContent>
             </Select>
           </div>

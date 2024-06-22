@@ -7,7 +7,7 @@ import {
   DialogTrigger
 } from "@/components/ui/dialog";
 import { Settings } from "lucide-react";
-import { Separator } from "../ui/separator";
+import { Separator } from "../../ui/separator";
 
 export const WithSettings = ({
   name,

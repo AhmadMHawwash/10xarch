@@ -6,11 +6,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useLevelManager } from "@/lib/hooks/useLevelManager";
-import { useMemo } from "react";
 import { type ComponentNodeProps } from "../SystemComponentNode";
 import { Label } from "../ui/label";
 import { Small } from "../ui/typography";
-import { WithSettings } from "./WithSettings";
+import { WithSettings } from "./Wrappers/WithSettings";
 
 export const Cache = ({ name, Icon }: ComponentNodeProps) => {
   return (

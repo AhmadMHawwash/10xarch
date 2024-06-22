@@ -3,7 +3,7 @@ import { useLevelManager } from "@/lib/hooks/useLevelManager";
 import { type ComponentNodeProps } from "../../SystemComponentNode";
 import { Label } from "../../ui/label";
 import { Small } from "../../ui/typography";
-import { WithSettings } from "../WithSettings";
+import { WithSettings } from "../Wrappers/WithSettings";
 
 export const DatabaseCluster = ({ name, Icon }: ComponentNodeProps) => {
   return (

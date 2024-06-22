@@ -18,12 +18,20 @@
 [ ] Book based game (You read a bit then design your solution (or vice versa))
 [ ] Move all static AI instructional content to the engine itself, so we don't consume lots of tokens (just send user solution through network, everything else that's static, then it should be inside the instructions)
 
+## Arch:
+[ ] Use Coolify instead of vercel
+
 ## In game level ideas:
 [ ] Having lots of databases? And lots of servers? Use clusters instead
 [ ] Your servers are under utilised? And at peak time you need more servers? Use "Pay as you go" arch (Same for replicas)
 [ ] Cache replica (For high availability)
 [ ] Clusters
 [ ] Availability zones
+
+## Explaining components:
+[ ] Explain it like I'm (5, 15, 25, 40) years old
+[ ] Explain in detail level (shallow, medium, deep)
+[ ] Explain the What, Who, Where, When, Why
 
 ## Tracks:
 [ ] Free abstract learning

@@ -1,10 +1,4 @@
 import { Input } from "@/components/ui/input";
-import { useLevelManager } from "@/lib/hooks/useLevelManager";
-import { useMemo } from "react";
-import { type ComponentNodeProps } from "../../SystemComponentNode";
-import { Label } from "../../ui/label";
-import { Small } from "../../ui/typography";
-import { WithSettings } from "../WithSettings";
 import {
   Select,
   SelectContent,
@@ -12,6 +6,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useLevelManager } from "@/lib/hooks/useLevelManager";
+import { type ComponentNodeProps } from "../../SystemComponentNode";
+import { Label } from "../../ui/label";
+import { Small } from "../../ui/typography";
+import { WithSettings } from "../Wrappers/WithSettings";
 
 export const CacheCluster = ({ name, Icon }: ComponentNodeProps) => {
   return (

@@ -10,7 +10,7 @@ import { useSystemDesigner } from "@/lib/hooks/useSystemDesigner";
 import { type ComponentNodeProps } from "../SystemComponentNode";
 import { Label } from "../ui/label";
 import { Small } from "../ui/typography";
-import { WithSettings } from "./WithSettings";
+import { WithSettings } from "./Wrappers/WithSettings";
 
 export const Database = ({ name, Icon }: ComponentNodeProps) => {
   return (

@@ -10,6 +10,7 @@ import { Cache } from "./SystemComponents/Cache";
 import { DatabaseCluster } from "./SystemComponents/Clusters/Database";
 import { CacheCluster } from "./SystemComponents/Clusters/Cache";
 import { ServerCluster } from "./SystemComponents/Clusters/Server";
+import { WithDetails } from "./SystemComponents/Wrappers/WithDetails";
 
 export type SystemComponentNodeDataProps = {
   icon?: typeof PiIcon;
@@ -39,7 +40,7 @@ export const SystemComponentNode: FC<
       />
       <div
         className={cn(
-          "flex flex-col items-center justify-center rounded-sm border border-gray-400 p-2",
+          "group flex flex-col items-center justify-center rounded-sm border border-gray-400 p-2",
           selected ? "bg-gray-300" : "bg-gray-100",
           isEdgeBeingConnected &&
             // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
@@ -48,6 +49,10 @@ export const SystemComponentNode: FC<
         )}
       >
         <Component name={id} Icon={Icon} />
+        <WithDetails
+          className="opacity-0 transition-all group-hover:opacity-100"
+          name={name}
+        />
       </div>
 
       <Handle

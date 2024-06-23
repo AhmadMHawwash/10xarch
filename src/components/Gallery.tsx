@@ -13,6 +13,16 @@ import {
 } from "lucide-react";
 import type { DragEvent } from "react";
 import { Lead } from "./ui/typography";
+import { server } from "@/content/server";
+import { loadBalancer } from "@/content/load-balancer";
+import { cache } from "@/content/cache";
+import { database } from "@/content/database";
+import { cdn } from "@/content/cdn";
+import { messageQueue } from "@/content/message-queue";
+import { databaseCluster } from "@/content/database-cluster";
+import { cacheCluster } from "@/content/cache-cluster";
+import { serverCluster } from "@/content/server-cluster";
+import { client } from "@/content/client";
 
 const components: Record<SystemComponentType, SystemComponent> = {
   Client: {
@@ -20,39 +30,46 @@ const components: Record<SystemComponentType, SystemComponent> = {
     description:
       "A client is a device that connects to the server and requests data from it.",
     icon: MonitorSmartphone,
+    content: client
   },
   Server: {
     name: "Server",
     description:
       "A server is a device that receives requests from clients and sends data back to them.",
     icon: Server,
+    content: server,
   },
   "Load Balancer": {
     name: "Load Balancer",
     description:
       "A load balancer is a device that distributes incoming network traffic across multiple servers.",
     icon: Network,
+    content: loadBalancer,
   },
   Cache: {
     name: "Cache",
     description: "A cache is a device that stores data for future use.",
     icon: DatabaseZap,
+    content: cache,
   },
   CDN: {
     name: "CDN",
     description: "A cache is a device that stores data for future use.",
     icon: Globe,
+    content: cdn,
   },
   Database: {
     name: "Database",
     description: "A database is a device that stores data for future use.",
     icon: Database,
+    content: database,
   },
   "Message Queue": {
     name: "Message Queue",
     description:
       "A message queue is a device that queues asynchronous messages between system components.",
     icon: HardDriveDownload,
+    content: messageQueue,
   },
   "Database Cluster": {
     name: "Database Cluster",
@@ -67,6 +84,7 @@ const components: Record<SystemComponentType, SystemComponent> = {
         />
       </div>
     ),
+    content: databaseCluster
   },
   "Cache Cluster": {
     name: "Cache Cluster",
@@ -81,6 +99,7 @@ const components: Record<SystemComponentType, SystemComponent> = {
         />
       </div>
     ),
+    content: cacheCluster
   },
   "Server Cluster": {
     name: "Server Cluster",
@@ -95,6 +114,7 @@ const components: Record<SystemComponentType, SystemComponent> = {
         />
       </div>
     ),
+    content: serverCluster
   },
 };
 

@@ -1,3 +1,4 @@
+import { type ReactElement, ReactNode, type FC } from "react";
 import { z } from "zod";
 
 export type Connection<T = string> = {
@@ -124,6 +125,7 @@ const systemComponentSchema = z.object({
   name: componentsListSchema,
   description: z.string(),
   icon: z.any(),
+  content: z.string().optional(),
 });
 
 export type Level = z.infer<typeof levelSchema>;

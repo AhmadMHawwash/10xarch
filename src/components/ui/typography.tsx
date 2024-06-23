@@ -10,7 +10,7 @@ const H1 = forwardRef<
       {...props}
       ref={ref}
       className={cn(
-        "scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl",
+        "scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-4xl pb-2",
         props.className,
       )}
     >
@@ -31,7 +31,7 @@ const H2 = forwardRef<
       {...props}
       ref={ref}
       className={cn(
-        "scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0",
+        "scroll-m-20 border-b py-2 text-3xl font-semibold tracking-tight first:mt-0",
         props.className,
       )}
     >
@@ -52,7 +52,7 @@ const H3 = forwardRef<
       {...props}
       ref={ref}
       className={cn(
-        "scroll-m-20 text-2xl font-semibold tracking-tight",
+        "scroll-m-20 text-2xl font-semibold tracking-tight pt-4",
         props.className,
       )}
     >
@@ -84,6 +84,40 @@ const H4 = forwardRef<
 
 H4.displayName = "H4";
 export { H4 };
+
+const H5 = forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>((props, ref) => {
+  return (
+    <h5
+      {...props}
+      ref={ref}
+      className={cn(
+        "scroll-m-20 text-lg font-semibold tracking-tight",
+        props.className,
+      )}
+    >
+      {props.children}
+    </h5>
+  );
+});
+H5.displayName = "H5";
+export { H5 };
+
+const H6 = forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>((props, ref) => {
+  return (
+    <h6
+      {...props}
+      ref={ref}
+      className={cn(
+        "scroll-m-20 text-base font-semibold tracking-tight",
+        props.className,
+      )}
+    >
+      {props.children}
+    </h6>
+  );
+});
+H6.displayName = "H6";
+export { H6 };
 
 const Lead = forwardRef<
   HTMLParagraphElement,

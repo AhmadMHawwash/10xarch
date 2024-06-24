@@ -17,14 +17,17 @@ import { useSystemDesigner } from "./useSystemDesigner";
 export const SYSTEM_COMPONENT_NODE = "SystemComponentNode";
 
 const useLevelStore = create<{
-  level: Level | undefined;
+  allLevels: Level[];
   toNextLevel: () => void;
   isInitialised: boolean;
   setIsInitialised: (isInitialised: boolean) => void;
   currentLevelIndex: number;
 }>((set, get) => ({
+  allLevels: levels.map((level) => {
+    componentsNumberingStore.getState().resetCounting();
+    return level();
+  }),
   currentLevelIndex: 0,
-  level: levels[0]?.(),
   isInitialised: false,
   setIsInitialised: (isInitialised: boolean) => {
     set({ isInitialised });
@@ -42,31 +45,16 @@ const useLevelStore = create<{
   },
 }));
 
-// const initialConfigs: Partial<
-//   Record<SystemComponentType, Record<string, unknown>>
-// > = {
-//   "Cache Cluster": {
-//     type: "unknown",
-//   },
-//   "Database Cluster": {
-//     type: "unknown",
-//   },
-//   Cache: {
-//     type: "unknown",
-//   },
-//   Database: {
-//     type: "unknown",
-//   },
-// };
-
 export const useLevelManager = () => {
   const {
-    level: currentLevel,
     toNextLevel,
     isInitialised,
     setIsInitialised,
+    allLevels,
+    currentLevelIndex,
   } = useLevelStore((state) => state);
 
+  const currentLevel = allLevels[currentLevelIndex];
   const { updateNodes, updateEdges, nodes, edges } = useSystemDesigner();
 
   useEffect(() => {

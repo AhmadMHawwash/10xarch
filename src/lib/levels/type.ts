@@ -1,4 +1,3 @@
-import { type ReactElement, ReactNode, type FC } from "react";
 import { z } from "zod";
 
 export type Connection<T = string> = {
@@ -88,15 +87,6 @@ const componentSchema = z.union([
     configs: z.object({}).optional(),
   }),
 ]);
-
-const connectionSchema = z.object({
-  source: z.object({
-    id: z.string(),
-  }),
-  target: z.object({
-    id: z.string(),
-  }),
-});
 
 export const levelSchema = z.object({
   id: z.string(),

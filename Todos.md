@@ -27,6 +27,7 @@
 [ ] Cache replica (For high availability)
 [ ] Clusters
 [ ] Availability zones
+[ ] 
 
 ## Explaining components:
 [ ] Explain it like I'm (5, 15, 25, 40) years old
@@ -37,3 +38,4 @@
 [ ] Free abstract learning
 [ ] System design mission (ie: design twitter)
 [ ] Simulated attacks
+[ ] "Given this system, here's a problem, solve it." ie. We want to reduce trafic by 10% (one possible solution could be by eleminating unneccessary data in database) - in url shortening service, no need for expires_at which takes ~11% of data bandwidth.

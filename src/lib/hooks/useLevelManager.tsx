@@ -19,6 +19,7 @@ export const SYSTEM_COMPONENT_NODE = "SystemComponentNode";
 const useLevelStore = create<{
   allLevels: Level[];
   toNextLevel: () => void;
+  toPreviousLevel: () => void;
   isInitialised: boolean;
   setIsInitialised: (isInitialised: boolean) => void;
   currentLevelIndex: number;
@@ -43,11 +44,23 @@ const useLevelStore = create<{
       };
     });
   },
+  toPreviousLevel: () => {
+    set((state) => {
+      const previousLevelIndex = get().currentLevelIndex - 1;
+      componentsNumberingStore.getState().resetCounting();
+      return {
+        ...state,
+        currentLevelIndex: previousLevelIndex,
+        level: levels[previousLevelIndex]?.(),
+      };
+    });
+  },
 }));
 
 export const useLevelManager = () => {
   const {
     toNextLevel,
+    toPreviousLevel,
     isInitialised,
     setIsInitialised,
     allLevels,
@@ -153,8 +166,14 @@ export const useLevelManager = () => {
       setIsInitialised(false);
       toNextLevel();
     },
+    toPreviousLevel: () => {
+      setIsInitialised(false);
+      toPreviousLevel();
+    },
     checkSolution,
     useSystemComponentConfigSlice,
+    allLevels,
+    currentLevelIndex,
   };
 };
 

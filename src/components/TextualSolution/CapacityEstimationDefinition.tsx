@@ -15,7 +15,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CogIcon, InfoIcon } from "lucide-react";
+import { InfoIcon, NotebookPen } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { WithMarkdownDetails } from "../SystemComponents/Wrappers/WithMarkdownDetails";
@@ -24,21 +24,23 @@ import { Separator } from "../ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Textarea } from "../ui/textarea";
 
-const requirementsDefinitionSchema = z.object({
+const capacityEstimationDefinitionSchema = z.object({
   functionalRequirements: z.string(),
   nonFunctionalRequirements: z.string(),
 });
 
-export const RequirementsDefinition = () => {
-  const form = useForm<z.infer<typeof requirementsDefinitionSchema>>({
-    resolver: zodResolver(requirementsDefinitionSchema),
+export const CapacityEstimationDefinition = () => {
+  const form = useForm<z.infer<typeof capacityEstimationDefinitionSchema>>({
+    resolver: zodResolver(capacityEstimationDefinitionSchema),
     defaultValues: {
       functionalRequirements: "",
       nonFunctionalRequirements: "",
     },
   });
 
-  function onSubmit(values: z.infer<typeof requirementsDefinitionSchema>) {
+  function onSubmit(
+    values: z.infer<typeof capacityEstimationDefinitionSchema>,
+  ) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     console.log(values);
@@ -47,14 +49,14 @@ export const RequirementsDefinition = () => {
   return (
     <Dialog>
       <DialogTrigger className="w-full">
-        <Button variant="outline" size="xs" className="w-full">
-          <CogIcon size={15} className="mr-1" />
-          Requirements
+        <Button variant="outline" size="xs" className="mt-1 w-full">
+          <NotebookPen size={15} className="mr-1" />
+          Capacity Estimations
         </Button>
       </DialogTrigger>
       <DialogContent className="w-[50vw] max-w-4xl">
         <DialogHeader>
-          <DialogTitle>Requirements definition</DialogTitle>
+          <DialogTitle>System API definition</DialogTitle>
           <DialogDescription>
             <Separator className="mb-4 mt-2" />
             <div className="flex items-center">

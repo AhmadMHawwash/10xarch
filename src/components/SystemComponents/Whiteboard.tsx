@@ -1,4 +1,6 @@
 import { type ComponentNodeProps } from "../SystemComponentNode";
+import { APIDefinition } from "../TextualSolution/APIDefinition";
+import { CapacityEstimationDefinition } from "../TextualSolution/CapacityEstimationDefinition";
 import { RequirementsDefinition } from "../TextualSolution/RequirementsDefinition";
 import { Small } from "../ui/typography";
 
@@ -8,6 +10,8 @@ export const Whiteboard = ({ name, Icon }: ComponentNodeProps) => {
       {/* {Icon && <Icon size={20} />} */}
       <Small className="mb-2">System definitions</Small>
       <RequirementsDefinition />
+      <APIDefinition />
+      <CapacityEstimationDefinition />
     </div>
   );
 };

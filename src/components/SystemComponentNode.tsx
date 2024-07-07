@@ -1,5 +1,8 @@
 import { useSystemDesigner } from "@/lib/hooks/useSystemDesigner";
-import { type SystemComponent } from "@/lib/levels/type";
+import {
+  type SystemComponentType,
+  type SystemComponent,
+} from "@/lib/levels/type";
 import { cn } from "@/lib/utils";
 import { InfoIcon, type PiIcon } from "lucide-react";
 import { memo, type FC } from "react";
@@ -36,12 +39,14 @@ export const SystemComponentNode: FC<
   const { icon: ComponentIcon, content } = getSystemComponent(name);
   return (
     <>
-      <Handle
-        type="target"
-        position={Position.Left}
-        style={{ background: "#aaa", width: "10px", height: "10px" }}
-        className="transition-all"
-      />
+      {withoutTargetHandle.includes(name) ? null : (
+        <Handle
+          type="target"
+          position={Position.Left}
+          style={{ background: "#aaa", width: "10px", height: "10px" }}
+          className="transition-all"
+        />
+      )}
       <div
         className={cn(
           "group flex flex-col items-center justify-center rounded-sm border border-gray-400 p-2",
@@ -53,21 +58,25 @@ export const SystemComponentNode: FC<
         )}
       >
         <Component name={id} Icon={Icon} />
-        <WithMarkdownDetails
-          className="absolute left-0 top-[-17px] rounded-full bg-gray-100 opacity-0 transition-all group-hover:opacity-100"
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-          Icon={ComponentIcon}
-          content={content}
-          trigger={<InfoIcon size={16} className="stroke-gray-500" />}
-        />
+        {content && (
+          <WithMarkdownDetails
+            className="absolute left-0 top-[-17px] rounded-full bg-gray-100 opacity-0 transition-all group-hover:opacity-100"
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            Icon={ComponentIcon}
+            content={content}
+            trigger={<InfoIcon size={16} className="stroke-gray-500" />}
+          />
+        )}
       </div>
 
-      <Handle
-        type="source"
-        position={Position.Right}
-        style={{ background: "#aaa", width: "10px", height: "10px" }}
-        className="transition-all"
-      />
+      {withoutSourceHandle.includes(name) ? null : (
+        <Handle
+          type="source"
+          position={Position.Right}
+          style={{ background: "#aaa", width: "10px", height: "10px" }}
+          className="transition-all"
+        />
+      )}
     </>
   );
 };
@@ -99,3 +108,10 @@ const DefaultComponent = ({ name, Icon }: ComponentNodeProps) => (
     <Small>{name}</Small>
   </>
 );
+
+const withoutTargetHandle: SystemComponentType[] = ["Whiteboard", "Client"];
+const withoutSourceHandle: SystemComponentType[] = [
+  "Whiteboard",
+  "Database",
+  "Database Cluster",
+];

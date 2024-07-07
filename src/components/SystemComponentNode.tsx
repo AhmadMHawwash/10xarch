@@ -4,14 +4,15 @@ import { cn } from "@/lib/utils";
 import { InfoIcon, type PiIcon } from "lucide-react";
 import { memo, type FC } from "react";
 import { Handle, Position, type NodeProps } from "reactflow";
-import { Database } from "./SystemComponents/Database";
-import { Small } from "./ui/typography";
-import { Cache } from "./SystemComponents/Cache";
-import { DatabaseCluster } from "./SystemComponents/Clusters/Database";
-import { CacheCluster } from "./SystemComponents/Clusters/Cache";
-import { ServerCluster } from "./SystemComponents/Clusters/Server";
-import { WithDetails } from "./SystemComponents/Wrappers/WithDetails";
 import { getSystemComponent } from "./Gallery";
+import { Cache } from "./SystemComponents/Cache";
+import { CacheCluster } from "./SystemComponents/Clusters/Cache";
+import { DatabaseCluster } from "./SystemComponents/Clusters/Database";
+import { ServerCluster } from "./SystemComponents/Clusters/Server";
+import { Database } from "./SystemComponents/Database";
+import { Whiteboard } from "./SystemComponents/Whiteboard";
+import { WithMarkdownDetails } from "./SystemComponents/Wrappers/WithMarkdownDetails";
+import { Small } from "./ui/typography";
 
 export type SystemComponentNodeDataProps = {
   icon?: typeof PiIcon;
@@ -52,7 +53,7 @@ export const SystemComponentNode: FC<
         )}
       >
         <Component name={id} Icon={Icon} />
-        <WithDetails
+        <WithMarkdownDetails
           className="absolute left-0 top-[-17px] rounded-full bg-gray-100 opacity-0 transition-all group-hover:opacity-100"
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           Icon={ComponentIcon}
@@ -89,6 +90,7 @@ const components: Partial<
   "Database Cluster": DatabaseCluster,
   "Cache Cluster": CacheCluster,
   "Server Cluster": ServerCluster,
+  Whiteboard,
 };
 
 const DefaultComponent = ({ name, Icon }: ComponentNodeProps) => (

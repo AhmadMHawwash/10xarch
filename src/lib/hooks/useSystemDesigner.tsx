@@ -104,6 +104,7 @@ const componentTargets: Record<
   "Message Queue": ["Server", "Server Cluster"],
   "Cache Cluster": ["Database Cluster", "Database"],
   "Database Cluster": [],
+  Whiteboard: [],
 };
 
 export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
@@ -148,7 +149,7 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
         ),
       );
     },
-    [nodes, toast],
+    [nodes],
   );
 
   const onConnectStart: OnConnectStart = useCallback(

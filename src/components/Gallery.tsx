@@ -9,6 +9,7 @@ import {
   HardDriveDownload,
   MonitorSmartphone,
   Network,
+  PresentationIcon,
   Server,
 } from "lucide-react";
 import type { DragEvent } from "react";
@@ -30,7 +31,7 @@ const components: Record<SystemComponentType, SystemComponent> = {
     description:
       "A client is a device that connects to the server and requests data from it.",
     icon: MonitorSmartphone,
-    content: client
+    content: client,
   },
   Server: {
     name: "Server",
@@ -84,7 +85,7 @@ const components: Record<SystemComponentType, SystemComponent> = {
         />
       </div>
     ),
-    content: databaseCluster
+    content: databaseCluster,
   },
   "Cache Cluster": {
     name: "Cache Cluster",
@@ -99,7 +100,7 @@ const components: Record<SystemComponentType, SystemComponent> = {
         />
       </div>
     ),
-    content: cacheCluster
+    content: cacheCluster,
   },
   "Server Cluster": {
     name: "Server Cluster",
@@ -114,7 +115,13 @@ const components: Record<SystemComponentType, SystemComponent> = {
         />
       </div>
     ),
-    content: serverCluster
+    content: serverCluster,
+  },
+  Whiteboard: {
+    description:
+      "Whiteboard is your area to write your notes and thoughts about the system.",
+    name: "Whiteboard",
+    icon: PresentationIcon,
   },
 };
 

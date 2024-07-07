@@ -16,6 +16,7 @@ const componentsListSchema = z.enum([
   "Database Cluster",
   "Cache Cluster",
   "Server Cluster",
+  "Whiteboard",
 ]);
 
 const DatabaseConfigs = z.object({

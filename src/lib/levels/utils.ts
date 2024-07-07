@@ -17,6 +17,7 @@ export const componentsNumberingStore = create<{
     "Database Cluster": 1,
     "Cache Cluster": 1,
     "Server Cluster": 1,
+    Whiteboard: 1,
   },
   getNextId: (componentName) => {
     const id = get().componentsToCount[componentName];
@@ -41,6 +42,7 @@ export const componentsNumberingStore = create<{
         "Database Cluster": 1,
         "Cache Cluster": 1,
         "Server Cluster": 1,
+        Whiteboard: 1,
       },
     });
   },

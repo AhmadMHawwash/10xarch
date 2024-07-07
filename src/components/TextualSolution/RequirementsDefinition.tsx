@@ -18,11 +18,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { CogIcon, InfoIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { WithMarkdownDetails } from "../SystemComponents/Wrappers/WithMarkdownDetails";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Textarea } from "../ui/textarea";
-import { WithDetails } from "../SystemComponents/Wrappers/WithDetails";
 
 const requirementsDefinitionSchema = z.object({
   functionalRequirements: z.string(),
@@ -47,9 +47,9 @@ export const RequirementsDefinition = () => {
   return (
     <Dialog>
       <DialogTrigger>
-        <Button variant={"outline"}>
-          <CogIcon size={16} className="mr-2" />
-          Requirements definition
+        <Button variant="outline" size="xs">
+          <CogIcon size={15} className="mr-1" />
+          Requirements
         </Button>
       </DialogTrigger>
       <DialogContent className="w-[50vw] max-w-4xl">
@@ -86,7 +86,7 @@ export const RequirementsDefinition = () => {
                               />
                             </FormControl>
                             <FormDescription>
-                              <WithDetails
+                              <WithMarkdownDetails
                                 Icon={InfoIcon}
                                 trigger={
                                   <Button
@@ -120,7 +120,7 @@ export const RequirementsDefinition = () => {
                               />
                             </FormControl>
                             <FormDescription>
-                              <WithDetails
+                              <WithMarkdownDetails
                                 Icon={InfoIcon}
                                 trigger={
                                   <Button

@@ -5,12 +5,11 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useLevelManager } from "@/lib/hooks/useLevelManager";
-import { H3, Large, List, P, Small } from "./ui/typography";
 import { cn } from "@/lib/utils";
-import { Button } from "./ui/button";
-import { Separator } from "@radix-ui/react-select";
-import { useState } from "react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
+import { useState } from "react";
+import { Button } from "./ui/button";
+import { H3, Large, P } from "./ui/typography";
 
 export const Dashboard = () => {
   const { level, toNextLevel, toPreviousLevel } = useLevelManager();

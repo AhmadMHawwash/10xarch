@@ -17,14 +17,10 @@ import {
   P,
   Quote,
 } from "@/components/ui/typography";
-import { cn } from "@/lib/utils";
-import { InfoIcon } from "lucide-react";
-import ReactMarkdown, { type Components } from "react-markdown";
-import remarkGfm from "remark-gfm";
-import rehypeRaw from "rehype-raw";
 import React from "react";
-import { getSystemComponent } from "@/components/Gallery";
-import { type SystemComponentType } from "@/lib/levels/type";
+import ReactMarkdown, { type Components } from "react-markdown";
+import rehypeRaw from "rehype-raw";
+import remarkGfm from "remark-gfm";
 
 const components1: Components = {
   h1: ({ node: _, ...props }) => <H1 {...props} />,
@@ -47,7 +43,7 @@ const components1: Components = {
   code: ({ node: _, ...props }) => <InlineCode {...props} />,
 };
 
-export const WithDetails = ({
+export const WithMarkdownDetails = ({
   content,
   Icon,
   className,

@@ -1,7 +1,8 @@
 "use client";
+import { useLevelManager } from "@/lib/hooks/useLevelManager";
 import {
   SystemDesignerProvider,
-  useSystemDesigner as useSystemDesigner,
+  useSystemDesigner,
 } from "@/lib/hooks/useSystemDesigner";
 import { type ComponentType } from "react";
 import ReactFlow, {
@@ -22,8 +23,8 @@ import { CustomEdge } from "./CustomEdge";
 import Gallery from "./Gallery";
 import SystemComponentNode from "./SystemComponentNode";
 import { Dashboard } from "./SystemDashboard";
+import { RequirementsDefinition } from "./TextualSolution/RequirementsDefinition";
 import { Button } from "./ui/button";
-import { useLevelManager } from "@/lib/hooks/useLevelManager";
 
 const nodeTypes: Record<string, ComponentType<NodeProps>> = {
   SystemComponentNode,
@@ -88,12 +89,12 @@ const SystemDesigner = () => {
         <Panel position="top-left">
           <Dashboard />
         </Panel>
-        <Panel position="top-right">
+        <Panel position="top-right" className="flex flex-col items-end">
+          <Button className="mr-2" onClick={checkSolution}>
+            Check solution
+          </Button>
           <Gallery />
-        </Panel>
-        <Panel position="bottom-right">
-          <Button onClick={checkSolution}>Check solution</Button>
-          <Button onClick={toNextLevel}>To next level</Button>
+          <RequirementsDefinition />
         </Panel>
         <Controls />
       </ReactFlow>

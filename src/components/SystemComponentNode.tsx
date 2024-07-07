@@ -1,7 +1,7 @@
 import { useSystemDesigner } from "@/lib/hooks/useSystemDesigner";
 import { type SystemComponent } from "@/lib/levels/type";
 import { cn } from "@/lib/utils";
-import { type PiIcon } from "lucide-react";
+import { InfoIcon, type PiIcon } from "lucide-react";
 import { memo, type FC } from "react";
 import { Handle, Position, type NodeProps } from "reactflow";
 import { Database } from "./SystemComponents/Database";
@@ -11,6 +11,7 @@ import { DatabaseCluster } from "./SystemComponents/Clusters/Database";
 import { CacheCluster } from "./SystemComponents/Clusters/Cache";
 import { ServerCluster } from "./SystemComponents/Clusters/Server";
 import { WithDetails } from "./SystemComponents/Wrappers/WithDetails";
+import { getSystemComponent } from "./Gallery";
 
 export type SystemComponentNodeDataProps = {
   icon?: typeof PiIcon;
@@ -30,6 +31,8 @@ export const SystemComponentNode: FC<
   const { isEdgeBeingConnected } = useSystemDesigner();
 
   const Component = components[name] ?? DefaultComponent;
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const { icon: ComponentIcon, content } = getSystemComponent(name);
   return (
     <>
       <Handle
@@ -50,8 +53,11 @@ export const SystemComponentNode: FC<
       >
         <Component name={id} Icon={Icon} />
         <WithDetails
-          className="opacity-0 transition-all group-hover:opacity-100"
-          name={name}
+          className="absolute left-0 top-[-17px] rounded-full bg-gray-100 opacity-0 transition-all group-hover:opacity-100"
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          Icon={ComponentIcon}
+          content={content}
+          trigger={<InfoIcon size={16} className="stroke-gray-500" />}
         />
       </div>
 

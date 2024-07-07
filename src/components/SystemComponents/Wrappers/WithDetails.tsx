@@ -48,33 +48,26 @@ const components1: Components = {
 };
 
 export const WithDetails = ({
-  name,
+  content,
+  Icon,
   className,
+  trigger,
 }: {
-  name: SystemComponentType;
-  className: string;
-  children?: React.ReactNode;
+  content?: string;
+  Icon: any;
+  className?: string;
+  trigger?: React.ReactNode;
 }) => {
-
-  
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const { icon: ComponentIcon, content } = getSystemComponent(name);
   return (
     <Dialog>
       <DialogTrigger>
-        <span
-          className={cn(
-            "absolute left-0 top-[-17px] rounded-full bg-gray-100",
-            className,
-          )}
-        >
-          <InfoIcon size={16} className="stroke-gray-500" />
-        </span>
+        <span className={className}>{trigger}</span>
       </DialogTrigger>
-      <DialogContent className="min-h-90 w-[90vw] max-w-4xl">
+      <DialogContent className="min-h-90 w-[50vw] max-w-4xl">
         <DialogHeader className="relative">
           <span className="absolute -left-[104px] -top-0 rounded-md bg-white p-4">
-            <ComponentIcon />
+            <Icon />
           </span>
           <div className="h-[80vh] overflow-scroll">
             <div className="markdown-container">

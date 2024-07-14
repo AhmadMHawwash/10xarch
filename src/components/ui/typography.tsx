@@ -10,7 +10,7 @@ const H1 = forwardRef<
       {...props}
       ref={ref}
       className={cn(
-        "scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-4xl pb-2",
+        "scroll-m-20 text-4xl font-semibold tracking-tight lg:text-4xl pb-4",
         props.className,
       )}
     >
@@ -237,7 +237,7 @@ const List = forwardRef<
     <ul
       {...props}
       ref={ref}
-      className={cn("my-6 ml-6 list-disc [&>li]:mt-2", props.className)}
+      className={cn("my-3 ml-6 list-disc [&>li]:mt-2", props.className)}
     >
       {props.children}
     </ul>

@@ -21,20 +21,20 @@ import { z } from "zod";
 import { WithMarkdownDetails } from "../SystemComponents/Wrappers/WithMarkdownDetails";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Textarea } from "../ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 
 const capacityEstimationDefinitionSchema = z.object({
-  functionalRequirements: z.string(),
-  nonFunctionalRequirements: z.string(),
+  capacityEstimations: z.string(),
+  constraints: z.string(),
 });
 
 export const CapacityEstimationDefinition = () => {
   const form = useForm<z.infer<typeof capacityEstimationDefinitionSchema>>({
     resolver: zodResolver(capacityEstimationDefinitionSchema),
     defaultValues: {
-      functionalRequirements: "",
-      nonFunctionalRequirements: "",
+      capacityEstimations: "",
+      constraints: "",
     },
   });
 
@@ -56,7 +56,7 @@ export const CapacityEstimationDefinition = () => {
       </DialogTrigger>
       <DialogContent className="w-[50vw] max-w-4xl">
         <DialogHeader>
-          <DialogTitle>System API definition</DialogTitle>
+          <DialogTitle>Capacity estimation and constraints</DialogTitle>
           <DialogDescription>
             <Separator className="mb-4 mt-2" />
             <div className="flex items-center">
@@ -65,25 +65,23 @@ export const CapacityEstimationDefinition = () => {
                   onSubmit={form.handleSubmit(onSubmit)}
                   className="w-full space-y-8"
                 >
-                  <Tabs defaultValue="functional" className="w-full">
+                  <Tabs defaultValue="capacityEstimations" className="w-full">
                     <TabsList className="grid w-full grid-cols-2">
-                      <TabsTrigger value="functional">
-                        Functional requirements
+                      <TabsTrigger value="capacityEstimations">
+                        Capacity estimations
                       </TabsTrigger>
-                      <TabsTrigger value="nonfunctional">
-                        Non-functional requirements
-                      </TabsTrigger>
+                      <TabsTrigger value="constraints">Constraints</TabsTrigger>
                     </TabsList>
-                    <TabsContent value="functional">
+                    <TabsContent value="capacityEstimations">
                       <FormField
                         control={form.control}
-                        name="functionalRequirements"
+                        name="capacityEstimations"
                         render={({ field }) => (
                           <FormItem>
                             <FormControl>
                               <Textarea
                                 rows={10}
-                                placeholder="Functional behaviour of the system"
+                                placeholder="Capacity estimations"
                                 {...field}
                               />
                             </FormControl>
@@ -96,10 +94,10 @@ export const CapacityEstimationDefinition = () => {
                                     className="pl-0 pt-0 opacity-50 transition-all hover:opacity-100"
                                   >
                                     <InfoIcon className="mr-1" size={16} />
-                                    What the system should do
+                                    Capacity estimations of the system
                                   </Button>
                                 }
-                                content={functionalRequirements}
+                                content={capacityEstimations}
                               />
                             </FormDescription>
                             <FormMessage />
@@ -108,16 +106,16 @@ export const CapacityEstimationDefinition = () => {
                       />
                     </TabsContent>
 
-                    <TabsContent value="nonfunctional">
+                    <TabsContent value="constraints">
                       <FormField
                         control={form.control}
-                        name="nonFunctionalRequirements"
+                        name="constraints"
                         render={({ field }) => (
                           <FormItem>
                             <FormControl>
                               <Textarea
                                 rows={10}
-                                placeholder="Non-functional behaviour of the system"
+                                placeholder="Constraints of the system"
                                 {...field}
                               />
                             </FormControl>
@@ -130,11 +128,10 @@ export const CapacityEstimationDefinition = () => {
                                     className="pl-0 pt-0 opacity-50 transition-all hover:opacity-100"
                                   >
                                     <InfoIcon className="mr-1" size={16} />
-                                    How the system should perform the functional
-                                    requirements
+                                    Constraints of the system
                                   </Button>
                                 }
-                                content={nonFunctionalRequirements}
+                                content={constraints}
                               />
                             </FormDescription>
                             <FormMessage />
@@ -143,6 +140,7 @@ export const CapacityEstimationDefinition = () => {
                       />
                     </TabsContent>
                   </Tabs>
+
                   <Button type="submit">Submit</Button>
                 </form>
               </Form>
@@ -154,33 +152,127 @@ export const CapacityEstimationDefinition = () => {
   );
 };
 
-const functionalRequirements = `## Functional Requirements
+const capacityEstimations = `# Capacity Estimation and Constraints
 
-Functional requirements specify what the system should do. They define the expected behavior and functionalities of the system, including specific actions, tasks, and operations the system must perform to meet user needs. These requirements outline the capabilities the system must have to satisfy its intended purpose and are essential for ensuring that the system works correctly and meets user expectations.
+## Introduction
+Capacity estimation is a crucial step in system design. It involves predicting the resources required to handle the expected load on the system. This includes estimating the number of requests, storage requirements, bandwidth, and memory usage. Understanding these factors helps in designing a scalable and efficient system that can handle the anticipated traffic and data volume.
 
-Examples of functional requirements include:
+## Why Capacity Estimation is Important
+1. **Scalability**: Ensures the system can scale to meet future growth without performance degradation.
+2. **Performance**: Helps in maintaining optimal performance by allocating adequate resources.
+3. **Cost Management**: Aids in budgeting and resource planning by predicting hardware and infrastructure needs.
+4. **Reliability**: Prevents system failures by ensuring that the system can handle peak loads.
 
-- **Authentication**: The system must allow users to log in and log out.
-- **Data Processing**: The system must process input data and generate the appropriate output.
-- **User Interface**: The system must provide an interface for users to interact with.
-- **Reporting**: The system must generate reports based on user activity.
+## Key Elements of Capacity Estimation
+When estimating capacity, consider the following elements:
 
-Functional requirements are critical as they provide a clear understanding of what is expected from the system, guiding the design, development, and testing processes.`;
+### 1. Traffic Estimates
+Estimate the number of requests the system will handle per unit time (e.g., per second, per day).
 
-const nonFunctionalRequirements = `
-## Non-Functional Requirements
+### 2. Storage Estimates
+Estimate the amount of data the system will store, including databases, logs, and backups.
 
-Non-functional requirements specify how the system performs its functions. They define the quality attributes, system constraints, and other criteria that judge the operation of a system rather than specific behaviors. These requirements ensure the usability, efficiency, reliability, and scalability of the system.
+### 3. Bandwidth Estimates
+Estimate the network bandwidth required for data transfer between clients and servers.
 
-Examples of non-functional requirements include:
+### 4. Memory Estimates
+Estimate the memory needed for caching, processing, and temporary data storage.
 
-- **Performance**: The system must handle a specific number of transactions per second.
-- **Scalability**: The system must scale to support an increasing number of users.
-- **Availability**: The system must be available 99.9% of the time.
-- **Security**: The system must protect user data through encryption and authentication.
-- **Usability**: The system must be easy to use and provide a good user experience.
-- **Maintainability**: The system must be easy to maintain and update.
-- **Compliance**: The system must comply with industry regulations and standards.
+## Example: URL Shortening Service
 
-Non-functional requirements are essential for ensuring that the system performs well under various conditions and meets user expectations for quality and performance.
+### Traffic Estimates
+Assume we expect 500 million new URL shortenings per month with a 100:1 read/write ratio.
+- **New URLs per second**:
+  500 million divided by 1 Month of Seconds is approximately 193 new shortend URLs per second.
+- **URL redirections/reads per second**:
+  100 times 193 equals 19,300 requests per second.
+
+### Storage Estimates
+Assume each URL shortening request (including metadata) takes 500 bytes of storage.
+- **Total storage for 5 years**:
+  500 million * 12 months/year * 5 years * 500 bytes equals 15 terabytes.
+
+### Bandwidth Estimates
+Estimate the data transfer rates for both incoming (URL creation) and outgoing (URL redirection) traffic.
+- **Incoming data**:
+  193 URLs per second * 500 bytes equals 96.5 kilobytes per second.
+- **Outgoing data**:
+  19,300 requests per second * 500 bytes equals 9.65 megabytes per second.
+
+### Memory Estimates
+Estimate the memory required to cache frequently accessed URLs.
+- **Caching 20% of daily traffic**:
+  20% * (19,300 requests/second * 3600 seconds/hour * 24 hours/day) * 500 bytes equals approximately 170 gigabytes.
+
+## Conclusion
+Capacity estimation and understanding constraints are essential steps in system design. They ensure that the system is scalable, performs well under load, and remains within budget. By accurately estimating traffic, storage, bandwidth, and memory requirements, and considering constraints like latency, throughput, availability, consistency, and cost, you can design a robust and efficient system.
+`;
+
+const constraints = `# Constraints in System Design
+
+## Introduction
+In system design, constraints are limitations or restrictions that must be considered when building a system. They can come from various sources, including technical limitations, business requirements, regulatory guidelines, and environmental factors. Understanding and managing these constraints is crucial for designing a robust, scalable, and maintainable system.
+
+## Types of Constraints
+
+### 1. Technical Constraints
+Technical constraints are limitations related to the technology stack, hardware, software, and architecture. These can include:
+- **Performance**: Limitations on how fast the system must respond to user requests (latency) and how many requests it can handle (throughput).
+- **Scalability**: Restrictions on the system's ability to scale horizontally (adding more machines) or vertically (upgrading machine capacity).
+- **Reliability**: Requirements to ensure the system remains operational and can recover from failures (fault tolerance, redundancy).
+- **Consistency**: The need to maintain data consistency across distributed systems (eventual consistency vs. strong consistency).
+
+### 2. Business Constraints
+Business constraints are requirements and limitations imposed by the organization's goals and priorities. These can include:
+- **Budget**: Financial limitations on the cost of development, infrastructure, and maintenance.
+- **Time**: Deadlines for delivering features or complete systems.
+- **Compliance**: Adherence to industry standards, legal regulations, and internal policies.
+- **Market Demand**: Need to meet customer expectations and competitive pressures.
+
+### 3. Environmental Constraints
+Environmental constraints are external factors that can impact the system. These can include:
+- **Geographic Distribution**: The need to serve users across different geographic locations, which can affect latency and data residency requirements.
+- **Network Conditions**: Variability in network performance, such as bandwidth limitations and latency.
+- **Hardware Availability**: Limitations based on the availability and capability of hardware resources.
+
+### 4. Security Constraints
+Security constraints involve requirements to protect the system and data from unauthorized access, breaches, and other security threats. These can include:
+- **Authentication and Authorization**: Ensuring only authorized users can access the system and perform actions.
+- **Data Encryption**: Protecting data in transit and at rest through encryption.
+- **Compliance**: Meeting security standards and regulations such as GDPR, HIPAA, or PCI-DSS.
+
+## Managing Constraints
+
+### Identifying Constraints
+- **Requirement Analysis**: Gather and analyze requirements from stakeholders to identify constraints early in the design process.
+- **Technical Assessment**: Evaluate the technical environment, including existing systems and technology stack, to uncover technical limitations.
+- **Risk Assessment**: Identify potential risks and constraints related to security, compliance, and external factors.
+
+### Addressing Constraints
+- **Prioritization**: Prioritize constraints based on their impact on the system and the feasibility of addressing them.
+- **Trade-offs**: Make informed trade-offs between competing constraints. For example, balancing performance with cost.
+- **Design Patterns**: Use design patterns and best practices to address common constraints. For instance, using caching to improve performance or sharding to enhance scalability.
+- **Prototyping and Testing**: Build prototypes and conduct performance tests to validate assumptions and understand the impact of constraints.
+
+## Example: URL Shortening Service
+
+### Constraints
+- **Performance**: The system must handle high read and write throughput efficiently.
+- **Scalability**: The system should scale to accommodate increasing numbers of users and URLs.
+- **Reliability**: Ensure high availability and fault tolerance to prevent downtime.
+- **Security**: Protect against unauthorized access and data breaches.
+- **Cost**: Keep infrastructure and operational costs within budget.
+
+### Solutions
+- **Load Balancer**: Distribute traffic across multiple servers to handle high throughput.
+- **Database Partitioning**: Use sharding to distribute data across multiple database instances for scalability.
+- **Caching**: Implement caching to reduce database load and improve read performance.
+- **Replication**: Use database replication to ensure high availability and data redundancy.
+- **HTTPS**: Secure data in transit by using HTTPS for all communications.
+- **Monitoring**: Implement monitoring and logging to track system performance and detect issues.
+
+## Conclusion
+Constraints are an integral part of system design, influencing decisions at every stage of development. By identifying and managing constraints effectively, designers can build systems that meet performance, scalability, reliability, and security requirements while staying within budget and time constraints. Understanding constraints helps in making informed trade-offs and designing systems that are robust and resilient.
+
+
 `;

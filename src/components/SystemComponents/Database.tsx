@@ -34,6 +34,10 @@ const DatabaseSettings = ({ name: id }: { name: string }) => {
 
   const [databaseDesign, setDatabaseDesign] =
     useSystemComponentConfigSlice<string>(id, "Database design");
+  const [purpose, setPurpose] = useSystemComponentConfigSlice<string>(
+    id,
+    "Database purpose",
+  );
 
   const databaseNodes = nodes
     .filter((node) => node.data.name === "Database")
@@ -64,10 +68,10 @@ const DatabaseSettings = ({ name: id }: { name: string }) => {
               onValueChange={(x: DatabaseType) => setDatabaseType(x)}
               name="database-type"
             >
-              <SelectTrigger className="w-fit">
+              <SelectTrigger id="database-type" className="w-fit">
                 <SelectValue placeholder="Database type" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent id="database-type">
                 <SelectItem value="Read/Write">Read/Write</SelectItem>
                 <SelectItem value="Replica (Read only)">
                   Replica (Read only)
@@ -89,10 +93,10 @@ const DatabaseSettings = ({ name: id }: { name: string }) => {
                 }
                 name="replica-of"
               >
-                <SelectTrigger className="w-fit">
+                <SelectTrigger id="replica-of" className="w-fit">
                   <SelectValue placeholder="Replica of" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent id="replica-of">
                   {databaseNodes.map((node) => (
                     <SelectItem key={node.id} value={node.id}>
                       {node.data.id}
@@ -104,17 +108,14 @@ const DatabaseSettings = ({ name: id }: { name: string }) => {
           </div>
         )}
         {databaseType === "Read/Write" && (
-          <>
-            <Label htmlFor="database-design">
-              Database design
-            </Label>
-            <div>
-              <Textarea
-                name="database-design"
-                rows={10}
-                value={databaseDesign}
-                onChange={(e) => setDatabaseDesign(e.target.value)}
-                placeholder={`Example: URL Shortening Service
+          <div className="flex flex-col gap-4">
+            <Label htmlFor="database-design">Database design</Label>
+            <Textarea
+              id="database-design"
+              rows={10}
+              value={databaseDesign}
+              onChange={(e) => setDatabaseDesign(e.target.value)}
+              placeholder={`Example: URL Shortening Service
 Urls table
 - id (Primary Key)
 - alias
@@ -130,11 +131,21 @@ User table
 - password
 - Created_at
 `}
-                className="text-md"
-              />
-            </div>
-          </>
+              className="text-md"
+            />
+          </div>
         )}
+        <div className="flex flex-col gap-4">
+          <Label htmlFor="database-purpose">Database purpose</Label>
+          <Textarea
+            name="database-purpose"
+            id="database-purpose"
+            rows={10}
+            className="text-md"
+            value={purpose}
+            onChange={(e) => setPurpose(e.target.value)}
+          />
+        </div>
       </div>
     </WithSettings>
   );

@@ -11,6 +11,7 @@ import { type ComponentNodeProps } from "../../SystemComponentNode";
 import { Label } from "../../ui/label";
 import { Small } from "../../ui/typography";
 import { WithSettings } from "../Wrappers/WithSettings";
+import { Textarea } from "@/components/ui/textarea";
 
 export const CacheCluster = ({ name, Icon }: ComponentNodeProps) => {
   return (
@@ -27,9 +28,9 @@ type CachePurpose = "Database Read/Write" | "User Session";
 const CacheSettings = ({ name: id }: { name: string }) => {
   const { useSystemComponentConfigSlice } = useLevelManager();
 
-  const [cacheType, setCacheType] = useSystemComponentConfigSlice<CachePurpose>(
+  const [purpose, setPurpose] = useSystemComponentConfigSlice<string>(
     id,
-    "type",
+    "Cache purpose",
   );
   const [primaryInstancesCount, setPrimaryInstancesCount] =
     useSystemComponentConfigSlice<number>(id, "primary instances count");
@@ -39,7 +40,7 @@ const CacheSettings = ({ name: id }: { name: string }) => {
   return (
     <WithSettings name={id}>
       <div className="grid w-full grid-flow-row grid-cols-1 gap-2 !text-black">
-        <div className="grid grid-flow-col grid-cols-2">
+        {/* <div className="grid grid-flow-col grid-cols-2">
           <Label htmlFor="cache-purpose" className=" col-span-1 my-auto">
             Cache purpose
           </Label>
@@ -60,6 +61,17 @@ const CacheSettings = ({ name: id }: { name: string }) => {
               </SelectContent>
             </Select>
           </div>
+        </div> */}
+        <div className="flex flex-col gap-4">
+          <Label htmlFor="cache-purpose">Cache purpose</Label>
+          <Textarea
+            name="cache-purpose"
+            id="cache-purpose"
+            rows={10}
+            className="text-md"
+            value={purpose}
+            onChange={(e) => setPurpose(e.target.value)}
+          />
         </div>
         <div className="grid grid-flow-col grid-cols-2">
           <Label
@@ -69,6 +81,7 @@ const CacheSettings = ({ name: id }: { name: string }) => {
             Read/Write
           </Label>
           <Input
+            id="primary-instances-count"
             value={primaryInstancesCount}
             onChange={(e) => setPrimaryInstancesCount(parseInt(e.target.value))}
             className="col-span-1"
@@ -87,6 +100,7 @@ const CacheSettings = ({ name: id }: { name: string }) => {
             value={replicaInstancesCount}
             onChange={(e) => setReplicaInstancesCount(parseInt(e.target.value))}
             name="replica-instances-count"
+            id="replica-instances-count"
             className="col-span-1"
             placeholder="# of instances"
             type="number"

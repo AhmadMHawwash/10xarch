@@ -4,6 +4,7 @@ import { type ComponentNodeProps } from "../../SystemComponentNode";
 import { Label } from "../../ui/label";
 import { Small } from "../../ui/typography";
 import { WithSettings } from "../Wrappers/WithSettings";
+import { Textarea } from "@/components/ui/textarea";
 
 export const ServerCluster = ({ name, Icon }: ComponentNodeProps) => {
   return (
@@ -22,6 +23,10 @@ const ServerClusterSettings = ({ name: id }: { name: string }) => {
     id,
     "servers count",
   );
+  const [purpose, setPurpose] = useSystemComponentConfigSlice<string>(
+    id,
+    "Server purpose",
+  );
 
   return (
     <WithSettings name={id}>
@@ -34,9 +39,21 @@ const ServerClusterSettings = ({ name: id }: { name: string }) => {
             value={serversCount}
             onChange={(e) => setServersCount(parseInt(e.target.value))}
             name="servers-count"
+            id="servers-count"
             className="col-span-1"
             placeholder="# of instances"
             type="number"
+          />
+        </div>
+        <div className="flex flex-col gap-4">
+          <Label htmlFor="server-purpose">Server purpose</Label>
+          <Textarea
+            name="server-purpose"
+            id="server-purpose"
+            rows={10}
+            className="text-md"
+            value={purpose}
+            onChange={(e) => setPurpose(e.target.value)}
           />
         </div>
       </div>

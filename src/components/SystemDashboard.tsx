@@ -1,54 +1,44 @@
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import { useLevelManager } from "@/lib/hooks/useLevelManager";
-import { cn } from "@/lib/utils";
-import { ArrowLeft, ArrowRight } from "lucide-react";
-import { useState } from "react";
+import { ArrowLeft, ArrowRight, BookOpenText } from "lucide-react";
 import { Button } from "./ui/button";
-import { H3, Large, P } from "./ui/typography";
+import { H5, Large, P } from "./ui/typography";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTrigger
+} from "@/components/ui/sheet";
 
 export const Dashboard = () => {
   const { level, toNextLevel, toPreviousLevel } = useLevelManager();
-  const [isOpen, setIsOpen] = useState<boolean>(false);
   return (
-    <Accordion
-      className="z-50 w-[24rem] bg-slate-50 px-4"
-      type="single"
-      collapsible
-      onValueChange={(v) => setIsOpen(v === "item-1")}
-    >
-      <AccordionItem value="item-1">
-        <AccordionTrigger className="hover:no-underline">
-          <div className={"flex w-full flex-col items-start"}>
-            <H3
-              className={cn(
-                "pt-0 text-xl transition-all",
-                isOpen ? "opacity-0" : "opacity-100",
-              )}
-            >
-              Problem statement
-            </H3>
-          </div>
-        </AccordionTrigger>
-        <AccordionContent className="rounded-sm bg-slate-100 p-2 pt-0">
-          <div className="mb-2 flex justify-between">
-            <Button size="xs" variant="default" onClick={toPreviousLevel}>
-              <ArrowLeft className="mr-1" />
-              Previous
-            </Button>
-            <Button size="xs" variant="default" onClick={toNextLevel}>
-              Next
-              <ArrowRight className="ml-1" />
-            </Button>
-          </div>
-          <Large>{level?.title}</Large>
-          <P>{level?.description}</P>
-        </AccordionContent>
-      </AccordionItem>
-    </Accordion>
+    <Sheet>
+      <SheetTrigger asChild>
+        <Button variant="outline" className="border-gray-400 m-2 z-[500]">
+          <BookOpenText className="mr-2" size="17" /> Challenge statement
+        </Button>
+      </SheetTrigger>
+      <SheetContent side="bottom" className="h-[80vh]">
+        <SheetHeader>
+          {/* <SheetTitle></SheetTitle> */}
+          <SheetDescription className="text-black">
+            <div className="mb-2 flex justify-between">
+              <Button size="sm" variant="outline" onClick={toPreviousLevel}>
+                <ArrowLeft className="mr-1" />
+                Previous
+              </Button>
+              <H5>{level?.title}</H5>
+              <Button size="sm" variant="outline" onClick={toNextLevel}>
+                Next
+                <ArrowRight className="ml-1" />
+              </Button>
+            </div>
+            <Large></Large>
+            <P>{level?.description}</P>
+          </SheetDescription>
+        </SheetHeader>
+      </SheetContent>
+    </Sheet>
   );
 };

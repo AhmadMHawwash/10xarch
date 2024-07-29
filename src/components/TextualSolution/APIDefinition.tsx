@@ -6,41 +6,20 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@/components/ui/form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useLevelManager } from "@/lib/hooks/useLevelManager";
 import { CableIcon, InfoIcon } from "lucide-react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { WithMarkdownDetails } from "../SystemComponents/Wrappers/WithMarkdownDetails";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import { Textarea } from "../ui/textarea";
 
-const APIDefinitionSchema = z.object({
-  apiDefinition: z.string(),
-});
+export const APIDefinition = ({ name: id }: { name: string }) => {
+  const { useSystemComponentConfigSlice } = useLevelManager();
 
-export const APIDefinition = () => {
-  const form = useForm<z.infer<typeof APIDefinitionSchema>>({
-    resolver: zodResolver(APIDefinitionSchema),
-    defaultValues: {
-      apiDefinition: "",
-    },
-  });
-
-  function onSubmit(values: z.infer<typeof APIDefinitionSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
-  }
-
+  const [apiDef, setApiDef] = useSystemComponentConfigSlice<string>(
+    id,
+    "api definition",
+  );
   return (
     <Dialog>
       <DialogTrigger className="w-full">
@@ -49,52 +28,52 @@ export const APIDefinition = () => {
           System API
         </Button>
       </DialogTrigger>
-      <DialogContent className="w-[50vw] max-w-4xl">
+      <DialogContent className="!h-[95vh] w-[70vw] max-w-5xl">
         <DialogHeader>
           <DialogTitle>System API definition</DialogTitle>
           <DialogDescription>
             <Separator className="mb-4 mt-2" />
-            <div className="flex items-center">
-              <Form {...form}>
-                <form
-                  onSubmit={form.handleSubmit(onSubmit)}
-                  className="w-full space-y-8"
+            <Textarea
+              rows={25}
+              value={apiDef}
+              onChange={(e) => setApiDef(e.target.value)}
+              placeholder={`Example:
+1.  Create Short URL
+
+    Endpoint: POST /shorten
+    Description: This API generates a short URL for a given long URL.
+    Parameters:
+      - original_url (string): The original long URL that needs to be shortened.
+    Response:
+      - short_url (string): The generated short URL.
+
+    Example Request:
+      POST /shorten {
+        "original_url": "http://example.com/some/very/long/url",
+      }
+    Example Response:
+      JSON: {
+        "short_url": "http://short.url/xyz"
+      }
+  
+2.  ...
+              `}
+              className="text-md !text-black"
+            />
+
+            <WithMarkdownDetails
+              Icon={InfoIcon}
+              trigger={
+                <Button
+                  variant="link"
+                  className="pl-0 pt-0 opacity-50 transition-all hover:opacity-100"
                 >
-                  <FormField
-                    control={form.control}
-                    name="apiDefinition"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <Textarea
-                            rows={10}
-                            placeholder="API definition"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormDescription>
-                          <WithMarkdownDetails
-                            Icon={InfoIcon}
-                            trigger={
-                              <Button
-                                variant="link"
-                                className="pl-0 pt-0 opacity-50 transition-all hover:opacity-100"
-                              >
-                                <InfoIcon className="mr-1" size={16} />
-                                What the system should do
-                              </Button>
-                            }
-                            content={apiDefinition}
-                          />
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <Button type="submit">Submit</Button>
-                </form>
-              </Form>
-            </div>
+                  <InfoIcon className="mr-1" size={16} />
+                  How clients interact with the system
+                </Button>
+              }
+              content={apiDefinition}
+            />
           </DialogDescription>
         </DialogHeader>
       </DialogContent>

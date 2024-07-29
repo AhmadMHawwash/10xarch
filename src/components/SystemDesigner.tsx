@@ -78,6 +78,9 @@ const SystemDesigner = () => {
           markerEnd: { type: MarkerType.ArrowClosed },
           animated: true,
         }}
+        proOptions={{
+          hideAttribution: true,
+        }}
         connectionMode={ConnectionMode.Loose}
         panOnScroll
         selectionOnDrag
@@ -86,7 +89,7 @@ const SystemDesigner = () => {
         fitView={false}
       >
         <Background variant={BackgroundVariant.Dots} color="black" />
-        <Panel position="top-left">
+        <Panel position="bottom-right">
           <Dashboard />
         </Panel>
         <Panel position="top-right" className="flex flex-col items-end">
@@ -94,7 +97,6 @@ const SystemDesigner = () => {
             Check solution
           </Button>
           <Gallery />
-          <RequirementsDefinition />
         </Panel>
         <Controls />
       </ReactFlow>

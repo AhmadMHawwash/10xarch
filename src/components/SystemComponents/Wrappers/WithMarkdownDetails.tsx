@@ -50,22 +50,22 @@ export const WithMarkdownDetails = ({
   trigger,
 }: {
   content?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   Icon: any;
   className?: string;
   trigger?: React.ReactNode;
 }) => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   return (
     <Dialog>
       <DialogTrigger>
         <span className={className}>{trigger}</span>
       </DialogTrigger>
-      <DialogContent className="min-h-90 w-[50vw] max-w-4xl">
+      <DialogContent className="min-h-95 w-[70vw] max-w-5xl">
         <DialogHeader className="relative">
           <span className="absolute -left-[104px] -top-0 rounded-md bg-white p-4">
             <Icon />
           </span>
-          <div className="h-[80vh] overflow-scroll">
+          <div className="h-[90vh] overflow-scroll">
             <div className="markdown-container">
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}

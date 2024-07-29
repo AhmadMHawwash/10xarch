@@ -6,45 +6,34 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@/components/ui/form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useLevelManager } from "@/lib/hooks/useLevelManager";
 import { InfoIcon, NotebookPen } from "lucide-react";
-import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { WithMarkdownDetails } from "../SystemComponents/Wrappers/WithMarkdownDetails";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import { Textarea } from "../ui/textarea";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 
 const capacityEstimationDefinitionSchema = z.object({
   capacityEstimations: z.string(),
   constraints: z.string(),
 });
 
-export const CapacityEstimationDefinition = () => {
-  const form = useForm<z.infer<typeof capacityEstimationDefinitionSchema>>({
-    resolver: zodResolver(capacityEstimationDefinitionSchema),
-    defaultValues: {
-      capacityEstimations: "",
-      constraints: "",
-    },
-  });
+export const CapacityEstimationDefinition = ({
+  name: id,
+}: {
+  name: string;
+}) => {
+  const { useSystemComponentConfigSlice } = useLevelManager();
 
-  function onSubmit(
-    values: z.infer<typeof capacityEstimationDefinitionSchema>,
-  ) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
-  }
+  const [capacity, setCapacity] = useSystemComponentConfigSlice<string>(
+    id,
+    "Capacity estimations",
+  );
+  // const [constraints, setConstraints] = useSystemComponentConfigSlice<string>(
+  //   id,
+  //   "Constraints",
+  // );
 
   return (
     <Dialog>
@@ -54,97 +43,83 @@ export const CapacityEstimationDefinition = () => {
           Capacity Estimations
         </Button>
       </DialogTrigger>
-      <DialogContent className="w-[50vw] max-w-4xl">
+      <DialogContent className="!h-[95vh] w-[70vw] max-w-5xl">
         <DialogHeader>
-          <DialogTitle>Capacity estimation and constraints</DialogTitle>
+          <DialogTitle>Capacity estimation</DialogTitle>
           <DialogDescription>
             <Separator className="mb-4 mt-2" />
-            <div className="flex items-center">
-              <Form {...form}>
-                <form
-                  onSubmit={form.handleSubmit(onSubmit)}
-                  className="w-full space-y-8"
+            {/* <Tabs defaultValue="capacityEstimations" className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="capacityEstimations">
+                    Capacity estimations
+                  </TabsTrigger>
+                  <TabsTrigger value="constraints">Constraints</TabsTrigger>
+                </TabsList>
+                <TabsContent value="capacityEstimations"> */}
+            <Textarea
+              rows={25}
+              value={capacity}
+              onChange={(e) => setCapacity(e.target.value)}
+              placeholder={`Example: URL Shortening Service
+  1. Traffic Estimates
+    // Assume we expect 500 million new URL shortenings per month with a 100:1 read/write ratio.
+
+    - New URLs per second: 500 million divided by 1 Month of Seconds is approximately 193 new shortend URLs per second.
+    - URL redirections/reads per second: 100 times 193 equals 19,300 requests per second.
+
+  2. Storage Estimates
+    // Assume each URL shortening request (including metadata) takes 500 bytes of storage.
+    - Total storage for 5 years: 500 million * 12 months/year * 5 years * 500 bytes equals 15 terabytes.
+
+  3. Bandwidth Estimates
+    // Estimate the data transfer rates for both incoming (URL creation) and outgoing (URL redirection) traffic.
+    
+    - Incoming data: 193 URLs per second * 500 bytes equals 96.5 kilobytes per second.
+    - Outgoing data: 19,300 requests per second * 500 bytes equals 9.65 megabytes per second.
+
+  4. Memory Estimates
+    // Estimate the memory required to cache frequently accessed URLs.
+    - Caching 20% of daily traffic: 20% * (19,300 requests/second * 3600 seconds/hour * 24 hours/day) * 500 bytes equals approximately 170 gigabytes.
+              `}
+              className="text-md !text-black"
+            />
+            <WithMarkdownDetails
+              Icon={InfoIcon}
+              trigger={
+                <Button
+                  variant="link"
+                  className="pl-0 pt-0 opacity-50 transition-all hover:opacity-100"
                 >
-                  <Tabs defaultValue="capacityEstimations" className="w-full">
-                    <TabsList className="grid w-full grid-cols-2">
-                      <TabsTrigger value="capacityEstimations">
-                        Capacity estimations
-                      </TabsTrigger>
-                      <TabsTrigger value="constraints">Constraints</TabsTrigger>
-                    </TabsList>
-                    <TabsContent value="capacityEstimations">
-                      <FormField
-                        control={form.control}
-                        name="capacityEstimations"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormControl>
-                              <Textarea
-                                rows={10}
-                                placeholder="Capacity estimations"
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormDescription>
-                              <WithMarkdownDetails
-                                Icon={InfoIcon}
-                                trigger={
-                                  <Button
-                                    variant="link"
-                                    className="pl-0 pt-0 opacity-50 transition-all hover:opacity-100"
-                                  >
-                                    <InfoIcon className="mr-1" size={16} />
-                                    Capacity estimations of the system
-                                  </Button>
-                                }
-                                content={capacityEstimations}
-                              />
-                            </FormDescription>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </TabsContent>
+                  <InfoIcon className="mr-1" size={16} />
+                  Defining syetem load and capacity
+                </Button>
+              }
+              content={capacityEstimations}
+            />
+            {/* </TabsContent> */}
 
-                    <TabsContent value="constraints">
-                      <FormField
-                        control={form.control}
-                        name="constraints"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormControl>
-                              <Textarea
-                                rows={10}
-                                placeholder="Constraints of the system"
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormDescription>
-                              <WithMarkdownDetails
-                                Icon={InfoIcon}
-                                trigger={
-                                  <Button
-                                    variant="link"
-                                    className="pl-0 pt-0 opacity-50 transition-all hover:opacity-100"
-                                  >
-                                    <InfoIcon className="mr-1" size={16} />
-                                    Constraints of the system
-                                  </Button>
-                                }
-                                content={constraints}
-                              />
-                            </FormDescription>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </TabsContent>
-                  </Tabs>
-
-                  <Button type="submit">Submit</Button>
-                </form>
-              </Form>
-            </div>
+            {/* <TabsContent value="constraints">
+                  <Textarea
+                    rows={10}
+                    value={constraints}
+                    onChange={(e) => setConstraints(e.target.value)}
+                    placeholder="Constraints of the system"
+                  />
+                  <WithMarkdownDetails
+                    Icon={InfoIcon}
+                    trigger={
+                      <Button
+                        variant="link"
+                        className="pl-0 pt-0 opacity-50 transition-all hover:opacity-100"
+                      >
+                        <InfoIcon className="mr-1" size={16} />
+                        Constraints of the system
+                      </Button>
+                    }
+                    content={constraintsContent}
+                  />
+                </TabsContent>
+              </Tabs> */}
           </DialogDescription>
         </DialogHeader>
       </DialogContent>
@@ -208,7 +183,7 @@ Estimate the memory required to cache frequently accessed URLs.
 Capacity estimation and understanding constraints are essential steps in system design. They ensure that the system is scalable, performs well under load, and remains within budget. By accurately estimating traffic, storage, bandwidth, and memory requirements, and considering constraints like latency, throughput, availability, consistency, and cost, you can design a robust and efficient system.
 `;
 
-const constraints = `# Constraints in System Design
+const constraintsContent = `# Constraints in System Design
 
 ## Introduction
 In system design, constraints are limitations or restrictions that must be considered when building a system. They can come from various sources, including technical limitations, business requirements, regulatory guidelines, and environmental factors. Understanding and managing these constraints is crucial for designing a robust, scalable, and maintainable system.

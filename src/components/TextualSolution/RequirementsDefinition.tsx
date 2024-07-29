@@ -6,43 +6,23 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@/components/ui/form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { CogIcon, InfoIcon } from "lucide-react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { WithMarkdownDetails } from "../SystemComponents/Wrappers/WithMarkdownDetails";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Textarea } from "../ui/textarea";
+import { useLevelManager } from "@/lib/hooks/useLevelManager";
 
-const requirementsDefinitionSchema = z.object({
-  functionalRequirements: z.string(),
-  nonFunctionalRequirements: z.string(),
-});
+export const RequirementsDefinition = ({ name: id }: { name: string }) => {
+  const { useSystemComponentConfigSlice } = useLevelManager();
 
-export const RequirementsDefinition = () => {
-  const form = useForm<z.infer<typeof requirementsDefinitionSchema>>({
-    resolver: zodResolver(requirementsDefinitionSchema),
-    defaultValues: {
-      functionalRequirements: "",
-      nonFunctionalRequirements: "",
-    },
-  });
-
-  function onSubmit(values: z.infer<typeof requirementsDefinitionSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
-  }
+  const [functional, setFunctional] = useSystemComponentConfigSlice<string>(
+    id,
+    "functional requirements",
+  );
+  const [nonfunctional, setNonfunctional] =
+    useSystemComponentConfigSlice<string>(id, "non-functional requirements");
 
   return (
     <Dialog>
@@ -52,98 +32,79 @@ export const RequirementsDefinition = () => {
           Requirements
         </Button>
       </DialogTrigger>
-      <DialogContent className="w-[50vw] max-w-4xl">
+      <DialogContent className="!h-[95vh] w-[70vw] max-w-5xl">
         <DialogHeader>
           <DialogTitle>Requirements definition</DialogTitle>
           <DialogDescription>
             <Separator className="mb-4 mt-2" />
             <div className="flex items-center">
-              <Form {...form}>
-                <form
-                  onSubmit={form.handleSubmit(onSubmit)}
-                  className="w-full space-y-8"
-                >
-                  <Tabs defaultValue="functional" className="w-full">
-                    <TabsList className="grid w-full grid-cols-2">
-                      <TabsTrigger value="functional">
-                        Functional requirements
-                      </TabsTrigger>
-                      <TabsTrigger value="nonfunctional">
-                        Non-functional requirements
-                      </TabsTrigger>
-                    </TabsList>
-                    <TabsContent value="functional">
-                      <FormField
-                        control={form.control}
-                        name="functionalRequirements"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormControl>
-                              <Textarea
-                                rows={10}
-                                placeholder="Functional behaviour of the system"
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormDescription>
-                              <WithMarkdownDetails
-                                Icon={InfoIcon}
-                                trigger={
-                                  <Button
-                                    variant="link"
-                                    className="pl-0 pt-0 opacity-50 transition-all hover:opacity-100"
-                                  >
-                                    <InfoIcon className="mr-1" size={16} />
-                                    What the system should do
-                                  </Button>
-                                }
-                                content={functionalRequirements}
-                              />
-                            </FormDescription>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </TabsContent>
+              <Tabs defaultValue="functional" className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="functional">
+                    Functional requirements
+                  </TabsTrigger>
+                  <TabsTrigger value="nonfunctional">
+                    Non-functional requirements
+                  </TabsTrigger>
+                </TabsList>
+                <TabsContent value="functional">
+                  <Textarea
+                    rows={25}
+                    value={functional}
+                    placeholder={`Example:
+- Authentication: The system must allow users to log in and log out.
+- Data Processing: The system must process input data and generate the appropriate output.
+- User Interface: The system must provide an interface for users to interact with.
+- Reporting: The system must generate reports based on user activity.`}
+                    onChange={(e) => setFunctional(e.target.value)}
+                    className="!text-black text-md"
+                  />
+                  <WithMarkdownDetails
+                    Icon={InfoIcon}
+                    trigger={
+                      <Button
+                        variant="link"
+                        className="pl-0 pt-0 opacity-50 transition-all hover:opacity-100"
+                      >
+                        <InfoIcon className="mr-1" size={16} />
+                        What the system should do
+                      </Button>
+                    }
+                    content={functionalRequirements}
+                  />
+                </TabsContent>
 
-                    <TabsContent value="nonfunctional">
-                      <FormField
-                        control={form.control}
-                        name="nonFunctionalRequirements"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormControl>
-                              <Textarea
-                                rows={10}
-                                placeholder="Non-functional behaviour of the system"
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormDescription>
-                              <WithMarkdownDetails
-                                Icon={InfoIcon}
-                                trigger={
-                                  <Button
-                                    variant="link"
-                                    className="pl-0 pt-0 opacity-50 transition-all hover:opacity-100"
-                                  >
-                                    <InfoIcon className="mr-1" size={16} />
-                                    How the system should perform the functional
-                                    requirements
-                                  </Button>
-                                }
-                                content={nonFunctionalRequirements}
-                              />
-                            </FormDescription>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </TabsContent>
-                  </Tabs>
-                  <Button type="submit">Submit</Button>
-                </form>
-              </Form>
+                <TabsContent value="nonfunctional">
+                  <Textarea
+                    rows={25}
+                    className="!text-black text-md"
+                    value={nonfunctional}
+                    placeholder={`Example:
+- Performance: The system must handle a specific number of transactions per second.
+- Scalability: The system must scale to support an increasing number of users.
+- Availability: The system must be available 99.9% of the time.
+- Security: The system must protect user data through encryption and authentication.
+- Usability: The system must be easy to use and provide a good user experience.
+- Maintainability: The system must be easy to maintain and update.
+- Compliance: The system must comply with industry regulations and standards.`}
+                    onChange={(e) => setNonfunctional(e.target.value)}
+                  />
+                  <WithMarkdownDetails
+                    Icon={InfoIcon}
+                    trigger={
+                      <Button
+                        variant="link"
+                        className="pl-0 pt-0 opacity-50 transition-all hover:opacity-100"
+                      >
+                        <InfoIcon className="mr-1" size={16} />
+                        How the system should perform the functional
+                        requirements
+                      </Button>
+                    }
+                    content={nonFunctionalRequirements}
+                  />
+                </TabsContent>
+              </Tabs>
             </div>
           </DialogDescription>
         </DialogHeader>

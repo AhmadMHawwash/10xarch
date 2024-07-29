@@ -9,9 +9,9 @@ export const Whiteboard = ({ name, Icon }: ComponentNodeProps) => {
     <div className="relative flex flex-col items-center">
       {/* {Icon && <Icon size={20} />} */}
       <Small className="mb-2">System definitions</Small>
-      <RequirementsDefinition />
-      <APIDefinition />
-      <CapacityEstimationDefinition />
+      <RequirementsDefinition name={name} />
+      <APIDefinition name={name} />
+      <CapacityEstimationDefinition name={name} />
     </div>
   );
 };

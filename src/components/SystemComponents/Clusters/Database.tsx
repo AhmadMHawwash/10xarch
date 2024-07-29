@@ -4,6 +4,7 @@ import { type ComponentNodeProps } from "../../SystemComponentNode";
 import { Label } from "../../ui/label";
 import { Small } from "../../ui/typography";
 import { WithSettings } from "../Wrappers/WithSettings";
+import { Textarea } from "@/components/ui/textarea";
 
 export const DatabaseCluster = ({ name, Icon }: ComponentNodeProps) => {
   return (
@@ -22,10 +23,12 @@ const DatabaseClusterSettings = ({ name: id }: { name: string }) => {
     useSystemComponentConfigSlice<number>(id, "Number of Primary instances");
   const [replicaInstancesCount, setReplicaInstancesCount] =
     useSystemComponentConfigSlice<number>(id, "Number of Replica instances");
+  const [databaseDesign, setDatabaseDesign] =
+    useSystemComponentConfigSlice<string>(id, "database design");
 
   return (
     <WithSettings name={id}>
-      <div className="grid w-full grid-flow-row grid-cols-1 gap-2">
+      <div className="grid w-full grid-flow-row grid-cols-1 gap-2 !text-black">
         <div className="grid grid-flow-col grid-cols-2">
           <Label
             htmlFor="primary-instances-count"
@@ -58,6 +61,34 @@ const DatabaseClusterSettings = ({ name: id }: { name: string }) => {
             type="number"
           />
         </div>
+        <Label htmlFor="database-design">
+              Database design
+            </Label>
+            <div>
+              <Textarea
+                name="database-design"
+                rows={10}
+                value={databaseDesign}
+                onChange={(e) => setDatabaseDesign(e.target.value)}
+                placeholder={`Example: URL Shortening Service
+Urls table
+- id (Primary Key)
+- alias
+- original_url
+- created_at
+- expiration_date
+
+
+User table
+- user_id (Primary Key)
+- name
+- email
+- password
+- Created_at
+`}
+                className="text-md"
+              />
+            </div>
       </div>
     </WithSettings>
   );

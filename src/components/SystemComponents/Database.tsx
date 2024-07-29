@@ -11,6 +11,7 @@ import { type ComponentNodeProps } from "../SystemComponentNode";
 import { Label } from "../ui/label";
 import { Small } from "../ui/typography";
 import { WithSettings } from "./Wrappers/WithSettings";
+import { Textarea } from "../ui/textarea";
 
 export const Database = ({ name, Icon }: ComponentNodeProps) => {
   return (
@@ -31,6 +32,9 @@ const DatabaseSettings = ({ name: id }: { name: string }) => {
   const { nodes } = useSystemDesigner();
   const { useSystemComponentConfigSlice } = useLevelManager();
 
+  const [databaseDesign, setDatabaseDesign] =
+    useSystemComponentConfigSlice<string>(id, "Database design");
+
   const databaseNodes = nodes
     .filter((node) => node.data.name === "Database")
     .filter((node) => node.id !== id);
@@ -49,7 +53,7 @@ const DatabaseSettings = ({ name: id }: { name: string }) => {
 
   return (
     <WithSettings name={id}>
-      <div className="grid w-full grid-flow-row grid-cols-1 gap-2">
+      <div className="grid w-full grid-flow-row grid-cols-1 gap-2 !text-black">
         <div className="grid grid-flow-col grid-cols-2">
           <Label htmlFor="database-type" className=" col-span-1 my-auto">
             Database type
@@ -98,6 +102,38 @@ const DatabaseSettings = ({ name: id }: { name: string }) => {
               </Select>
             </div>
           </div>
+        )}
+        {databaseType === "Read/Write" && (
+          <>
+            <Label htmlFor="database-design">
+              Database design
+            </Label>
+            <div>
+              <Textarea
+                name="database-design"
+                rows={10}
+                value={databaseDesign}
+                onChange={(e) => setDatabaseDesign(e.target.value)}
+                placeholder={`Example: URL Shortening Service
+Urls table
+- id (Primary Key)
+- alias
+- original_url
+- created_at
+- expiration_date
+
+
+User table
+- user_id (Primary Key)
+- name
+- email
+- password
+- Created_at
+`}
+                className="text-md"
+              />
+            </div>
+          </>
         )}
       </div>
     </WithSettings>

@@ -81,7 +81,7 @@ export const CapacityEstimationDefinition = ({
     // Estimate the memory required to cache frequently accessed URLs.
     - Caching 20% of daily traffic: 20% * (19,300 requests/second * 3600 seconds/hour * 24 hours/day) * 500 bytes equals approximately 170 gigabytes.
               `}
-              className="text-md !text-black"
+              className="text-md"
             />
             <WithMarkdownDetails
               Icon={InfoIcon}

@@ -37,7 +37,7 @@ export const APIDefinition = ({ name: id }: { name: string }) => {
               rows={25}
               value={apiDef}
               onChange={(e) => setApiDef(e.target.value)}
-              placeholder={`Example:
+              placeholder={`Example: URL Shortening Service
 1.  Create Short URL
 
     Endpoint: POST /shorten
@@ -58,7 +58,7 @@ export const APIDefinition = ({ name: id }: { name: string }) => {
   
 2.  ...
               `}
-              className="text-md !text-black"
+              className="text-md"
             />
 
             <WithMarkdownDetails

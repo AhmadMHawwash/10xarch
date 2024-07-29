@@ -51,13 +51,13 @@ export const RequirementsDefinition = ({ name: id }: { name: string }) => {
                   <Textarea
                     rows={25}
                     value={functional}
-                    placeholder={`Example:
+                    placeholder={`Example: URL Shortening Service
 - Authentication: The system must allow users to log in and log out.
 - Data Processing: The system must process input data and generate the appropriate output.
 - User Interface: The system must provide an interface for users to interact with.
 - Reporting: The system must generate reports based on user activity.`}
                     onChange={(e) => setFunctional(e.target.value)}
-                    className="!text-black text-md"
+                    className="text-md"
                   />
                   <WithMarkdownDetails
                     Icon={InfoIcon}
@@ -77,9 +77,9 @@ export const RequirementsDefinition = ({ name: id }: { name: string }) => {
                 <TabsContent value="nonfunctional">
                   <Textarea
                     rows={25}
-                    className="!text-black text-md"
+                    className="text-md"
                     value={nonfunctional}
-                    placeholder={`Example:
+                    placeholder={`Example: URL Shortening Service
 - Performance: The system must handle a specific number of transactions per second.
 - Scalability: The system must scale to support an increasing number of users.
 - Availability: The system must be available 99.9% of the time.

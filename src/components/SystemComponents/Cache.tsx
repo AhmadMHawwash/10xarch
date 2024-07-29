@@ -33,7 +33,7 @@ const CacheSettings = ({ name: id }: { name: string }) => {
 
   return (
     <WithSettings name={id}>
-      <div className="grid w-full grid-flow-row grid-cols-1 gap-2">
+      <div className="grid w-full grid-flow-row grid-cols-1 gap-2 !text-black">
         <div className="grid grid-flow-col grid-cols-2">
           <Label htmlFor="cache-purpose" className=" col-span-1 my-auto">
             Cache purpose

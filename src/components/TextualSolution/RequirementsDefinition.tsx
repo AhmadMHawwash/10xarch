@@ -35,7 +35,7 @@ export const RequirementsDefinition = ({ name: id }: { name: string }) => {
       <DialogContent className="!h-[95vh] w-[70vw] max-w-5xl">
         <DialogHeader>
           <DialogTitle>Requirements definition</DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="!text-black">
             <Separator className="mb-4 mt-2" />
             <div className="flex items-center">
               <Tabs defaultValue="functional" className="w-full">

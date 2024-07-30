@@ -31,7 +31,7 @@ export const APIDefinition = ({ name: id }: { name: string }) => {
       <DialogContent className="!h-[95vh] w-[70vw] max-w-5xl">
         <DialogHeader>
           <DialogTitle>System API definition</DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="!text-black">
             <Separator className="mb-4 mt-2" />
             <Textarea
               rows={25}

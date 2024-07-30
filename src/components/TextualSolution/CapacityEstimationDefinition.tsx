@@ -46,7 +46,7 @@ export const CapacityEstimationDefinition = ({
       <DialogContent className="!h-[95vh] w-[70vw] max-w-5xl">
         <DialogHeader>
           <DialogTitle>Capacity estimation</DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="!text-black">
             <Separator className="mb-4 mt-2" />
             {/* <Tabs defaultValue="capacityEstimations" className="w-full">
                 <TabsList className="grid w-full grid-cols-2">

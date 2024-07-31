@@ -1,10 +1,3 @@
-
-import SystemDesigner from "@/components/SystemDesigner";
-
-export default async function Home() {
-  return (
-    <main className="flex min-h-screen">
-      <SystemDesigner />
-    </main>
-  );
+export default function Home() {
+  return <div className="grid grid-cols-4 gap-4">home page</div>;
 }

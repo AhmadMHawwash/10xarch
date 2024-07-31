@@ -1,5 +1,5 @@
 import { Input } from "@/components/ui/input";
-import { useLevelManager } from "@/lib/hooks/useLevelManager";
+import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
 import { type ComponentNodeProps } from "../../SystemComponentNode";
 import { Label } from "../../ui/label";
 import { Small } from "../../ui/typography";
@@ -17,7 +17,7 @@ export const ServerCluster = ({ name, Icon }: ComponentNodeProps) => {
 };
 
 const ServerClusterSettings = ({ name: id }: { name: string }) => {
-  const { useSystemComponentConfigSlice } = useLevelManager();
+  const { useSystemComponentConfigSlice } = useChallengeManager();
 
   const [serversCount, setServersCount] = useSystemComponentConfigSlice<number>(
     id,

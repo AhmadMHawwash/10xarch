@@ -5,7 +5,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useLevelManager } from "@/lib/hooks/useLevelManager";
+import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
 import { useSystemDesigner } from "@/lib/hooks/useSystemDesigner";
 import { type ComponentNodeProps } from "../SystemComponentNode";
 import { Label } from "../ui/label";
@@ -30,7 +30,7 @@ type DatabaseType = ReadWrite | Replica;
 
 const DatabaseSettings = ({ name: id }: { name: string }) => {
   const { nodes } = useSystemDesigner();
-  const { useSystemComponentConfigSlice } = useLevelManager();
+  const { useSystemComponentConfigSlice } = useChallengeManager();
 
   const [databaseDesign, setDatabaseDesign] =
     useSystemComponentConfigSlice<string>(id, "Database design");

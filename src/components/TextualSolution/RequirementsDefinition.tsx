@@ -6,16 +6,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
 import { CogIcon, InfoIcon } from "lucide-react";
 import { WithMarkdownDetails } from "../SystemComponents/Wrappers/WithMarkdownDetails";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Textarea } from "../ui/textarea";
-import { useLevelManager } from "@/lib/hooks/useLevelManager";
 
 export const RequirementsDefinition = ({ name: id }: { name: string }) => {
-  const { useSystemComponentConfigSlice } = useLevelManager();
+  const { useSystemComponentConfigSlice } = useChallengeManager();
 
   const [functional, setFunctional] = useSystemComponentConfigSlice<string>(
     id,

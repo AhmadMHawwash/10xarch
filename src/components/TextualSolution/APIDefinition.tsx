@@ -6,7 +6,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useLevelManager } from "@/lib/hooks/useLevelManager";
+import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
 import { CableIcon, InfoIcon } from "lucide-react";
 import { WithMarkdownDetails } from "../SystemComponents/Wrappers/WithMarkdownDetails";
 import { Button } from "../ui/button";
@@ -14,7 +14,7 @@ import { Separator } from "../ui/separator";
 import { Textarea } from "../ui/textarea";
 
 export const APIDefinition = ({ name: id }: { name: string }) => {
-  const { useSystemComponentConfigSlice } = useLevelManager();
+  const { useSystemComponentConfigSlice } = useChallengeManager();
 
   const [apiDef, setApiDef] = useSystemComponentConfigSlice<string>(
     id,

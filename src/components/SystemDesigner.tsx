@@ -1,5 +1,5 @@
 "use client";
-import { useLevelManager } from "@/lib/hooks/useLevelManager";
+import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
 import {
   SystemDesignerProvider,
   useSystemDesigner,
@@ -23,7 +23,6 @@ import { CustomEdge } from "./CustomEdge";
 import Gallery from "./Gallery";
 import SystemComponentNode from "./SystemComponentNode";
 import { Dashboard } from "./SystemDashboard";
-import { RequirementsDefinition } from "./TextualSolution/RequirementsDefinition";
 import { Button } from "./ui/button";
 
 const nodeTypes: Record<string, ComponentType<NodeProps>> = {
@@ -49,7 +48,7 @@ const SystemDesigner = () => {
     onConnectEnd,
   } = useSystemDesigner();
 
-  const { checkSolution, toNextLevel } = useLevelManager();
+  const { checkSolution } = useChallengeManager();
 
   const handleConnect: OnConnect = (params) => {
     const { source, target } = params;

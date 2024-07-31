@@ -6,7 +6,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useLevelManager } from "@/lib/hooks/useLevelManager";
+import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
 import { InfoIcon, NotebookPen } from "lucide-react";
 import { z } from "zod";
 import { WithMarkdownDetails } from "../SystemComponents/Wrappers/WithMarkdownDetails";
@@ -24,7 +24,7 @@ export const CapacityEstimationDefinition = ({
 }: {
   name: string;
 }) => {
-  const { useSystemComponentConfigSlice } = useLevelManager();
+  const { useSystemComponentConfigSlice } = useChallengeManager();
 
   const [capacity, setCapacity] = useSystemComponentConfigSlice<string>(
     id,

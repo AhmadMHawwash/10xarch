@@ -7,7 +7,8 @@ import { TRPCReactProvider } from "@/trpc/react";
 
 export const metadata = {
   title: "System Design Playground",
-  description: "A system design playground for learning and practicing system design concepts.",
+  description:
+    "A system design playground for learning and practicing system design concepts.",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
@@ -20,9 +21,7 @@ export default function RootLayout({
     <html lang="en" className={`${GeistSans.variable}`}>
       <body>
         <TRPCReactProvider>
-          {/* <ReactFlowProvider> */}
-          {children}
-          {/* </ReactFlowProvider> */}
+          <main className="flex min-h-screen">{children}</main>
         </TRPCReactProvider>
       </body>
     </html>

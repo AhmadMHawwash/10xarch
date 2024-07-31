@@ -6,7 +6,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useLevelManager } from "@/lib/hooks/useLevelManager";
+import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
 import { type ComponentNodeProps } from "../../SystemComponentNode";
 import { Label } from "../../ui/label";
 import { Small } from "../../ui/typography";
@@ -26,7 +26,7 @@ export const CacheCluster = ({ name, Icon }: ComponentNodeProps) => {
 type CachePurpose = "Database Read/Write" | "User Session";
 
 const CacheSettings = ({ name: id }: { name: string }) => {
-  const { useSystemComponentConfigSlice } = useLevelManager();
+  const { useSystemComponentConfigSlice } = useChallengeManager();
 
   const [purpose, setPurpose] = useSystemComponentConfigSlice<string>(
     id,

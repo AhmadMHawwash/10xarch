@@ -1,4 +1,4 @@
-import { useLevelManager } from "@/lib/hooks/useLevelManager";
+import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
 import { type ComponentNodeProps } from "../SystemComponentNode";
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
@@ -18,7 +18,7 @@ export const Cache = ({ name, Icon }: ComponentNodeProps) => {
 // type CachePurpose = "Database Read/Write" | "User Session";
 
 const CacheSettings = ({ name: id }: { name: string }) => {
-  const { useSystemComponentConfigSlice } = useLevelManager();
+  const { useSystemComponentConfigSlice } = useChallengeManager();
 
   // const [cacheType, setCacheType] = useSystemComponentConfigSlice<CachePurpose>(
   //   id,

@@ -27,7 +27,7 @@ import {
   type ReactFlowJsonObject,
 } from "reactflow";
 import { type SystemComponent } from "../levels/type";
-import { SYSTEM_COMPONENT_NODE } from "./useLevelManager";
+import { SYSTEM_COMPONENT_NODE } from "./useChallengeManager";
 import { componentsNumberingStore } from "../levels/utils";
 
 interface SystemDesignerState {

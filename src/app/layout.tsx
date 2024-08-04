@@ -4,6 +4,7 @@ import "reactflow/dist/style.css";
 import { GeistSans } from "geist/font/sans";
 
 import { TRPCReactProvider } from "@/trpc/react";
+import { Toaster } from "@/components/ui/toaster";
 
 export const metadata = {
   title: "System Design Playground",
@@ -21,6 +22,7 @@ export default function RootLayout({
     <html lang="en" className={`${GeistSans.variable}`}>
       <body>
         <TRPCReactProvider>
+          <Toaster />
           <main className="flex min-h-screen">{children}</main>
         </TRPCReactProvider>
       </body>

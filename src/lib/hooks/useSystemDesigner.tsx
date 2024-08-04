@@ -29,6 +29,7 @@ import {
 import { type SystemComponent } from "../levels/type";
 import { SYSTEM_COMPONENT_NODE } from "./useChallengeManager";
 import { componentsNumberingStore } from "../levels/utils";
+import { useToast } from "@/components/ui/use-toast";
 
 interface SystemDesignerState {
   nodes: Node<SystemComponentNodeDataProps>[];
@@ -109,15 +110,30 @@ const componentTargets: Record<
 
 export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
-  const [nodes, setNodes] = useState<Node<SystemComponentNodeDataProps>[]>([]);
+  const [nodes, setNodes] = useState<Node<SystemComponentNodeDataProps>[]>([
+    {
+      id: "Whiteboard-1",
+      type: SYSTEM_COMPONENT_NODE,
+      data: {
+        name: "Whiteboard",
+        withTargetHandle: true,
+        withSourceHandle: true,
+        id: "Whiteboard-1",
+        configs: {},
+      },
+      position: {
+        x: 100,
+        y: 100,
+      },
+    },
+  ]);
   const [edges, setEdges] = useState<Edge[]>([]);
   const [reactFlowInstance, setReactFlowInstance] =
     useState<ReactFlowInstance | null>(null);
   const { setViewport } = useReactFlow();
   const [isEdgeBeingConnected, setIsEdgeBeingConnected] = useState(false);
 
-  const toast = (_x: unknown) => null;
-  // const toast = useToast();
+  const { toast } = useToast();
 
   const onConnect: OnConnect = useCallback(
     (params) => {
@@ -248,6 +264,7 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
 
   // console.log({ nodes, edges });
   const updateNodes = useCallback((nodes: Node[]) => {
+    console.log(nodes);
     setNodes(nodes);
   }, []);
 
@@ -266,7 +283,21 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
   }, []);
 
   const onNodesChange: OnNodesChange = (changes: NodeChange[]) => {
-    const newNodes = applyNodeChanges(changes, nodes);
+    const isDeletingWhiteboard = changes.some(
+      (change) => change.type === "remove" && change.id.includes("Whiteboard"),
+    );
+
+    if (isDeletingWhiteboard) {
+      toast({
+        title: "You cannot delete the whiteboard",
+      });
+    }
+
+    const changesWithKeptSystemDefs = changes.filter(
+      (change) =>
+        !(change.type === "remove" && change.id.includes("Whiteboard")),
+    );
+    const newNodes = applyNodeChanges(changesWithKeptSystemDefs, nodes);
 
     setNodes(newNodes);
   };

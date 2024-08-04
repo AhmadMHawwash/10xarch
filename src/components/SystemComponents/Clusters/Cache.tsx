@@ -73,7 +73,7 @@ const CacheSettings = ({ name: id }: { name: string }) => {
             onChange={(e) => setPurpose(e.target.value)}
           />
         </div>
-        <div className="grid grid-flow-col grid-cols-2">
+        {/* <div className="grid grid-flow-col grid-cols-2">
           <Label
             htmlFor="primary-instances-count"
             className=" col-span-1 my-auto"
@@ -105,7 +105,7 @@ const CacheSettings = ({ name: id }: { name: string }) => {
             placeholder="# of instances"
             type="number"
           />
-        </div>
+        </div> */}
       </div>
     </WithSettings>
   );

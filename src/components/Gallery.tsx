@@ -122,6 +122,16 @@ const components: Record<SystemComponentType, SystemComponent> = {
       "Whiteboard is your area to write your notes and thoughts about the system.",
     name: "Whiteboard",
     icon: PresentationIcon,
+    content: `# Whiteboard
+Is your digital area where you can write down your notes and thoughts about the system.
+
+It includes 3 main areas:
+- **Requirements**: where you define functional and non-functional requirements of the system.
+- **System API**: where you define the API endpoints and their expected behavior.
+- **Capacity estimations**: where you define the expected traffic, storage, memory, and bandwidth requirements of the system.
+
+Defining these 3 areas at the beginning will help you design the system in a thoughtful and considerable way.
+    `,
   },
 };
 

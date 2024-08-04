@@ -149,8 +149,18 @@ export const useChallengeManager = () => {
   return {
     challenge: challenge!,
     stage: challenge?.stages[currentStageIndex],
-    toNextStage,
-    toPreviousStage,
+    toNextStage: () => {
+      if (currentStageIndex < challenge!.stages.length - 1) {
+        toNextStage();
+      }
+      return;
+    },
+    toPreviousStage: () => {
+      if (currentStageIndex > 0) {
+        toPreviousStage();
+      }
+      return;
+    },
     checkSolution,
     useSystemComponentConfigSlice,
     currentStageIndex,

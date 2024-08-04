@@ -65,16 +65,14 @@ export const WithMarkdownDetails = ({
           <span className="absolute -left-[104px] -top-0 rounded-md bg-white p-4">
             <Icon />
           </span>
-          <div className="h-[90vh] overflow-scroll">
-            <div className="markdown-container">
-              <ReactMarkdown
-                remarkPlugins={[remarkGfm]}
-                rehypePlugins={[rehypeRaw]} // Enable raw HTML parsing
-                components={components1}
-              >
-                {content}
-              </ReactMarkdown>
-            </div>
+          <div className="h-[90vh] overflow-scroll px-8">
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              rehypePlugins={[rehypeRaw]} // Enable raw HTML parsing
+              components={components1}
+            >
+              {content}
+            </ReactMarkdown>
           </div>
         </DialogHeader>
       </DialogContent>

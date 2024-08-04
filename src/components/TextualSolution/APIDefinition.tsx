@@ -12,9 +12,10 @@ import { WithMarkdownDetails } from "../SystemComponents/Wrappers/WithMarkdownDe
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import { Textarea } from "../ui/textarea";
+import { Hints } from "./RequirementsDefinition";
 
 export const APIDefinition = ({ name: id }: { name: string }) => {
-  const { useSystemComponentConfigSlice } = useChallengeManager();
+  const { useSystemComponentConfigSlice, stage } = useChallengeManager();
 
   const [apiDef, setApiDef] = useSystemComponentConfigSlice<string>(
     id,
@@ -74,6 +75,7 @@ export const APIDefinition = ({ name: id }: { name: string }) => {
               }
               content={apiDefinition}
             />
+            <Hints hints={stage?.hintsPerArea.systemAPI} />
           </DialogDescription>
         </DialogHeader>
       </DialogContent>

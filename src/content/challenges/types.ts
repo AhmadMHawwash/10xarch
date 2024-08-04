@@ -1,10 +1,16 @@
 export type Challenge = {
   slug: string;
   title: string;
-  diffcutly: "Easy" | "Medium" | "Hard";
   description: string;
+  difficulty: "Easy" | "Medium" | "Hard";
   stages: {
-    objective: string;
-    problem?: string;
+    problem: string;
+    assumptions: string[];
+    hintsPerArea: {
+      functionalAndNonFunctionalRequirements: string[];
+      systemAPI: string[];
+      capacityEstimations: string[];
+      highLevelDesign: string[];
+    };
   }[];
 };

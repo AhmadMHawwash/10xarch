@@ -13,6 +13,7 @@ import { WithMarkdownDetails } from "../SystemComponents/Wrappers/WithMarkdownDe
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import { Textarea } from "../ui/textarea";
+import { Hints } from "./RequirementsDefinition";
 
 const capacityEstimationDefinitionSchema = z.object({
   capacityEstimations: z.string(),
@@ -24,7 +25,7 @@ export const CapacityEstimationDefinition = ({
 }: {
   name: string;
 }) => {
-  const { useSystemComponentConfigSlice } = useChallengeManager();
+  const { useSystemComponentConfigSlice, stage } = useChallengeManager();
 
   const [capacity, setCapacity] = useSystemComponentConfigSlice<string>(
     id,
@@ -48,32 +49,19 @@ export const CapacityEstimationDefinition = ({
           <DialogTitle>Capacity estimation</DialogTitle>
           <DialogDescription className="!text-black">
             <Separator className="mb-4 mt-2" />
-            {/* <Tabs defaultValue="capacityEstimations" className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="capacityEstimations">
-                    Capacity estimations
-                  </TabsTrigger>
-                  <TabsTrigger value="constraints">Constraints</TabsTrigger>
-                </TabsList>
-                <TabsContent value="capacityEstimations"> */}
             <Textarea
               rows={25}
               value={capacity}
               onChange={(e) => setCapacity(e.target.value)}
               placeholder={`Example: URL Shortening Service
   1. Traffic Estimates
-    // Assume we expect 500 million new URL shortenings per month with a 100:1 read/write ratio.
-
     - New URLs per second: 500 million divided by 1 Month of Seconds is approximately 193 new shortend URLs per second.
     - URL redirections/reads per second: 100 times 193 equals 19,300 requests per second.
 
   2. Storage Estimates
-    // Assume each URL shortening request (including metadata) takes 500 bytes of storage.
     - Total storage for 5 years: 500 million * 12 months/year * 5 years * 500 bytes equals 15 terabytes.
 
-  3. Bandwidth Estimates
-    // Estimate the data transfer rates for both incoming (URL creation) and outgoing (URL redirection) traffic.
-    
+  3. Bandwidth Estimates    
     - Incoming data: 193 URLs per second * 500 bytes equals 96.5 kilobytes per second.
     - Outgoing data: 19,300 requests per second * 500 bytes equals 9.65 megabytes per second.
 
@@ -96,30 +84,7 @@ export const CapacityEstimationDefinition = ({
               }
               content={capacityEstimations}
             />
-            {/* </TabsContent> */}
-
-            {/* <TabsContent value="constraints">
-                  <Textarea
-                    rows={10}
-                    value={constraints}
-                    onChange={(e) => setConstraints(e.target.value)}
-                    placeholder="Constraints of the system"
-                  />
-                  <WithMarkdownDetails
-                    Icon={InfoIcon}
-                    trigger={
-                      <Button
-                        variant="link"
-                        className="pl-0 pt-0 opacity-50 transition-all hover:opacity-100"
-                      >
-                        <InfoIcon className="mr-1" size={16} />
-                        Constraints of the system
-                      </Button>
-                    }
-                    content={constraintsContent}
-                  />
-                </TabsContent>
-              </Tabs> */}
+            <Hints hints={stage?.hintsPerArea.capacityEstimations} />
           </DialogDescription>
         </DialogHeader>
       </DialogContent>

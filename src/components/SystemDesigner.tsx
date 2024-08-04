@@ -88,9 +88,9 @@ const SystemDesigner = () => {
         fitView={false}
       >
         <Background variant={BackgroundVariant.Dots} color="black" />
-        <Panel position="bottom-right">
+        {/* <Panel position="bottom-right">
           <Dashboard />
-        </Panel>
+        </Panel> */}
         <Panel position="top-right" className="flex flex-col items-end">
           <Button className="mr-2" onClick={checkSolution}>
             Check solution

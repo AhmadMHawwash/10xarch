@@ -163,7 +163,7 @@ export const ListAndDetails = ({
 
   return (
     <div className="flex w-full flex-row">
-      <div className="mr-2 flex w-36 flex-col rounded-sm border overflow-scroll h-[16.1rem]">
+      <div className="mr-2 flex w-36 flex-col rounded-sm border">
         {items.map(([key, value], index) => (
           <div
             className={cn(

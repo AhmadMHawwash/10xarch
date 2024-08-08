@@ -47,6 +47,27 @@ export const APIDefinition = ({ name: id }: { name: string }) => {
                 setApis(newApis);
               }}
               onAdd={() => setApis([...apis, ["new api", ""]])}
+              textareaPlaceholder={`Example: URL Shortening Service
+1.  Create Short URL
+
+Endpoint: POST /shorten
+Description: This API generates a short URL for a given long URL.
+Parameters:
+- original_url (string): The original long URL that needs to be shortened.
+Response:
+- short_url (string): The generated short URL.
+
+Example Request:
+POST /shorten {
+"original_url": "http://example.com/some/very/long/url",
+}
+Example Response:
+JSON: {
+"short_url": "http://short.url/xyz"
+}
+
+2.  ...
+    `}
             />
 
             <WithMarkdownDetails
@@ -122,11 +143,15 @@ export const ListAndDetails = ({
   onChange,
   onDelete,
   onAdd,
+  textareaPlaceholder,
+  textareaRowsCount = 25
 }: {
   items: [string, string][];
   onChange: (items: [string, string][]) => void;
   onDelete: (index: number) => void;
   onAdd: () => void;
+  textareaPlaceholder?: string;
+  textareaRowsCount?: number;
 }) => {
   const [selectedKeyIndex, setSelectedKeyIndex] = useState<number>(0);
   const [inputValue, setInputValue] = useState<string>(
@@ -197,7 +222,7 @@ export const ListAndDetails = ({
             }}
           />
           <Textarea
-            rows={25}
+            rows={textareaRowsCount}
             value={textareaValue}
             onBlur={() => {
               const newApis = items.map(
@@ -209,27 +234,7 @@ export const ListAndDetails = ({
               onChange(newApis);
             }}
             onChange={(e) => setTextareaValue(e.target.value)}
-            placeholder={`Example: URL Shortening Service
-1.  Create Short URL
-
-Endpoint: POST /shorten
-Description: This API generates a short URL for a given long URL.
-Parameters:
-- original_url (string): The original long URL that needs to be shortened.
-Response:
-- short_url (string): The generated short URL.
-
-Example Request:
-POST /shorten {
-"original_url": "http://example.com/some/very/long/url",
-}
-Example Response:
-JSON: {
-"short_url": "http://short.url/xyz"
-}
-
-2.  ...
-    `}
+            placeholder={textareaPlaceholder}
             className="text-md"
           />
         </div>

@@ -144,7 +144,7 @@ const Gallery = () => {
   return (
     <div className="m-2 h-fit w-fit flex-col rounded-md border border-gray-200 bg-gray-50 bg-opacity-70 p-2">
       <Lead className="h-fit">Components</Lead>
-      {Object.values(components).map(({ name, icon: Icon }) => (
+      {Object.values(components).filter(c => c.name !== 'Whiteboard').map(({ name, icon: Icon }) => (
         <div
           key={name}
           className="my-1 flex cursor-grab items-center rounded-md border border-gray-200 bg-gray-50 bg-opacity-70 p-2"

@@ -262,9 +262,7 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
     [reactFlowInstance],
   );
 
-  // console.log({ nodes, edges });
   const updateNodes = useCallback((nodes: Node[]) => {
-    console.log(nodes);
     setNodes(nodes);
   }, []);
 
@@ -289,7 +287,7 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
 
     if (isDeletingWhiteboard) {
       toast({
-        title: "You cannot delete the whiteboard",
+        title: "You cannot delete the System definitions",
       });
     }
 

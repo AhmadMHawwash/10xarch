@@ -10,6 +10,7 @@ export const CustomEdge: FC<EdgeProps> = ({
   targetPosition,
   style = {},
   markerEnd,
+  data
 }) => {
   const [edgePath] = getBezierPath({
     sourceX,
@@ -19,5 +20,6 @@ export const CustomEdge: FC<EdgeProps> = ({
     targetY,
     targetPosition,
   });
+  console.log(data)
   return <BaseEdge path={edgePath} markerEnd={markerEnd} style={style} />;
 };

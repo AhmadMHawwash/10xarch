@@ -118,11 +118,12 @@ export const useChallengeManager = () => {
     <T,>(
       componentId: string,
       configKey: string,
+      defaultValue?: T,
     ): [T, (configValue: T) => void] => {
       const component = nodes.find((node) => node.id === componentId);
 
       return [
-        (component?.data.configs?.[configKey] ?? undefined) as T,
+        (component?.data.configs?.[configKey] ?? defaultValue) as T,
         (configValue: T) => {
           const updatedNodes = nodes.map((node) => {
             if (node.id === componentId) {

@@ -7,20 +7,32 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
-import { CableIcon, InfoIcon } from "lucide-react";
+import { CableIcon, InfoIcon, PlusIcon, X, XIcon } from "lucide-react";
 import { WithMarkdownDetails } from "../SystemComponents/Wrappers/WithMarkdownDetails";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import { Textarea } from "../ui/textarea";
 import { Hints } from "./RequirementsDefinition";
+import { useState } from "react";
+import { Input } from "../ui/input";
+import { cn } from "@/lib/utils";
+import { H6, Small } from "../ui/typography";
 
 export const APIDefinition = ({ name: id }: { name: string }) => {
   const { useSystemComponentConfigSlice, stage } = useChallengeManager();
-
-  const [apiDef, setApiDef] = useSystemComponentConfigSlice<string>(
+  const [apis, setApis] = useSystemComponentConfigSlice<[string, string][]>(
     id,
-    "api definition",
+    "API definitions",
+    [["new api", ""]],
   );
+  const [selectedApiIndex, setSelectedApiIndex] = useState<number>(0);
+  const [inputValue, setInputValue] = useState<string>(
+    apis[selectedApiIndex]?.[0] ?? "",
+  );
+  const [textareaValue, setTextareaValue] = useState<string>(
+    apis[selectedApiIndex]?.[1] ?? "",
+  );
+
   return (
     <Dialog>
       <DialogTrigger className="w-full">
@@ -29,16 +41,82 @@ export const APIDefinition = ({ name: id }: { name: string }) => {
           System API
         </Button>
       </DialogTrigger>
-      <DialogContent className="!h-[95vh] w-[70vw] max-w-5xl">
+      <DialogContent className="!h-[95vh] w-[70vw] max-w-5xl overflow-scroll">
         <DialogHeader>
           <DialogTitle>System API definition</DialogTitle>
           <DialogDescription className="!text-black">
             <Separator className="mb-4 mt-2" />
-            <Textarea
-              rows={25}
-              value={apiDef}
-              onChange={(e) => setApiDef(e.target.value)}
-              placeholder={`Example: URL Shortening Service
+            <div className="flex w-full flex-row">
+              <div className="mr-2 flex w-36 flex-col rounded-sm border">
+                {apis.map(([apiName, apiDef], index) => (
+                  <div
+                    className={cn(
+                      "group relative flex border-b transition-all hover:cursor-pointer hover:bg-slate-200",
+                      { [`bg-slate-100`]: selectedApiIndex === index },
+                    )}
+                    onClick={() => {
+                      setSelectedApiIndex(index);
+                      setInputValue(apiName);
+                      setTextareaValue(apiDef)
+                    }}
+                    key={apiName + index}
+                  >
+                    <Small className="mr-2 overflow-hidden p-2">
+                      {apiName}
+                    </Small>
+                    <span className="absolute right-2 top-2 rounded-full bg-slate-300 opacity-0 hover:cursor-pointer group-hover:opacity-100">
+                      <X
+                        size={16}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const newApis = apis.filter((_, i) => i !== index);
+                          setApis(newApis);
+                        }}
+                      />
+                    </span>
+                  </div>
+                ))}
+                <Button
+                  size="xs"
+                  variant="ghost"
+                  onClick={() => setApis([...apis, ["new api", ""]])}
+                >
+                  <PlusIcon size="16" />
+                </Button>
+              </div>
+              {!isNaN(selectedApiIndex) ? (
+                <div className="flex w-full flex-col">
+                  <Input
+                    type="text"
+                    className="mb-2 h-8"
+                    value={inputValue}
+                    onChange={(e) => {
+                      setInputValue(e.target.value);
+                    }}
+                    onBlur={() => {
+                      const newApis = apis.map(
+                        ([name, value], i) =>
+                          (i === selectedApiIndex
+                            ? [inputValue, value]
+                            : [name, value]) as [string, string],
+                      );
+                      setApis(newApis);
+                    }}
+                  />
+                  <Textarea
+                    rows={25}
+                    value={textareaValue}
+                    onBlur={() => {
+                      const newApis = apis.map(
+                        ([name, value], i) =>
+                          (i === selectedApiIndex
+                            ? [name, textareaValue]
+                            : [name, value]) as [string, string],
+                      );
+                      setApis(newApis);
+                    }}
+                    onChange={(e) => setTextareaValue(e.target.value)}
+                    placeholder={`Example: URL Shortening Service
 1.  Create Short URL
 
     Endpoint: POST /shorten
@@ -59,8 +137,15 @@ export const APIDefinition = ({ name: id }: { name: string }) => {
   
 2.  ...
               `}
-              className="text-md"
-            />
+                    className="text-md"
+                  />
+                </div>
+              ) : (
+                <H6 className="text-center">
+                  Select an API to view or add a new one
+                </H6>
+              )}
+            </div>
 
             <WithMarkdownDetails
               Icon={InfoIcon}

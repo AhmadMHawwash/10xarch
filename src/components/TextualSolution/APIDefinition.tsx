@@ -25,13 +25,6 @@ export const APIDefinition = ({ name: id }: { name: string }) => {
     "API definitions",
     [["new api", ""]],
   );
-  const [selectedApiIndex, setSelectedApiIndex] = useState<number>(0);
-  const [inputValue, setInputValue] = useState<string>(
-    apis[selectedApiIndex]?.[0] ?? "",
-  );
-  const [textareaValue, setTextareaValue] = useState<string>(
-    apis[selectedApiIndex]?.[1] ?? "",
-  );
 
   return (
     <Dialog>
@@ -46,106 +39,15 @@ export const APIDefinition = ({ name: id }: { name: string }) => {
           <DialogTitle>System API definition</DialogTitle>
           <DialogDescription className="!text-black">
             <Separator className="mb-4 mt-2" />
-            <div className="flex w-full flex-row">
-              <div className="mr-2 flex w-36 flex-col rounded-sm border">
-                {apis.map(([apiName, apiDef], index) => (
-                  <div
-                    className={cn(
-                      "group relative flex border-b transition-all hover:cursor-pointer hover:bg-slate-200",
-                      { [`bg-slate-100`]: selectedApiIndex === index },
-                    )}
-                    onClick={() => {
-                      setSelectedApiIndex(index);
-                      setInputValue(apiName);
-                      setTextareaValue(apiDef)
-                    }}
-                    key={apiName + index}
-                  >
-                    <Small className="mr-2 overflow-hidden p-2">
-                      {apiName}
-                    </Small>
-                    <span className="absolute right-2 top-2 rounded-full bg-slate-300 opacity-0 hover:cursor-pointer group-hover:opacity-100">
-                      <X
-                        size={16}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          const newApis = apis.filter((_, i) => i !== index);
-                          setApis(newApis);
-                        }}
-                      />
-                    </span>
-                  </div>
-                ))}
-                <Button
-                  size="xs"
-                  variant="ghost"
-                  onClick={() => setApis([...apis, ["new api", ""]])}
-                >
-                  <PlusIcon size="16" />
-                </Button>
-              </div>
-              {!isNaN(selectedApiIndex) ? (
-                <div className="flex w-full flex-col">
-                  <Input
-                    type="text"
-                    className="mb-2 h-8"
-                    value={inputValue}
-                    onChange={(e) => {
-                      setInputValue(e.target.value);
-                    }}
-                    onBlur={() => {
-                      const newApis = apis.map(
-                        ([name, value], i) =>
-                          (i === selectedApiIndex
-                            ? [inputValue, value]
-                            : [name, value]) as [string, string],
-                      );
-                      setApis(newApis);
-                    }}
-                  />
-                  <Textarea
-                    rows={25}
-                    value={textareaValue}
-                    onBlur={() => {
-                      const newApis = apis.map(
-                        ([name, value], i) =>
-                          (i === selectedApiIndex
-                            ? [name, textareaValue]
-                            : [name, value]) as [string, string],
-                      );
-                      setApis(newApis);
-                    }}
-                    onChange={(e) => setTextareaValue(e.target.value)}
-                    placeholder={`Example: URL Shortening Service
-1.  Create Short URL
-
-    Endpoint: POST /shorten
-    Description: This API generates a short URL for a given long URL.
-    Parameters:
-      - original_url (string): The original long URL that needs to be shortened.
-    Response:
-      - short_url (string): The generated short URL.
-
-    Example Request:
-      POST /shorten {
-        "original_url": "http://example.com/some/very/long/url",
-      }
-    Example Response:
-      JSON: {
-        "short_url": "http://short.url/xyz"
-      }
-  
-2.  ...
-              `}
-                    className="text-md"
-                  />
-                </div>
-              ) : (
-                <H6 className="text-center">
-                  Select an API to view or add a new one
-                </H6>
-              )}
-            </div>
+            <ListAndDetails
+              items={apis}
+              onChange={setApis}
+              onDelete={(index) => {
+                const newApis = apis.filter((_, i) => i !== index);
+                setApis(newApis);
+              }}
+              onAdd={() => setApis([...apis, ["new api", ""]])}
+            />
 
             <WithMarkdownDetails
               Icon={InfoIcon}
@@ -214,3 +116,126 @@ POST /shorten {
 }
 \`\`\`
 `;
+
+export const ListAndDetails = ({
+  items,
+  onChange,
+  onDelete,
+  onAdd,
+}: {
+  items: [string, string][];
+  onChange: (items: [string, string][]) => void;
+  onDelete: (index: number) => void;
+  onAdd: () => void;
+}) => {
+  const [selectedKeyIndex, setSelectedKeyIndex] = useState<number>(0);
+  const [inputValue, setInputValue] = useState<string>(
+    items[selectedKeyIndex]?.[0] ?? "",
+  );
+  const [textareaValue, setTextareaValue] = useState<string>(
+    items[selectedKeyIndex]?.[1] ?? "",
+  );
+
+  return (
+    <div className="flex w-full flex-row">
+      <div className="mr-2 flex w-36 flex-col rounded-sm border">
+        {items.map(([key, value], index) => (
+          <div
+            className={cn(
+              "group relative flex border-b transition-all hover:cursor-pointer hover:bg-slate-200",
+              { [`bg-slate-100`]: selectedKeyIndex === index },
+            )}
+            onClick={() => {
+              setSelectedKeyIndex(index);
+              setInputValue(key);
+              setTextareaValue(value);
+            }}
+            key={key + index}
+          >
+            <Small className="mr-2 overflow-hidden p-2">{key}</Small>
+            <span className="absolute right-2 top-2 rounded-full bg-slate-300 opacity-0 hover:cursor-pointer group-hover:opacity-100">
+              <X
+                size={16}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete(index);
+                  // const newApis = items.filter((_, i) => i !== index);
+                  // setApis(newApis);
+                }}
+              />
+            </span>
+          </div>
+        ))}
+        <Button
+          size="xs"
+          variant="ghost"
+          onClick={() => {
+            onAdd();
+            // setApis([...items, ["new api", ""]]);
+          }}
+        >
+          <PlusIcon size="16" />
+        </Button>
+      </div>
+      {!isNaN(selectedKeyIndex) ? (
+        <div className="flex w-full flex-col">
+          <Input
+            type="text"
+            className="mb-2 h-8"
+            value={inputValue}
+            onChange={(e) => {
+              setInputValue(e.target.value);
+            }}
+            onBlur={() => {
+              const newApis = items.map(
+                ([name, value], i) =>
+                  (i === selectedKeyIndex
+                    ? [inputValue, value]
+                    : [name, value]) as [string, string],
+              );
+              onChange(newApis);
+            }}
+          />
+          <Textarea
+            rows={25}
+            value={textareaValue}
+            onBlur={() => {
+              const newApis = items.map(
+                ([name, value], i) =>
+                  (i === selectedKeyIndex
+                    ? [name, textareaValue]
+                    : [name, value]) as [string, string],
+              );
+              onChange(newApis);
+            }}
+            onChange={(e) => setTextareaValue(e.target.value)}
+            placeholder={`Example: URL Shortening Service
+1.  Create Short URL
+
+Endpoint: POST /shorten
+Description: This API generates a short URL for a given long URL.
+Parameters:
+- original_url (string): The original long URL that needs to be shortened.
+Response:
+- short_url (string): The generated short URL.
+
+Example Request:
+POST /shorten {
+"original_url": "http://example.com/some/very/long/url",
+}
+Example Response:
+JSON: {
+"short_url": "http://short.url/xyz"
+}
+
+2.  ...
+    `}
+            className="text-md"
+          />
+        </div>
+      ) : (
+        <H6 className="text-center">Select an API to view or add a new one</H6>
+      )}
+    </div>
+  );
+};

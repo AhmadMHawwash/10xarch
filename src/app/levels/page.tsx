@@ -31,7 +31,7 @@ export default async function Levels() {
                   variant="outline"
                   className="bg-slate-50 text-muted-foreground"
                 >
-                  {challenge.diffcutly}
+                  {challenge.difficulty}
                 </Badge>
               </CardFooter>
             </Card>

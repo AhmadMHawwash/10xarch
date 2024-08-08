@@ -5,6 +5,7 @@ import { Label } from "../../ui/label";
 import { Small } from "../../ui/typography";
 import { WithSettings } from "../Wrappers/WithSettings";
 import { Textarea } from "@/components/ui/textarea";
+import { ListAndDetails } from "@/components/TextualSolution/APIDefinition";
 
 export const DatabaseCluster = ({ name, Icon }: ComponentNodeProps) => {
   return (
@@ -23,10 +24,15 @@ const DatabaseClusterSettings = ({ name: id }: { name: string }) => {
     useSystemComponentConfigSlice<number>(id, "Number of Primary instances");
   const [replicaInstancesCount, setReplicaInstancesCount] =
     useSystemComponentConfigSlice<number>(id, "Number of Replica instances");
-  const [databaseDesign, setDatabaseDesign] =
-    useSystemComponentConfigSlice<string>(id, "database design");
-  const [purpose, setPurpose] =
-    useSystemComponentConfigSlice<string>(id, "Database purpose");
+  const [purpose, setPurpose] = useSystemComponentConfigSlice<string>(
+    id,
+    "Database purpose",
+  );
+  const [models, setModels] = useSystemComponentConfigSlice<[string, string][]>(
+    id,
+    "Database models",
+    [["new model", ""]],
+  );
 
   return (
     <WithSettings name={id}>
@@ -67,31 +73,24 @@ const DatabaseClusterSettings = ({ name: id }: { name: string }) => {
         </div>
         <div className="flex flex-col gap-4">
           <Label htmlFor="database-design">Database design</Label>
-          <div>
-            <Textarea
-              id="database-design"
-              rows={10}
-              value={databaseDesign}
-              onChange={(e) => setDatabaseDesign(e.target.value)}
-              placeholder={`Example: URL Shortening Service
-              Urls table
-              - id (Primary Key)
-              - alias
-              - original_url
-              - created_at
-              - expiration_date
-              
-              
-              User table
-              - user_id (Primary Key)
-              - name
-              - email
-              - password
-              - Created_at
-              `}
-              className="text-md"
-            />
-          </div>
+          <ListAndDetails
+            textareaRowsCount={10}
+            items={models}
+            onChange={setModels}
+            onDelete={(index) => {
+              const newModels = models.filter((_, i) => i !== index);
+              setModels(newModels);
+            }}
+            onAdd={() => setModels([...models, ["new model", ""]])}
+            textareaPlaceholder={`Example: URL Shortening Service
+Urls table
+- id (Primary Key)
+- alias
+- original_url
+- created_at
+- expiration_date
+`}
+          />
         </div>
         <div className="flex flex-col gap-4">
           <Label htmlFor="database-purpose">Database purpose</Label>

@@ -19,10 +19,10 @@ import ReactFlow, {
   type OnConnect,
 } from "reactflow";
 import "reactflow/dist/style.css";
+import { ApiRequestFlowModeMode } from "./ApiRequestFlowMode";
 import { CustomEdge } from "./CustomEdge";
 import Gallery from "./Gallery";
 import SystemComponentNode from "./SystemComponentNode";
-import { Dashboard } from "./SystemDashboard";
 import { Button } from "./ui/button";
 
 const nodeTypes: Record<string, ComponentType<NodeProps>> = {
@@ -88,14 +88,12 @@ const SystemDesigner = () => {
         fitView={false}
       >
         <Background variant={BackgroundVariant.Dots} color="black" />
-        {/* <Panel position="bottom-right">
-          <Dashboard />
-        </Panel> */}
         <Panel position="top-right" className="flex flex-col items-end">
           <Button className="mr-2" onClick={checkSolution}>
             Check solution
           </Button>
           <Gallery />
+          <ApiRequestFlowModeMode />
         </Panel>
         <Controls />
       </ReactFlow>

@@ -48,6 +48,8 @@ interface SystemDesignerState {
   onSave: () => void;
   onRestore: () => void;
   isEdgeBeingConnected?: boolean;
+  toggleApiRequestFlowModeMode: () => void;
+  isApiRequestFlowMode: boolean;
 }
 
 const SystemDesignerContext = createContext<SystemDesignerState>({
@@ -66,6 +68,8 @@ const SystemDesignerContext = createContext<SystemDesignerState>({
   onConnectEnd: noop,
   onSave: noop,
   onRestore: noop,
+  toggleApiRequestFlowModeMode: noop,
+  isApiRequestFlowMode: false,
 });
 
 export const makeKey = (id: number, type: string) => `${type}-${id}`;
@@ -132,6 +136,7 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
     useState<ReactFlowInstance | null>(null);
   const { setViewport } = useReactFlow();
   const [isEdgeBeingConnected, setIsEdgeBeingConnected] = useState(false);
+  const [isApiRequestFlowMode, setisApiRequestFlowMode] = useState(false);
 
   const { toast } = useToast();
 
@@ -160,12 +165,13 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
             ...params,
             id: `${sourceNode.id} -> ${targetNode.id}`,
             type: "CustomEdge",
+            animated: isApiRequestFlowMode,
           },
           eds,
         ),
       );
     },
-    [nodes],
+    [nodes, isApiRequestFlowMode],
   );
 
   const onConnectStart: OnConnectStart = useCallback(
@@ -330,6 +336,100 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
     restoreFlow().catch(console.error);
   }, [setViewport]);
 
+  const toggleApiRequestFlowModeMode = useCallback(() => {
+    const newEdges = edges.map((edge) => ({
+      ...edge,
+      animated: !isApiRequestFlowMode,
+    }));
+
+    setEdges(newEdges);
+    setisApiRequestFlowMode((prev) => {
+      const mode = !prev;
+
+      const nodesWithoutWhiteboard = nodes.filter(
+        (node) => node.data.name !== "Whiteboard",
+      );
+      const whiteboard = nodes.find((node) => node.data.name === "Whiteboard");
+      if (mode) {
+        const farthestY = nodesWithoutWhiteboard.reduce((acc, node) => {
+          if (node.position.y > acc) return node.position.y;
+          return acc;
+        }, 0);
+
+        const farthestX = nodesWithoutWhiteboard.reduce((acc, node) => {
+          if (node.position.x > acc) return node.position.x;
+          return acc;
+        }, 0);
+
+        const closestX = nodesWithoutWhiteboard.reduce((acc, node) => {
+          if (node.position.x < acc) return node.position.x;
+          return acc;
+        }, nodesWithoutWhiteboard[0]?.position.x ?? 0);
+
+        const closestY = nodesWithoutWhiteboard.reduce((acc, node) => {
+          if (node.position.y < acc) return node.position.y;
+          return acc;
+        }, nodesWithoutWhiteboard[0]?.position.y ?? 0);
+
+        const group: Node<SystemComponentNodeDataProps> = {
+          id: "api-request-flow-group",
+          type: "group",
+          data: {
+            id: "api-request-flow-group",
+            name: "API Request Flow",
+            configs: {},
+          },
+          position: { x: closestX - 20, y: closestY - 20 },
+          connectable: false,
+          deletable: false,
+          style: {
+            backgroundColor: "rgba(255, 0, 0, 0.2)",
+            width: farthestX - closestX + 180,
+            height: farthestY - closestY + 140,
+          },
+        };
+
+        const newNodes = nodesWithoutWhiteboard.map((node) => ({
+          ...node,
+          position: {
+            x: node.position.x - group.position.x,
+            y: node.position.y - group.position.y,
+          },
+          extent: "parent" as const,
+          parentId: "api-request-flow-group",
+          data: {
+            ...node.data,
+          },
+        }));
+
+        setNodes([group, whiteboard!, ...newNodes]);
+      } else {
+        const group = nodes.find(
+          (node) => node.id === "api-request-flow-group",
+        );
+        const whiteboard = nodes.find(
+          (node) => node.data.name === "Whiteboard",
+        );
+        const newNodes = nodesWithoutWhiteboard
+          .filter((node) => node.id !== "api-request-flow-group")
+          .map((node) => ({
+            ...node,
+            position: {
+              x: node.position.x + (group?.position?.x ?? 0),
+              y: node.position.y + (group?.position?.y ?? 0),
+            },
+            parentId: undefined,
+            data: {
+              ...node.data,
+            },
+          }));
+        setNodes([whiteboard!, ...newNodes]);
+      }
+
+      return mode;
+    });
+  }, [edges, isApiRequestFlowMode, nodes]);
+
   return (
     <SystemDesignerContext.Provider
       value={{
@@ -349,6 +449,8 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
         edges,
         nodes,
         isEdgeBeingConnected,
+        toggleApiRequestFlowModeMode,
+        isApiRequestFlowMode,
       }}
     >
       {children}

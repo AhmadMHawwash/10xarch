@@ -1,5 +1,6 @@
 import { getSystemComponent } from "@/components/Gallery";
-import type { SystemComponentNodeDataProps } from "@/components/SystemComponentNode";
+import { type SystemComponentNodeDataProps } from "@/components/ReactflowCustomNodes/SystemComponentNode";
+import { useToast } from "@/components/ui/use-toast";
 import { noop } from "@/lib/utils";
 import {
   createContext,
@@ -27,9 +28,8 @@ import {
   type ReactFlowJsonObject,
 } from "reactflow";
 import { type SystemComponent } from "../levels/type";
-import { SYSTEM_COMPONENT_NODE } from "./useChallengeManager";
 import { componentsNumberingStore } from "../levels/utils";
-import { useToast } from "@/components/ui/use-toast";
+import { SYSTEM_COMPONENT_NODE } from "./useChallengeManager";
 
 interface SystemDesignerState {
   nodes: Node<SystemComponentNodeDataProps>[];
@@ -352,12 +352,14 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
       const whiteboard = nodes.find((node) => node.data.name === "Whiteboard");
       if (mode) {
         const farthestY = nodesWithoutWhiteboard.reduce((acc, node) => {
-          if (node.position.y > acc) return node.position.y;
+          if (node.position.y + (node?.height ?? 0) > acc)
+            return node.position.y + (node?.height ?? 0);
           return acc;
         }, 0);
 
         const farthestX = nodesWithoutWhiteboard.reduce((acc, node) => {
-          if (node.position.x > acc) return node.position.x;
+          if (node.position.x + (node.width ?? 0) > acc)
+            return node.position.x + (node.width ?? 0);
           return acc;
         }, 0);
 
@@ -384,9 +386,19 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
           deletable: false,
           style: {
             backgroundColor: "rgba(255, 0, 0, 0.2)",
-            width: farthestX - closestX + 180,
-            height: farthestY - closestY + 140,
+            width: farthestX - closestX + 40,
+            height: farthestY - closestY + 40,
           },
+        };
+
+        const apisNode: Node = {
+          id: "apis",
+          data: {
+            id: "apis",
+          },
+          position: { x: -132, y: 0 },
+          parentId: "api-request-flow-group",
+          type: "APIsNode",
         };
 
         const newNodes = nodesWithoutWhiteboard.map((node) => ({
@@ -402,7 +414,7 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
           },
         }));
 
-        setNodes([group, whiteboard!, ...newNodes]);
+        setNodes([group, apisNode, whiteboard!, ...newNodes]);
       } else {
         const group = nodes.find(
           (node) => node.id === "api-request-flow-group",
@@ -411,7 +423,10 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
           (node) => node.data.name === "Whiteboard",
         );
         const newNodes = nodesWithoutWhiteboard
-          .filter((node) => node.id !== "api-request-flow-group")
+          .filter(
+            (node) =>
+              node.id !== "api-request-flow-group" && node.id !== "apis",
+          )
           .map((node) => ({
             ...node,
             position: {

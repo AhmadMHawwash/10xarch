@@ -1,6 +1,6 @@
 import { Input } from "@/components/ui/input";
 import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
-import { type ComponentNodeProps } from "../../SystemComponentNode";
+import { type ComponentNodeProps } from "../../ReactflowCustomNodes/SystemComponentNode";
 import { Label } from "../../ui/label";
 import { Small } from "../../ui/typography";
 import { WithSettings } from "../Wrappers/WithSettings";

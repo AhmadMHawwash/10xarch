@@ -1,5 +1,5 @@
 import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
-import { type ComponentNodeProps } from "../SystemComponentNode";
+import { type ComponentNodeProps } from "../ReactflowCustomNodes/SystemComponentNode";
 import { ListAndDetails } from "../TextualSolution/APIDefinition";
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";

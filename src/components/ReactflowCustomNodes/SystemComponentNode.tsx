@@ -7,15 +7,15 @@ import { cn } from "@/lib/utils";
 import { InfoIcon, type PiIcon } from "lucide-react";
 import { memo, type FC } from "react";
 import { Handle, Position, type NodeProps } from "reactflow";
-import { getSystemComponent } from "./Gallery";
-import { Cache } from "./SystemComponents/Cache";
-import { CacheCluster } from "./SystemComponents/Clusters/Cache";
-import { DatabaseCluster } from "./SystemComponents/Clusters/Database";
-import { ServerCluster } from "./SystemComponents/Clusters/Server";
-import { Database } from "./SystemComponents/Database";
-import { Whiteboard } from "./SystemComponents/Whiteboard";
-import { WithMarkdownDetails } from "./SystemComponents/Wrappers/WithMarkdownDetails";
-import { Small } from "./ui/typography";
+import { getSystemComponent } from "../Gallery";
+import { Cache } from "../SystemComponents/Cache";
+import { CacheCluster } from "../SystemComponents/Clusters/Cache";
+import { DatabaseCluster } from "../SystemComponents/Clusters/Database";
+import { ServerCluster } from "../SystemComponents/Clusters/Server";
+import { Database } from "../SystemComponents/Database";
+import { Whiteboard } from "../SystemComponents/Whiteboard";
+import { WithMarkdownDetails } from "../SystemComponents/Wrappers/WithMarkdownDetails";
+import { Small } from "../ui/typography";
 
 export type SystemComponentNodeDataProps = {
   icon?: typeof PiIcon;

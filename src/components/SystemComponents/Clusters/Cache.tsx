@@ -1,17 +1,9 @@
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
-import { type ComponentNodeProps } from "../../SystemComponentNode";
+import { type ComponentNodeProps } from "../../ReactflowCustomNodes/SystemComponentNode";
 import { Label } from "../../ui/label";
 import { Small } from "../../ui/typography";
 import { WithSettings } from "../Wrappers/WithSettings";
-import { Textarea } from "@/components/ui/textarea";
 
 export const CacheCluster = ({ name, Icon }: ComponentNodeProps) => {
   return (
@@ -32,11 +24,6 @@ const CacheSettings = ({ name: id }: { name: string }) => {
     id,
     "Cache purpose",
   );
-  const [primaryInstancesCount, setPrimaryInstancesCount] =
-    useSystemComponentConfigSlice<number>(id, "primary instances count");
-  const [replicaInstancesCount, setReplicaInstancesCount] =
-    useSystemComponentConfigSlice<number>(id, "replica instances count");
-
   return (
     <WithSettings name={id}>
       <div className="grid w-full grid-flow-row grid-cols-1 gap-2 !text-black">

@@ -1,4 +1,4 @@
-import { type ComponentNodeProps } from "../SystemComponentNode";
+import { type ComponentNodeProps } from "../ReactflowCustomNodes/SystemComponentNode";
 import { APIDefinition } from "../TextualSolution/APIDefinition";
 import { CapacityEstimationDefinition } from "../TextualSolution/CapacityEstimationDefinition";
 import { RequirementsDefinition } from "../TextualSolution/RequirementsDefinition";

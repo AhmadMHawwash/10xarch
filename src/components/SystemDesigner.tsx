@@ -22,11 +22,13 @@ import "reactflow/dist/style.css";
 import { ApiRequestFlowModeMode } from "./ApiRequestFlowMode";
 import { CustomEdge } from "./CustomEdge";
 import Gallery from "./Gallery";
-import SystemComponentNode from "./SystemComponentNode";
+import SystemComponentNode from "./ReactflowCustomNodes/SystemComponentNode";
 import { Button } from "./ui/button";
+import APIsNode from "./ReactflowCustomNodes/APIsNode";
 
 const nodeTypes: Record<string, ComponentType<NodeProps>> = {
   SystemComponentNode,
+  APIsNode
 };
 
 const edgeTypes: Record<string, ComponentType<EdgeProps>> = {

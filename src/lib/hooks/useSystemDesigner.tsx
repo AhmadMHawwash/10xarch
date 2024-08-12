@@ -117,11 +117,9 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
   const [nodes, setNodes] = useState<Node<SystemComponentNodeDataProps>[]>([
     {
       id: "Whiteboard-1",
-      type: SYSTEM_COMPONENT_NODE,
+      type: "Whiteboard",
       data: {
         name: "Whiteboard",
-        withTargetHandle: true,
-        withSourceHandle: true,
         id: "Whiteboard-1",
         configs: {},
       },
@@ -346,34 +344,33 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
     setisApiRequestFlowMode((prev) => {
       const mode = !prev;
 
-      const nodesWithoutWhiteboard = nodes.filter(
-        (node) => node.data.name !== "Whiteboard",
+      const systemComponents = nodes.filter(
+        (node) => node.data.name === "Whiteboard",
       );
-      const whiteboard = nodes.find((node) => node.data.name === "Whiteboard");
       if (mode) {
-        const farthestY = nodesWithoutWhiteboard.reduce((acc, node) => {
+        const farthestY = systemComponents.reduce((acc, node) => {
           if (node.position.y + (node?.height ?? 0) > acc)
             return node.position.y + (node?.height ?? 0);
           return acc;
         }, 0);
 
-        const farthestX = nodesWithoutWhiteboard.reduce((acc, node) => {
+        const farthestX = systemComponents.reduce((acc, node) => {
           if (node.position.x + (node.width ?? 0) > acc)
             return node.position.x + (node.width ?? 0);
           return acc;
         }, 0);
 
-        const closestX = nodesWithoutWhiteboard.reduce((acc, node) => {
+        const closestX = systemComponents.reduce((acc, node) => {
           if (node.position.x < acc) return node.position.x;
           return acc;
-        }, nodesWithoutWhiteboard[0]?.position.x ?? 0);
+        }, systemComponents[0]?.position.x ?? 0);
 
-        const closestY = nodesWithoutWhiteboard.reduce((acc, node) => {
+        const closestY = systemComponents.reduce((acc, node) => {
           if (node.position.y < acc) return node.position.y;
           return acc;
-        }, nodesWithoutWhiteboard[0]?.position.y ?? 0);
+        }, systemComponents[0]?.position.y ?? 0);
 
-        const group: Node<SystemComponentNodeDataProps> = {
+        const group: Node = {
           id: "api-request-flow-group",
           type: "group",
           data: {
@@ -401,7 +398,7 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
           type: "APIsNode",
         };
 
-        const newNodes = nodesWithoutWhiteboard.map((node) => ({
+        const newNodes = systemComponents.map((node) => ({
           ...node,
           position: {
             x: node.position.x - group.position.x,
@@ -414,15 +411,12 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
           },
         }));
 
-        setNodes([group, apisNode, whiteboard!, ...newNodes]);
+        setNodes([group, apisNode, ...newNodes]);
       } else {
         const group = nodes.find(
           (node) => node.id === "api-request-flow-group",
         );
-        const whiteboard = nodes.find(
-          (node) => node.data.name === "Whiteboard",
-        );
-        const newNodes = nodesWithoutWhiteboard
+        const newNodes = systemComponents
           .filter(
             (node) =>
               node.id !== "api-request-flow-group" && node.id !== "apis",
@@ -438,7 +432,7 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
               ...node.data,
             },
           }));
-        setNodes([whiteboard!, ...newNodes]);
+        setNodes(newNodes);
       }
 
       return mode;

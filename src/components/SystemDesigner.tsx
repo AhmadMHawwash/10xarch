@@ -25,10 +25,12 @@ import Gallery from "./Gallery";
 import SystemComponentNode from "./ReactflowCustomNodes/SystemComponentNode";
 import { Button } from "./ui/button";
 import APIsNode from "./ReactflowCustomNodes/APIsNode";
+import { Whiteboard } from "./SystemComponents/Whiteboard";
 
 const nodeTypes: Record<string, ComponentType<NodeProps>> = {
   SystemComponentNode,
-  APIsNode
+  Whiteboard,
+  APIsNode,
 };
 
 const edgeTypes: Record<string, ComponentType<EdgeProps>> = {

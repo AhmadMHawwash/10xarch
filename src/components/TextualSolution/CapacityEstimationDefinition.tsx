@@ -6,35 +6,18 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
 import { InfoIcon, NotebookPen } from "lucide-react";
-import { z } from "zod";
+import { useWhiteboard } from "../ReactflowCustomNodes/APIsNode";
 import { WithMarkdownDetails } from "../SystemComponents/Wrappers/WithMarkdownDetails";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import { Textarea } from "../ui/textarea";
 import { Hints } from "./RequirementsDefinition";
+import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
 
-const capacityEstimationDefinitionSchema = z.object({
-  capacityEstimations: z.string(),
-  constraints: z.string(),
-});
-
-export const CapacityEstimationDefinition = ({
-  name: id,
-}: {
-  name: string;
-}) => {
-  const { useSystemComponentConfigSlice, stage } = useChallengeManager();
-
-  const [capacity, setCapacity] = useSystemComponentConfigSlice<string>(
-    id,
-    "Capacity estimations",
-  );
-  // const [constraints, setConstraints] = useSystemComponentConfigSlice<string>(
-  //   id,
-  //   "Constraints",
-  // );
+export const CapacityEstimationDefinition = () => {
+  const { capacity, setCapacity } = useWhiteboard();
+  const { stage } = useChallengeManager();
 
   return (
     <Dialog>

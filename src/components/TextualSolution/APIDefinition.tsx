@@ -7,24 +7,21 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
-import { CableIcon, InfoIcon, PlusIcon, X, XIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { CableIcon, InfoIcon, PlusIcon, X } from "lucide-react";
+import { useState } from "react";
 import { WithMarkdownDetails } from "../SystemComponents/Wrappers/WithMarkdownDetails";
 import { Button } from "../ui/button";
+import { Input } from "../ui/input";
 import { Separator } from "../ui/separator";
 import { Textarea } from "../ui/textarea";
-import { Hints } from "./RequirementsDefinition";
-import { useState } from "react";
-import { Input } from "../ui/input";
-import { cn } from "@/lib/utils";
 import { H6, Small } from "../ui/typography";
+import { Hints } from "./RequirementsDefinition";
+import { useWhiteboard } from "../ReactflowCustomNodes/APIsNode";
 
-export const APIDefinition = ({ name: id }: { name: string }) => {
-  const { useSystemComponentConfigSlice, stage } = useChallengeManager();
-  const [apis, setApis] = useSystemComponentConfigSlice<[string, string][]>(
-    id,
-    "API definitions",
-    [["new api", ""]],
-  );
+export const APIDefinition = () => {
+  const { stage } = useChallengeManager();
+  const { apis, setApis } = useWhiteboard();
 
   return (
     <Dialog>
@@ -144,7 +141,7 @@ export const ListAndDetails = ({
   onDelete,
   onAdd,
   textareaPlaceholder,
-  textareaRowsCount = 25
+  textareaRowsCount = 25,
 }: {
   items: [string, string][];
   onChange: (items: [string, string][]) => void;

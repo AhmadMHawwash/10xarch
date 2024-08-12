@@ -1,17 +1,23 @@
-import { type ComponentNodeProps } from "../ReactflowCustomNodes/SystemComponentNode";
+import { cn } from "@/lib/utils";
 import { APIDefinition } from "../TextualSolution/APIDefinition";
 import { CapacityEstimationDefinition } from "../TextualSolution/CapacityEstimationDefinition";
 import { RequirementsDefinition } from "../TextualSolution/RequirementsDefinition";
 import { Small } from "../ui/typography";
+import { type NodeProps } from "reactflow";
+import { type FC } from "react";
 
-export const Whiteboard = ({ name, Icon }: ComponentNodeProps) => {
+export const Whiteboard: FC<NodeProps> = ({ selected }) => {
   return (
-    <div className="relative flex flex-col items-center">
-      {/* {Icon && <Icon size={20} />} */}
+    <div
+      className={cn(
+        "group flex flex-col items-center justify-center rounded-sm border border-gray-400 p-2",
+        selected ? "bg-gray-300" : "bg-gray-100",
+      )}
+    >
       <Small className="mb-2">System definitions</Small>
-      <RequirementsDefinition name={name} />
-      <APIDefinition name={name} />
-      <CapacityEstimationDefinition name={name} />
+      <RequirementsDefinition />
+      <APIDefinition />
+      <CapacityEstimationDefinition />
     </div>
   );
 };

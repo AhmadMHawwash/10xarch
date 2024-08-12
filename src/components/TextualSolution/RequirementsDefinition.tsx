@@ -14,17 +14,13 @@ import { Separator } from "../ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Textarea } from "../ui/textarea";
 import { Muted } from "../ui/typography";
+import { useWhiteboard } from "../ReactflowCustomNodes/APIsNode";
 
-export const RequirementsDefinition = ({ name: id }: { name: string }) => {
-  const { useSystemComponentConfigSlice, stage } = useChallengeManager();
-
-  const [functional, setFunctional] = useSystemComponentConfigSlice<string>(
-    id,
-    "functional requirements",
-  );
-  const [nonfunctional, setNonfunctional] =
-    useSystemComponentConfigSlice<string>(id, "non-functional requirements");
-
+export const RequirementsDefinition = () => {
+  const { stage } = useChallengeManager();
+  const { functional, nonfunctional, setFunctional, setNonfunctional } =
+    useWhiteboard();
+    
   return (
     <Dialog>
       <DialogTrigger className="w-full">
@@ -127,8 +123,9 @@ export const Hints = ({ hints = [] }: { hints?: string[] }) => {
       <Muted className="!mt-4 flex items-center">
         <LightbulbIcon size={16} className="mr-1" />
         Hints
-        <span className="text-xs !ml-0.5">
-          (for {challenge.title} challenge - part {currentStageIndex + 1}/{challenge.stages.length})
+        <span className="!ml-0.5 text-xs">
+          (for {challenge.title} challenge - part {currentStageIndex + 1}/
+          {challenge.stages.length})
         </span>
       </Muted>
       <div className="ml-1 mt-2">

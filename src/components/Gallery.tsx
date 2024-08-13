@@ -117,22 +117,22 @@ const components: Record<SystemComponentType, SystemComponent> = {
     ),
     content: serverCluster,
   },
-  Whiteboard: {
-    description:
-      "Whiteboard is your area to write your notes and thoughts about the system.",
-    name: "Whiteboard",
-    icon: PresentationIcon,
-    content: `# Whiteboard
-Is your digital area where you can write down your notes and thoughts about the system.
+//   Whiteboard: {
+//     description:
+//       "Whiteboard is your area to write your notes and thoughts about the system.",
+//     name: "Whiteboard",
+//     icon: PresentationIcon,
+//     content: `# Whiteboard
+// Is your digital area where you can write down your notes and thoughts about the system.
 
-It includes 3 main areas:
-- **Requirements**: where you define functional and non-functional requirements of the system.
-- **System API**: where you define the API endpoints and their expected behavior.
-- **Capacity estimations**: where you define the expected traffic, storage, memory, and bandwidth requirements of the system.
+// It includes 3 main areas:
+// - **Requirements**: where you define functional and non-functional requirements of the system.
+// - **System API**: where you define the API endpoints and their expected behavior.
+// - **Capacity estimations**: where you define the expected traffic, storage, memory, and bandwidth requirements of the system.
 
-Defining these 3 areas at the beginning will help you design the system in a thoughtful and considerable way.
-    `,
-  },
+// Defining these 3 areas at the beginning will help you design the system in a thoughtful and considerable way.
+//     `,
+//   },
 };
 
 const Gallery = () => {
@@ -144,7 +144,7 @@ const Gallery = () => {
   return (
     <div className="m-2 h-fit w-fit flex-col rounded-md border border-gray-200 bg-gray-50 bg-opacity-70 p-2">
       <Lead className="h-fit">Components</Lead>
-      {Object.values(components).filter(c => c.name !== 'Whiteboard').map(({ name, icon: Icon }) => (
+      {Object.values(components).map(({ name, icon: Icon }) => (
         <div
           key={name}
           className="my-1 flex cursor-grab items-center rounded-md border border-gray-200 bg-gray-50 bg-opacity-70 p-2"

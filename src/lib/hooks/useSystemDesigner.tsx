@@ -1,5 +1,8 @@
 import { getSystemComponent } from "@/components/Gallery";
-import { type SystemComponentNodeDataProps } from "@/components/ReactflowCustomNodes/SystemComponentNode";
+import {
+  type OtherNodeDataProps,
+  type SystemComponentNodeDataProps,
+} from "@/components/ReactflowCustomNodes/SystemComponentNode";
 import { useToast } from "@/components/ui/use-toast";
 import { noop } from "@/lib/utils";
 import {
@@ -32,7 +35,7 @@ import { componentsNumberingStore } from "../levels/utils";
 import { SYSTEM_COMPONENT_NODE } from "./useChallengeManager";
 
 interface SystemDesignerState {
-  nodes: Node<SystemComponentNodeDataProps>[];
+  nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[];
   edges: Edge[];
   initInstance: (instance: ReactFlowInstance) => void;
   initWrapper: (wrapper: HTMLDivElement) => void;
@@ -109,12 +112,13 @@ const componentTargets: Record<
   "Message Queue": ["Server", "Server Cluster"],
   "Cache Cluster": ["Database Cluster", "Database"],
   "Database Cluster": [],
-  Whiteboard: [],
 };
 
 export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
-  const [nodes, setNodes] = useState<Node<SystemComponentNodeDataProps>[]>([
+  const [nodes, setNodes] = useState<
+    Node<SystemComponentNodeDataProps | OtherNodeDataProps>[]
+  >([
     {
       id: "Whiteboard-1",
       type: "Whiteboard",
@@ -146,8 +150,13 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
 
       if (!sourceNode || !targetNode) return;
 
-      const targets = componentTargets[sourceNode?.data.name];
-      if (!targets.includes(targetNode?.data.name)) {
+      // to exclude OtherNodeDataProps
+      const typedSourceNode = sourceNode as Node<SystemComponentNodeDataProps>;
+      // to exclude OtherNodeDataProps
+      const typedTargetNode = targetNode as Node<SystemComponentNodeDataProps>;
+
+      const targets = componentTargets[typedSourceNode?.data.name];
+      if (!targets.includes(typedTargetNode?.data.name)) {
         // toast(
         //   warning({
         //     title: `You cannot connect ${sourceNode?.data.name} to ${targetNode?.data.name}`,
@@ -179,23 +188,29 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
       const isSource = data.handleType === "source";
       const isTarget = !isSource;
 
-      const targets = componentTargets[sourceNode?.data.name];
+      // to exclude OtherNodeDataProps
+      const typedSourceNode = sourceNode as Node<SystemComponentNodeDataProps>;
+
+      const targets = componentTargets[typedSourceNode?.data.name];
       const sources = Object.entries(componentTargets).reduce(
         (acc, [key, value]) => {
-          if (value.includes(sourceNode.data.name)) acc.push(key);
+          if (value.includes(typedSourceNode.data.name)) acc.push(key);
           return acc;
         },
         [] as string[],
       );
 
-      const newNodes = nodes.map((node) => ({
-        ...node,
-        data: {
-          ...node.data,
-          withTargetHandle: isSource && targets.includes(node.data.name),
-          withSourceHandle: isTarget && sources.includes(node.data.name),
-        },
-      }));
+      // to exclude OtherNodeDataProps
+      const newNodes = (nodes as Node<SystemComponentNodeDataProps>[]).map(
+        (node) => ({
+          ...node,
+          data: {
+            ...node.data,
+            withTargetHandle: isSource && targets.includes(node.data.name),
+            withSourceHandle: isTarget && sources.includes(node.data.name),
+          },
+        }),
+      );
       setNodes(newNodes);
       setIsEdgeBeingConnected(true);
     },
@@ -345,8 +360,10 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
       const mode = !prev;
 
       const systemComponents = nodes.filter(
-        (node) => node.data.name === "Whiteboard",
+        (node) => node.data.name !== "Whiteboard",
       );
+      const whiteboard = nodes.find((node) => node.data.name === "Whiteboard")!;
+
       if (mode) {
         const farthestY = systemComponents.reduce((acc, node) => {
           if (node.position.y + (node?.height ?? 0) > acc)
@@ -411,7 +428,7 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
           },
         }));
 
-        setNodes([group, apisNode, ...newNodes]);
+        setNodes([group, apisNode, whiteboard, ...newNodes]);
       } else {
         const group = nodes.find(
           (node) => node.id === "api-request-flow-group",
@@ -432,7 +449,7 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
               ...node.data,
             },
           }));
-        setNodes(newNodes);
+        setNodes([...newNodes, whiteboard]);
       }
 
       return mode;

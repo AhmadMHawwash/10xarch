@@ -1,7 +1,7 @@
 import { useSystemDesigner } from "@/lib/hooks/useSystemDesigner";
 import {
-  type SystemComponentType,
   type SystemComponent,
+  type SystemComponentType,
 } from "@/lib/levels/type";
 import { cn } from "@/lib/utils";
 import { InfoIcon, type PiIcon } from "lucide-react";
@@ -13,7 +13,6 @@ import { CacheCluster } from "../SystemComponents/Clusters/Cache";
 import { DatabaseCluster } from "../SystemComponents/Clusters/Database";
 import { ServerCluster } from "../SystemComponents/Clusters/Server";
 import { Database } from "../SystemComponents/Database";
-import { Whiteboard } from "../SystemComponents/Whiteboard";
 import { WithMarkdownDetails } from "../SystemComponents/Wrappers/WithMarkdownDetails";
 import { Small } from "../ui/typography";
 
@@ -21,6 +20,15 @@ export type SystemComponentNodeDataProps = {
   icon?: typeof PiIcon;
   id: string;
   name: SystemComponent["name"];
+  withTargetHandle?: boolean;
+  withSourceHandle?: boolean;
+  configs: Record<string, unknown>;
+};
+
+export type OtherNodeDataProps = {
+  icon?: typeof PiIcon;
+  id: string;
+  name: "Whiteboard" | "Group" | "APIs List";
   withTargetHandle?: boolean;
   withSourceHandle?: boolean;
   configs: Record<string, unknown>;
@@ -99,7 +107,6 @@ const components: Partial<
   "Database Cluster": DatabaseCluster,
   "Cache Cluster": CacheCluster,
   "Server Cluster": ServerCluster,
-  Whiteboard,
 };
 
 const DefaultComponent = ({ name, Icon }: ComponentNodeProps) => (
@@ -109,9 +116,8 @@ const DefaultComponent = ({ name, Icon }: ComponentNodeProps) => (
   </>
 );
 
-const withoutTargetHandle: SystemComponentType[] = ["Whiteboard", "Client"];
+const withoutTargetHandle: SystemComponentType[] = ["Client"];
 const withoutSourceHandle: SystemComponentType[] = [
-  "Whiteboard",
   "Database",
   "Database Cluster",
 ];

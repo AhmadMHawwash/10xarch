@@ -1,6 +1,7 @@
 import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
 import { type FC } from "react";
 import { type NodeProps } from "reactflow";
+import { Button } from "../ui/button";
 
 export type SystemComponentNodeDataProps = {
   id: string;
@@ -15,11 +16,17 @@ export const APIsNode: FC<NodeProps<SystemComponentNodeDataProps>> = () => {
   );
 
   return (
-    <div className="flex w-32 max-w-32 flex-col gap-1 rounded-sm border bg-slate-100">
+    <div className="flex w-32 max-w-32 flex-col gap-1 rounded-sm border bg-slate-50 p-1">
       {apis?.map(([key]) => (
-        <div className="truncate text-ellipsis bg-slate-200 p-1" key={key}>
+        <Button
+          variant="outline"
+          onClick={console.log}
+          size="sm"
+          className="truncate text-ellipsis"
+          key={key}
+        >
           {key}
-        </div>
+        </Button>
       ))}
     </div>
   );

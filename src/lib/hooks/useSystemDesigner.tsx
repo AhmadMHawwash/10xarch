@@ -357,14 +357,14 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
 
     setEdges(newEdges);
     setisApiRequestFlowMode((prev) => {
-      const mode = !prev;
+      const isRequestFlowMode = !prev;
 
       const systemComponents = nodes.filter(
         (node) => node.data.name !== "Whiteboard",
       );
       const whiteboard = nodes.find((node) => node.data.name === "Whiteboard")!;
 
-      if (mode) {
+      if (isRequestFlowMode) {
         const farthestY = systemComponents.reduce((acc, node) => {
           if (node.position.y + (node?.height ?? 0) > acc)
             return node.position.y + (node?.height ?? 0);
@@ -413,6 +413,7 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
           position: { x: -132, y: 0 },
           parentId: "api-request-flow-group",
           type: "APIsNode",
+          draggable: false,
         };
 
         const newNodes = systemComponents.map((node) => ({
@@ -440,10 +441,12 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
           )
           .map((node) => ({
             ...node,
-            position: {
-              x: node.position.x + (group?.position?.x ?? 0),
-              y: node.position.y + (group?.position?.y ?? 0),
-            },
+            position: !node.parentId
+              ? node.position
+              : {
+                  x: node.position.x + (group?.position?.x ?? 0),
+                  y: node.position.y + (group?.position?.y ?? 0),
+                },
             parentId: undefined,
             data: {
               ...node.data,
@@ -452,7 +455,7 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
         setNodes([...newNodes, whiteboard]);
       }
 
-      return mode;
+      return isRequestFlowMode;
     });
   }, [edges, isApiRequestFlowMode, nodes]);
 

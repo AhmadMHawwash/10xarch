@@ -50,13 +50,16 @@ export const APIsNode: FC<NodeProps<SystemComponentNodeDataProps>> = () => {
 
 export default APIsNode;
 
+export type API = { name: string; definition: string; flow: string };
 export const useWhiteboard = () => {
   const { useSystemComponentConfigSlice } = useChallengeManager();
 
   const whiteboardId = "Whiteboard-1";
-  const [apis, setApis] = useSystemComponentConfigSlice<
-    [string, string, string][]
-  >(whiteboardId, "API definitions and flows", [["new api", "", ""]]);
+  const [apis, setApis] = useSystemComponentConfigSlice<API[]>(
+    whiteboardId,
+    "API definitions and flows",
+    [{ name: "new api", definition: "", flow: "" }],
+  );
 
   const [functional, setFunctional] = useSystemComponentConfigSlice<string>(
     whiteboardId,

@@ -97,7 +97,7 @@ const SystemDesigner = () => {
             Check solution
           </Button>
           <Gallery />
-          <ApiRequestFlowModeMode />
+          {/* <ApiRequestFlowModeMode /> */}
         </Panel>
         <Controls />
       </ReactFlow>

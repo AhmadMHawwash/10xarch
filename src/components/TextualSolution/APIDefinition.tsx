@@ -17,7 +17,7 @@ import { Separator } from "../ui/separator";
 import { Textarea } from "../ui/textarea";
 import { H6, Small } from "../ui/typography";
 import { Hints } from "./RequirementsDefinition";
-import { useWhiteboard } from "../ReactflowCustomNodes/APIsNode";
+import { type API, useWhiteboard } from "../ReactflowCustomNodes/APIsNode";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 
 export const APIDefinition = () => {
@@ -45,7 +45,12 @@ export const APIDefinition = () => {
                 const newApis = apis.filter((_, i) => i !== index);
                 setApis(newApis);
               }}
-              onAddApi={() => setApis([...apis, ["new api", "", ""]])}
+              onAddApi={() =>
+                setApis([
+                  ...apis,
+                  { name: "new api", definition: "", flow: "" },
+                ])
+              }
               apiPlaceholder={`Example: URL Shortening Service
 1.  Create Short URL
 
@@ -260,8 +265,8 @@ export const ListAndMultiDetails = ({
   flowPlaceholder,
   textareaRowsCount = 25,
 }: {
-  apis: [string, string, string][];
-  onChangeApi: (items: [string, string, string][]) => void;
+  apis: API[];
+  onChangeApi: (items: API[]) => void;
   onDeleteApi: (index: number) => void;
   onAddApi: () => void;
   apiPlaceholder?: string;
@@ -270,19 +275,19 @@ export const ListAndMultiDetails = ({
 }) => {
   const [selectedKeyIndex, setSelectedKeyIndex] = useState<number>(0);
   const [inputValue, setInputValue] = useState<string>(
-    apis[selectedKeyIndex]?.[0] ?? "",
+    apis[selectedKeyIndex]?.name ?? "",
   );
   const [apiDefinition, setApiDefinition] = useState<string>(
-    apis[selectedKeyIndex]?.[1] ?? "",
+    apis[selectedKeyIndex]?.definition ?? "",
   );
   const [apiFlow, setApiFlow] = useState<string>(
-    apis[selectedKeyIndex]?.[2] ?? "",
+    apis[selectedKeyIndex]?.flow ?? "",
   );
 
   return (
     <div className="flex w-full flex-row">
       <div className="mr-2 flex w-36 flex-col rounded-sm border">
-        {apis.map(([key, def, flow], index) => (
+        {apis.map(({ name: key, definition: def, flow }, index) => (
           <div
             className={cn(
               "group relative flex border-b transition-all hover:cursor-pointer hover:bg-slate-200",
@@ -330,11 +335,8 @@ export const ListAndMultiDetails = ({
             setInputValue(e.target.value);
           }}
           onBlur={() => {
-            const newApis = apis.map<[string, string, string]>(
-              ([name, oldDefinition, oldFlow], i) =>
-                i === selectedKeyIndex
-                  ? [inputValue, oldDefinition, oldFlow]
-                  : [name, oldDefinition, oldFlow],
+            const newApis = apis.map<API>((oldApi, i) =>
+              i === selectedKeyIndex ? { ...oldApi, name: inputValue } : oldApi,
             );
             onChangeApi(newApis);
           }}
@@ -353,12 +355,12 @@ export const ListAndMultiDetails = ({
               rows={textareaRowsCount}
               value={apiDefinition}
               onBlur={() => {
-                const newApis = apis.map<[string, string, string]>(
-                  ([name, oldDefinition, oldFlow], i) =>
-                    i === selectedKeyIndex
-                      ? [name, apiDefinition, oldFlow]
-                      : [name, oldDefinition, oldFlow],
+                const newApis = apis.map<API>((oldApi, i) =>
+                  i === selectedKeyIndex
+                    ? { ...oldApi, definition: apiDefinition }
+                    : oldApi,
                 );
+                console.log(newApis);
                 onChangeApi(newApis);
               }}
               onChange={(e) => setApiDefinition(e.target.value)}
@@ -371,13 +373,13 @@ export const ListAndMultiDetails = ({
               rows={textareaRowsCount}
               value={apiFlow}
               onBlur={() => {
-                const newFlows = apis.map<[string, string, string]>(
-                  ([name, oldDefinition, oldFlow], i) =>
-                    i === selectedKeyIndex
-                      ? [name, oldDefinition, apiFlow]
-                      : [name, oldDefinition, oldFlow],
+                const newApis = apis.map<API>((oldApi, i) =>
+                  i === selectedKeyIndex
+                    ? { ...oldApi, flow: apiFlow }
+                    : oldApi,
                 );
-                onChangeApi(newFlows);
+                console.log(newApis);
+                onChangeApi(newApis);
               }}
               onChange={(e) => setApiFlow(e.target.value)}
               placeholder={flowPlaceholder}

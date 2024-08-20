@@ -1,4 +1,3 @@
-import { type SystemComponentNodeDataProps } from "@/components/SystemComponentNode";
 import { type Challenge } from "@/content/challenges/types";
 import { useCallback } from "react";
 import { type ReactFlowJsonObject } from "reactflow";
@@ -6,6 +5,7 @@ import { create } from "zustand";
 import { useSystemDesigner } from "./useSystemDesigner";
 import { useParams, useRouter } from "next/navigation";
 import challenges from "@/content/challenges";
+import { type SystemComponentNodeDataProps } from "@/components/ReactflowCustomNodes/APIsNode";
 
 export const SYSTEM_COMPONENT_NODE = "SystemComponentNode";
 

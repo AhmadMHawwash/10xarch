@@ -54,56 +54,7 @@ export const useChallengeManager = () => {
   const { toNextStage, toPreviousStage, setChallenge, currentStageIndex } =
     useLevelStore((state) => state);
 
-  const { updateNodes, updateEdges, nodes, edges } = useSystemDesigner();
-
-  // useEffect(() => {
-  //   if (isInitialised) return;
-
-  //   setIsInitialised(true);
-
-  //   const nodes: Node<SystemComponentNodeDataProps>[] =
-  //     currentLevel?.preConnectedComponents
-  //       .filter((x) => x.type)
-  //       .map((component, index) => {
-  //         const systemComponent = getSystemComponent(component.type);
-
-  //         const id = component.id;
-  //         return {
-  //           data: {
-  //             id,
-  //             name: systemComponent?.name,
-  //             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  //             icon: systemComponent?.icon,
-  //             withTargetHandle: true,
-  //             withSourceHandle: true,
-  //             configs: (component.configs as Record<string, unknown>) ?? {},
-  //           },
-  //           id,
-  //           type: SYSTEM_COMPONENT_NODE,
-  //           position: { x: 100 + index * 100, y: 100 },
-  //         };
-  //       }) ?? [];
-
-  //   updateNodes(nodes);
-
-  //   const edges: Edge[] =
-  //     currentLevel?.preConnectedComponents.flatMap(({ id, targets }) => {
-  //       return targets.map((targetId) => ({
-  //         id: `${id} -> ${targetId}`,
-  //         source: id,
-  //         target: targetId,
-  //         type: "CustomEdge",
-  //         animated: true,
-  //         markerEnd: { type: MarkerType.ArrowClosed },
-  //       }));
-  //     }) ?? [];
-
-  //   updateEdges(edges);
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [currentLevel]);
-
-  // const { data, mutate } = api.ai.hello.useMutation();
-  // data && console.log(data);
+  const { updateNodes, updateEdges, nodes, edges, } = useSystemDesigner();
 
   const checkSolution = async () => {
     const cleaned = cleanup({ nodes, edges });

@@ -3,7 +3,7 @@ import { Label } from "./ui/label";
 import { Switch } from "./ui/switch";
 
 export const ApiRequestFlowModeMode = () => {
-  const { toggleApiRequestFlowModeMode, isApiRequestFlowMode } = useSystemDesigner();
+  const { toggleApiRequestFlowMode: toggleApiRequestFlowModeMode, isApiRequestFlowMode } = useSystemDesigner();
   return (
     <div className="mr-6 flex items-center space-x-2 w-max-20 flex-wrap">
       <Switch

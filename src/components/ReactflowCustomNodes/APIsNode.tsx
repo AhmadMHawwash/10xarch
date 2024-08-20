@@ -1,7 +1,10 @@
 import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
+import { InfoIcon } from "lucide-react";
 import { type FC } from "react";
 import { type NodeProps } from "reactflow";
-import { Button } from "../ui/button";
+import { WithMarkdownDetails } from "../SystemComponents/Wrappers/WithMarkdownDetails";
+import { useSystemDesigner } from "@/lib/hooks/useSystemDesigner";
+import { cn } from "@/lib/utils";
 
 export type SystemComponentNodeDataProps = {
   id: string;
@@ -9,6 +12,7 @@ export type SystemComponentNodeDataProps = {
 
 export const APIsNode: FC<NodeProps<SystemComponentNodeDataProps>> = () => {
   const { useSystemComponentConfigSlice } = useChallengeManager();
+  const { selectedApiFlow, setSelectedApiFlow } = useSystemDesigner();
 
   const [apis] = useSystemComponentConfigSlice<[string, string][]>(
     "Whiteboard-1",
@@ -16,18 +20,30 @@ export const APIsNode: FC<NodeProps<SystemComponentNodeDataProps>> = () => {
   );
 
   return (
-    <div className="flex w-32 max-w-32 flex-col gap-1 rounded-sm border bg-slate-50 p-1">
+    <div className="group flex w-32 max-w-32 flex-col gap-1 rounded-sm border bg-slate-50 p-1">
       {apis?.map(([key]) => (
-        <Button
-          variant="outline"
-          onClick={console.log}
-          size="sm"
-          className="truncate text-ellipsis"
+        <div
+          onClick={() => {
+            setSelectedApiFlow(key);
+          }}
+          className={cn(
+            "truncate text-ellipsis rounded-md border border-slate-200 bg-slate-100 px-2 py-1 transition-all hover:cursor-pointer hover:bg-slate-200",
+            {
+              "bg-slate-200": selectedApiFlow === key,
+            },
+          )}
           key={key}
         >
           {key}
-        </Button>
+        </div>
       ))}
+      <WithMarkdownDetails
+        className="absolute left-0 top-[-17px] rounded-full bg-gray-100 opacity-0 transition-all group-hover:opacity-100"
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        Icon={InfoIcon}
+        content={APIsNodeContent}
+        trigger={<InfoIcon size={16} className="stroke-gray-500" />}
+      />
     </div>
   );
 };
@@ -38,11 +54,9 @@ export const useWhiteboard = () => {
   const { useSystemComponentConfigSlice } = useChallengeManager();
 
   const whiteboardId = "Whiteboard-1";
-  const [apis, setApis] = useSystemComponentConfigSlice<[string, string][]>(
-    whiteboardId,
-    "API definitions",
-    [["new api", ""]],
-  );
+  const [apis, setApis] = useSystemComponentConfigSlice<
+    [string, string, string][]
+  >(whiteboardId, "API definitions and flows", [["new api", "", ""]]);
 
   const [functional, setFunctional] = useSystemComponentConfigSlice<string>(
     whiteboardId,
@@ -59,6 +73,12 @@ export const useWhiteboard = () => {
     "Capacity estimations",
   );
 
+  const [flows, setFlows] = useSystemComponentConfigSlice<[string, string][]>(
+    whiteboardId,
+    "Request API flows",
+    [],
+  );
+
   return {
     apis,
     setApis,
@@ -68,5 +88,26 @@ export const useWhiteboard = () => {
     setNonfunctional,
     capacity,
     setCapacity,
+    flows,
+    setFlows,
   };
 };
+
+const APIsNodeContent = `
+### These are the APIs that you defined for the system.
+#### Now you have to specify the expected behavior of each API endpoint. And how they flow together to serve the system's functionality.
+Example: URL Shortening Service
+  
+Create Short URL
+Endpoint: POST /shorten
+##### Steps:
+1. The client sends a POST request to /shorten with the original_url to the server.
+2. The server generates a short_url for the original_url and saves it to the database.
+3. The server sends the short_url back to the client.
+`;
+
+type RequestFlow = {
+  edgeId: string;
+  subFlowDescription: string;
+}[];
+type IDtoRequestFlow = [string, RequestFlow];

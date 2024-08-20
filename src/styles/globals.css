@@ -78,4 +78,10 @@
   .react-flow {
     height: 100vh!important;
     width: 100%!important;
+    .react-flow__edges{
+      z-index: 2000!important;
+    }
+    .react-flow__edgelabel-renderer{
+      z-index: 2000!important;
+    }
   }

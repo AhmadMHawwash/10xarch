@@ -51,8 +51,10 @@ interface SystemDesignerState {
   onSave: () => void;
   onRestore: () => void;
   isEdgeBeingConnected?: boolean;
-  toggleApiRequestFlowModeMode: () => void;
+  toggleApiRequestFlowMode: () => void;
   isApiRequestFlowMode: boolean;
+  selectedApiFlow?: string;
+  setSelectedApiFlow: (selectedApiFlow: string) => void;
 }
 
 const SystemDesignerContext = createContext<SystemDesignerState>({
@@ -71,8 +73,10 @@ const SystemDesignerContext = createContext<SystemDesignerState>({
   onConnectEnd: noop,
   onSave: noop,
   onRestore: noop,
-  toggleApiRequestFlowModeMode: noop,
+  toggleApiRequestFlowMode: noop,
   isApiRequestFlowMode: false,
+  selectedApiFlow: undefined,
+  setSelectedApiFlow: noop,
 });
 
 export const makeKey = (id: number, type: string) => `${type}-${id}`;
@@ -139,6 +143,7 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
   const { setViewport } = useReactFlow();
   const [isEdgeBeingConnected, setIsEdgeBeingConnected] = useState(false);
   const [isApiRequestFlowMode, setisApiRequestFlowMode] = useState(false);
+  const [selectedApiFlow, setSelectedApiFlow] = useState<string>();
 
   const { toast } = useToast();
 
@@ -349,7 +354,7 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
     restoreFlow().catch(console.error);
   }, [setViewport]);
 
-  const toggleApiRequestFlowModeMode = useCallback(() => {
+  const toggleApiRequestFlowMode = useCallback(() => {
     const newEdges = edges.map((edge) => ({
       ...edge,
       animated: !isApiRequestFlowMode,
@@ -478,8 +483,10 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
         edges,
         nodes,
         isEdgeBeingConnected,
-        toggleApiRequestFlowModeMode,
+        toggleApiRequestFlowMode,
         isApiRequestFlowMode,
+        selectedApiFlow,
+        setSelectedApiFlow: (v: string) => setSelectedApiFlow(v),
       }}
     >
       {children}

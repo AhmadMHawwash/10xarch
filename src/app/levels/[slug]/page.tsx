@@ -1,15 +1,17 @@
 "use client";
+import { WithMarkdownDetails } from "@/components/SystemComponents/Wrappers/WithMarkdownDetails";
 import SystemBuilder from "@/components/SystemDesigner";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { Separator } from "@/components/ui/separator";
-import { H5, List, Muted, P } from "@/components/ui/typography";
+import { H5, List, Muted, P, Small } from "@/components/ui/typography";
 import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, Info, InfoIcon } from "lucide-react";
 
 export default function Level() {
   return (
@@ -59,18 +61,76 @@ const LevelContent = () => {
               <div className="mt-0 rounded-md border">
                 <List className="!ml-2">
                   {oldAssumptions.map((assumption, index) => (
-                    <P key={index} className="!mt-0 line-through opacity-50">
-                      {index + 1}. {assumption}
+                    <P
+                      key={index}
+                      className="!mt-0 ml-4 list-item list-decimal line-through opacity-50"
+                    >
+                      {assumption}
                     </P>
                   ))}
                   {stage?.assumptions.map((assumption, index) => (
-                    <P key={index} className="!mt-0">
-                      {oldAssumptions.length + index + 1}. {assumption}
+                    <P
+                      key={index}
+                      className="!mt-0 ml-4 list-item list-decimal"
+                    >
+                      {assumption}
                     </P>
                   ))}
                 </List>
               </div>
             </div>
+            <div>
+              <WithMarkdownDetails
+                Icon={InfoIcon}
+                trigger={
+                  <Muted className="flex items-center gap-1">
+                    <InfoIcon size="17" />
+                    Elements of a successful system design
+                  </Muted>
+                }
+                content={`
+### Elements of a successful system design
+&nbsp;
+#### A successful system design should include the following elements:
+- **Requirements**: 
+  - Functional 
+  - Non-functional requirements
+- **System API**: 
+  - API definitions
+  - API flows
+- **Capacity Estimations**: 
+  - Traffic estimates
+  - Storage estimates
+  - Bandwidth estimates
+  - Memory estimates
+- **High level design**: System components and their connections
+- **Database**: Models and purpose
+- And other system components purposes
+                  `}
+              />
+            </div>
+            {/* <div>
+              <Muted>Design elements checklist</Muted>
+              <div className="mt-0 rounded-md border">
+                <List className="!ml-4 opacity-70">
+                  {designElements.map(({ title, elements }, index1) => (
+                    <li key={index1} className="!mt-0 list-none">
+                      <Small>{title}</Small>
+                      {elements && (
+                        <List className="!-ml-1 flex flex-col gap-1 mt-2">
+                          {elements.map((element, index2) => (
+                            <span className="flex gap-2" key={index2}>
+                              <Checkbox className="!mt-0" />
+                              <Small>{element.title}</Small>
+                            </span>
+                          ))}
+                        </List>
+                      )}
+                    </li>
+                  ))}
+                </List>
+              </div>
+            </div> */}
           </div>
         </div>
       </div>
@@ -95,3 +155,46 @@ const LevelContent = () => {
     </div>
   );
 };
+
+type DesignElement = {
+  title: string;
+  elements?: DesignElement[];
+};
+const designElements: DesignElement[] = [
+  {
+    title: "Requirements",
+    elements: [
+      { title: "Functional requirements" },
+      { title: "Non-functional requirements" },
+    ],
+  },
+  {
+    title: "System API",
+    elements: [{ title: "API definitions" }, { title: "API flows" }],
+  },
+  {
+    title: "Capacity Estimations",
+    elements: [
+      { title: "Traffic estimations" },
+      { title: "Storage estimations" },
+      { title: "Bandwidth estimations" },
+      { title: "Memory estimations" },
+    ],
+  },
+  {
+    title: "High level design",
+    elements: [{ title: "System components" }, { title: "System connections" }],
+  },
+  {
+    title: "Server",
+    elements: [{ title: "Purpose" }],
+  },
+  {
+    title: "Database",
+    elements: [{ title: "Models" }, { title: "Purpose" }],
+  },
+  {
+    title: "Cache",
+    elements: [{ title: "Purpose" }],
+  },
+];

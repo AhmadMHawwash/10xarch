@@ -14,6 +14,7 @@ import { Separator } from "../ui/separator";
 import { Textarea } from "../ui/textarea";
 import { Hints } from "./RequirementsDefinition";
 import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
+import { Muted, Small } from "../ui/typography";
 
 export const CapacityEstimationDefinition = () => {
   const { capacity, setCapacity } = useWhiteboard();
@@ -30,28 +31,52 @@ export const CapacityEstimationDefinition = () => {
       <DialogContent className="!h-[95vh] w-[70vw] max-w-5xl">
         <DialogHeader>
           <DialogTitle>Capacity estimation</DialogTitle>
-          <DialogDescription className="!text-black">
+          <DialogDescription className="!text-black flex flex-col gap-2 items-start">
             <Separator className="mb-4 mt-2" />
+            <Small>Traffic estimation</Small>
             <Textarea
-              rows={25}
-              value={capacity}
-              onChange={(e) => setCapacity(e.target.value)}
+              rows={5}
+              value={capacity.Traffic}
+              onChange={(e) =>
+                setCapacity({ ...capacity, Traffic: e.target.value })
+              }
               placeholder={`Example: URL Shortening Service
-  1. Traffic Estimates
-    - New URLs per second: 500 million divided by 1 Month of Seconds is approximately 193 new shortend URLs per second.
-    - URL redirections/reads per second: 100 times 193 equals 19,300 requests per second.
-
-  2. Storage Estimates
-    - Total storage for 5 years: 500 million * 12 months/year * 5 years * 500 bytes equals 15 terabytes.
-
-  3. Bandwidth Estimates    
-    - Incoming data: 193 URLs per second * 500 bytes equals 96.5 kilobytes per second.
-    - Outgoing data: 19,300 requests per second * 500 bytes equals 9.65 megabytes per second.
-
-  4. Memory Estimates
-    // Estimate the memory required to cache frequently accessed URLs.
-    - Caching 20% of daily traffic: 20% * (19,300 requests/second * 3600 seconds/hour * 24 hours/day) * 500 bytes equals approximately 170 gigabytes.
-              `}
+- New URLs per second: 500 million divided by 1 Month of Seconds is approximately 193 new shortend URLs per second.
+- URL redirections/reads per second: 100 times 193 equals 19,300 requests per second.`}
+              className="text-md"
+            />
+            <Small>Storage estimation</Small>
+            <Textarea
+              rows={5}
+              value={capacity.Storage}
+              onChange={(e) =>
+                setCapacity({ ...capacity, Storage: e.target.value })
+              }
+              placeholder={`Example: URL Shortening Service
+- Total storage for 5 years: 500 million * 12 months/year * 5 years * 500 bytes equals 15 terabytes.`}
+              className="text-md"
+            />
+            <Small>Bandwidth estimation</Small>
+            <Textarea
+              rows={5}
+              value={capacity.Bandwidth}
+              onChange={(e) =>
+                setCapacity({ ...capacity, Bandwidth: e.target.value })
+              }
+              placeholder={`Example: URL Shortening Service
+- Incoming data: 193 URLs per second * 500 bytes equals 96.5 kilobytes per second.
+- Outgoing data: 19,300 requests per second * 500 bytes equals 9.65 megabytes per second.`}
+              className="text-md"
+            />
+            <Small>Memory estimation</Small>
+            <Textarea
+              rows={5}
+              value={capacity.Memory}
+              onChange={(e) =>
+                setCapacity({ ...capacity, Memory: e.target.value })
+              }
+              placeholder={`Example: URL Shortening Service
+- Caching 20% of daily traffic: 20% * (19,300 requests/second * 3600 seconds/hour * 24 hours/day) * 500 bytes equals approximately 170 gigabytes.`}
               className="text-md"
             />
             <WithMarkdownDetails

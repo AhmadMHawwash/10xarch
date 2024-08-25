@@ -50,6 +50,7 @@ export const APIsNode: FC<NodeProps<SystemComponentNodeDataProps>> = () => {
 
 export default APIsNode;
 
+export type Capacity = "Traffic" | "Storage" | "Bandwidth" | "Memory";
 export type API = { name: string; definition: string; flow: string };
 export const useWhiteboard = () => {
   const { useSystemComponentConfigSlice } = useChallengeManager();
@@ -71,10 +72,14 @@ export const useWhiteboard = () => {
       "non-functional requirements",
     );
 
-  const [capacity, setCapacity] = useSystemComponentConfigSlice<string>(
-    whiteboardId,
-    "Capacity estimations",
-  );
+  const [capacity, setCapacity] = useSystemComponentConfigSlice<
+    Record<Capacity, string>
+  >(whiteboardId, "Capacity estimations", {
+    Traffic: "",
+    Storage: "",
+    Bandwidth: "",
+    Memory: "",
+  });
 
   const [flows, setFlows] = useSystemComponentConfigSlice<[string, string][]>(
     whiteboardId,

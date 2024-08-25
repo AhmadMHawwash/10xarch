@@ -51,10 +51,10 @@ interface SystemDesignerState {
   onSave: () => void;
   onRestore: () => void;
   isEdgeBeingConnected?: boolean;
-  toggleApiRequestFlowMode: () => void;
-  isApiRequestFlowMode: boolean;
-  selectedApiFlow?: string;
-  setSelectedApiFlow: (selectedApiFlow: string) => void;
+  // toggleApiRequestFlowMode: () => void;
+  // isApiRequestFlowMode: boolean;
+  // selectedApiFlow?: string;
+  // setSelectedApiFlow: (selectedApiFlow: string) => void;
 }
 
 const SystemDesignerContext = createContext<SystemDesignerState>({
@@ -142,7 +142,7 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
     useState<ReactFlowInstance | null>(null);
   const { setViewport } = useReactFlow();
   const [isEdgeBeingConnected, setIsEdgeBeingConnected] = useState(false);
-  const [isApiRequestFlowMode, setisApiRequestFlowMode] = useState(false);
+  // const [isApiRequestFlowMode, setisApiRequestFlowMode] = useState(false);
   const [selectedApiFlow, setSelectedApiFlow] = useState<string>();
 
   const { toast } = useToast();
@@ -177,13 +177,16 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
             ...params,
             id: `${sourceNode.id} -> ${targetNode.id}`,
             type: "CustomEdge",
-            animated: isApiRequestFlowMode,
+            // animated: isApiRequestFlowMode,
           },
           eds,
         ),
       );
     },
-    [nodes, isApiRequestFlowMode],
+    [
+      nodes,
+      // isApiRequestFlowMode
+    ],
   );
 
   const onConnectStart: OnConnectStart = useCallback(
@@ -354,115 +357,116 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
     restoreFlow().catch(console.error);
   }, [setViewport]);
 
-  const toggleApiRequestFlowMode = useCallback(() => {
-    const newEdges = edges.map((edge) => ({
-      ...edge,
-      animated: !isApiRequestFlowMode,
-    }));
+  // abandoned feature
+  // const toggleApiRequestFlowMode = useCallback(() => {
+  //   const newEdges = edges.map((edge) => ({
+  //     ...edge,
+  //     animated: !isApiRequestFlowMode,
+  //   }));
 
-    setEdges(newEdges);
-    setisApiRequestFlowMode((prev) => {
-      const isRequestFlowMode = !prev;
+  //   setEdges(newEdges);
+  //   setisApiRequestFlowMode((prev) => {
+  //     const isRequestFlowMode = !prev;
 
-      const systemComponents = nodes.filter(
-        (node) => node.data.name !== "Whiteboard",
-      );
-      const whiteboard = nodes.find((node) => node.data.name === "Whiteboard")!;
+  //     const systemComponents = nodes.filter(
+  //       (node) => node.data.name !== "Whiteboard",
+  //     );
+  //     const whiteboard = nodes.find((node) => node.data.name === "Whiteboard")!;
 
-      if (isRequestFlowMode) {
-        const farthestY = systemComponents.reduce((acc, node) => {
-          if (node.position.y + (node?.height ?? 0) > acc)
-            return node.position.y + (node?.height ?? 0);
-          return acc;
-        }, 0);
+  //     if (isRequestFlowMode) {
+  //       const farthestY = systemComponents.reduce((acc, node) => {
+  //         if (node.position.y + (node?.height ?? 0) > acc)
+  //           return node.position.y + (node?.height ?? 0);
+  //         return acc;
+  //       }, 0);
 
-        const farthestX = systemComponents.reduce((acc, node) => {
-          if (node.position.x + (node.width ?? 0) > acc)
-            return node.position.x + (node.width ?? 0);
-          return acc;
-        }, 0);
+  //       const farthestX = systemComponents.reduce((acc, node) => {
+  //         if (node.position.x + (node.width ?? 0) > acc)
+  //           return node.position.x + (node.width ?? 0);
+  //         return acc;
+  //       }, 0);
 
-        const closestX = systemComponents.reduce((acc, node) => {
-          if (node.position.x < acc) return node.position.x;
-          return acc;
-        }, systemComponents[0]?.position.x ?? 0);
+  //       const closestX = systemComponents.reduce((acc, node) => {
+  //         if (node.position.x < acc) return node.position.x;
+  //         return acc;
+  //       }, systemComponents[0]?.position.x ?? 0);
 
-        const closestY = systemComponents.reduce((acc, node) => {
-          if (node.position.y < acc) return node.position.y;
-          return acc;
-        }, systemComponents[0]?.position.y ?? 0);
+  //       const closestY = systemComponents.reduce((acc, node) => {
+  //         if (node.position.y < acc) return node.position.y;
+  //         return acc;
+  //       }, systemComponents[0]?.position.y ?? 0);
 
-        const group: Node = {
-          id: "api-request-flow-group",
-          type: "group",
-          data: {
-            id: "api-request-flow-group",
-            name: "API Request Flow",
-            configs: {},
-          },
-          position: { x: closestX - 20, y: closestY - 20 },
-          connectable: false,
-          deletable: false,
-          style: {
-            backgroundColor: "rgba(255, 0, 0, 0.2)",
-            width: farthestX - closestX + 40,
-            height: farthestY - closestY + 40,
-          },
-        };
+  //       const group: Node = {
+  //         id: "api-request-flow-group",
+  //         type: "group",
+  //         data: {
+  //           id: "api-request-flow-group",
+  //           name: "API Request Flow",
+  //           configs: {},
+  //         },
+  //         position: { x: closestX - 20, y: closestY - 20 },
+  //         connectable: false,
+  //         deletable: false,
+  //         style: {
+  //           backgroundColor: "rgba(255, 0, 0, 0.2)",
+  //           width: farthestX - closestX + 40,
+  //           height: farthestY - closestY + 40,
+  //         },
+  //       };
 
-        const apisNode: Node = {
-          id: "apis",
-          data: {
-            id: "apis",
-          },
-          position: { x: -132, y: 0 },
-          parentId: "api-request-flow-group",
-          type: "APIsNode",
-          draggable: false,
-        };
+  //       const apisNode: Node = {
+  //         id: "apis",
+  //         data: {
+  //           id: "apis",
+  //         },
+  //         position: { x: -132, y: 0 },
+  //         parentId: "api-request-flow-group",
+  //         type: "APIsNode",
+  //         draggable: false,
+  //       };
 
-        const newNodes = systemComponents.map((node) => ({
-          ...node,
-          position: {
-            x: node.position.x - group.position.x,
-            y: node.position.y - group.position.y,
-          },
-          extent: "parent" as const,
-          parentId: "api-request-flow-group",
-          data: {
-            ...node.data,
-          },
-        }));
+  //       const newNodes = systemComponents.map((node) => ({
+  //         ...node,
+  //         position: {
+  //           x: node.position.x - group.position.x,
+  //           y: node.position.y - group.position.y,
+  //         },
+  //         extent: "parent" as const,
+  //         parentId: "api-request-flow-group",
+  //         data: {
+  //           ...node.data,
+  //         },
+  //       }));
 
-        setNodes([group, apisNode, whiteboard, ...newNodes]);
-      } else {
-        const group = nodes.find(
-          (node) => node.id === "api-request-flow-group",
-        );
-        const newNodes = systemComponents
-          .filter(
-            (node) =>
-              node.id !== "api-request-flow-group" && node.id !== "apis",
-          )
-          .map((node) => ({
-            ...node,
-            position: !node.parentId
-              ? node.position
-              : {
-                  x: node.position.x + (group?.position?.x ?? 0),
-                  y: node.position.y + (group?.position?.y ?? 0),
-                },
-            parentId: undefined,
-            data: {
-              ...node.data,
-            },
-          }));
-        setNodes([...newNodes, whiteboard]);
-      }
+  //       setNodes([group, apisNode, whiteboard, ...newNodes]);
+  //     } else {
+  //       const group = nodes.find(
+  //         (node) => node.id === "api-request-flow-group",
+  //       );
+  //       const newNodes = systemComponents
+  //         .filter(
+  //           (node) =>
+  //             node.id !== "api-request-flow-group" && node.id !== "apis",
+  //         )
+  //         .map((node) => ({
+  //           ...node,
+  //           position: !node.parentId
+  //             ? node.position
+  //             : {
+  //                 x: node.position.x + (group?.position?.x ?? 0),
+  //                 y: node.position.y + (group?.position?.y ?? 0),
+  //               },
+  //           parentId: undefined,
+  //           data: {
+  //             ...node.data,
+  //           },
+  //         }));
+  //       setNodes([...newNodes, whiteboard]);
+  //     }
 
-      return isRequestFlowMode;
-    });
-  }, [edges, isApiRequestFlowMode, nodes]);
+  //     return isRequestFlowMode;
+  //   });
+  // }, [edges, isApiRequestFlowMode, nodes]);
 
   return (
     <SystemDesignerContext.Provider
@@ -483,10 +487,10 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
         edges,
         nodes,
         isEdgeBeingConnected,
-        toggleApiRequestFlowMode,
-        isApiRequestFlowMode,
-        selectedApiFlow,
-        setSelectedApiFlow: (v: string) => setSelectedApiFlow(v),
+        // toggleApiRequestFlowMode,
+        // isApiRequestFlowMode,
+        // selectedApiFlow,
+        // setSelectedApiFlow: (v: string) => setSelectedApiFlow(v),
       }}
     >
       {children}

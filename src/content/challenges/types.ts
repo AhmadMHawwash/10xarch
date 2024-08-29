@@ -12,5 +12,6 @@ export type Challenge = {
       capacityEstimations: string[];
       highLevelDesign: string[];
     };
+    criteria: string[];
   }[];
 };

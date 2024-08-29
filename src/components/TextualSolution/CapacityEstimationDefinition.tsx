@@ -6,15 +6,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
 import { InfoIcon, NotebookPen } from "lucide-react";
 import { useWhiteboard } from "../ReactflowCustomNodes/APIsNode";
 import { WithMarkdownDetails } from "../SystemComponents/Wrappers/WithMarkdownDetails";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Textarea } from "../ui/textarea";
 import { Hints } from "./RequirementsDefinition";
-import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
-import { Muted, Small } from "../ui/typography";
 
 export const CapacityEstimationDefinition = () => {
   const { capacity, setCapacity } = useWhiteboard();
@@ -28,57 +28,69 @@ export const CapacityEstimationDefinition = () => {
           Capacity Estimations
         </Button>
       </DialogTrigger>
-      <DialogContent className="!h-[95vh] w-[70vw] max-w-5xl">
+      <DialogContent className="h-[95vh] w-[70vw] max-w-5xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Capacity estimation</DialogTitle>
           <DialogDescription className="!text-black flex flex-col gap-2 items-start">
             <Separator className="mb-4 mt-2" />
-            <Small>Traffic estimation</Small>
-            <Textarea
-              rows={5}
-              value={capacity.Traffic}
-              onChange={(e) =>
-                setCapacity({ ...capacity, Traffic: e.target.value })
-              }
-              placeholder={`Example: URL Shortening Service
+            <Tabs defaultValue="traffic" className="w-full">
+              <TabsList className="w-full">
+                <TabsTrigger value="traffic" className="w-full">Traffic</TabsTrigger>
+                <TabsTrigger value="storage" className="w-full">Storage</TabsTrigger>
+                <TabsTrigger value="bandwidth" className="w-full">Bandwidth</TabsTrigger>
+                <TabsTrigger value="memory" className="w-full">Memory</TabsTrigger>
+              </TabsList>
+              <TabsContent value="traffic">
+                <Textarea
+                  rows={25}
+                  value={capacity.Traffic}
+                  onChange={(e) =>
+                    setCapacity({ ...capacity, Traffic: e.target.value })
+                  }
+                  placeholder={`Example: URL Shortening Service
 - New URLs per second: 500 million divided by 1 Month of Seconds is approximately 193 new shortend URLs per second.
 - URL redirections/reads per second: 100 times 193 equals 19,300 requests per second.`}
-              className="text-md"
-            />
-            <Small>Storage estimation</Small>
-            <Textarea
-              rows={5}
-              value={capacity.Storage}
-              onChange={(e) =>
-                setCapacity({ ...capacity, Storage: e.target.value })
-              }
-              placeholder={`Example: URL Shortening Service
+                  className="text-md"
+                />
+              </TabsContent>
+              <TabsContent value="storage">
+                <Textarea
+                  rows={25}
+                  value={capacity.Storage}
+                  onChange={(e) =>
+                    setCapacity({ ...capacity, Storage: e.target.value })
+                  }
+                  placeholder={`Example: URL Shortening Service
 - Total storage for 5 years: 500 million * 12 months/year * 5 years * 500 bytes equals 15 terabytes.`}
-              className="text-md"
-            />
-            <Small>Bandwidth estimation</Small>
-            <Textarea
-              rows={5}
-              value={capacity.Bandwidth}
-              onChange={(e) =>
-                setCapacity({ ...capacity, Bandwidth: e.target.value })
-              }
-              placeholder={`Example: URL Shortening Service
+                  className="text-md"
+                />
+              </TabsContent>
+              <TabsContent value="bandwidth">
+                <Textarea
+                  rows={25}
+                  value={capacity.Bandwidth}
+                  onChange={(e) =>
+                    setCapacity({ ...capacity, Bandwidth: e.target.value })
+                  }
+                  placeholder={`Example: URL Shortening Service
 - Incoming data: 193 URLs per second * 500 bytes equals 96.5 kilobytes per second.
 - Outgoing data: 19,300 requests per second * 500 bytes equals 9.65 megabytes per second.`}
-              className="text-md"
-            />
-            <Small>Memory estimation</Small>
-            <Textarea
-              rows={5}
-              value={capacity.Memory}
-              onChange={(e) =>
-                setCapacity({ ...capacity, Memory: e.target.value })
-              }
-              placeholder={`Example: URL Shortening Service
+                  className="text-md"
+                />
+              </TabsContent>
+              <TabsContent value="memory">
+                <Textarea
+                  rows={25}
+                  value={capacity.Memory}
+                  onChange={(e) =>
+                    setCapacity({ ...capacity, Memory: e.target.value })
+                  }
+                  placeholder={`Example: URL Shortening Service
 - Caching 20% of daily traffic: 20% * (19,300 requests/second * 3600 seconds/hour * 24 hours/day) * 500 bytes equals approximately 170 gigabytes.`}
-              className="text-md"
-            />
+                  className="text-md"
+                />
+              </TabsContent>
+            </Tabs>
             <WithMarkdownDetails
               Icon={InfoIcon}
               trigger={

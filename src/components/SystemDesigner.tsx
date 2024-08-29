@@ -4,6 +4,7 @@ import {
   SystemDesignerProvider,
   useSystemDesigner,
 } from "@/lib/hooks/useSystemDesigner";
+import { Loader2 } from "lucide-react";
 import { type ComponentType } from "react";
 import ReactFlow, {
   Background,
@@ -19,13 +20,12 @@ import ReactFlow, {
   type OnConnect,
 } from "reactflow";
 import "reactflow/dist/style.css";
-import { ApiRequestFlowModeMode } from "./ApiRequestFlowMode";
 import { CustomEdge } from "./CustomEdge";
 import Gallery from "./Gallery";
-import SystemComponentNode from "./ReactflowCustomNodes/SystemComponentNode";
-import { Button } from "./ui/button";
 import APIsNode from "./ReactflowCustomNodes/APIsNode";
+import SystemComponentNode from "./ReactflowCustomNodes/SystemComponentNode";
 import { Whiteboard } from "./SystemComponents/Whiteboard";
+import { Button } from "./ui/button";
 
 const nodeTypes: Record<string, ComponentType<NodeProps>> = {
   SystemComponentNode,
@@ -52,7 +52,7 @@ const SystemDesigner = () => {
     onConnectEnd,
   } = useSystemDesigner();
 
-  const { checkSolution } = useChallengeManager();
+  const { checkSolution, isLoadingAnswer } = useChallengeManager();
 
   const handleConnect: OnConnect = (params) => {
     const { source, target } = params;
@@ -93,8 +93,15 @@ const SystemDesigner = () => {
       >
         <Background variant={BackgroundVariant.Dots} color="black" />
         <Panel position="top-right" className="flex flex-col items-end">
-          <Button className="mr-2" onClick={checkSolution}>
-            Check solution
+          <Button className="mr-2" onClick={checkSolution} disabled={isLoadingAnswer}>
+            {isLoadingAnswer ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Checking...
+              </>
+            ) : (
+              'Check solution'
+            )}
           </Button>
           <Gallery />
           {/* <ApiRequestFlowModeMode /> */}

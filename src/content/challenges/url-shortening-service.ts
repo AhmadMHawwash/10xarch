@@ -92,6 +92,16 @@ export const urlShorteningService: Challenge = {
           "Start with a simple client-server-database architecture to handle basic requests.",
         ],
       },
+      criteria: [
+        "Functional and non-functional requirements are defined and meets the given problem and assumptions",
+        "System APIs and flows are defined and meets the given problem and assumptions",
+        "System capacity estimations are defined and meets the given problem and assumptions",
+        "High level design (components and their connections) is defined and meets the given problem and assumptions",
+        "Database schema is defined and meets the given problem and assumptions",
+        "There's at least 1 client component",
+        "There's at least 1 server component",
+        "There's at least 1 database component",
+      ],
     },
     {
       problem:
@@ -113,6 +123,11 @@ export const urlShorteningService: Challenge = {
           "Introduce redundancy by adding multiple servers to the architecture and connect them through a load balancer.",
         ],
       },
+      criteria: [
+        "Load balancer distributes traffic evenly",
+        "System handles 1000 requests per second",
+        "No single point of failure in the server layer",
+      ],
     },
     {
       problem:
@@ -134,6 +149,11 @@ export const urlShorteningService: Challenge = {
           "Place the cache between the servers and the database to speed up read operations.",
         ],
       },
+      criteria: [
+        "Caching layer is implemented",
+        "70% of repeated requests are served from cache",
+        "Significant reduction in average response time",
+      ],
     },
     {
       problem:
@@ -156,6 +176,11 @@ export const urlShorteningService: Challenge = {
           "Designate one database as the primary for writes and others as replicas for reads to improve availability and durability.",
         ],
       },
+      criteria: [
+        "Database replication is implemented",
+        "System handles 200 writes and 20,000 reads per second",
+        "Data remains available if one database instance fails",
+      ],
     },
     {
       problem:
@@ -175,6 +200,11 @@ export const urlShorteningService: Challenge = {
           "Integrate a cleanup service to periodically remove expired URLs from the database and cache.",
         ],
       },
+      criteria: [
+        "URL expiration mechanism is in place",
+        "Periodic cleanup of expired URLs is implemented",
+        "10% of URLs are successfully expired each month",
+      ],
     },
     {
       problem:
@@ -196,6 +226,11 @@ export const urlShorteningService: Challenge = {
           "Introduce an authentication service to handle user login and manage permissions securely.",
         ],
       },
+      criteria: [
+        "User authentication system is implemented",
+        "Access control for URL management is in place",
+        "System handles 10,000 active users with 10 API requests per day each",
+      ],
     },
     {
       problem:
@@ -217,6 +252,11 @@ export const urlShorteningService: Challenge = {
           "Integrate monitoring tools to track system performance and detect issues.",
         ],
       },
+      criteria: [
+        "Telemetry and monitoring tools are integrated",
+        "System tracks key metrics (requests per second, response time, error rates)",
+        "Performance data is accessible through an API",
+      ],
     },
     {
       problem:
@@ -236,6 +276,11 @@ export const urlShorteningService: Challenge = {
           "Add additional servers and databases to handle increased load.",
         ],
       },
+      criteria: [
+        "System scales to handle doubling of users and requests every six months",
+        "Performance remains stable under increased load",
+        "No significant increase in response times as system scales",
+      ],
     },
     {
       problem: "Efficiently manage large volumes of data using partitioning.",
@@ -254,6 +299,11 @@ export const urlShorteningService: Challenge = {
           "Implement data partitioning to handle large datasets efficiently.",
         ],
       },
+      criteria: [
+        "Database partitioning is implemented",
+        "System efficiently handles billions of records",
+        "Query performance remains stable with large data volumes",
+      ],
     },
     {
       problem:
@@ -273,6 +323,11 @@ export const urlShorteningService: Challenge = {
           "Integrate a disaster recovery service to handle backups and data restoration.",
         ],
       },
+      criteria: [
+        "Daily backups are performed successfully",
+        "System can recover from a disaster within one hour",
+        "Data integrity is maintained during recovery process",
+      ],
     },
   ],
 };

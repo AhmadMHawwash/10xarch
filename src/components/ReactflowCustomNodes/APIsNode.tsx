@@ -3,40 +3,16 @@ import { InfoIcon } from "lucide-react";
 import { type FC } from "react";
 import { type NodeProps } from "reactflow";
 import { WithMarkdownDetails } from "../SystemComponents/Wrappers/WithMarkdownDetails";
-import { useSystemDesigner } from "@/lib/hooks/useSystemDesigner";
-import { cn } from "@/lib/utils";
 
 export type SystemComponentNodeDataProps = {
   id: string;
+  name: string;
+  configs: Record<string, unknown>;
 };
 
 export const APIsNode: FC<NodeProps<SystemComponentNodeDataProps>> = () => {
-  const { useSystemComponentConfigSlice } = useChallengeManager();
-  const { selectedApiFlow, setSelectedApiFlow } = useSystemDesigner();
-
-  const [apis] = useSystemComponentConfigSlice<[string, string][]>(
-    "Whiteboard-1",
-    "API definitions",
-  );
-
   return (
     <div className="group flex w-32 max-w-32 flex-col gap-1 rounded-sm border bg-slate-50 p-1">
-      {apis?.map(([key]) => (
-        <div
-          onClick={() => {
-            setSelectedApiFlow(key);
-          }}
-          className={cn(
-            "truncate text-ellipsis rounded-md border border-slate-200 bg-slate-100 px-2 py-1 transition-all hover:cursor-pointer hover:bg-slate-200",
-            {
-              "bg-slate-200": selectedApiFlow === key,
-            },
-          )}
-          key={key}
-        >
-          {key}
-        </div>
-      ))}
       <WithMarkdownDetails
         className="absolute left-0 top-[-17px] rounded-full bg-gray-100 opacity-0 transition-all group-hover:opacity-100"
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -114,8 +90,8 @@ Endpoint: POST /shorten
 3. The server sends the short_url back to the client.
 `;
 
-type RequestFlow = {
-  edgeId: string;
-  subFlowDescription: string;
-}[];
-type IDtoRequestFlow = [string, RequestFlow];
+// type RequestFlow = {
+//   edgeId: string;
+//   subFlowDescription: string;
+// }[];
+// type IDtoRequestFlow = [string, RequestFlow];

@@ -68,8 +68,11 @@ export const useChallengeManager = () => {
       edges,
     });
     const prompt = promptBuilder(challenge!, currentLevel!);
-    console.log(prompt)
-    // mutate(prompt);
+    console.log(prompt);
+    mutate({
+      challengeAndSolutionPrompt: prompt,
+      criteria: currentLevel?.criteria ?? [],
+    });
   };
 
   const useSystemComponentConfigSlice = useCallback(
@@ -124,7 +127,7 @@ export const useChallengeManager = () => {
     useSystemComponentConfigSlice,
     currentStageIndex,
     setChallenge,
-    isLoadingAnswer: isPending
+    isLoadingAnswer: isPending,
   };
 };
 
@@ -216,19 +219,18 @@ const getLLMPromptBuilder = ({
         problem: currentStage?.problem ?? "",
         assumptions: currentStage?.assumptions ?? [],
         hintsPerArea: currentStage?.hintsPerArea ?? {},
-        criteria: currentStage?.criteria ?? [],
       },
       solution: {
         components: cleanedNodes,
         "API definitions": whiteboardData?.apiDefinitions ?? [],
-        "Trafic capacity estimation ":
-          whiteboardData?.capacityEstimations.trafic ?? "",
+        "Traffic capacity estimation ":
+          whiteboardData?.capacityEstimations?.traffic ?? "",
         "Storage capacity estimation":
-          whiteboardData?.capacityEstimations.storage ?? "",
+          whiteboardData?.capacityEstimations?.storage ?? "",
         "Bandwidth capacity estimation":
-          whiteboardData?.capacityEstimations.bandwidth ?? "",
+          whiteboardData?.capacityEstimations?.bandwidth ?? "",
         "Memory capacity estimation":
-          whiteboardData?.capacityEstimations.memory ?? "",
+          whiteboardData?.capacityEstimations?.memory ?? "",
         "Functional requirments": whiteboardData?.functionalRequirements ?? "",
         "Non functional requirments":
           whiteboardData?.nonFunctionalRequirements ?? "",

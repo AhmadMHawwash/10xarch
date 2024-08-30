@@ -93,11 +93,7 @@ export const urlShorteningService: Challenge = {
         ],
       },
       criteria: [
-        "Functional and non-functional requirements are defined and meets the given problem and assumptions",
-        "System APIs and flows are defined and meets the given problem and assumptions",
-        "System capacity estimations are defined and meets the given problem and assumptions",
-        "High level design (components and their connections) is defined and meets the given problem and assumptions",
-        "Database schema is defined and meets the given problem and assumptions",
+        
         "There's at least 1 client component",
         "There's at least 1 server component",
         "There's at least 1 database component",

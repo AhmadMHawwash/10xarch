@@ -19,7 +19,7 @@ import ReactFlow, {
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { CustomEdge } from "./CustomEdge";
-import { FlowManager } from "./FlowManager";
+import { FlowManager } from "./SolutionFlowManager";
 import Gallery from "./Gallery";
 import APIsNode from "./ReactflowCustomNodes/APIsNode";
 import SystemComponentNode from "./ReactflowCustomNodes/SystemComponentNode";

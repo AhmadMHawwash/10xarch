@@ -1,20 +1,16 @@
-import { useEffect, useState } from "react";
-import { Button } from "./ui/button";
-import {
-  Loader2,
-  RotateCcw,
-  Check,
-  ChevronDown,
-  ChevronUp,
-} from "lucide-react";
 import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
 import { useSystemDesigner } from "@/lib/hooks/useSystemDesigner";
-import { type Node, type Edge } from "reactflow";
+import { type SystemComponentType } from "@/lib/levels/type";
+import { Check, ChevronUp, Loader2, RotateCcw } from "lucide-react";
+import { useEffect, useState } from "react";
+import { type Edge, type Node } from "reactflow";
+import { getSystemComponent } from "./Gallery";
 import {
-  type SystemComponentNodeDataProps,
   type OtherNodeDataProps,
+  type SystemComponentNodeDataProps,
 } from "./ReactflowCustomNodes/SystemComponentNode";
 import { SolutionFeedback } from "./SolutionFeedback";
+import { Button } from "./ui/button";
 
 type FlowData = {
   nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[];
@@ -43,7 +39,11 @@ export const FlowManager: React.FC = () => {
               ...node,
               data: {
                 ...node.data,
-                name: node.data.name as "Whiteboard" | "Group" | "APIs List",
+                // We have to assign the icon because it's not serializable (when saved in localStorage)
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                icon: getSystemComponent(node.data.name as SystemComponentType)
+                  .icon,
+                name: node.data.name as SystemComponentType,
               },
             })),
           );
@@ -95,7 +95,7 @@ export const FlowManager: React.FC = () => {
 
   return (
     <div
-      className={`flex flex-col items-center rounded-sm border border-slate-200 bg-slate-100 p-2 ${answer ? "!w-[200px]" : "w-fit"} transition-all duration-300`}
+      className={`flex flex-col items-center rounded-sm border border-slate-200 bg-slate-100 px-4 py-2 ${isFeedbackExpanded ? "w-[500px]" : "w-fit"} transition-all duration-300`}
     >
       <SolutionFeedback
         isExpanded={isFeedbackExpanded}
@@ -129,16 +129,18 @@ export const FlowManager: React.FC = () => {
             "Run solution"
           )}
         </Button>
-        <Button
-          size="sm"
-          variant="ghost"
-          onClick={() => setIsFeedbackExpanded(!isFeedbackExpanded)}
-          className="w-4 h-4 p-0"
-        >
-          <ChevronUp
-            className={`w-4 h-4 ${isFeedbackExpanded ? "hidden" : ""}`}
-          />
-        </Button>
+        {answer && (
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => setIsFeedbackExpanded(!isFeedbackExpanded)}
+            className="h-4 w-4 p-0"
+          >
+            <ChevronUp
+              className={`h-4 w-4 ${isFeedbackExpanded ? "hidden" : ""}`}
+            />
+          </Button>
+        )}
       </div>
     </div>
   );

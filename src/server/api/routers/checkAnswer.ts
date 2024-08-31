@@ -64,8 +64,8 @@ export const checkSolution = createTRPCRouter({
                 {
                   type: "text",
                   text: `Score the solution as follows:
-- If the solution meets all criteria for the current challenge level, give a score of 9/10.
-- If the solution goes beyond the provided criteria, give a score of 10/10.`,
+- If the solution meets all criteria for the current challenge level, give a score of 90/100.
+- If the solution goes beyond the provided criteria, give a score of 100/100.`,
                 },
               ],
             },
@@ -83,7 +83,7 @@ export const checkSolution = createTRPCRouter({
               content: [
                 {
                   type: "text",
-                  text: `Respond in JSON format {score: [score], fixes: [listOfElementsToBeFixed]}. Knowing that score range: 1 - 10, if any criteria is not met then take down from the score, other than that a 9/10 if and only if the solution met all the criteria then a 9/10 score is deserved. However a 10/10 is well deserved for exceeding the criteria)`,
+                  text: `Respond in JSON format {score: [score], fixes: [listOfElementsToBeFixed]}. Knowing that score range: 1 - 100, if any criteria is not met then take down from the score, other than that a 90/100 if and only if the solution met all the criteria then a 90/100 score is deserved. However a 100/100 is well deserved for exceeding the criteria)`,
                 },
               ],
             },

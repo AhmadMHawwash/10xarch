@@ -66,7 +66,7 @@ export const useChallengeManager = () => {
       edges,
     });
     const prompt = promptBuilder(challenge!, currentLevel!);
-    // console.log(prompt);
+
     mutate({
       challengeAndSolutionPrompt: prompt,
       criteria: currentLevel?.criteria ?? [],

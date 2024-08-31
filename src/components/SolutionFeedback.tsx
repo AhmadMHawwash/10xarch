@@ -1,6 +1,7 @@
 import { ChevronDown, ChevronUp, Loader2 } from "lucide-react";
 import { ScrollArea } from "./ui/scroll-area";
 import { Button } from "./ui/button";
+import { cn } from "@/lib/utils";
 
 interface SolutionFeedbackProps {
   isLoadingAnswer: boolean;
@@ -11,23 +12,10 @@ interface SolutionFeedbackProps {
 
 export const SolutionFeedback: React.FC<SolutionFeedbackProps> = ({
   isLoadingAnswer,
-  answer = {
-    score: 1,
-    fixes: [
-      "Add at least 1 client component.",
-      "Add at least 1 server component.",
-      "Add at least 1 database component.",
-      "Define API endpoints for creating and retrieving URLs.",
-      "Include functional and non-functional requirements.",
-      "Provide traffic and storage capacity estimations.",
-      "Outline a high-level design with components and their connections.",
-    ],
-  },
+  answer,
   isExpanded,
   onToggleExpand,
 }) => {
-  const scorePercentage = answer ? (answer.score / 10) * 100 : 0;
-
   const getScoreColor = (score: number) => {
     if (score <= 50) return "text-red-500";
     if (score >= 80) return "text-green-500";
@@ -37,7 +25,7 @@ export const SolutionFeedback: React.FC<SolutionFeedbackProps> = ({
   if (!answer && !isLoadingAnswer) return null;
 
   return (
-    <div className="mb-4 w-full">
+    <div className={cn("w-full", isExpanded ? "mb-4" : "mb-0")}>
       {isLoadingAnswer ? (
         <div className="flex justify-center">
           <Loader2 className="h-6 w-6 animate-spin" />
@@ -45,16 +33,16 @@ export const SolutionFeedback: React.FC<SolutionFeedbackProps> = ({
       ) : answer ? (
         <div>
           {isExpanded && (
-            <div className="space-y-2">
+            <div className="">
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
                   <span className="text-sm font-semibold">
-                    Your system design scored
+                    Your design scored
                   </span>
                   <span
-                    className={`text-md px-1 py-1 font-medium ${getScoreColor(scorePercentage)}`}
+                    className={`text-md px-1 font-medium ${getScoreColor(answer.score)}`}
                   >
-                    {scorePercentage}%
+                    {answer.score}%
                   </span>
                 </div>
                 <Button

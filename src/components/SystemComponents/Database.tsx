@@ -8,8 +8,8 @@ import { WithSettings } from "./Wrappers/WithSettings";
 
 export const Database = ({ name, Icon }: ComponentNodeProps) => {
   return (
-    <div className="relative flex flex-col items-center">
-      {Icon && <Icon size={20} />}
+    <div className="relative flex flex-col items-center text-gray-200">
+      {Icon && <Icon size={20} className="text-gray-300" />}
       <Small>{name}</Small>
       <DatabaseSettings name={name} />
     </div>
@@ -32,9 +32,9 @@ const DatabaseSettings = ({ name: id }: { name: string }) => {
 
   return (
     <WithSettings name={id}>
-      <div className="grid w-full grid-flow-row grid-cols-1 gap-2 !text-black">
+      <div className="grid w-full grid-flow-row grid-cols-1 gap-2 text-gray-200">
         <div className="flex flex-col gap-4">
-          <Label htmlFor="database-design">Database design</Label>
+          <Label htmlFor="database-design" className="text-gray-300">Database design</Label>
           <ListAndDetails
             textareaRowsCount={10}
             items={models}
@@ -54,14 +54,13 @@ Urls table
 `}
           />
         </div>
-        {/* )} */}
         <div className="flex flex-col gap-4">
-          <Label htmlFor="database-purpose">Database purpose</Label>
+          <Label htmlFor="database-purpose" className="text-gray-300">Database purpose</Label>
           <Textarea
             name="database-purpose"
             id="database-purpose"
             rows={10}
-            className="text-md"
+            className="text-md bg-gray-700 text-gray-200 border-gray-600"
             value={purpose}
             onChange={(e) => setPurpose(e.target.value)}
           />

@@ -29,18 +29,18 @@ export const RequirementsDefinition = () => {
           Requirements
         </Button>
       </DialogTrigger>
-      <DialogContent className="!h-[95vh] w-[70vw] max-w-5xl">
+      <DialogContent className="!h-[95vh] w-[70vw] max-w-5xl bg-gray-800 text-gray-200">
         <DialogHeader>
-          <DialogTitle>Requirements definition</DialogTitle>
-          <DialogDescription className="!text-black">
-            <Separator className="mb-4 mt-2" />
+          <DialogTitle className="text-gray-100">Requirements definition</DialogTitle>
+          <DialogDescription className="text-gray-300">
+            <Separator className="mb-4 mt-2 bg-gray-600" />
             <div className="flex flex-col">
               <Tabs defaultValue="functional" className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="functional">
+                <TabsList className="grid w-full grid-cols-2 bg-gray-700">
+                  <TabsTrigger value="functional" className="data-[state=active]:bg-gray-600 data-[state=active]:text-gray-100">
                     Functional requirements
                   </TabsTrigger>
-                  <TabsTrigger value="nonfunctional">
+                  <TabsTrigger value="nonfunctional" className="data-[state=active]:bg-gray-600 data-[state=active]:text-gray-100">
                     Non-functional requirements
                   </TabsTrigger>
                 </TabsList>
@@ -54,14 +54,14 @@ export const RequirementsDefinition = () => {
 - User Interface: The system must provide an interface for users to interact with.
 - Reporting: The system must generate reports based on user activity.`}
                     onChange={(e) => setFunctional(e.target.value)}
-                    className="text-md"
+                    className="text-md bg-gray-700 text-gray-200 border-gray-600 focus:border-gray-500"
                   />
                   <WithMarkdownDetails
                     Icon={InfoIcon}
                     trigger={
                       <Button
                         variant="link"
-                        className="!mb-0 !pb-0 pl-0 pt-0 opacity-50 transition-all hover:opacity-100"
+                        className="!mb-0 !pb-0 pl-0 pt-0 opacity-50 transition-all hover:opacity-100 text-gray-300"
                       >
                         <InfoIcon className="mr-1" size={16} />
                         What the system should do
@@ -74,7 +74,7 @@ export const RequirementsDefinition = () => {
                 <TabsContent value="nonfunctional">
                   <Textarea
                     rows={25}
-                    className="text-md"
+                    className="text-md bg-gray-700 text-gray-200 border-gray-600 focus:border-gray-500"
                     value={nonfunctional}
                     placeholder={`Example: URL Shortening Service
 - Performance: The system must handle a specific number of transactions per second.
@@ -91,7 +91,7 @@ export const RequirementsDefinition = () => {
                     trigger={
                       <Button
                         variant="link"
-                        className="pl-0 pt-0 opacity-50 transition-all hover:opacity-100"
+                        className="pl-0 pt-0 opacity-50 transition-all hover:opacity-100 text-gray-300"
                       >
                         <InfoIcon className="mr-1" size={16} />
                         How the system should perform the functional
@@ -119,8 +119,8 @@ export const Hints = ({ hints = [] }: { hints?: string[] }) => {
   const { currentStageIndex, challenge } = useChallengeManager();
   if (!challenge || hints.length === 0) return null;
   return (
-    <div>
-      <Muted className="!mt-4 flex items-center">
+    <div className="text-gray-300">
+      <Muted className="!mt-4 flex items-center text-gray-400">
         <LightbulbIcon size={16} className="mr-1" />
         Hints
         <span className="!ml-0.5 text-xs">

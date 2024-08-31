@@ -9,8 +9,8 @@ import { ListAndDetails } from "@/components/TextualSolution/APIDefinition";
 
 export const DatabaseCluster = ({ name, Icon }: ComponentNodeProps) => {
   return (
-    <div className="relative flex flex-col items-center">
-      {Icon && <Icon size={20} />}
+    <div className="relative flex flex-col items-center text-gray-200">
+      {Icon && <Icon size={20} className="text-gray-300" />}
       <Small>{name}</Small>
       <DatabaseClusterSettings name={name} />
     </div>
@@ -26,17 +26,17 @@ const DatabaseClusterSettings = ({ name: id }: { name: string }) => {
     useSystemComponentConfigSlice<number>(id, "Number of Replica instances");
   const [purpose, setPurpose] = useSystemComponentConfigSlice<string>(
     id,
-    "Database purpose",
+    "Database Cluster purpose",
   );
   const [models, setModels] = useSystemComponentConfigSlice<[string, string][]>(
     id,
-    "Database models",
+    "Database Cluster models",
     [["new model", ""]],
   );
 
   return (
     <WithSettings name={id}>
-      <div className="grid w-full grid-flow-row grid-cols-1 gap-2 !text-black">
+      <div className="grid w-full grid-flow-row grid-cols-1 gap-2 text-gray-200">
         <div className="grid grid-flow-col grid-cols-2">
           <Label
             htmlFor="primary-instances-count"
@@ -72,7 +72,7 @@ const DatabaseClusterSettings = ({ name: id }: { name: string }) => {
           />
         </div>
         <div className="flex flex-col gap-4">
-          <Label htmlFor="database-design">Database design</Label>
+          <Label htmlFor="database-cluster-design" className="text-gray-300">Database Cluster design</Label>
           <ListAndDetails
             textareaRowsCount={10}
             items={models}
@@ -82,8 +82,8 @@ const DatabaseClusterSettings = ({ name: id }: { name: string }) => {
               setModels(newModels);
             }}
             onAdd={() => setModels([...models, ["new model", ""]])}
-            textareaPlaceholder={`Example: URL Shortening Service
-Urls table
+            textareaPlaceholder={`Example: URL Shortening Service Cluster
+Urls table (Sharded by id)
 - id (Primary Key)
 - alias
 - original_url
@@ -93,12 +93,12 @@ Urls table
           />
         </div>
         <div className="flex flex-col gap-4">
-          <Label htmlFor="database-purpose">Database purpose</Label>
+          <Label htmlFor="database-cluster-purpose" className="text-gray-300">Database Cluster purpose</Label>
           <Textarea
-            name="database-purpose"
-            id="database-purpose"
+            name="database-cluster-purpose"
+            id="database-cluster-purpose"
             rows={10}
-            className="text-md"
+            className="text-md bg-gray-700 text-gray-200 border-gray-600"
             value={purpose}
             onChange={(e) => setPurpose(e.target.value)}
           />

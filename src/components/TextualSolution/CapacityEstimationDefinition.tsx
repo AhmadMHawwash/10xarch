@@ -28,17 +28,17 @@ export const CapacityEstimationDefinition = () => {
           Capacity Estimations
         </Button>
       </DialogTrigger>
-      <DialogContent className="h-[95vh] w-[70vw] max-w-5xl overflow-y-auto">
+      <DialogContent className="h-[95vh] w-[70vw] max-w-5xl overflow-y-auto bg-gray-800 text-gray-200 border-gray-700">
         <DialogHeader>
-          <DialogTitle>Capacity estimation</DialogTitle>
-          <DialogDescription className="!text-black flex flex-col gap-2 items-start">
-            <Separator className="mb-4 mt-2" />
+          <DialogTitle className="text-gray-100">Capacity estimation</DialogTitle>
+          <DialogDescription className="text-gray-300 flex flex-col gap-2 items-start">
+            <Separator className="mb-4 mt-2 bg-gray-600" />
             <Tabs defaultValue="traffic" className="w-full">
-              <TabsList className="w-full">
-                <TabsTrigger value="traffic" className="w-full">Traffic</TabsTrigger>
-                <TabsTrigger value="storage" className="w-full">Storage</TabsTrigger>
-                <TabsTrigger value="bandwidth" className="w-full">Bandwidth</TabsTrigger>
-                <TabsTrigger value="memory" className="w-full">Memory</TabsTrigger>
+              <TabsList className="w-full bg-gray-700">
+                <TabsTrigger value="traffic" className="w-full data-[state=active]:bg-gray-600 data-[state=active]:text-gray-100">Traffic</TabsTrigger>
+                <TabsTrigger value="storage" className="w-full data-[state=active]:bg-gray-600 data-[state=active]:text-gray-100">Storage</TabsTrigger>
+                <TabsTrigger value="bandwidth" className="w-full data-[state=active]:bg-gray-600 data-[state=active]:text-gray-100">Bandwidth</TabsTrigger>
+                <TabsTrigger value="memory" className="w-full data-[state=active]:bg-gray-600 data-[state=active]:text-gray-100">Memory</TabsTrigger>
               </TabsList>
               <TabsContent value="traffic">
                 <Textarea
@@ -50,7 +50,7 @@ export const CapacityEstimationDefinition = () => {
                   placeholder={`Example: URL Shortening Service
 - New URLs per second: 500 million divided by 1 Month of Seconds is approximately 193 new shortend URLs per second.
 - URL redirections/reads per second: 100 times 193 equals 19,300 requests per second.`}
-                  className="text-md"
+                  className="text-md bg-gray-700 text-gray-200 border-gray-600"
                 />
               </TabsContent>
               <TabsContent value="storage">
@@ -62,7 +62,7 @@ export const CapacityEstimationDefinition = () => {
                   }
                   placeholder={`Example: URL Shortening Service
 - Total storage for 5 years: 500 million * 12 months/year * 5 years * 500 bytes equals 15 terabytes.`}
-                  className="text-md"
+                  className="text-md bg-gray-700 text-gray-200 border-gray-600"
                 />
               </TabsContent>
               <TabsContent value="bandwidth">
@@ -75,7 +75,7 @@ export const CapacityEstimationDefinition = () => {
                   placeholder={`Example: URL Shortening Service
 - Incoming data: 193 URLs per second * 500 bytes equals 96.5 kilobytes per second.
 - Outgoing data: 19,300 requests per second * 500 bytes equals 9.65 megabytes per second.`}
-                  className="text-md"
+                  className="text-md bg-gray-700 text-gray-200 border-gray-600"
                 />
               </TabsContent>
               <TabsContent value="memory">
@@ -87,7 +87,7 @@ export const CapacityEstimationDefinition = () => {
                   }
                   placeholder={`Example: URL Shortening Service
 - Caching 20% of daily traffic: 20% * (19,300 requests/second * 3600 seconds/hour * 24 hours/day) * 500 bytes equals approximately 170 gigabytes.`}
-                  className="text-md"
+                  className="text-md bg-gray-700 text-gray-200 border-gray-600"
                 />
               </TabsContent>
             </Tabs>
@@ -96,10 +96,10 @@ export const CapacityEstimationDefinition = () => {
               trigger={
                 <Button
                   variant="link"
-                  className="pl-0 pt-0 opacity-50 transition-all hover:opacity-100"
+                  className="pl-0 pt-0 opacity-50 transition-all hover:opacity-100 text-gray-300"
                 >
                   <InfoIcon className="mr-1" size={16} />
-                  Defining syetem load and capacity
+                  Defining system load and capacity
                 </Button>
               }
               content={capacityEstimations}

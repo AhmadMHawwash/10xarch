@@ -32,11 +32,11 @@ export const APIDefinition = () => {
           System API
         </Button>
       </DialogTrigger>
-      <DialogContent className="!h-[95vh] w-[70vw] max-w-5xl overflow-scroll">
+      <DialogContent className="!h-[95vh] w-[70vw] max-w-5xl overflow-scroll bg-gray-800 text-gray-200 border-gray-700">
         <DialogHeader>
-          <DialogTitle>System API definition</DialogTitle>
-          <DialogDescription className="!text-black">
-            <Separator className="mb-4 mt-2" />
+          <DialogTitle className="text-gray-100">System API definition</DialogTitle>
+          <DialogDescription className="text-gray-300">
+            <Separator className="mb-4 mt-2 bg-gray-600" />
 
             <ListAndMultiDetails
               apis={apis}
@@ -86,7 +86,7 @@ Example: URL Shortening Service
               trigger={
                 <Button
                   variant="link"
-                  className="pl-0 pt-0 opacity-50 transition-all hover:opacity-100"
+                  className="pl-0 pt-0 opacity-50 transition-all hover:opacity-100 text-gray-300"
                 >
                   <InfoIcon className="mr-1" size={16} />
                   How clients interact with the system
@@ -174,12 +174,12 @@ export const ListAndDetails = ({
 
   return (
     <div className="flex w-full flex-row">
-      <div className="mr-2 flex w-36 flex-col rounded-sm border">
+      <div className="mr-2 flex w-36 flex-col rounded-sm border border-gray-600">
         {items.map(([key, value], index) => (
           <div
             className={cn(
-              "group relative flex border-b transition-all hover:cursor-pointer hover:bg-slate-200",
-              { [`bg-slate-100`]: selectedKeyIndex === index },
+              "group relative flex border-b border-gray-600 transition-all hover:cursor-pointer hover:bg-gray-700",
+              { [`bg-gray-700`]: selectedKeyIndex === index },
             )}
             onClick={() => {
               setSelectedKeyIndex(index);
@@ -188,16 +188,15 @@ export const ListAndDetails = ({
             }}
             key={key + index}
           >
-            <Small className="mr-2 overflow-hidden p-2">{key}</Small>
-            <span className="absolute right-2 top-2 rounded-full bg-slate-300 opacity-0 hover:cursor-pointer group-hover:opacity-100">
+            <Small className="mr-2 overflow-hidden p-2 text-gray-300">{key}</Small>
+            <span className="absolute right-2 top-2 rounded-full bg-gray-600 opacity-0 hover:cursor-pointer group-hover:opacity-100">
               <X
                 size={16}
                 onClick={(e) => {
                   e.stopPropagation();
                   onDelete(index);
-                  // const newApis = items.filter((_, i) => i !== index);
-                  // setApis(newApis);
                 }}
+                className="text-gray-300"
               />
             </span>
           </div>
@@ -205,10 +204,8 @@ export const ListAndDetails = ({
         <Button
           size="xs"
           variant="ghost"
-          onClick={() => {
-            onAdd();
-            // setApis([...items, ["new api", ""]]);
-          }}
+          onClick={onAdd}
+          className="text-gray-300 hover:bg-gray-700"
         >
           <PlusIcon size="16" />
         </Button>
@@ -217,7 +214,7 @@ export const ListAndDetails = ({
         <div className="flex w-full flex-col">
           <Input
             type="text"
-            className="mb-2 h-8"
+            className="mb-2 h-8 bg-gray-700 text-gray-200 border-gray-600"
             value={inputValue}
             onChange={(e) => {
               setInputValue(e.target.value);
@@ -246,11 +243,11 @@ export const ListAndDetails = ({
             }}
             onChange={(e) => setTextareaValue(e.target.value)}
             placeholder={textareaPlaceholder}
-            className="text-md"
+            className="text-md bg-gray-700 text-gray-200 border-gray-600"
           />
         </div>
       ) : (
-        <H6 className="text-center">Select an API to view or add a new one</H6>
+        <H6 className="text-center text-gray-300">Select an API to view or add a new one</H6>
       )}
     </div>
   );
@@ -286,12 +283,12 @@ export const ListAndMultiDetails = ({
 
   return (
     <div className="flex w-full flex-row">
-      <div className="mr-2 flex w-36 flex-col rounded-sm border">
+      <div className="mr-2 flex w-36 flex-col rounded-sm border border-gray-600">
         {apis.map(({ name: key, definition: def, flow }, index) => (
           <div
             className={cn(
-              "group relative flex border-b transition-all hover:cursor-pointer hover:bg-slate-200",
-              { [`bg-slate-100`]: selectedKeyIndex === index },
+              "group relative flex border-b border-gray-600 transition-all hover:cursor-pointer hover:bg-gray-700",
+              { [`bg-gray-700`]: selectedKeyIndex === index },
             )}
             onClick={() => {
               setSelectedKeyIndex(index);
@@ -301,16 +298,15 @@ export const ListAndMultiDetails = ({
             }}
             key={key + index}
           >
-            <Small className="mr-2 overflow-hidden p-2">{key}</Small>
-            <span className="absolute right-2 top-2 rounded-full bg-slate-300 opacity-0 hover:cursor-pointer group-hover:opacity-100">
+            <Small className="mr-2 overflow-hidden p-2 text-gray-300">{key}</Small>
+            <span className="absolute right-2 top-2 rounded-full bg-gray-600 opacity-0 hover:cursor-pointer group-hover:opacity-100">
               <X
                 size={16}
                 onClick={(e) => {
                   e.stopPropagation();
                   onDeleteApi(index);
-                  // const newApis = items.filter((_, i) => i !== index);
-                  // setApis(newApis);
                 }}
+                className="text-gray-300"
               />
             </span>
           </div>
@@ -318,10 +314,8 @@ export const ListAndMultiDetails = ({
         <Button
           size="xs"
           variant="ghost"
-          onClick={() => {
-            onAddApi();
-            // setApis([...items, ["new api", ""]]);
-          }}
+          onClick={onAddApi}
+          className="text-gray-300 hover:bg-gray-700"
         >
           <PlusIcon size="16" />
         </Button>
@@ -329,7 +323,7 @@ export const ListAndMultiDetails = ({
       <div className="flex w-full flex-col">
         <Input
           type="text"
-          className="mb-2 h-8"
+          className="mb-2 h-8 bg-gray-700 text-gray-200 border-gray-600"
           value={inputValue}
           onChange={(e) => {
             setInputValue(e.target.value);
@@ -342,11 +336,11 @@ export const ListAndMultiDetails = ({
           }}
         />
         <Tabs defaultValue="api-definition" className="w-full">
-          <TabsList className="w-full">
-            <TabsTrigger value="api-definition" className="w-full">
+          <TabsList className="w-full bg-gray-700">
+            <TabsTrigger value="api-definition" className="w-full data-[state=active]:bg-gray-600 data-[state=active]:text-gray-100">
               Definition
             </TabsTrigger>
-            <TabsTrigger value="api-flow" className="w-full">
+            <TabsTrigger value="api-flow" className="w-full data-[state=active]:bg-gray-600 data-[state=active]:text-gray-100">
               Request flow
             </TabsTrigger>
           </TabsList>
@@ -364,7 +358,7 @@ export const ListAndMultiDetails = ({
               }}
               onChange={(e) => setApiDefinition(e.target.value)}
               placeholder={apiPlaceholder}
-              className="text-md"
+              className="text-md bg-gray-700 text-gray-200 border-gray-600"
             />
           </TabsContent>
           <TabsContent value="api-flow">
@@ -381,7 +375,7 @@ export const ListAndMultiDetails = ({
               }}
               onChange={(e) => setApiFlow(e.target.value)}
               placeholder={flowPlaceholder}
-              className="text-md"
+              className="text-md bg-gray-700 text-gray-200 border-gray-600"
             />
           </TabsContent>
         </Tabs>

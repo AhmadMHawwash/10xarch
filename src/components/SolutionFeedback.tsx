@@ -1,12 +1,12 @@
-import { useState } from "react";
-import { Loader2, ChevronDown, ChevronUp } from "lucide-react";
-import { Badge } from "./ui/badge";
+import { ChevronDown, ChevronUp, Loader2 } from "lucide-react";
 import { ScrollArea } from "./ui/scroll-area";
 import { Button } from "./ui/button";
 
 interface SolutionFeedbackProps {
   isLoadingAnswer: boolean;
   answer?: { score: number; fixes: string[] };
+  isExpanded: boolean;
+  onToggleExpand: (isExpanded: boolean) => void;
 }
 
 export const SolutionFeedback: React.FC<SolutionFeedbackProps> = ({
@@ -23,10 +23,10 @@ export const SolutionFeedback: React.FC<SolutionFeedbackProps> = ({
       "Outline a high-level design with components and their connections.",
     ],
   },
+  isExpanded,
+  onToggleExpand,
 }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-
-  const scorePercentage = (answer.score / 10) * 100;
+  const scorePercentage = answer ? (answer.score / 10) * 100 : 0;
 
   const getScoreColor = (score: number) => {
     if (score <= 50) return "text-red-500";
@@ -44,49 +44,26 @@ export const SolutionFeedback: React.FC<SolutionFeedbackProps> = ({
         </div>
       ) : answer ? (
         <div>
-          <div className="mb-2 flex items-center justify-between">
-            {isExpanded && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsExpanded(false)}
-              >
-                <ChevronUp className="mr-1 h-4 w-4" />
-              </Button>
-            )}
-            {!isExpanded && (
-              <div className="flex items-center">
-                <span className="text-sm font-semibold">
-                  Your system design scored
-                </span>
-                <span
-                  className={`text-md px-1 py-1 font-medium ${getScoreColor(scorePercentage)}`}
-                >
-                  {scorePercentage}%
-                </span>
-              </div>
-            )}
-            {!isExpanded && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsExpanded(true)}
-              >
-                <ChevronDown className="mr-1 h-4 w-4" />
-              </Button>
-            )}
-          </div>
           {isExpanded && (
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold">
-                  Your system design scored
-                </span>
-                <span
-                  className={`text-md px-1 py-1 font-medium ${getScoreColor(scorePercentage)}`}
+                <div className="flex items-center">
+                  <span className="text-sm font-semibold">
+                    Your system design scored
+                  </span>
+                  <span
+                    className={`text-md px-1 py-1 font-medium ${getScoreColor(scorePercentage)}`}
+                  >
+                    {scorePercentage}%
+                  </span>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => onToggleExpand(false)}
                 >
-                  {scorePercentage}%
-                </span>
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
               </div>
               {answer.fixes.length > 0 && (
                 <div>

@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
-import { Loader2, RotateCcw, Check } from "lucide-react";
+import {
+  Loader2,
+  RotateCcw,
+  Check,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react";
 import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
 import { useSystemDesigner } from "@/lib/hooks/useSystemDesigner";
 import { type Node, type Edge } from "reactflow";
@@ -20,6 +26,7 @@ export const FlowManager: React.FC = () => {
   const [resetDone, setResetDone] = useState(false);
   const { checkSolution, isLoadingAnswer, answer } = useChallengeManager();
   const { nodes, edges, setNodes, setEdges } = useSystemDesigner();
+  const [isFeedbackExpanded, setIsFeedbackExpanded] = useState(false);
 
   useEffect(() => {
     const savedData = localStorage.getItem("reactFlowData");
@@ -88,9 +95,14 @@ export const FlowManager: React.FC = () => {
 
   return (
     <div
-      className={`flex flex-col items-center rounded-sm bg-slate-100 p-2 ${answer ? "w-[500px]" : ""} transition-all duration-300`}
+      className={`flex flex-col items-center rounded-sm border border-slate-200 bg-slate-100 p-2 ${answer ? "!w-[200px]" : "w-fit"} transition-all duration-300`}
     >
-      <SolutionFeedback isLoadingAnswer={isLoadingAnswer} answer={answer} />
+      <SolutionFeedback
+        isExpanded={isFeedbackExpanded}
+        isLoadingAnswer={isLoadingAnswer}
+        answer={answer}
+        onToggleExpand={setIsFeedbackExpanded}
+      />
       <div className="flex items-center space-x-2">
         <Button
           size="sm"
@@ -116,6 +128,16 @@ export const FlowManager: React.FC = () => {
           ) : (
             "Run solution"
           )}
+        </Button>
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={() => setIsFeedbackExpanded(!isFeedbackExpanded)}
+          className="w-4 h-4 p-0"
+        >
+          <ChevronUp
+            className={`w-4 h-4 ${isFeedbackExpanded ? "hidden" : ""}`}
+          />
         </Button>
       </div>
     </div>

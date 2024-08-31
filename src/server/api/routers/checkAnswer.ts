@@ -2,6 +2,12 @@ import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import OpenAI from "openai";
 import { z } from "zod";
 
+// Define the response type
+interface EvaluationResponse {
+  score: number;
+  fixes: string[];
+}
+
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
@@ -44,7 +50,11 @@ export const checkSolution = createTRPCRouter({
               content: [
                 {
                   type: "text",
-                  text: '{ \n"General evaluation criteria": [\n"A clear database schema must be defined.",\n"Both functional and non-functional requirements should be addressed, aligning with the current level of the challenge and assumptions.",\n"System APIs must be clearly defined, with their flows aligned to address the challenge level appropriately. More than one API may be necessary depending on the requirements.",\n"System capacity estimations should be defined and match the challenge level and assumptions.",\n"A high-level design should include components and their connections, matching the challenge level and assumptions.",\n"Database schema and models should be defined, meeting the challenge level and assumptions."]\n}',
+                  text: `General evaluation criteria: \n${JSON.stringify(
+                    generalEvaluationCriteria,
+                    null,
+                    2,
+                  )}`,
                 },
               ],
             },
@@ -53,7 +63,9 @@ export const checkSolution = createTRPCRouter({
               content: [
                 {
                   type: "text",
-                  text: "  Score the solution as follows: \n- If the solution meets all criteria for the current challenge level, give a score of 9/10. \n- If the solution goes beyond the provided criteria, give a score of 10/10.",
+                  text: `Score the solution as follows:
+- If the solution meets all criteria for the current challenge level, give a score of 9/10.
+- If the solution goes beyond the provided criteria, give a score of 10/10.`,
                 },
               ],
             },
@@ -71,7 +83,7 @@ export const checkSolution = createTRPCRouter({
               content: [
                 {
                   type: "text",
-                  text: "Respond with the score in this format: \n[score] \n(Score range: 1 - 10, if any criteria is not met then take down from the score, other than that a 9/10 if and only if the solution met all the criteria then a 9/10 score is deserved. However a 10/10 is well deserved for exceeding the criteria) \nList of elements to be fixed: \n1. [Specify areas needing improvement based on evaluation]",
+                  text: `Respond in JSON format {score: [score], fixes: [listOfElementsToBeFixed]}. Knowing that score range: 1 - 10, if any criteria is not met then take down from the score, other than that a 9/10 if and only if the solution met all the criteria then a 9/10 score is deserved. However a 10/10 is well deserved for exceeding the criteria)`,
                 },
               ],
             },
@@ -80,7 +92,7 @@ export const checkSolution = createTRPCRouter({
               content: [
                 {
                   type: "text",
-                  text: "Provide a concise evaluation score from 1 to 10 without any further explanation.",
+                  text: "Provide a concise evaluation without any further explanation.",
                 },
               ],
             },
@@ -94,8 +106,24 @@ export const checkSolution = createTRPCRouter({
             type: "text",
           },
         });
+        
+        const content = response.choices[0]?.message.content ?? "No response generated";
+        
+        // Parse the content as JSON with type checking
+        try {
+          const jsonResponse = JSON.parse(content) as EvaluationResponse;
+          
+          // Validate the parsed response
+          if (typeof jsonResponse.score !== 'number' || !Array.isArray(jsonResponse.fixes)) {
+            throw new Error("Invalid response format");
+          }
+          
+          return jsonResponse;
+        } catch (parseError) {
+          console.error("Error parsing OpenAI response as JSON:", parseError);
+          throw new Error("Failed to parse the evaluation result. Please try again later.");
+        }
 
-        return response.choices[0]?.message.content ?? "No response generated";
       } catch (error) {
         console.error("Error calling OpenAI API:", error);
         throw new Error(
@@ -104,3 +132,12 @@ export const checkSolution = createTRPCRouter({
       }
     }),
 });
+
+const generalEvaluationCriteria = [
+  "A clear database schema must be defined.",
+  "Both functional and non-functional requirements should be addressed, aligning with the current level of the challenge and assumptions.",
+  "System APIs must be clearly defined, with their flows aligned to address the challenge level appropriately. More than one API may be necessary depending on the requirements.",
+  "System capacity estimations should be defined and match the challenge level and assumptions.",
+  "A high-level design should include components and their connections, matching the challenge level and assumptions.",
+  "Database schema and models should be defined, meeting the challenge level and assumptions.",
+];

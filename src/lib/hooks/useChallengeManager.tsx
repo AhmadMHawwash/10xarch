@@ -126,6 +126,7 @@ export const useChallengeManager = () => {
     currentStageIndex,
     setChallenge,
     isLoadingAnswer: isPending,
+    answer: data,
   };
 };
 

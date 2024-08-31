@@ -93,7 +93,6 @@ export const urlShorteningService: Challenge = {
         ],
       },
       criteria: [
-        
         "There's at least 1 client component",
         "There's at least 1 server component",
         "There's at least 1 database component",

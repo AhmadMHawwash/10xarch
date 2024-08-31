@@ -8,6 +8,7 @@ import {
   type SystemComponentNodeDataProps,
   type OtherNodeDataProps,
 } from "./ReactflowCustomNodes/SystemComponentNode";
+import { SolutionFeedback } from "./SolutionFeedback";
 
 type FlowData = {
   nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[];
@@ -17,7 +18,7 @@ type FlowData = {
 export const FlowManager: React.FC = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [resetDone, setResetDone] = useState(false);
-  const { checkSolution, isLoadingAnswer } = useChallengeManager();
+  const { checkSolution, isLoadingAnswer, answer } = useChallengeManager();
   const { nodes, edges, setNodes, setEdges } = useSystemDesigner();
 
   useEffect(() => {
@@ -85,35 +86,38 @@ export const FlowManager: React.FC = () => {
     setTimeout(() => setResetDone(false), 1500); // Reset after 2 seconds
   };
 
-  console.log(resetDone);
   return (
-    <div className="flex rounded-sm bg-slate-100 p-2">
-      <Button
-        size="xs"
-        className="mr-2"
-        onClick={resetFlow}
-        variant="outline"
-        title="Reset solution to initial state"
-        disabled={resetDone}
-      >
-        {resetDone ? (
-          <Check className="h-4 w-4 text-green-500" />
-        ) : (
-          <RotateCcw className="h-4 w-4" />
-        )}
-      </Button>
-      <Button
-        size="xs"
-        onClick={checkSolution}
-        disabled={isLoadingAnswer}
-        title="Check solution"
-      >
-        {isLoadingAnswer ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
-        ) : (
-          "Run solution"
-        )}
-      </Button>
+    <div
+      className={`flex flex-col items-center rounded-sm bg-slate-100 p-2 ${answer ? "w-[500px]" : ""} transition-all duration-300`}
+    >
+      <SolutionFeedback isLoadingAnswer={isLoadingAnswer} answer={answer} />
+      <div className="flex items-center space-x-2">
+        <Button
+          size="sm"
+          onClick={resetFlow}
+          variant="outline"
+          title="Reset solution to initial state"
+          disabled={resetDone}
+        >
+          {resetDone ? (
+            <Check className="h-4 w-4 text-green-500" />
+          ) : (
+            <RotateCcw className="h-4 w-4" />
+          )}
+        </Button>
+        <Button
+          size="sm"
+          onClick={checkSolution}
+          disabled={isLoadingAnswer}
+          title="Check solution"
+        >
+          {isLoadingAnswer ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            "Run solution"
+          )}
+        </Button>
+      </div>
     </div>
   );
 };

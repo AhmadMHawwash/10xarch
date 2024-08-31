@@ -1,10 +1,7 @@
 import { useSystemDesigner } from "@/lib/hooks/useSystemDesigner";
 import { cn } from "@/lib/utils";
 import { useRef, useState, type FC } from "react";
-import {
-  getBezierPath,
-  type EdgeProps
-} from "reactflow";
+import { getBezierPath, type EdgeProps } from "reactflow";
 import { Textarea } from "./ui/textarea";
 
 export const CustomEdge: FC<EdgeProps> = ({
@@ -27,8 +24,7 @@ export const CustomEdge: FC<EdgeProps> = ({
     targetPosition,
   });
   const ref = useRef<HTMLTextAreaElement>(null);
-  const { isApiRequestFlowMode } = useSystemDesigner();
-  console.log(ref.current);
+  // const { isApiRequestFlowMode } = useSystemDesigner();
   const [content, setContent] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   return (
@@ -42,7 +38,7 @@ export const CustomEdge: FC<EdgeProps> = ({
         d={edgePath}
         markerEnd={markerEnd}
       />
-      {isApiRequestFlowMode && (
+      {true && (
         <foreignObject
           style={{
             transform: `translate(${isFocused ? "-100px" : "-40px"}, ${isFocused ? "-50px" : "-15px"})`,
@@ -67,7 +63,7 @@ export const CustomEdge: FC<EdgeProps> = ({
               value={content}
               rows={isFocused ? 4 : 1}
               onChange={(e) => setContent(e.target.value)}
-              className="select-none transition-all resize-none nodrag nowheel"
+              className="nodrag nowheel select-none resize-none transition-all"
               placeholder="How they interact with each other"
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}

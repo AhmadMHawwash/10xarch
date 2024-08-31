@@ -51,6 +51,10 @@ interface SystemDesignerState {
   onSave: () => void;
   onRestore: () => void;
   isEdgeBeingConnected?: boolean;
+  setNodes: (
+    nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[],
+  ) => void;
+  setEdges: (edges: Edge[]) => void;
   // toggleApiRequestFlowMode: () => void;
   // isApiRequestFlowMode: boolean;
   // selectedApiFlow?: string;
@@ -142,8 +146,6 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
     useState<ReactFlowInstance | null>(null);
   const { setViewport } = useReactFlow();
   const [isEdgeBeingConnected, setIsEdgeBeingConnected] = useState(false);
-  // const [isApiRequestFlowMode, setisApiRequestFlowMode] = useState(false);
-  const [selectedApiFlow, setSelectedApiFlow] = useState<string>();
 
   const { toast } = useToast();
 
@@ -487,6 +489,8 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
         edges,
         nodes,
         isEdgeBeingConnected,
+        setNodes,
+        setEdges,
         // toggleApiRequestFlowMode,
         // isApiRequestFlowMode,
         // selectedApiFlow,

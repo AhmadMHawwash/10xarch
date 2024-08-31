@@ -60,15 +60,13 @@ export const useChallengeManager = () => {
 
   const { mutate, data, isPending } = api.ai.hello.useMutation();
 
-  console.log(data);
-
   const checkSolution = async () => {
     const promptBuilder = getLLMPromptBuilder({
       nodes,
       edges,
     });
     const prompt = promptBuilder(challenge!, currentLevel!);
-    console.log(prompt);
+    // console.log(prompt);
     mutate({
       challengeAndSolutionPrompt: prompt,
       criteria: currentLevel?.criteria ?? [],

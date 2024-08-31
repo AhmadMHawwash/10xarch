@@ -122,8 +122,6 @@ export const loadBalancingLevelMaker = () => {
   return loadBalancing;
 };
 
-// console.log(loadBalancing)
-
 // - Requests Per Second is 1000
 // - Success Rate is 70%
 // - Latency is 800ms

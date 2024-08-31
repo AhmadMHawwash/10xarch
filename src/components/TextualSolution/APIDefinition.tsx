@@ -360,7 +360,6 @@ export const ListAndMultiDetails = ({
                     ? { ...oldApi, definition: apiDefinition }
                     : oldApi,
                 );
-                console.log(newApis);
                 onChangeApi(newApis);
               }}
               onChange={(e) => setApiDefinition(e.target.value)}
@@ -378,7 +377,6 @@ export const ListAndMultiDetails = ({
                     ? { ...oldApi, flow: apiFlow }
                     : oldApi,
                 );
-                console.log(newApis);
                 onChangeApi(newApis);
               }}
               onChange={(e) => setApiFlow(e.target.value)}

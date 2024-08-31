@@ -11,7 +11,7 @@ export const DatabaseCluster = ({ name, Icon }: ComponentNodeProps) => {
   return (
     <div className="relative flex flex-col items-center text-gray-200">
       {Icon && <Icon size={20} className="text-gray-300" />}
-      <Small>{name}</Small>
+      <Small className="text-gray-300">{name}</Small>
       <DatabaseClusterSettings name={name} />
     </div>
   );
@@ -36,11 +36,11 @@ const DatabaseClusterSettings = ({ name: id }: { name: string }) => {
 
   return (
     <WithSettings name={id}>
-      <div className="grid w-full grid-flow-row grid-cols-1 gap-2 text-gray-200">
-        <div className="grid grid-flow-col grid-cols-2">
+      <div className="grid w-full grid-flow-row grid-cols-1 gap-4 text-gray-200">
+        <div className="grid grid-flow-col grid-cols-2 gap-2">
           <Label
             htmlFor="primary-instances-count"
-            className=" col-span-1 my-auto"
+            className="col-span-1 my-auto text-gray-300"
           >
             Read/Write
           </Label>
@@ -49,15 +49,15 @@ const DatabaseClusterSettings = ({ name: id }: { name: string }) => {
             onChange={(e) => setPrimaryInstancesCount(parseInt(e.target.value))}
             name="primary-instances-count"
             id="primary-instances-count"
-            className="col-span-1"
+            className="col-span-1 bg-gray-700 text-gray-200 border-gray-600"
             placeholder="# of instances"
             type="number"
           />
         </div>
-        <div className="grid grid-flow-col grid-cols-2">
+        <div className="grid grid-flow-col grid-cols-2 gap-2">
           <Label
             htmlFor="replica-instances-count"
-            className=" col-span-1 my-auto"
+            className="col-span-1 my-auto text-gray-300"
           >
             Replica (Read only)
           </Label>
@@ -66,7 +66,7 @@ const DatabaseClusterSettings = ({ name: id }: { name: string }) => {
             onChange={(e) => setReplicaInstancesCount(parseInt(e.target.value))}
             name="replica-instances-count"
             id="replica-instances-count"
-            className="col-span-1"
+            className="col-span-1 bg-gray-700 text-gray-200 border-gray-600"
             placeholder="# of instances"
             type="number"
           />
@@ -98,7 +98,7 @@ Urls table (Sharded by id)
             name="database-cluster-purpose"
             id="database-cluster-purpose"
             rows={10}
-            className="text-md bg-gray-700 text-gray-200 border-gray-600"
+            className="text-md bg-gray-700 text-gray-200 border-gray-600 focus:border-gray-500"
             value={purpose}
             onChange={(e) => setPurpose(e.target.value)}
           />

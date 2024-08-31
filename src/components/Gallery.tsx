@@ -79,7 +79,7 @@ const components: Record<SystemComponentType, SystemComponent> = {
       <div className="relative h-[20px] w-[20px]">
         <Database className="absolute -left-1 -top-1" size={20} />
         <Database
-          className="absolute left-0 top-0 bg-gray-50 bg-opacity-60 p-0"
+          className="absolute left-0 top-0 bg-gray-900 bg-opacity-60 p-0"
           size={20}
         />
       </div>
@@ -94,7 +94,7 @@ const components: Record<SystemComponentType, SystemComponent> = {
       <div className="relative h-[20px] w-[20px]">
         <DatabaseZap className="absolute -left-1 -top-1" size={20} />
         <DatabaseZap
-          className="absolute left-0 top-0 bg-gray-50 bg-opacity-60 p-0"
+          className="absolute left-0 top-0 bg-gray-900 bg-opacity-60 p-0"
           size={20}
         />
       </div>
@@ -109,7 +109,7 @@ const components: Record<SystemComponentType, SystemComponent> = {
       <div className="relative h-[20px] w-[20px]">
         <Server className="absolute -left-1 -top-1" size={20} />
         <Server
-          className="absolute left-0 top-0 bg-gray-50 bg-opacity-60 p-0"
+          className="absolute left-0 top-0 bg-gray-900 bg-opacity-60 p-0"
           size={20}
         />
       </div>

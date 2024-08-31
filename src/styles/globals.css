@@ -114,3 +114,8 @@
 .react-flow__attribution {
   @apply bg-gray-800 text-gray-200;
 }
+
+/* Make sure the dark class is applied to the html tag when in dark mode */
+html.dark {
+  color-scheme: dark;
+}

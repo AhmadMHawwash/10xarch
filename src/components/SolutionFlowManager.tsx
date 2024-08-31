@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
-import { Loader2, RotateCcw } from "lucide-react";
+import { Loader2, RotateCcw, Check } from "lucide-react";
 import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
 import { useSystemDesigner } from "@/lib/hooks/useSystemDesigner";
 import { type Node, type Edge } from "reactflow";
@@ -16,6 +16,7 @@ type FlowData = {
 
 export const FlowManager: React.FC = () => {
   const [isLoaded, setIsLoaded] = useState(false);
+  const [resetDone, setResetDone] = useState(false);
   const { checkSolution, isLoadingAnswer } = useChallengeManager();
   const { nodes, edges, setNodes, setEdges } = useSystemDesigner();
 
@@ -80,8 +81,11 @@ export const FlowManager: React.FC = () => {
       },
     ]);
     setEdges([]);
+    setResetDone(true);
+    setTimeout(() => setResetDone(false), 1500); // Reset after 2 seconds
   };
 
+  console.log(resetDone);
   return (
     <div className="flex rounded-sm bg-slate-100 p-2">
       <Button
@@ -90,8 +94,13 @@ export const FlowManager: React.FC = () => {
         onClick={resetFlow}
         variant="outline"
         title="Reset solution to initial state"
+        disabled={resetDone}
       >
-        <RotateCcw className="h-4 w-4" />
+        {resetDone ? (
+          <Check className="h-4 w-4 text-green-500" />
+        ) : (
+          <RotateCcw className="h-4 w-4" />
+        )}
       </Button>
       <Button
         size="xs"

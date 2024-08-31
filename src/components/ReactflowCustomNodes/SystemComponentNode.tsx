@@ -34,20 +34,19 @@ export type OtherNodeDataProps = {
   configs: Record<string, unknown>;
 };
 
-export const SystemComponentNode: FC<
-  NodeProps<SystemComponentNodeDataProps>
-> = ({
-  data: { icon: Icon, name, id, withTargetHandle, withSourceHandle },
+export default function SystemComponentNode({
+  data,
   selected,
-}) => {
+}: NodeProps<SystemComponentNodeDataProps>) {
   const { isEdgeBeingConnected } = useSystemDesigner();
 
-  const Component = components[name] ?? DefaultComponent;
+  const Component = components[data.name] ?? DefaultComponent;
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const { icon: ComponentIcon, content } = getSystemComponent(name);
+  const { icon: ComponentIcon, content } = getSystemComponent(data.name);
+
   return (
     <>
-      {withoutTargetHandle.includes(name) ? null : (
+      {!withoutTargetHandle.includes(data.name) && (
         <Handle
           type="target"
           position={Position.Left}
@@ -58,26 +57,25 @@ export const SystemComponentNode: FC<
       <div
         className={cn(
           "group flex flex-col items-center justify-center rounded-sm border border-gray-400 p-2",
-          selected ? "bg-gray-300" : "bg-gray-100",
+          selected ? "bg-gray-700" : "bg-gray-800",
           isEdgeBeingConnected &&
-            // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-            !(withTargetHandle || withSourceHandle) &&
+            !(data.withTargetHandle || data.withSourceHandle) &&
             "opacity-50",
         )}
       >
-        <Component name={id} Icon={Icon} />
+        <Component name={data.id} Icon={data.icon} />
         {content && (
           <WithMarkdownDetails
-            className="absolute left-0 top-[-17px] rounded-full bg-gray-100 opacity-0 transition-all group-hover:opacity-100"
+            className="absolute left-0 top-[-17px] rounded-full bg-gray-700 opacity-0 transition-all group-hover:opacity-100"
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             Icon={ComponentIcon}
             content={content}
-            trigger={<InfoIcon size={16} className="stroke-gray-500" />}
+            trigger={<InfoIcon size={16} className="stroke-gray-300" />}
           />
         )}
       </div>
 
-      {withoutSourceHandle.includes(name) ? null : (
+      {!withoutSourceHandle.includes(data.name) && (
         <Handle
           type="source"
           position={Position.Right}
@@ -87,9 +85,7 @@ export const SystemComponentNode: FC<
       )}
     </>
   );
-};
-
-export default memo(SystemComponentNode);
+}
 
 export type ComponentNodeProps = {
   name: string;
@@ -111,8 +107,8 @@ const components: Partial<
 
 const DefaultComponent = ({ name, Icon }: ComponentNodeProps) => (
   <>
-    {Icon && <Icon height="20px" width="20px" />}
-    <Small>{name}</Small>
+    {Icon && <Icon height="20px" width="20px" className="text-gray-300" />}
+    <Small className="text-gray-300">{name}</Small>
   </>
 );
 

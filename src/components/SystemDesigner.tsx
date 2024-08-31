@@ -17,6 +17,7 @@ import ReactFlow, {
   type NodeProps,
   type OnConnect
 } from "reactflow";
+import "reactflow/dist/base.css";
 import "reactflow/dist/style.css";
 import { CustomEdge } from "./CustomEdge";
 import { FlowManager } from "./SolutionFlowManager";
@@ -58,7 +59,7 @@ const SystemDesigner = () => {
   };
 
   return (
-    <div className="relative flex h-full flex-grow flex-col" ref={initWrapper}>
+    <div className="relative flex h-full flex-grow flex-col bg-gray-900" ref={initWrapper}>
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -85,8 +86,9 @@ const SystemDesigner = () => {
         panOnDrag={false}
         selectionMode={SelectionMode.Partial}
         fitView={false}
+        className="dark-theme"
       >
-        <Background variant={BackgroundVariant.Dots} color="black" />
+        <Background variant={BackgroundVariant.Dots} color="#4a5568" />
         <Panel position="bottom-center">
           <FlowManager />
         </Panel>

@@ -10,9 +10,9 @@ export type SystemComponentNodeDataProps = {
   configs: Record<string, unknown>;
 };
 
-export const APIsNode: FC<NodeProps<SystemComponentNodeDataProps>> = () => {
+export default function APIsNode({ data, isConnectable }: NodeProps<APIsNodeDataProps>) {
   return (
-    <div className="group flex w-32 max-w-32 flex-col gap-1 rounded-sm border bg-slate-50 p-1">
+    <div className="flex flex-col items-center rounded-md border border-gray-600 bg-gray-800 p-2 text-gray-200">
       <WithMarkdownDetails
         className="absolute left-0 top-[-17px] rounded-full bg-gray-100 opacity-0 transition-all group-hover:opacity-100"
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -22,9 +22,7 @@ export const APIsNode: FC<NodeProps<SystemComponentNodeDataProps>> = () => {
       />
     </div>
   );
-};
-
-export default APIsNode;
+}
 
 export type Capacity = "Traffic" | "Storage" | "Bandwidth" | "Memory";
 export type API = { name: string; definition: string; flow: string };

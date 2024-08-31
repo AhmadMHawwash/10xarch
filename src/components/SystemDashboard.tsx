@@ -17,29 +17,28 @@ export const Dashboard = () => {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="outline" className="z-[500] m-2 border-gray-400">
+        <Button variant="outline" className="z-[500] m-2 border-gray-600 text-gray-200 hover:bg-gray-700">
           <BookOpenText className="mr-2" size="17" /> Challenge statement
         </Button>
       </SheetTrigger>
-      <SheetContent side="bottom" className="h-[80vh]">
+      <SheetContent side="bottom" className="h-[80vh] bg-gray-900 text-gray-200">
         <SheetHeader>
-          {/* <SheetTitle></SheetTitle> */}
-          <SheetDescription className="text-black">
+          <SheetDescription className="text-gray-300">
             <div className="mb-2 flex justify-between">
-              <Button size="sm" variant="outline" onClick={toPreviousStage}>
+              <Button size="sm" variant="outline" onClick={toPreviousStage} className="border-gray-600 text-gray-200 hover:bg-gray-700">
                 <ArrowLeft className="mr-1" />
                 Previous
               </Button>
-              <H5>{challenge.title}</H5>
-              <Button size="sm" variant="outline" onClick={toNextStage}>
+              <H5 className="text-gray-100">{challenge.title}</H5>
+              <Button size="sm" variant="outline" onClick={toNextStage} className="border-gray-600 text-gray-200 hover:bg-gray-700">
                 Next
                 <ArrowRight className="ml-1" />
               </Button>
             </div>
             <Large></Large>
-            <P>{stage?.objective}</P>
-            <Separator />
-            <P>The current problem is: {challenge.description}</P>
+            {/* <P className="text-gray-300">{stage?.objective}</P> */}
+            <Separator className="bg-gray-700" />
+            <P className="text-gray-300">The current problem is: {challenge.description}</P>
           </SheetDescription>
         </SheetHeader>
       </SheetContent>

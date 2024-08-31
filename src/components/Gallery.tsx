@@ -141,16 +141,16 @@ const Gallery = () => {
   };
 
   return (
-    <div className="m-2 h-fit w-fit flex-col rounded-md border border-gray-200 bg-gray-50 bg-opacity-70 p-2">
-      <Lead className="h-fit">Components</Lead>
+    <div className="m-2 h-fit w-fit flex-col rounded-md border border-gray-700 bg-gray-800 bg-opacity-70 p-2">
+      <Lead className="h-fit text-gray-200">Components</Lead>
       {Object.values(components).map(({ name, icon: Icon }) => (
         <div
           key={name}
-          className="my-1 flex cursor-grab items-center rounded-md border border-gray-200 bg-gray-50 bg-opacity-70 p-2"
+          className="my-1 flex cursor-grab items-center rounded-md border border-gray-700 bg-gray-800 bg-opacity-70 p-2 text-gray-200"
           onDragStart={(event) => onDragStart(event, name)}
           draggable
         >
-          {Icon && <Icon size={20} />}
+          {Icon && <Icon size={20} className="text-gray-300" />}
           <div className="ml-2">{name}</div>
         </div>
       ))}

@@ -85,3 +85,32 @@
       z-index: 2000!important;
     }
   }
+
+  /* Add this at the end of the file */
+.react-flow__node {
+  @apply bg-gray-800 text-gray-200 border-gray-600;
+}
+
+.react-flow__handle {
+  @apply bg-gray-500;
+}
+
+.react-flow__edge-path {
+  @apply stroke-gray-400;
+}
+
+.react-flow__controls {
+  @apply bg-gray-800 border-gray-700;
+}
+
+.react-flow__controls-button {
+  @apply bg-gray-700 border-gray-600 text-gray-200;
+}
+
+.react-flow__minimap {
+  @apply bg-gray-800 border-gray-700;
+}
+
+.react-flow__attribution {
+  @apply bg-gray-800 text-gray-200;
+}

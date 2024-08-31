@@ -95,7 +95,7 @@ export const FlowManager: React.FC = () => {
 
   return (
     <div
-      className={`flex flex-col items-center rounded-sm border border-slate-200 bg-slate-100 px-4 py-2 ${isFeedbackExpanded ? "w-[500px]" : "w-fit"} transition-all duration-300`}
+      className={`flex flex-col items-center rounded-md border border-gray-700 bg-gray-800 px-4 py-2 ${isFeedbackExpanded ? "w-[500px]" : "w-fit"} transition-all duration-300`}
     >
       <SolutionFeedback
         isExpanded={isFeedbackExpanded}
@@ -110,9 +110,10 @@ export const FlowManager: React.FC = () => {
           variant="outline"
           title="Reset solution to initial state"
           disabled={resetDone}
+          className="border-gray-600 text-gray-200 hover:bg-gray-700"
         >
           {resetDone ? (
-            <Check className="h-4 w-4 text-green-500" />
+            <Check className="h-4 w-4 text-green-400" />
           ) : (
             <RotateCcw className="h-4 w-4" />
           )}
@@ -122,6 +123,7 @@ export const FlowManager: React.FC = () => {
           onClick={checkSolution}
           disabled={isLoadingAnswer}
           title="Check solution"
+          className="bg-blue-600 text-gray-200 hover:bg-blue-700"
         >
           {isLoadingAnswer ? (
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -134,7 +136,7 @@ export const FlowManager: React.FC = () => {
             size="sm"
             variant="ghost"
             onClick={() => setIsFeedbackExpanded(!isFeedbackExpanded)}
-            className="h-4 w-4 p-0"
+            className="h-4 w-4 p-0 text-gray-300 hover:bg-gray-700"
           >
             <ChevronUp
               className={`h-4 w-4 ${isFeedbackExpanded ? "hidden" : ""}`}

@@ -1,7 +1,7 @@
-import { ChevronDown, ChevronUp, Loader2 } from "lucide-react";
-import { ScrollArea } from "./ui/scroll-area";
-import { Button } from "./ui/button";
 import { cn } from "@/lib/utils";
+import { ChevronDown, Loader2 } from "lucide-react";
+import { Button } from "./ui/button";
+import { ScrollArea } from "./ui/scroll-area";
 
 interface SolutionFeedbackProps {
   isLoadingAnswer: boolean;

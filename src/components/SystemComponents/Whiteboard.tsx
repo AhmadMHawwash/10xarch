@@ -8,12 +8,12 @@ import { type FC } from "react";
 import { WithMarkdownDetails } from "./Wrappers/WithMarkdownDetails";
 import { InfoIcon, PresentationIcon } from "lucide-react";
 
-export const Whiteboard: FC<NodeProps> = ({ selected }) => {
+export const Whiteboard = ({ selected }: NodeProps) => {
   return (
     <div
       className={cn(
-        "group flex flex-col items-center justify-center rounded-sm border border-gray-400 p-2",
-        selected ? "bg-gray-300" : "bg-gray-100",
+        "group flex h-full w-full flex-col rounded-md border border-gray-600 p-2 text-gray-200",
+        selected ? "bg-gray-700" : "bg-gray-800",
       )}
     >
       <Small className="mb-2">System definitions</Small>
@@ -21,9 +21,9 @@ export const Whiteboard: FC<NodeProps> = ({ selected }) => {
       <APIDefinition />
       <CapacityEstimationDefinition />
       <WithMarkdownDetails
-        className="absolute left-0 top-[-17px] rounded-full bg-gray-100 opacity-0 transition-all group-hover:opacity-100"
+        className="absolute left-0 top-[-17px] rounded-full bg-gray-700 opacity-0 transition-all group-hover:opacity-100"
         Icon={PresentationIcon}
-        trigger={<InfoIcon size={16} className="stroke-gray-500" />}
+        trigger={<InfoIcon size={16} className="stroke-gray-300" />}
         content={`# Whiteboard
 Is your digital area where you can write down your notes and thoughts about the system.
 

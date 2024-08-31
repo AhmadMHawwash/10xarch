@@ -23,24 +23,24 @@ import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";
 
 const components1: Components = {
-  h1: ({ node: _, ...props }) => <H1 {...props} />,
-  h2: ({ node: _, ...props }) => <H2 {...props} />,
-  h3: ({ node: _, ...props }) => <H3 {...props} />,
-  h4: ({ node: _, ...props }) => <H4 {...props} />,
-  h5: ({ node: _, ...props }) => <H5 {...props} />,
-  h6: ({ node: _, ...props }) => <H6 {...props} />,
-  p: ({ node: _, ...props }) => <P {...props} />,
-  ul: ({ node: _, ...props }) => <List {...props} />,
+  h1: ({ node: _, ...props }) => <H1 className="text-gray-100" {...props} />,
+  h2: ({ node: _, ...props }) => <H2 className="text-gray-100" {...props} />,
+  h3: ({ node: _, ...props }) => <H3 className="text-gray-100" {...props} />,
+  h4: ({ node: _, ...props }) => <H4 className="text-gray-100" {...props} />,
+  h5: ({ node: _, ...props }) => <H5 className="text-gray-100" {...props} />,
+  h6: ({ node: _, ...props }) => <H6 className="text-gray-100" {...props} />,
+  p: ({ node: _, ...props }) => <P className="text-gray-300" {...props} />,
+  ul: ({ node: _, ...props }) => <List className="text-gray-300" {...props} />,
   li: ({ node: _, ...props }) => (
-    <li className="list-item">{props.children}</li>
+    <li className="list-item text-gray-300">{props.children}</li>
   ),
-  blockquote: ({ node: _, ...props }) => <Quote {...props} />,
+  blockquote: ({ node: _, ...props }) => <Quote className="text-gray-300" {...props} />,
   a: ({ node: _, ...props }) => (
-    <a {...props} className="link">
+    <a {...props} className="link text-blue-400 hover:text-blue-300">
       {props.children}
     </a>
   ),
-  code: ({ node: _, ...props }) => <InlineCode {...props} />,
+  code: ({ node: _, ...props }) => <InlineCode className="bg-gray-700 text-gray-200" {...props} />,
 };
 
 export const WithMarkdownDetails = ({
@@ -60,12 +60,12 @@ export const WithMarkdownDetails = ({
       <DialogTrigger>
         <span className={className}>{trigger}</span>
       </DialogTrigger>
-      <DialogContent className="min-h-95 w-[70vw] max-w-5xl">
+      <DialogContent className="min-h-95 w-[70vw] max-w-5xl bg-gray-800 border-gray-700">
         <DialogHeader className="relative">
-          <span className="absolute -left-[104px] -top-0 rounded-md bg-white p-4">
-            <Icon />
+          <span className="absolute -left-[104px] -top-0 rounded-md bg-gray-700 p-4">
+            <Icon className="text-gray-300" />
           </span>
-          <div className="h-[90vh] overflow-scroll px-8">
+          <div className="h-[90vh] overflow-scroll px-8 text-gray-200">
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
               rehypePlugins={[rehypeRaw]} // Enable raw HTML parsing

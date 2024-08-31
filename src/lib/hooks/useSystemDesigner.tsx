@@ -77,10 +77,8 @@ const SystemDesignerContext = createContext<SystemDesignerState>({
   onConnectEnd: noop,
   onSave: noop,
   onRestore: noop,
-  toggleApiRequestFlowMode: noop,
-  isApiRequestFlowMode: false,
-  selectedApiFlow: undefined,
-  setSelectedApiFlow: noop,
+  setNodes: noop,
+  setEdges: noop,
 });
 
 export const makeKey = (id: number, type: string) => `${type}-${id}`;

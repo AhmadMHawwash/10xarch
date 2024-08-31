@@ -56,7 +56,7 @@ export const useChallengeManager = () => {
     useLevelStore((state) => state);
   const currentLevel = challenge?.stages[currentStageIndex];
 
-  const { updateNodes, updateEdges, nodes, edges } = useSystemDesigner();
+  const { updateNodes, nodes, edges } = useSystemDesigner();
 
   const { mutate, data, isPending } = api.ai.hello.useMutation();
 

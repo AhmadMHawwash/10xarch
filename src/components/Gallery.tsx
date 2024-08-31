@@ -9,7 +9,6 @@ import {
   HardDriveDownload,
   MonitorSmartphone,
   Network,
-  PresentationIcon,
   Server,
 } from "lucide-react";
 import type { DragEvent } from "react";

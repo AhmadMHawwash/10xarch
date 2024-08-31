@@ -1,4 +1,3 @@
-import { useSystemDesigner } from "@/lib/hooks/useSystemDesigner";
 import { cn } from "@/lib/utils";
 import { useRef, useState, type FC } from "react";
 import { getBezierPath, type EdgeProps } from "reactflow";
@@ -11,7 +10,6 @@ export const CustomEdge: FC<EdgeProps> = ({
   targetY,
   sourcePosition,
   targetPosition,
-  style = {},
   markerEnd,
   id,
 }) => {

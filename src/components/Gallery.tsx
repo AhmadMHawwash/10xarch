@@ -1,7 +1,5 @@
-import {
-  type SystemComponent,
-  type SystemComponentType,
-} from "@/lib/levels/type";
+import { useState } from "react";
+import { type SystemComponent, type SystemComponentType } from "@/lib/levels/type";
 import {
   Database,
   DatabaseZap,
@@ -10,6 +8,7 @@ import {
   MonitorSmartphone,
   Network,
   Server,
+  Search,
 } from "lucide-react";
 import type { DragEvent } from "react";
 import { Lead } from "./ui/typography";
@@ -76,11 +75,11 @@ const components: Record<SystemComponentType, SystemComponent> = {
     description:
       "A database cluster is a group of databases that work together to store and serve data.",
     icon: () => (
-      <div className="relative h-[20px] w-[20px]">
-        <Database className="absolute -left-1 -top-1" size={20} />
+      <div className="relative h-[16px] w-[16px] mr-1">
+        <Database className="absolute -left-0.5 -top-0.5" size={16} />
         <Database
-          className="absolute left-0 top-0 bg-gray-900 bg-opacity-60 p-0"
-          size={20}
+          className="absolute left-0.5 top-0.5 bg-gray-900 bg-opacity-60 p-0"
+          size={16}
         />
       </div>
     ),
@@ -91,11 +90,11 @@ const components: Record<SystemComponentType, SystemComponent> = {
     description:
       "A cache cluster is a group of caches that work together to store and serve data.",
     icon: () => (
-      <div className="relative h-[20px] w-[20px]">
-        <DatabaseZap className="absolute -left-1 -top-1" size={20} />
+      <div className="relative h-[16px] w-[16px] mr-1">
+        <DatabaseZap className="absolute -left-0.5 -top-0.5" size={16} />
         <DatabaseZap
-          className="absolute left-0 top-0 bg-gray-900 bg-opacity-60 p-0"
-          size={20}
+          className="absolute left-0.5 top-0.5 bg-gray-900 bg-opacity-60 p-0"
+          size={16}
         />
       </div>
     ),
@@ -106,11 +105,11 @@ const components: Record<SystemComponentType, SystemComponent> = {
     description:
       "A server cluster is a group of servers that work together to serve data.",
     icon: () => (
-      <div className="relative h-[20px] w-[20px]">
-        <Server className="absolute -left-1 -top-1" size={20} />
+      <div className="relative h-[16px] w-[16px] mr-1">
+        <Server className="absolute -left-0.5 -top-0.5" size={16} />
         <Server
-          className="absolute left-0 top-0 bg-gray-900 bg-opacity-60 p-0"
-          size={20}
+          className="absolute left-0.5 top-0.5 bg-gray-900 bg-opacity-60 p-0"
+          size={16}
         />
       </div>
     ),
@@ -134,26 +133,51 @@ const components: Record<SystemComponentType, SystemComponent> = {
 //   },
 };
 
+const componentCategories = {
+  "Basic Components": ["Client", "Server", "Database"],
+  "Advanced Components": ["Load Balancer", "Cache", "CDN", "Message Queue"],
+  "Clustered Components": ["Database Cluster", "Cache Cluster", "Server Cluster"],
+};
+
 const Gallery = () => {
+  const [searchTerm, setSearchTerm] = useState("");
+
   const onDragStart = (event: DragEvent, nodeType: SystemComponentType) => {
     event.dataTransfer.setData("application/reactflow", nodeType);
     event.dataTransfer.effectAllowed = "move";
   };
 
+  const filteredComponents = Object.entries(components).filter(([name]) =>
+    name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
-    <div className="m-2 h-fit w-fit flex-col rounded-md border border-gray-700 bg-gray-800 bg-opacity-70 p-2">
-      <Lead className="h-fit text-gray-200">Components</Lead>
-      {Object.values(components).map(({ name, icon: Icon }) => (
-        <div
-          key={name}
-          className="my-1 flex cursor-grab items-center rounded-md border border-gray-700 bg-gray-800 bg-opacity-70 p-2 text-gray-200"
-          onDragStart={(event) => onDragStart(event, name)}
-          draggable
-        >
-          {Icon && <Icon size={20} className="text-gray-300" />}
-          <div className="ml-2">{name}</div>
-        </div>
-      ))}
+    <div className="m-2 h-fit w-48 flex-col rounded-md border border-gray-700 bg-gray-800 bg-opacity-70 p-2">
+      <Lead className="h-fit text-gray-200 mb-2 text-sm">Components</Lead>
+      <div className="relative mb-2">
+        <input
+          type="text"
+          placeholder="Search..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full px-2 py-1 text-xs bg-gray-700 text-gray-200 rounded-md pr-6"
+        />
+        <Search className="absolute right-1 top-1 text-gray-400" size={14} />
+      </div>
+      <div className="max-h-64 overflow-y-auto">
+        {filteredComponents.map(([name, { icon: Icon, description }]) => (
+          <div
+            key={name}
+            className="my-1 flex cursor-grab items-center rounded-md border border-gray-700 bg-gray-800 bg-opacity-70 p-1 text-gray-200 hover:bg-gray-700 transition-colors duration-200"
+            onDragStart={(event) => onDragStart(event, name as SystemComponentType)}
+            draggable
+            title={description}
+          >
+            {Icon && <Icon size={16} className="text-gray-300 mr-1" />}
+            <div className="text-xs">{name}</div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

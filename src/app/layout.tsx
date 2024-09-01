@@ -6,6 +6,7 @@ import { GeistSans } from "geist/font/sans";
 import { TRPCReactProvider } from "@/trpc/react";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import Navbar from "@/components/Navbar"; // Add this import
 
 export const metadata = {
   title: "System Design Playground",
@@ -25,6 +26,7 @@ export default function RootLayout({
         <TRPCReactProvider>
           <TooltipProvider>
             <Toaster />
+            <Navbar /> {/* Add the Navbar component here */}
             <main className="flex min-h-screen bg-gray-900 text-gray-100">
               {children}
             </main>

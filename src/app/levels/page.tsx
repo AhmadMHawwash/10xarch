@@ -8,31 +8,33 @@ import {
 } from "@/components/ui/card";
 import challenges from "@/content/challenges";
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 
 export default async function Levels() {
   return (
-    <div className="container mx-auto bg-gray-900 text-gray-100 min-h-screen py-8">
-      <h1 className="text-center text-4xl font-bold text-blue-400">Levels</h1>
-      <p className="text-center text-gray-300 mt-2">Choose a level to start your journey</p>
-      <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {challenges.map((challenge) => (
+    <div className="container mx-auto px-4 py-12">
+      <h1 className="text-center text-4xl font-bold text-blue-400 mb-2 animate-fade-in-fast">System Design Levels</h1>
+      <p className="text-center text-xl text-gray-300 mb-12 animate-fade-in-fast animation-delay-100">Master system design concepts through interactive challenges</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {challenges.map((challenge, index) => (
           <Link
             key={challenge.title}
             href={`/levels/${challenge.slug}`}
-            className="col-span-1"
+            className={`animate-fade-in-fast animation-delay-${(index + 1) * 50}`}
           >
-            <Card className="w-full border border-gray-700 bg-gray-800 transition-all hover:bg-gray-750">
+            <Card className="h-full border border-gray-700 bg-gray-800 transition-all duration-200 ease-in-out hover:border-blue-400 hover:shadow-md hover:shadow-blue-400/20">
               <CardHeader>
-                <CardTitle className="text-blue-300">{challenge.title}</CardTitle>
-                <CardDescription className="text-gray-400">{challenge.description}</CardDescription>
+                <CardTitle className="text-2xl font-bold text-blue-300 mb-2">{challenge.title}</CardTitle>
+                <CardDescription className="text-gray-400 text-base">{challenge.description}</CardDescription>
               </CardHeader>
-              <CardFooter className="flex justify-end">
+              <CardFooter className="flex justify-between items-center">
                 <Badge
                   variant="outline"
-                  className="bg-gray-700 text-gray-300 border-gray-600"
+                  className="bg-blue-900 text-blue-200 border-blue-700 px-3 py-1 text-sm font-medium"
                 >
                   {challenge.difficulty}
                 </Badge>
+                <ArrowRight className="text-blue-400 w-5 h-5 transition-transform duration-200 ease-in-out group-hover:translate-x-1" />
               </CardFooter>
             </Card>
           </Link>

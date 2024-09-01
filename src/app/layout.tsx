@@ -5,6 +5,7 @@ import { GeistSans } from "geist/font/sans";
 
 import { TRPCReactProvider } from "@/trpc/react";
 import { Toaster } from "@/components/ui/toaster";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 export const metadata = {
   title: "System Design Playground",
@@ -22,8 +23,12 @@ export default function RootLayout({
     <html lang="en" className={`${GeistSans.variable} dark`}>
       <body className="bg-gray-900 text-gray-100">
         <TRPCReactProvider>
-          <Toaster />
-          <main className="flex min-h-screen bg-gray-900 text-gray-100">{children}</main>
+          <TooltipProvider>
+            <Toaster />
+            <main className="flex min-h-screen bg-gray-900 text-gray-100">
+              {children}
+            </main>
+          </TooltipProvider>
         </TRPCReactProvider>
       </body>
     </html>

@@ -11,6 +11,10 @@ import { Separator } from "@/components/ui/separator";
 import { H5, List, Muted, P } from "@/components/ui/typography";
 import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
 import { ArrowLeft, ArrowRight, InfoIcon } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Badge } from "@/components/ui/badge";
+import { type ReactNode } from 'react';
 
 export default function Level() {
   return (
@@ -36,84 +40,104 @@ const LevelContent = () => {
 
   return (
     <div className="flex h-full max-h-[100vh] flex-col justify-between bg-gray-900 p-4 text-gray-200">
-      <div className="overflow-x-scroll pb-8">
+      <div className="overflow-y-auto pb-8">
         <div className="min-w-[17vw]">
-          <div className="sticky top-0 w-full bg-gray-900">
-            <H5 className="text-gray-100">
-              {challenge.title} &nbsp;&nbsp;
-              <Muted className="text-gray-400">
-                Part {currentStageIndex + 1}/{challenge.stages.length}
-              </Muted>
+          <div className="sticky top-0 w-full bg-gray-900 z-10">
+            <H5 className="text-gray-100 flex items-center justify-between">
+              <span>{challenge.title}</span>
+              <Badge variant="outline" className="text-blue-400 border-blue-400">
+                Stage {currentStageIndex + 1} of {challenge.stages.length}
+              </Badge>
             </H5>
-
             <Separator className="mb-5 mt-1 bg-gray-700" />
           </div>
-          <div className="flex flex-col gap-3 overflow-scroll">
-            <div>
-              <Muted className="text-gray-400">Emerging complexity</Muted>
-              <div className="mt-0 rounded-md border border-gray-700 p-2">
-                <P className="!mt-0 text-gray-300">{stage?.problem}</P>
-              </div>
-            </div>
-            <div>
-              <Muted className="text-gray-400">Assumptions</Muted>
-              <div className="mt-0 rounded-md border border-gray-700">
-                <List className="!ml-2">
-                  {oldAssumptions.map((assumption, index) => (
-                    <P
-                      key={index}
-                      className="!mt-0 ml-4 list-item list-decimal line-through opacity-50 text-gray-400"
-                    >
-                      {assumption}
-                    </P>
-                  ))}
-                  {stage?.assumptions.map((assumption, index) => (
-                    <P
-                      key={index}
-                      className="!mt-0 ml-4 list-item list-decimal text-gray-300"
-                    >
-                      {assumption}
-                    </P>
-                  ))}
-                </List>
-              </div>
-            </div>
-            <div>
-              <WithMarkdownDetails
-                Icon={InfoIcon}
-                trigger={
-                  <Muted className="flex items-center gap-1 text-gray-400">
-                    <InfoIcon size="17" />
-                    Elements of a successful system design
-                  </Muted>
-                }
-                content={content}
-              />
-            </div>
+          <div className="flex flex-col gap-4">
+            <Section title="Emerging Complexity" content={stage?.problem} />
+            <Section title="Assumptions" content={
+              <List className="!ml-2">
+                {oldAssumptions.map((assumption, index) => (
+                  <P key={index} className="!mt-0 ml-4 list-item list-decimal line-through opacity-50 text-gray-400">
+                    {assumption}
+                  </P>
+                ))}
+                {stage?.assumptions.map((assumption, index) => (
+                  <P key={index} className="!mt-0 ml-4 list-item list-decimal text-gray-300">
+                    {assumption}
+                  </P>
+                ))}
+              </List>
+            } />
+            <WithMarkdownDetails
+              Icon={InfoIcon}
+              trigger={
+                <Muted className="flex items-center gap-1 text-gray-400 cursor-pointer hover:text-gray-300 transition-colors">
+                  <InfoIcon size="17" />
+                  Elements of a successful system design
+                </Muted>
+              }
+              content={content}
+            />
           </div>
         </div>
       </div>
-      <div className="mb-2 flex flex-wrap justify-between">
-        <Button size="sm" variant="outline" onClick={toPreviousStage} className="border-gray-600 text-gray-200 hover:bg-gray-700">
-          <ArrowLeft className="mr-1" />
-        </Button>
-        <span className="min-w-32 pt-1">
-          {challenge.stages.map((_, index) => (
-            <span
-              key={index}
-              className={`mx-1 inline-block h-2 w-2 rounded-full ${
-                index === currentStageIndex ? "bg-gray-200" : "bg-gray-600"
-              }`}
-            />
-          ))}
-        </span>
-        <Button size="sm" variant="outline" onClick={toNextStage} className="border-gray-600 text-gray-200 hover:bg-gray-700">
-          <ArrowRight className="ml-1" />
-        </Button>
+      <div className="mt-4">
+        <StageProgress 
+          currentStage={currentStageIndex} 
+          totalStages={challenge.stages.length} 
+          onPrevious={toPreviousStage}
+          onNext={toNextStage}
+        />
       </div>
     </div>
   );
 };
+
+interface SectionProps {
+  title: string;
+  content: ReactNode;
+}
+
+const Section: React.FC<SectionProps> = ({ title, content }) => (
+  <div className="bg-gray-800 rounded-lg p-4 shadow-md">
+    <Muted className="text-gray-400 mb-2">{title}</Muted>
+    <div className="mt-0 text-gray-300">
+      {typeof content === 'string' ? <P className="!mt-0">{content}</P> : content}
+    </div>
+  </div>
+);
+
+interface StageProgressProps {
+  currentStage: number;
+  totalStages: number;
+  onPrevious: () => void;
+  onNext: () => void;
+}
+
+const StageProgress: React.FC<StageProgressProps> = ({ currentStage, totalStages, onPrevious, onNext }) => (
+  <div className="flex items-center justify-between">
+    <Button size="sm" variant="outline" onClick={onPrevious} className="border-gray-600 text-gray-200 hover:bg-gray-700">
+      <ArrowLeft className="mr-1" /> Previous
+    </Button>
+    <div className="flex-grow mx-4 relative">
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger className="w-full">
+            <Progress 
+              value={(currentStage + 1) / totalStages * 100} 
+              className="w-full h-2"
+            />
+          </TooltipTrigger>
+          <TooltipContent side="top" className="bg-gray-800 text-gray-200">
+            <p>Stage {currentStage + 1} of {totalStages}</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    </div>
+    <Button size="sm" variant="outline" onClick={onNext} className="border-gray-600 text-gray-200 hover:bg-gray-700">
+      Next <ArrowRight className="ml-1" />
+    </Button>
+  </div>
+);
 
 type DesignElement = {
   title: string;

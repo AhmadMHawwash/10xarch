@@ -1,78 +1,17 @@
 import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
 import { useSystemDesigner } from "@/lib/hooks/useSystemDesigner";
-import { type SystemComponentType } from "@/lib/levels/type";
 import { Check, ChevronUp, Loader2, RotateCcw } from "lucide-react";
-import { useEffect, useState } from "react";
-import { type Edge, type Node } from "reactflow";
-import { getSystemComponent } from "./Gallery";
-import {
-  type OtherNodeDataProps,
-  type SystemComponentNodeDataProps,
-} from "./ReactflowCustomNodes/SystemComponentNode";
+import { useState } from "react";
 import { SolutionFeedback } from "./SolutionFeedback";
 import { Button } from "./ui/button";
 
-type FlowData = {
-  nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[];
-  edges: Edge[];
-};
-
 export const FlowManager: React.FC = () => {
-  const [isLoaded, setIsLoaded] = useState(false);
   const [resetDone, setResetDone] = useState(false);
   const { checkSolution, isLoadingAnswer, answer } = useChallengeManager();
-  const { nodes, edges, setNodes, setEdges } = useSystemDesigner();
+  const { setNodes, setEdges } = useSystemDesigner();
   const [isFeedbackExpanded, setIsFeedbackExpanded] = useState(false);
 
-  useEffect(() => {
-    const savedData = localStorage.getItem("reactFlowData");
-
-    if (savedData) {
-      try {
-        const parsedData = JSON.parse(savedData) as FlowData;
-        if (
-          Array.isArray(parsedData.nodes) &&
-          Array.isArray(parsedData.edges)
-        ) {
-          setNodes(
-            parsedData.nodes.map((node) => ({
-              ...node,
-              data: {
-                ...node.data,
-                // We have to assign the icon because it's not serializable (when saved in localStorage)
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                icon: getSystemComponent(node.data.name as SystemComponentType)
-                  .icon,
-                name: node.data.name as SystemComponentType,
-              },
-            })),
-          );
-          setEdges(parsedData.edges);
-        }
-      } catch (error) {
-        console.error("Error parsing saved flow data:", error);
-        resetFlow();
-      }
-    } else {
-      resetFlow();
-    }
-    setIsLoaded(true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setNodes, setEdges]);
-
-  useEffect(() => {
-    const saveToLocalStorage = () => {
-      const flowData: FlowData = { nodes, edges };
-      localStorage.setItem("reactFlowData", JSON.stringify(flowData));
-    };
-
-    if (isLoaded) {
-      saveToLocalStorage();
-    }
-  }, [nodes, edges, isLoaded]);
-
   const resetFlow = () => {
-    localStorage.removeItem("reactFlowData");
     setNodes([
       {
         id: "Whiteboard-1",

@@ -30,9 +30,10 @@ import {
   type ReactFlowInstance,
   type ReactFlowJsonObject,
 } from "reactflow";
-import { type SystemComponent } from "../levels/type";
+import { type SystemComponentType, type SystemComponent } from "../levels/type";
 import { componentsNumberingStore } from "../levels/utils";
 import { SYSTEM_COMPONENT_NODE } from "./useChallengeManager";
+import useLocalStorageState from "../utils/useLocalStorageState";
 
 interface SystemDesignerState {
   nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[];
@@ -122,24 +123,42 @@ const componentTargets: Record<
 
 export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
-  const [nodes, setNodes] = useState<
+  const [nodes, setNodes] = useLocalStorageState<
     Node<SystemComponentNodeDataProps | OtherNodeDataProps>[]
-  >([
-    {
-      id: "Whiteboard-1",
-      type: "Whiteboard",
-      data: {
-        name: "Whiteboard",
+  >(
+    "reactflow-nodes",
+    [
+      {
         id: "Whiteboard-1",
-        configs: {},
+        type: "Whiteboard",
+        data: {
+          name: "Whiteboard",
+          id: "Whiteboard-1",
+          configs: {},
+        },
+        position: {
+          x: 100,
+          y: 100,
+        },
       },
-      position: {
-        x: 100,
-        y: 100,
-      },
+    ],
+    (nodes: string | null) => {
+      if (nodes === null) return [];
+      const parsedNodes = JSON.parse(nodes) as Node<
+        SystemComponentNodeDataProps | OtherNodeDataProps
+      >[];
+      return parsedNodes.map((node) => ({
+        ...node,
+        data: {
+          ...node.data,
+          name: node.data.name as SystemComponent["name"],
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          icon: getSystemComponent(node.data.name as SystemComponentType)?.icon,
+        },
+      }));
     },
-  ]);
-  const [edges, setEdges] = useState<Edge[]>([]);
+  );
+  const [edges, setEdges] = useLocalStorageState<Edge[]>("reactflow-edges", []);
   const [reactFlowInstance, setReactFlowInstance] =
     useState<ReactFlowInstance | null>(null);
   const { setViewport } = useReactFlow();

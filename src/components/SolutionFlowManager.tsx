@@ -55,7 +55,7 @@ export const FlowManager: React.FC = () => {
   return (
     <div
       className={`flex flex-col items-center rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 p-4 shadow-lg ${
-        isFeedbackExpanded ? "w-[500px]" : "w-fit"
+        isFeedbackExpanded ? "w-[1000px]" : "w-fit"
       } transition-all duration-300`}
     >
       <SolutionFeedback

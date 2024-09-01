@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowRight, Code, Users, BookOpen } from 'lucide-react';
+import { ArrowRight, Code, Users, BookOpen, IterationCcw } from 'lucide-react';
 
 export default function Home() {
   return (
@@ -14,9 +14,10 @@ export default function Home() {
 
       <section className="grid md:grid-cols-3 gap-8 mb-16">
         {[
-          { icon: Code, title: "Interactive Projects", description: "Build and experiment with real-world system designs" },
-          { icon: Users, title: "Community Driven", description: "Share your designs and learn from others" },
+          { icon: Code, title: "Interactive Challenges", description: "Build and experiment with real-world system designs" },
+          // { icon: Users, title: "Community Driven", description: "Share your designs and learn from others" },
           { icon: BookOpen, title: "Learn by Doing", description: "Practical approach to understanding complex systems" },
+          { icon: IterationCcw, title: "Iterate to Learn", description: "Improve your design step by step" },
         ].map((feature, index) => (
           <div key={index} className="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg text-center">
             <feature.icon className="mx-auto mb-4 w-12 h-12 text-blue-500" />

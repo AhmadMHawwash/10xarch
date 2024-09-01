@@ -69,7 +69,7 @@ export const SolutionFeedback: React.FC<SolutionFeedbackProps> = ({
                 <span className="mb-2 block text-sm font-semibold">
                   Suggested improvements:
                 </span>
-                <ScrollArea className="h-40 w-full">
+                <ScrollArea className="h-56 w-full">
                   <ul className="space-y-2">
                     {answer.fixes.map((fix, index) => (
                       <li

@@ -22,7 +22,7 @@ export default async function Levels() {
             href={`/levels/${challenge.slug}`}
             className={`animate-fade-in-fast animation-delay-${(index + 1) * 50}`}
           >
-            <Card className="h-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 transition-all duration-200 ease-in-out hover:border-blue-400 hover:shadow-md hover:shadow-blue-400/20">
+            <Card className="group h-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 transition-all duration-200 ease-in-out hover:border-blue-400 dark:hover:border-blue-600 hover:shadow-lg hover:shadow-blue-400/20">
               <CardHeader>
                 <CardTitle className="text-2xl font-bold text-blue-600 dark:text-blue-300 mb-2">{challenge.title}</CardTitle>
                 <CardDescription className="text-gray-600 dark:text-gray-400 text-base">{challenge.description}</CardDescription>
@@ -34,7 +34,7 @@ export default async function Levels() {
                 >
                   {challenge.difficulty}
                 </Badge>
-                <ArrowRight className="text-blue-600 dark:text-blue-400 w-5 h-5 transition-transform duration-200 ease-in-out group-hover:translate-x-1" />
+                <ArrowRight className="text-blue-600 dark:text-blue-400 w-5 h-5 transition-transform duration-200 ease-in-out group-hover:translate-x-2" />
               </CardFooter>
             </Card>
           </Link>

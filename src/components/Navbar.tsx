@@ -9,8 +9,8 @@ const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // Replace with actual auth state
 
   return (
-    <nav className="bg-slate-100 dark:bg-gray-800 p-4 shadow-md h-[8vh]">
-      <div className="container mx-auto flex justify-between items-center">
+    <nav className="bg-slate-100 dark:bg-gray-800 shadow-md p-4 h-[8vh]">
+      <div className="mx-auto flex justify-between items-center">
         <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">
           System Design Playground
         </Link>

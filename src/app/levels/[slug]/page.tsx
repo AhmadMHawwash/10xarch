@@ -87,25 +87,7 @@ const LevelContent = () => {
                     Elements of a successful system design
                   </Muted>
                 }
-                content={`
-### Elements of a successful system design
-&nbsp;
-#### A successful system design should include the following elements:
-- **Requirements**: 
-  - Functional 
-  - Non-functional requirements
-- **System API**: 
-  - API definitions
-  - API flows
-- **Capacity Estimations**: 
-  - Traffic estimates
-  - Storage estimates
-  - Bandwidth estimates
-  - Memory estimates
-- **High level design**: System components and their connections
-- **Database**: Models and purpose
-- And other system components purposes
-                  `}
+                content={content}
               />
             </div>
           </div>
@@ -175,3 +157,23 @@ const designElements: DesignElement[] = [
     elements: [{ title: "Purpose" }],
   },
 ];
+
+const content = `
+### Elements of a successful system design
+&nbsp;
+#### A successful system design should include the following elements:
+- **Requirements**: 
+  - Functional 
+  - Non-functional requirements
+- **System API**: 
+  - API definitions
+  - API flows
+- **Capacity Estimations**: 
+  - Traffic estimates
+  - Storage estimates
+  - Bandwidth estimates
+  - Memory estimates
+- **High level design**: System components and their connections
+- **Database**: Models and purpose
+- And other system components purposes
+`;

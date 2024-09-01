@@ -1,7 +1,6 @@
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -11,7 +10,6 @@ import { InfoIcon, NotebookPen } from "lucide-react";
 import { useWhiteboard } from "../ReactflowCustomNodes/APIsNode";
 import { WithMarkdownDetails } from "../SystemComponents/Wrappers/WithMarkdownDetails";
 import { Button } from "../ui/button";
-import { Separator } from "../ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Textarea } from "../ui/textarea";
 import { Hints } from "./RequirementsDefinition";
@@ -23,216 +21,253 @@ export const CapacityEstimationDefinition = () => {
   return (
     <Dialog>
       <DialogTrigger className="w-full">
-        <Button variant="outline" size="xs" className="mt-1 w-full">
-          <NotebookPen size={15} className="mr-1" />
+        <Button variant="outline" size="sm" className="w-full">
+          <NotebookPen size={15} className="mr-2" />
           Capacity Estimations
         </Button>
       </DialogTrigger>
-      <DialogContent className="h-[95vh] w-[70vw] max-w-5xl overflow-y-auto bg-gray-800 text-gray-200 border-gray-700">
+      <DialogContent className="max-w-4xl h-[90vh] bg-gray-900 text-gray-100 overflow-scroll">
         <DialogHeader>
-          <DialogTitle className="text-gray-100">Capacity estimation</DialogTitle>
-          <DialogDescription className="text-gray-300 flex flex-col gap-2 items-start">
-            <Separator className="mb-4 mt-2 bg-gray-600" />
-            <Tabs defaultValue="traffic" className="w-full">
-              <TabsList className="w-full bg-gray-700">
-                <TabsTrigger value="traffic" className="w-full data-[state=active]:bg-gray-600 data-[state=active]:text-gray-100">Traffic</TabsTrigger>
-                <TabsTrigger value="storage" className="w-full data-[state=active]:bg-gray-600 data-[state=active]:text-gray-100">Storage</TabsTrigger>
-                <TabsTrigger value="bandwidth" className="w-full data-[state=active]:bg-gray-600 data-[state=active]:text-gray-100">Bandwidth</TabsTrigger>
-                <TabsTrigger value="memory" className="w-full data-[state=active]:bg-gray-600 data-[state=active]:text-gray-100">Memory</TabsTrigger>
-              </TabsList>
-              <TabsContent value="traffic">
-                <Textarea
-                  rows={25}
-                  value={capacity.Traffic}
-                  onChange={(e) =>
-                    setCapacity({ ...capacity, Traffic: e.target.value })
-                  }
-                  placeholder={`Example: URL Shortening Service
-- New URLs per second: 500 million divided by 1 Month of Seconds is approximately 193 new shortend URLs per second.
-- URL redirections/reads per second: 100 times 193 equals 19,300 requests per second.`}
-                  className="text-md bg-gray-700 text-gray-200 border-gray-600"
-                />
-              </TabsContent>
-              <TabsContent value="storage">
-                <Textarea
-                  rows={25}
-                  value={capacity.Storage}
-                  onChange={(e) =>
-                    setCapacity({ ...capacity, Storage: e.target.value })
-                  }
-                  placeholder={`Example: URL Shortening Service
-- Total storage for 5 years: 500 million * 12 months/year * 5 years * 500 bytes equals 15 terabytes.`}
-                  className="text-md bg-gray-700 text-gray-200 border-gray-600"
-                />
-              </TabsContent>
-              <TabsContent value="bandwidth">
-                <Textarea
-                  rows={25}
-                  value={capacity.Bandwidth}
-                  onChange={(e) =>
-                    setCapacity({ ...capacity, Bandwidth: e.target.value })
-                  }
-                  placeholder={`Example: URL Shortening Service
-- Incoming data: 193 URLs per second * 500 bytes equals 96.5 kilobytes per second.
-- Outgoing data: 19,300 requests per second * 500 bytes equals 9.65 megabytes per second.`}
-                  className="text-md bg-gray-700 text-gray-200 border-gray-600"
-                />
-              </TabsContent>
-              <TabsContent value="memory">
-                <Textarea
-                  rows={25}
-                  value={capacity.Memory}
-                  onChange={(e) =>
-                    setCapacity({ ...capacity, Memory: e.target.value })
-                  }
-                  placeholder={`Example: URL Shortening Service
-- Caching 20% of daily traffic: 20% * (19,300 requests/second * 3600 seconds/hour * 24 hours/day) * 500 bytes equals approximately 170 gigabytes.`}
-                  className="text-md bg-gray-700 text-gray-200 border-gray-600"
-                />
-              </TabsContent>
-            </Tabs>
-            <WithMarkdownDetails
-              Icon={InfoIcon}
-              trigger={
-                <Button
-                  variant="link"
-                  className="pl-0 pt-0 opacity-50 transition-all hover:opacity-100 text-gray-300"
-                >
-                  <InfoIcon className="mr-1" size={16} />
-                  Defining system load and capacity
-                </Button>
-              }
-              content={capacityEstimations}
-            />
-            <Hints hints={stage?.hintsPerArea.capacityEstimations} />
-          </DialogDescription>
+          <DialogTitle className="text-2xl font-bold mb-4">Capacity Estimation</DialogTitle>
         </DialogHeader>
+        <Tabs defaultValue="traffic" className="w-full">
+          <TabsList className="grid w-full grid-cols-4 mb-4">
+            <TabsTrigger value="traffic">Traffic</TabsTrigger>
+            <TabsTrigger value="storage">Storage</TabsTrigger>
+            <TabsTrigger value="bandwidth">Bandwidth</TabsTrigger>
+            <TabsTrigger value="memory">Memory</TabsTrigger>
+          </TabsList>
+          <TabsContent value="traffic">
+            <CapacitySection
+              value={capacity.Traffic}
+              onChange={(value) => setCapacity({ ...capacity, Traffic: value })}
+              placeholder="Example: URL Shortening Service traffic estimation..."
+              infoContent={trafficEstimation}
+              infoButtonText="How to estimate traffic"
+            />
+          </TabsContent>
+          <TabsContent value="storage">
+            <CapacitySection
+              value={capacity.Storage}
+              onChange={(value) => setCapacity({ ...capacity, Storage: value })}
+              placeholder="Example: URL Shortening Service storage estimation..."
+              infoContent={storageEstimation}
+              infoButtonText="How to estimate storage"
+            />
+          </TabsContent>
+          <TabsContent value="bandwidth">
+            <CapacitySection
+              value={capacity.Bandwidth}
+              onChange={(value) => setCapacity({ ...capacity, Bandwidth: value })}
+              placeholder="Example: URL Shortening Service bandwidth estimation..."
+              infoContent={bandwidthEstimation}
+              infoButtonText="How to estimate bandwidth"
+            />
+          </TabsContent>
+          <TabsContent value="memory">
+            <CapacitySection
+              value={capacity.Memory}
+              onChange={(value) => setCapacity({ ...capacity, Memory: value })}
+              placeholder="Example: URL Shortening Service memory estimation..."
+              infoContent={memoryEstimation}
+              infoButtonText="How to estimate memory"
+            />
+          </TabsContent>
+        </Tabs>
+        <Hints hints={stage?.hintsPerArea.capacityEstimations} />
       </DialogContent>
     </Dialog>
   );
 };
 
-const capacityEstimations = `# Capacity Estimation and Constraints
+interface CapacitySectionProps {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder: string;
+  infoContent: string;
+  infoButtonText: string;
+}
+
+const CapacitySection: React.FC<CapacitySectionProps> = ({
+  value,
+  onChange,
+  placeholder,
+  infoContent,
+  infoButtonText
+}) => (
+  <div className="space-y-4">
+    <Textarea
+      rows={15}
+      value={value}
+      placeholder={placeholder}
+      onChange={(e) => onChange(e.target.value)}
+      className="text-md bg-gray-800 text-gray-100 border-gray-700 focus:border-gray-600"
+    />
+    <WithMarkdownDetails
+      Icon={InfoIcon}
+      trigger={
+        <Button variant="ghost" size="sm" className="text-gray-400 hover:text-gray-200">
+          <InfoIcon className="mr-2" size={16} />
+          {infoButtonText}
+        </Button>
+      }
+      content={infoContent}
+    />
+  </div>
+);
+
+const trafficEstimation = `# Traffic Estimation
 
 ## Introduction
-Capacity estimation is a crucial step in system design. It involves predicting the resources required to handle the expected load on the system. This includes estimating the number of requests, storage requirements, bandwidth, and memory usage. Understanding these factors helps in designing a scalable and efficient system that can handle the anticipated traffic and data volume.
+Traffic estimation is a crucial part of capacity planning for any system. It involves predicting the volume of requests or interactions that a system will need to handle. Accurate traffic estimation helps in designing a system that can efficiently handle the expected load without over-provisioning resources.
 
-## Why Capacity Estimation is Important
-1. **Scalability**: Ensures the system can scale to meet future growth without performance degradation.
-2. **Performance**: Helps in maintaining optimal performance by allocating adequate resources.
-3. **Cost Management**: Aids in budgeting and resource planning by predicting hardware and infrastructure needs.
-4. **Reliability**: Prevents system failures by ensuring that the system can handle peak loads.
+## Key Factors in Traffic Estimation
 
-## Key Elements of Capacity Estimation
-When estimating capacity, consider the following elements:
+1. **Daily Active Users (DAU)**: The number of unique users interacting with the system daily.
+2. **Requests per User**: The average number of requests or interactions each user makes per day.
+3. **Peak-to-Average Ratio**: The ratio of peak traffic to average traffic, often used to account for traffic spikes.
+4. **Growth Rate**: The expected increase in traffic over time.
 
-### 1. Traffic Estimates
-Estimate the number of requests the system will handle per unit time (e.g., per second, per day).
+## Example: URL Shortening Service Traffic Estimation
 
-### 2. Storage Estimates
-Estimate the amount of data the system will store, including databases, logs, and backups.
+Assume we have the following requirements:
+- 1 million daily active users
+- Each user creates 2 short URLs per day on average
+- Each short URL is accessed 10 times per day on average
+- Expected 20% year-over-year growth
 
-### 3. Bandwidth Estimates
-Estimate the network bandwidth required for data transfer between clients and servers.
+Calculations:
+1. **URL Creation Requests**:
+   - 1,000,000 users * 2 URLs/user/day = 2,000,000 URL creations per day
+   - 2,000,000 / 24 hours / 3600 seconds ≈ 23 URL creations per second
 
-### 4. Memory Estimates
-Estimate the memory needed for caching, processing, and temporary data storage.
+2. **URL Redirection Requests**:
+   - 2,000,000 URLs * 10 accesses/URL/day = 20,000,000 redirections per day
+   - 20,000,000 / 24 hours / 3600 seconds ≈ 231 URL redirections per second
 
-## Example: URL Shortening Service
+3. **Peak Traffic Estimation**:
+   - Assuming a peak-to-average ratio of 2:1
+   - Peak URL creations: 23 * 2 = 46 per second
+   - Peak URL redirections: 231 * 2 = 462 per second
 
-### Traffic Estimates
-Assume we expect 500 million new URL shortenings per month with a 100:1 read/write ratio.
-- **New URLs per second**:
-  500 million divided by 1 Month of Seconds is approximately 193 new shortend URLs per second.
-- **URL redirections/reads per second**:
-  100 times 193 equals 19,300 requests per second.
-
-### Storage Estimates
-Assume each URL shortening request (including metadata) takes 500 bytes of storage.
-- **Total storage for 5 years**:
-  500 million * 12 months/year * 5 years * 500 bytes equals 15 terabytes.
-
-### Bandwidth Estimates
-Estimate the data transfer rates for both incoming (URL creation) and outgoing (URL redirection) traffic.
-- **Incoming data**:
-  193 URLs per second * 500 bytes equals 96.5 kilobytes per second.
-- **Outgoing data**:
-  19,300 requests per second * 500 bytes equals 9.65 megabytes per second.
-
-### Memory Estimates
-Estimate the memory required to cache frequently accessed URLs.
-- **Caching 20% of daily traffic**:
-  20% * (19,300 requests/second * 3600 seconds/hour * 24 hours/day) * 500 bytes equals approximately 170 gigabytes.
+4. **Growth Projection**:
+   - After 1 year: 23 * 1.2 ≈ 28 URL creations per second, 231 * 1.2 ≈ 277 redirections per second
+   - After 3 years: 23 * (1.2^3) ≈ 40 URL creations per second, 231 * (1.2^3) ≈ 400 redirections per second
 
 ## Conclusion
-Capacity estimation and understanding constraints are essential steps in system design. They ensure that the system is scalable, performs well under load, and remains within budget. By accurately estimating traffic, storage, bandwidth, and memory requirements, and considering constraints like latency, throughput, availability, consistency, and cost, you can design a robust and efficient system.
+Traffic estimation provides a foundation for capacity planning and system design. It helps in determining the required resources, such as servers, databases, and network capacity. Regular monitoring and adjustment of these estimates are crucial as actual usage patterns emerge and evolve.
 `;
 
-const constraintsContent = `# Constraints in System Design
+const storageEstimation = `# Storage Estimation
 
 ## Introduction
-In system design, constraints are limitations or restrictions that must be considered when building a system. They can come from various sources, including technical limitations, business requirements, regulatory guidelines, and environmental factors. Understanding and managing these constraints is crucial for designing a robust, scalable, and maintainable system.
+Storage estimation is the process of calculating the amount of data storage capacity a system will require. This is crucial for choosing appropriate storage solutions, planning for data growth, and ensuring that the system can efficiently handle and retrieve data.
 
-## Types of Constraints
+## Key Factors in Storage Estimation
 
-### 1. Technical Constraints
-Technical constraints are limitations related to the technology stack, hardware, software, and architecture. These can include:
-- **Performance**: Limitations on how fast the system must respond to user requests (latency) and how many requests it can handle (throughput).
-- **Scalability**: Restrictions on the system's ability to scale horizontally (adding more machines) or vertically (upgrading machine capacity).
-- **Reliability**: Requirements to ensure the system remains operational and can recover from failures (fault tolerance, redundancy).
-- **Consistency**: The need to maintain data consistency across distributed systems (eventual consistency vs. strong consistency).
+1. **Data Size**: The size of individual data items or records.
+2. **Data Volume**: The number of data items or records to be stored.
+3. **Data Growth Rate**: The expected increase in data volume over time.
+4. **Redundancy Factor**: Additional storage needed for data replication and backups.
+5. **Overhead**: Extra storage required for indexing, metadata, and system operations.
 
-### 2. Business Constraints
-Business constraints are requirements and limitations imposed by the organization's goals and priorities. These can include:
-- **Budget**: Financial limitations on the cost of development, infrastructure, and maintenance.
-- **Time**: Deadlines for delivering features or complete systems.
-- **Compliance**: Adherence to industry standards, legal regulations, and internal policies.
-- **Market Demand**: Need to meet customer expectations and competitive pressures.
+## Example: URL Shortening Service Storage Estimation
 
-### 3. Environmental Constraints
-Environmental constraints are external factors that can impact the system. These can include:
-- **Geographic Distribution**: The need to serve users across different geographic locations, which can affect latency and data residency requirements.
-- **Network Conditions**: Variability in network performance, such as bandwidth limitations and latency.
-- **Hardware Availability**: Limitations based on the availability and capability of hardware resources.
+Assume we have the following requirements:
+- Store 2 million new URLs per day
+- Each URL entry consists of:
+  - Original URL (average 100 characters): 100 bytes
+  - Short URL (7 characters): 7 bytes
+  - Creation timestamp: 8 bytes
+  - User ID (8 bytes for a 64-bit ID): 8 bytes
+- Data needs to be stored for 5 years
+- 20% additional space for indexing and metadata
 
-### 4. Security Constraints
-Security constraints involve requirements to protect the system and data from unauthorized access, breaches, and other security threats. These can include:
-- **Authentication and Authorization**: Ensuring only authorized users can access the system and perform actions.
-- **Data Encryption**: Protecting data in transit and at rest through encryption.
-- **Compliance**: Meeting security standards and regulations such as GDPR, HIPAA, or PCI-DSS.
+Calculations:
+1. **Storage per URL Entry**:
+   - Total bytes per entry: 100 + 7 + 8 + 8 = 123 bytes
+   - With 20% overhead: 123 * 1.2 ≈ 148 bytes
 
-## Managing Constraints
+2. **Daily Storage Requirement**:
+   - 2,000,000 new URLs * 148 bytes ≈ 296 MB per day
 
-### Identifying Constraints
-- **Requirement Analysis**: Gather and analyze requirements from stakeholders to identify constraints early in the design process.
-- **Technical Assessment**: Evaluate the technical environment, including existing systems and technology stack, to uncover technical limitations.
-- **Risk Assessment**: Identify potential risks and constraints related to security, compliance, and external factors.
+3. **5-Year Storage Requirement**:
+   - 296 MB * 365 days * 5 years ≈ 540 GB
 
-### Addressing Constraints
-- **Prioritization**: Prioritize constraints based on their impact on the system and the feasibility of addressing them.
-- **Trade-offs**: Make informed trade-offs between competing constraints. For example, balancing performance with cost.
-- **Design Patterns**: Use design patterns and best practices to address common constraints. For instance, using caching to improve performance or sharding to enhance scalability.
-- **Prototyping and Testing**: Build prototypes and conduct performance tests to validate assumptions and understand the impact of constraints.
-
-## Example: URL Shortening Service
-
-### Constraints
-- **Performance**: The system must handle high read and write throughput efficiently.
-- **Scalability**: The system should scale to accommodate increasing numbers of users and URLs.
-- **Reliability**: Ensure high availability and fault tolerance to prevent downtime.
-- **Security**: Protect against unauthorized access and data breaches.
-- **Cost**: Keep infrastructure and operational costs within budget.
-
-### Solutions
-- **Load Balancer**: Distribute traffic across multiple servers to handle high throughput.
-- **Database Partitioning**: Use sharding to distribute data across multiple database instances for scalability.
-- **Caching**: Implement caching to reduce database load and improve read performance.
-- **Replication**: Use database replication to ensure high availability and data redundancy.
-- **HTTPS**: Secure data in transit by using HTTPS for all communications.
-- **Monitoring**: Implement monitoring and logging to track system performance and detect issues.
+4. **With Redundancy**:
+   - Assuming 3x replication for high availability
+   - 540 GB * 3 = 1.62 TB
 
 ## Conclusion
-Constraints are an integral part of system design, influencing decisions at every stage of development. By identifying and managing constraints effectively, designers can build systems that meet performance, scalability, reliability, and security requirements while staying within budget and time constraints. Understanding constraints helps in making informed trade-offs and designing systems that are robust and resilient.
+Storage estimation helps in choosing appropriate storage solutions and planning for future growth. It's important to regularly review and adjust these estimates based on actual usage patterns and data growth rates. Additionally, consider factors like data compression, which can significantly reduce storage requirements, and the need for
+`;
 
+const bandwidthEstimation = `# Bandwidth Estimation
 
+## Introduction
+Bandwidth estimation is the process of calculating the amount of network bandwidth required to support the expected data transfer rates in a system. Accurate bandwidth estimation is crucial for designing efficient and scalable network architectures, ensuring that the system can handle the anticipated data traffic without bottlenecks.
+
+## Key Factors in Bandwidth Estimation
+
+1. **Data Transfer Rates**: The rate at which data is transmitted between clients and servers.
+2. **Peak Traffic**: The maximum data transfer rate expected during peak usage periods.
+3. **Compression**: The use of data compression techniques to reduce the amount of data transferred.
+4. **Caching**: The use of caching mechanisms to minimize data transfer between clients and servers.
+
+## Example: URL Shortening Service Bandwidth Estimation
+
+Assume we have the following requirements:
+- 23 URL creations per second
+- 231 URL redirections per second
+- Each URL creation request is 100 bytes
+- Each URL redirection response is 500 bytes
+- 20% of URL redirection traffic is cached
+
+Calculations:
+1. **URL Creation Bandwidth**:
+   - 23 requests/second * 100 bytes/request = 2.3 kilobytes/second
+
+2. **URL Redirection Bandwidth**:
+   - 231 requests/second * 500 bytes/request = 115.5 kilobytes/second
+   - With 20% caching: 115.5 kilobytes/second * 0.8 = 92.4 kilobytes/second
+
+3. **Total Bandwidth**:
+   - 2.3 kilobytes/second (URL creation) + 92.4 kilobytes/second (URL redirection) = 94.7 kilobytes/second
+
+## Conclusion
+Bandwidth estimation is essential for designing efficient and scalable network architectures. It helps in determining the required network capacity to handle the anticipated data traffic, ensuring that the system can operate smoothly without bottlenecks. Regular monitoring and adjustment of bandwidth estimates are crucial as actual usage patterns emerge and evolve.
+`;
+
+const memoryEstimation = `# Memory Estimation
+
+## Introduction
+Memory estimation is the process of calculating the amount of memory required to support the expected workload of a system. Accurate memory estimation is crucial for designing efficient and scalable systems, ensuring that the system can handle the anticipated memory requirements without running out of resources.
+
+## Key Factors in Memory Estimation
+
+1. **Memory Usage**: The amount of memory used by various components of the system, such as caching, processing, and temporary data storage.
+2. **Peak Memory Usage**: The maximum amount of memory required during peak usage periods.
+3. **Caching**: The use of caching mechanisms to minimize memory usage and improve performance.
+4. **Compression**: The use of data compression techniques to reduce the amount of memory required for data storage.
+
+## Example: URL Shortening Service Memory Estimation
+
+Assume we have the following requirements:
+- 231 URL redirections per second
+- Each URL redirection response is 500 bytes
+- 20% of URL redirection traffic is cached
+- 10% of the cached data is evicted daily
+
+Calculations:
+1. **Cached Data**:
+   - 231 requests/second * 500 bytes/request * 20% = 23.1 kilobytes/second
+   - Daily cached data: 23.1 kilobytes/second * 3600 seconds/hour * 24 hours/day = 21.7 megabytes/day
+   - With 10% eviction: 21.7 megabytes/day * 0.9 = 19.5 megabytes/day
+
+2. **Peak Memory Usage**:
+   - Assuming a peak-to-average ratio of 2:1
+   - Peak cached data: 19.5 megabytes/day * 2 = 39 megabytes/day
+
+## Conclusion
+Memory estimation is essential for designing efficient and scalable systems. It helps in determining the required memory capacity to handle the anticipated workload, ensuring that the system can operate smoothly without running out of resources. Regular monitoring and adjustment of memory estimates are crucial as actual usage patterns emerge and evolve.
 `;

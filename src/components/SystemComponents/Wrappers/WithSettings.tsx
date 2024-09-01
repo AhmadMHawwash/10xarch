@@ -23,7 +23,7 @@ export const WithSettings = ({
           <Settings size={16} className="stroke-gray-300" />
         </span>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="max-w-4xl h-[90vh] bg-gray-900 text-gray-100 overflow-scroll">
         <DialogHeader>
           <DialogTitle>Configuring {name}</DialogTitle>
           <DialogDescription>

@@ -32,7 +32,10 @@ const ServerClusterSettings = ({ name: id }: { name: string }) => {
     <WithSettings name={id}>
       <div className="grid w-full grid-flow-row grid-cols-1 gap-2 text-gray-200">
         <div className="grid grid-flow-col grid-cols-2">
-          <Label htmlFor="servers-count" className="col-span-1 my-auto text-gray-300">
+          <Label
+            htmlFor="servers-count"
+            className="col-span-1 my-auto text-gray-300"
+          >
             Server replicas
           </Label>
           <Input
@@ -40,18 +43,20 @@ const ServerClusterSettings = ({ name: id }: { name: string }) => {
             onChange={(e) => setServersCount(parseInt(e.target.value))}
             name="servers-count"
             id="servers-count"
-            className="col-span-1 bg-gray-700 text-gray-200 border-gray-600"
+            className="text-md border-gray-700 bg-gray-800 text-gray-100 focus:border-gray-600"
             placeholder="# of instances"
             type="number"
           />
         </div>
         <div className="flex flex-col gap-4">
-          <Label htmlFor="server-purpose" className="text-gray-300">Server purpose</Label>
+          <Label htmlFor="server-purpose" className="text-gray-300">
+            Server purpose
+          </Label>
           <Textarea
             name="server-purpose"
             id="server-purpose"
             rows={10}
-            className="text-md bg-gray-700 text-gray-200 border-gray-600"
+            className="text-md border-gray-700 bg-gray-800 text-gray-100 focus:border-gray-600"
             value={purpose}
             onChange={(e) => setPurpose(e.target.value)}
           />

@@ -60,7 +60,7 @@ Urls table
             name="database-purpose"
             id="database-purpose"
             rows={10}
-            className="text-md bg-gray-700 text-gray-200 border-gray-600 focus:border-gray-500"
+            className="text-md bg-gray-800 text-gray-100 border-gray-700 focus:border-gray-600"
             value={purpose}
             onChange={(e) => setPurpose(e.target.value)}
           />

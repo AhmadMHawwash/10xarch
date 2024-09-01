@@ -1,7 +1,6 @@
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -10,133 +9,112 @@ import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
 import { CogIcon, InfoIcon, LightbulbIcon } from "lucide-react";
 import { WithMarkdownDetails } from "../SystemComponents/Wrappers/WithMarkdownDetails";
 import { Button } from "../ui/button";
-import { Separator } from "../ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Textarea } from "../ui/textarea";
 import { Muted } from "../ui/typography";
 import { useWhiteboard } from "../ReactflowCustomNodes/APIsNode";
 
-export const RequirementsDefinition = () => {
+export const RequirementsDefinition: React.FC = () => {
   const { stage } = useChallengeManager();
   const { functional, nonfunctional, setFunctional, setNonfunctional } =
     useWhiteboard();
     
   return (
     <Dialog>
-      <DialogTrigger className="w-full">
-        <Button variant="outline" size="xs" className="w-full">
-          <CogIcon size={15} className="mr-1" />
+      <DialogTrigger asChild>
+        <Button variant="outline" size="sm" className="w-full">
+          <CogIcon size={15} className="mr-2" />
           Requirements
         </Button>
       </DialogTrigger>
-      <DialogContent className="!h-[95vh] w-[70vw] max-w-5xl bg-gray-800 text-gray-200">
+      <DialogContent className="max-w-4xl h-[90vh] bg-gray-900 text-gray-100 overflow-scroll">
         <DialogHeader>
-          <DialogTitle className="text-gray-100">Requirements definition</DialogTitle>
-          <DialogDescription className="text-gray-300">
-            <Separator className="mb-4 mt-2 bg-gray-600" />
-            <div className="flex flex-col">
-              <Tabs defaultValue="functional" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 bg-gray-700">
-                  <TabsTrigger value="functional" className="data-[state=active]:bg-gray-600 data-[state=active]:text-gray-100">
-                    Functional requirements
-                  </TabsTrigger>
-                  <TabsTrigger value="nonfunctional" className="data-[state=active]:bg-gray-600 data-[state=active]:text-gray-100">
-                    Non-functional requirements
-                  </TabsTrigger>
-                </TabsList>
-                <TabsContent value="functional">
-                  <Textarea
-                    rows={25}
-                    value={functional}
-                    placeholder={`Example: URL Shortening Service
-- Authentication: The system must allow users to log in and log out.
-- Data Processing: The system must process input data and generate the appropriate output.
-- User Interface: The system must provide an interface for users to interact with.
-- Reporting: The system must generate reports based on user activity.`}
-                    onChange={(e) => setFunctional(e.target.value)}
-                    className="text-md bg-gray-700 text-gray-200 border-gray-600 focus:border-gray-500"
-                  />
-                  <WithMarkdownDetails
-                    Icon={InfoIcon}
-                    trigger={
-                      <Button
-                        variant="link"
-                        className="!mb-0 !pb-0 pl-0 pt-0 opacity-50 transition-all hover:opacity-100 text-gray-300"
-                      >
-                        <InfoIcon className="mr-1" size={16} />
-                        What the system should do
-                      </Button>
-                    }
-                    content={functionalRequirements}
-                  />
-                </TabsContent>
-
-                <TabsContent value="nonfunctional">
-                  <Textarea
-                    rows={25}
-                    className="text-md bg-gray-700 text-gray-200 border-gray-600 focus:border-gray-500"
-                    value={nonfunctional}
-                    placeholder={`Example: URL Shortening Service
-- Performance: The system must handle a specific number of transactions per second.
-- Scalability: The system must scale to support an increasing number of users.
-- Availability: The system must be available 99.9% of the time.
-- Security: The system must protect user data through encryption and authentication.
-- Usability: The system must be easy to use and provide a good user experience.
-- Maintainability: The system must be easy to maintain and update.
-- Compliance: The system must comply with industry regulations and standards.`}
-                    onChange={(e) => setNonfunctional(e.target.value)}
-                  />
-                  <WithMarkdownDetails
-                    Icon={InfoIcon}
-                    trigger={
-                      <Button
-                        variant="link"
-                        className="pl-0 pt-0 opacity-50 transition-all hover:opacity-100 text-gray-300"
-                      >
-                        <InfoIcon className="mr-1" size={16} />
-                        How the system should perform the functional
-                        requirements
-                      </Button>
-                    }
-                    content={nonFunctionalRequirements}
-                  />
-                </TabsContent>
-              </Tabs>
-              <Hints
-                hints={
-                  stage?.hintsPerArea.functionalAndNonFunctionalRequirements
-                }
-              />
-            </div>
-          </DialogDescription>
+          <DialogTitle className="text-2xl font-bold mb-4">Requirements Definition</DialogTitle>
         </DialogHeader>
+        <Tabs defaultValue="functional" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-4">
+            <TabsTrigger value="functional">Functional</TabsTrigger>
+            <TabsTrigger value="nonfunctional">Non-functional</TabsTrigger>
+          </TabsList>
+          <TabsContent value="functional">
+            <RequirementSection
+              value={functional}
+              onChange={setFunctional}
+              placeholder="Example: User Authentication, Data Processing, etc."
+              infoContent={functionalRequirements}
+              infoButtonText="What the system should do"
+            />
+          </TabsContent>
+          <TabsContent value="nonfunctional">
+            <RequirementSection
+              value={nonfunctional}
+              onChange={setNonfunctional}
+              placeholder="Example: Performance, Scalability, Security, etc."
+              infoContent={nonFunctionalRequirements}
+              infoButtonText="How the system should perform"
+            />
+          </TabsContent>
+        </Tabs>
+        <Hints hints={stage?.hintsPerArea.functionalAndNonFunctionalRequirements} />
       </DialogContent>
     </Dialog>
   );
 };
 
-export const Hints = ({ hints = [] }: { hints?: string[] }) => {
+interface RequirementSectionProps {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder: string;
+  infoContent: string;
+  infoButtonText: string;
+}
+
+const RequirementSection: React.FC<RequirementSectionProps> = ({
+  value,
+  onChange,
+  placeholder,
+  infoContent,
+  infoButtonText
+}) => (
+  <div className="space-y-4">
+    <Textarea
+      rows={15}
+      value={value}
+      placeholder={placeholder}
+      onChange={(e) => onChange(e.target.value)}
+      className="text-md bg-gray-800 text-gray-100 border-gray-700 focus:border-gray-600"
+    />
+    <WithMarkdownDetails
+      Icon={InfoIcon}
+      trigger={
+        <Button variant="ghost" size="sm" className="text-gray-400 hover:text-gray-200">
+          <InfoIcon className="mr-2" size={16} />
+          {infoButtonText}
+        </Button>
+      }
+      content={infoContent}
+    />
+  </div>
+);
+
+interface HintsProps {
+  hints?: string[];
+}
+
+export const Hints: React.FC<HintsProps> = ({ hints = [] }) => {
   const { currentStageIndex, challenge } = useChallengeManager();
   if (!challenge || hints.length === 0) return null;
   return (
-    <div className="text-gray-300">
-      <Muted className="!mt-4 flex items-center text-gray-400">
-        <LightbulbIcon size={16} className="mr-1" />
-        Hints
-        <span className="!ml-0.5 text-xs">
-          (for {challenge.title} challenge - part {currentStageIndex + 1}/
-          {challenge.stages.length})
-        </span>
+    <div className="mt-6 p-4 bg-gray-800 rounded-lg">
+      <Muted className="flex items-center text-gray-300 mb-2">
+        <LightbulbIcon size={16} className="mr-2" />
+        Hints for {challenge.title} - Part {currentStageIndex + 1}/{challenge.stages.length}
       </Muted>
-      <div className="ml-1 mt-2">
+      <ul className="list-disc list-inside space-y-1">
         {hints.map((hint, index) => (
-          <div key={index} className="mb-2 flex items-center">
-            <span>
-              {index + 1}. {hint}
-            </span>
-          </div>
+          <li key={index} className="text-gray-200">{hint}</li>
         ))}
-      </div>
+      </ul>
     </div>
   );
 };

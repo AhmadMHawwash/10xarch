@@ -19,11 +19,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${GeistSans.variable}`}>
-      <body>
+    <html lang="en" className={`${GeistSans.variable} dark`}>
+      <body className="bg-gray-900 text-gray-100">
         <TRPCReactProvider>
           <Toaster />
-          <main className="flex min-h-screen">{children}</main>
+          <main className="flex min-h-screen bg-gray-900 text-gray-100">{children}</main>
         </TRPCReactProvider>
       </body>
     </html>

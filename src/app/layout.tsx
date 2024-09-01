@@ -7,6 +7,7 @@ import { TRPCReactProvider } from "@/trpc/react";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Navbar from "@/components/Navbar"; // Add this import
+import { ThemeProvider } from "@/components/ThemeProvider"; // Add this import
 
 export const metadata = {
   title: "System Design Playground",
@@ -21,16 +22,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${GeistSans.variable} dark`}>
-      <body className="bg-gray-900 text-gray-100">
+    <html lang="en" className={GeistSans.variable} suppressHydrationWarning>
+      <body className="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
         <TRPCReactProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Navbar /> {/* Add the Navbar component here */}
-            <main className="flex min-h-screen bg-gray-900 text-gray-100">
-              {children}
-            </main>
-          </TooltipProvider>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <TooltipProvider>
+              <Toaster />
+              <Navbar />
+              <main className="h-[92vh]">
+                {children}
+              </main>
+            </TooltipProvider>
+          </ThemeProvider>
         </TRPCReactProvider>
       </body>
     </html>

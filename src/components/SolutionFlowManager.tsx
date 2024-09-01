@@ -54,7 +54,7 @@ export const FlowManager: React.FC = () => {
 
   return (
     <div
-      className={`flex flex-col items-center rounded-lg border border-gray-700 bg-gray-800 p-4 shadow-lg ${
+      className={`flex flex-col items-center rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 p-4 shadow-lg ${
         isFeedbackExpanded ? "w-[500px]" : "w-fit"
       } transition-all duration-300`}
     >
@@ -71,10 +71,10 @@ export const FlowManager: React.FC = () => {
           variant="outline"
           title="Reset solution to initial state"
           disabled={resetDone}
-          className="border-gray-600 text-gray-200 hover:bg-gray-700 transition-colors"
+          className="border-gray-400 dark:border-gray-600 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
         >
           {resetDone ? (
-            <Check className="h-4 w-4 text-green-400" />
+            <Check className="h-4 w-4 text-green-600 dark:text-green-400" />
           ) : (
             <RotateCcw className="h-4 w-4" />
           )}
@@ -85,7 +85,7 @@ export const FlowManager: React.FC = () => {
           onClick={checkSolution}
           disabled={isLoadingAnswer}
           title="Check solution"
-          className="bg-blue-600 text-gray-200 hover:bg-blue-700 transition-colors"
+          className="bg-blue-600 text-white hover:bg-blue-700 transition-colors"
         >
           {isLoadingAnswer ? (
             <Loader2 className="h-4 w-4 animate-spin mr-2" />
@@ -99,7 +99,7 @@ export const FlowManager: React.FC = () => {
             size="sm"
             variant="ghost"
             onClick={() => setIsFeedbackExpanded(true)}
-            className="text-gray-300 hover:bg-gray-700 transition-colors"
+            className="text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
           >
             <ChevronUp className="h-4 w-4 mr-2" />
             Show feedback

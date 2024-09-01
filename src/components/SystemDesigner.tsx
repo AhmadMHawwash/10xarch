@@ -59,7 +59,7 @@ const SystemDesigner = () => {
   };
 
   return (
-    <div className="relative flex h-full flex-grow flex-col bg-gray-900" ref={initWrapper}>
+    <div className="relative flex h-full flex-grow flex-col bg-white dark:bg-gray-900" ref={initWrapper}>
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -86,9 +86,9 @@ const SystemDesigner = () => {
         panOnDrag={false}
         selectionMode={SelectionMode.Partial}
         fitView={false}
-        className="dark-theme"
+        className="light-theme dark:dark-theme"
       >
-        <Background variant={BackgroundVariant.Dots} color="#4a5568" />
+        <Background variant={BackgroundVariant.Dots} color="#4a5568" gap={12} size={1} />
         <Panel position="bottom-center">
           <FlowManager />
         </Panel>

@@ -56,8 +56,10 @@ export default function SystemComponentNode({
       )}
       <div
         className={cn(
-          "group flex flex-col items-center justify-center rounded-sm border border-gray-400 p-2",
-          selected ? "bg-gray-700" : "bg-gray-800",
+          "group flex flex-col items-center justify-center rounded-sm border border-gray-300 p-2 dark:border-gray-600",
+          selected
+            ? "bg-gray-200 dark:bg-gray-700"
+            : "bg-gray-100 dark:bg-gray-800",
           isEdgeBeingConnected &&
             !(data.withTargetHandle || data.withSourceHandle) &&
             "opacity-50",
@@ -66,11 +68,16 @@ export default function SystemComponentNode({
         <Component name={data.id} Icon={data.icon} />
         {content && (
           <WithMarkdownDetails
-            className="absolute left-0 top-[-17px] rounded-full bg-gray-700 opacity-0 transition-all group-hover:opacity-100"
+            className="absolute left-0 top-[-17px] rounded-full bg-gray-200 opacity-0 transition-all group-hover:opacity-100 dark:bg-gray-700"
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             Icon={ComponentIcon}
             content={content}
-            trigger={<InfoIcon size={16} className="stroke-gray-300" />}
+            trigger={
+              <InfoIcon
+                size={16}
+                className="stroke-gray-700 dark:stroke-gray-300"
+              />
+            }
           />
         )}
       </div>
@@ -107,8 +114,14 @@ const components: Partial<
 
 const DefaultComponent = ({ name, Icon }: ComponentNodeProps) => (
   <>
-    {Icon && <Icon height="20px" width="20px" className="text-gray-300" />}
-    <Small className="text-gray-300">{name}</Small>
+    {Icon && (
+      <Icon
+        height="20px"
+        width="20px"
+        className="text-gray-700 dark:text-gray-300"
+      />
+    )}
+    <Small className="text-gray-700 dark:text-gray-300">{name}</Small>
   </>
 );
 

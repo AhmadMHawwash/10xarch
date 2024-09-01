@@ -9,9 +9,9 @@ import { ListAndDetails } from "@/components/TextualSolution/APIDefinition";
 
 export const DatabaseCluster = ({ name, Icon }: ComponentNodeProps) => {
   return (
-    <div className="relative flex flex-col items-center text-gray-200">
-      {Icon && <Icon size={20} className="text-gray-300" />}
-      <Small className="text-gray-300">{name}</Small>
+    <div className="relative flex flex-col items-center text-gray-800 dark:text-gray-200">
+      {Icon && <Icon size={20} className="text-gray-700 dark:text-gray-300" />}
+      <Small className="text-gray-700 dark:text-gray-300">{name}</Small>
       <DatabaseClusterSettings name={name} />
     </div>
   );
@@ -36,11 +36,11 @@ const DatabaseClusterSettings = ({ name: id }: { name: string }) => {
 
   return (
     <WithSettings name={id}>
-      <div className="grid w-full grid-flow-row grid-cols-1 gap-4 text-gray-200">
+      <div className="grid w-full grid-flow-row grid-cols-1 gap-4 text-gray-800 dark:text-gray-200">
         <div className="grid grid-flow-col grid-cols-2 gap-2">
           <Label
             htmlFor="primary-instances-count"
-            className="col-span-1 my-auto text-gray-300"
+            className="col-span-1 my-auto text-gray-700 dark:text-gray-300"
           >
             Read/Write
           </Label>
@@ -49,7 +49,7 @@ const DatabaseClusterSettings = ({ name: id }: { name: string }) => {
             onChange={(e) => setPrimaryInstancesCount(parseInt(e.target.value))}
             name="primary-instances-count"
             id="primary-instances-count"
-            className="col-span-1 bg-gray-700 text-gray-200 border-gray-600"
+            className="col-span-1 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
             placeholder="# of instances"
             type="number"
           />
@@ -57,7 +57,7 @@ const DatabaseClusterSettings = ({ name: id }: { name: string }) => {
         <div className="grid grid-flow-col grid-cols-2 gap-2">
           <Label
             htmlFor="replica-instances-count"
-            className="col-span-1 my-auto text-gray-300"
+            className="col-span-1 my-auto text-gray-700 dark:text-gray-300"
           >
             Replica (Read only)
           </Label>
@@ -66,13 +66,13 @@ const DatabaseClusterSettings = ({ name: id }: { name: string }) => {
             onChange={(e) => setReplicaInstancesCount(parseInt(e.target.value))}
             name="replica-instances-count"
             id="replica-instances-count"
-            className="col-span-1 bg-gray-700 text-gray-200 border-gray-600"
+            className="col-span-1 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
             placeholder="# of instances"
             type="number"
           />
         </div>
         <div className="flex flex-col gap-4">
-          <Label htmlFor="database-cluster-design" className="text-gray-300">Database Cluster design</Label>
+          <Label htmlFor="database-cluster-design" className="text-gray-700 dark:text-gray-300">Database Cluster design</Label>
           <ListAndDetails
             textareaRowsCount={10}
             items={models}
@@ -93,12 +93,12 @@ Urls table (Sharded by id)
           />
         </div>
         <div className="flex flex-col gap-4">
-          <Label htmlFor="database-cluster-purpose" className="text-gray-300">Database Cluster purpose</Label>
+          <Label htmlFor="database-cluster-purpose" className="text-gray-700 dark:text-gray-300">Database Cluster purpose</Label>
           <Textarea
             name="database-cluster-purpose"
             id="database-cluster-purpose"
             rows={10}
-            className="text-md bg-gray-700 text-gray-200 border-gray-600 focus:border-gray-500"
+            className="text-md bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 focus:border-gray-400 dark:focus:border-gray-600"
             value={purpose}
             onChange={(e) => setPurpose(e.target.value)}
           />

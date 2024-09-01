@@ -86,7 +86,93 @@
     }
   }
 
-  /* Add this at the end of the file */
+  /* React Flow Styles */
+.react-flow__node {
+  @apply bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 border-gray-300 dark:border-gray-600;
+}
+
+.react-flow__handle {
+  @apply bg-gray-400 dark:bg-gray-500;
+}
+
+.react-flow__edge-path {
+  @apply stroke-gray-500 dark:stroke-gray-400;
+}
+
+.react-flow__controls {
+  @apply bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700;
+}
+
+.react-flow__controls-button {
+  @apply bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-200;
+}
+
+.react-flow__minimap {
+  @apply bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700;
+}
+
+.react-flow__attribution {
+  @apply bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200;
+}
+
+/* Additional styles for better visibility in light mode */
+.react-flow__edge-path {
+  @apply stroke-2;
+}
+
+.react-flow__edge-text {
+  @apply fill-gray-700 dark:fill-gray-300;
+}
+
+.react-flow__node-default,
+.react-flow__node-input,
+.react-flow__node-output,
+.react-flow__node-group {
+  @apply shadow-md;
+}
+
+/* Improve visibility of selection in light mode */
+.react-flow__node.selected,
+.react-flow__node:focus,
+.react-flow__node:focus-visible {
+  @apply ring-2 ring-blue-500 dark:ring-blue-400;
+}
+
+/* Hover states for nodes */
+.react-flow__node:hover {
+  @apply bg-gray-200 dark:bg-gray-700;
+}
+
+/* Make sure the dark class is applied to the html tag when in dark mode */
+html.dark {
+  color-scheme: dark;
+}
+
+/* Ensure text is readable in both modes */
+.react-flow__node-default {
+  @apply text-sm font-medium;
+}
+
+/* Style node handles consistently */
+.react-flow__handle {
+  @apply w-3 h-3 border-2 border-white dark:border-gray-800;
+}
+
+/* Style the background */
+.react-flow__background {
+  @apply bg-gray-50 dark:bg-gray-900;
+}
+
+/* Style the minimap */
+.react-flow__minimap-mask {
+  @apply fill-gray-200 dark:fill-gray-700;
+}
+
+.react-flow__minimap-node {
+  @apply fill-gray-400 dark:fill-gray-500;
+}
+
+/* Add this at the end of the file */
 .react-flow__node {
   @apply bg-gray-800 text-gray-200 border-gray-600;
 }

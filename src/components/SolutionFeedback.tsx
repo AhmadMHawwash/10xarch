@@ -44,7 +44,7 @@ export const SolutionFeedback: React.FC<SolutionFeedbackProps> = ({
             isExpanded ? "opacity-100" : "h-0 overflow-hidden opacity-0",
           )}
         >
-          <div className="rounded-lg bg-gray-700 p-4">
+          <div className="rounded-lg bg-gray-200 dark:bg-gray-700 p-4">
             <div className="mb-4 flex items-center justify-between">
               <div className="flex items-center">
                 <span className="mr-2 text-sm font-semibold">Score:</span>
@@ -58,7 +58,7 @@ export const SolutionFeedback: React.FC<SolutionFeedbackProps> = ({
                 variant="ghost"
                 size="sm"
                 onClick={() => onToggleExpand(false)}
-                className="text-gray-300 hover:bg-gray-600"
+                className="text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
               >
                 <ChevronDown className="mr-1 h-4 w-4" />
                 Hide
@@ -74,7 +74,7 @@ export const SolutionFeedback: React.FC<SolutionFeedbackProps> = ({
                     {answer.fixes.map((fix, index) => (
                       <li
                         key={index}
-                        className="rounded bg-gray-600 p-2 text-sm text-gray-300"
+                        className="rounded bg-gray-300 dark:bg-gray-600 p-2 text-sm text-gray-700 dark:text-gray-300"
                       >
                         {fix}
                       </li>

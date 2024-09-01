@@ -8,8 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 
 export const ServerCluster = ({ name, Icon }: ComponentNodeProps) => {
   return (
-    <div className="relative flex flex-col items-center text-gray-200">
-      {Icon && <Icon size={20} className="text-gray-300" />}
+    <div className="relative flex flex-col items-center text-gray-800 dark:text-gray-200">
+      {Icon && <Icon size={20} className="text-gray-700 dark:text-gray-300" />}
       <Small>{name}</Small>
       <ServerClusterSettings name={name} />
     </div>
@@ -30,11 +30,11 @@ const ServerClusterSettings = ({ name: id }: { name: string }) => {
 
   return (
     <WithSettings name={id}>
-      <div className="grid w-full grid-flow-row grid-cols-1 gap-2 text-gray-200">
+      <div className="grid w-full grid-flow-row grid-cols-1 gap-2 text-gray-800 dark:text-gray-200">
         <div className="grid grid-flow-col grid-cols-2">
           <Label
             htmlFor="servers-count"
-            className="col-span-1 my-auto text-gray-300"
+            className="col-span-1 my-auto text-gray-700 dark:text-gray-300"
           >
             Server replicas
           </Label>
@@ -43,20 +43,20 @@ const ServerClusterSettings = ({ name: id }: { name: string }) => {
             onChange={(e) => setServersCount(parseInt(e.target.value))}
             name="servers-count"
             id="servers-count"
-            className="text-md border-gray-700 bg-gray-800 text-gray-100 focus:border-gray-600"
+            className="text-md border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:border-gray-400 dark:focus:border-gray-600"
             placeholder="# of instances"
             type="number"
           />
         </div>
         <div className="flex flex-col gap-4">
-          <Label htmlFor="server-purpose" className="text-gray-300">
+          <Label htmlFor="server-purpose" className="text-gray-700 dark:text-gray-300">
             Server purpose
           </Label>
           <Textarea
             name="server-purpose"
             id="server-purpose"
             rows={10}
-            className="text-md border-gray-700 bg-gray-800 text-gray-100 focus:border-gray-600"
+            className="text-md border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:border-gray-400 dark:focus:border-gray-600"
             value={purpose}
             onChange={(e) => setPurpose(e.target.value)}
           />

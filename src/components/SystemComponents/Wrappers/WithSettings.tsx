@@ -19,11 +19,11 @@ export const WithSettings = ({
   return (
     <Dialog>
       <DialogTrigger>
-        <span className="absolute right-[-14px] top-[-14px] rounded-full bg-gray-700">
-          <Settings size={16} className="stroke-gray-300" />
+        <span className="absolute right-[-14px] top-[-14px] rounded-full bg-gray-200 dark:bg-gray-700">
+          <Settings size={16} className="stroke-gray-700 dark:stroke-gray-300" />
         </span>
       </DialogTrigger>
-      <DialogContent className="max-w-4xl h-[90vh] bg-gray-900 text-gray-100 overflow-scroll">
+      <DialogContent className="max-w-4xl h-[90vh] bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 overflow-scroll">
         <DialogHeader>
           <DialogTitle>Configuring {name}</DialogTitle>
           <DialogDescription>

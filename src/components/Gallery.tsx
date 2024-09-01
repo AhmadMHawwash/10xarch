@@ -78,7 +78,7 @@ const components: Record<SystemComponentType, SystemComponent> = {
       <div className="relative h-[16px] w-[16px] mr-1">
         <Database className="absolute -left-0.5 -top-0.5" size={16} />
         <Database
-          className="absolute left-0.5 top-0.5 bg-gray-900 bg-opacity-60 p-0"
+          className="absolute left-0.5 top-0.5 bg-gray-100 dark:bg-gray-900 bg-opacity-60 p-0"
           size={16}
         />
       </div>
@@ -93,7 +93,7 @@ const components: Record<SystemComponentType, SystemComponent> = {
       <div className="relative h-[16px] w-[16px] mr-1">
         <DatabaseZap className="absolute -left-0.5 -top-0.5" size={16} />
         <DatabaseZap
-          className="absolute left-0.5 top-0.5 bg-gray-900 bg-opacity-60 p-0"
+          className="absolute left-0.5 top-0.5 bg- dark:bg-gray-900 bg-opacity-60 p-0"
           size={16}
         />
       </div>
@@ -108,7 +108,7 @@ const components: Record<SystemComponentType, SystemComponent> = {
       <div className="relative h-[16px] w-[16px] mr-1">
         <Server className="absolute -left-0.5 -top-0.5" size={16} />
         <Server
-          className="absolute left-0.5 top-0.5 bg-gray-900 bg-opacity-60 p-0"
+          className="absolute left-0.5 top-0.5 bg- dark:bg-gray-900 bg-opacity-60 p-0"
           size={16}
         />
       </div>
@@ -152,28 +152,28 @@ const Gallery = () => {
   );
 
   return (
-    <div className="m-2 h-fit w-48 flex-col rounded-md border border-gray-700 bg-gray-800 bg-opacity-70 p-2">
-      <Lead className="h-fit text-gray-200 mb-2 text-sm">Components</Lead>
+    <div className="m-2 h-fit w-48 flex-col rounded-md border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 bg-opacity-70 p-2">
+      <Lead className="h-fit text-gray-800 dark:text-gray-200 mb-2 text-sm">Components</Lead>
       <div className="relative mb-2">
         <input
           type="text"
           placeholder="Search..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full px-2 py-1 text-xs bg-gray-700 text-gray-200 rounded-md pr-6"
+          className="w-full px-2 py-1 text-xs bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-md pr-6"
         />
-        <Search className="absolute right-1 top-1 text-gray-400" size={14} />
+        <Search className="absolute right-1 top-1 text-gray-600 dark:text-gray-400" size={14} />
       </div>
       <div className="max-h-64 overflow-y-auto">
         {filteredComponents.map(([name, { icon: Icon, description }]) => (
           <div
             key={name}
-            className="my-1 flex cursor-grab items-center rounded-md border border-gray-700 bg-gray-800 bg-opacity-70 p-1 text-gray-200 hover:bg-gray-700 transition-colors duration-200"
+            className="my-1 flex cursor-grab items-center rounded-md border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 bg-opacity-70 p-1 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
             onDragStart={(event) => onDragStart(event, name as SystemComponentType)}
             draggable
             title={description}
           >
-            {Icon && <Icon size={16} className="text-gray-300 mr-1" />}
+            {Icon && <Icon size={16} className="text-gray-700 dark:text-gray-300 mr-1" />}
             <div className="text-xs">{name}</div>
           </div>
         ))}

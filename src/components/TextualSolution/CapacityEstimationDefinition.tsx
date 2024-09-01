@@ -21,12 +21,12 @@ export const CapacityEstimationDefinition = () => {
   return (
     <Dialog>
       <DialogTrigger className="w-full">
-        <Button variant="outline" size="sm" className="w-full">
+        <Button variant="outline" size="sm" className="w-full mt-1">
           <NotebookPen size={15} className="mr-2" />
           Capacity Estimations
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-4xl h-[90vh] bg-gray-900 text-gray-100 overflow-scroll">
+      <DialogContent className="max-w-4xl h-[90vh] bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 overflow-scroll">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold mb-4">Capacity Estimation</DialogTitle>
         </DialogHeader>
@@ -101,12 +101,12 @@ const CapacitySection: React.FC<CapacitySectionProps> = ({
       value={value}
       placeholder={placeholder}
       onChange={(e) => onChange(e.target.value)}
-      className="text-md bg-gray-800 text-gray-100 border-gray-700 focus:border-gray-600"
+      className="text-md bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 focus:border-gray-400 dark:focus:border-gray-600"
     />
     <WithMarkdownDetails
       Icon={InfoIcon}
       trigger={
-        <Button variant="ghost" size="sm" className="text-gray-400 hover:text-gray-200">
+        <Button variant="ghost" size="sm" className="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200">
           <InfoIcon className="mr-2" size={16} />
           {infoButtonText}
         </Button>

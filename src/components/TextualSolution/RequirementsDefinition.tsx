@@ -27,7 +27,7 @@ export const RequirementsDefinition: React.FC = () => {
           Requirements
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-4xl h-[90vh] bg-gray-900 text-gray-100 overflow-scroll">
+      <DialogContent className="max-w-4xl h-[90vh] bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 overflow-scroll">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold mb-4">Requirements Definition</DialogTitle>
         </DialogHeader>
@@ -82,12 +82,12 @@ const RequirementSection: React.FC<RequirementSectionProps> = ({
       value={value}
       placeholder={placeholder}
       onChange={(e) => onChange(e.target.value)}
-      className="text-md bg-gray-800 text-gray-100 border-gray-700 focus:border-gray-600"
+      className="text-md bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 focus:border-gray-400 dark:focus:border-gray-600"
     />
     <WithMarkdownDetails
       Icon={InfoIcon}
       trigger={
-        <Button variant="ghost" size="sm" className="text-gray-400 hover:text-gray-200">
+        <Button variant="ghost" size="sm" className="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200">
           <InfoIcon className="mr-2" size={16} />
           {infoButtonText}
         </Button>
@@ -105,14 +105,14 @@ export const Hints: React.FC<HintsProps> = ({ hints = [] }) => {
   const { currentStageIndex, challenge } = useChallengeManager();
   if (!challenge || hints.length === 0) return null;
   return (
-    <div className="mt-6 p-4 bg-gray-800 rounded-lg">
-      <Muted className="flex items-center text-gray-300 mb-2">
+    <div className="mt-6 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
+      <Muted className="flex items-center text-gray-700 dark:text-gray-300 mb-2">
         <LightbulbIcon size={16} className="mr-2" />
         Hints for {challenge.title} - Part {currentStageIndex + 1}/{challenge.stages.length}
       </Muted>
       <ul className="list-disc list-inside space-y-1">
         {hints.map((hint, index) => (
-          <li key={index} className="text-gray-200">{hint}</li>
+          <li key={index} className="text-gray-800 dark:text-gray-200">{hint}</li>
         ))}
       </ul>
     </div>

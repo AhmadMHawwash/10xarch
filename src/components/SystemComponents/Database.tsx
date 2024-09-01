@@ -8,9 +8,9 @@ import { WithSettings } from "./Wrappers/WithSettings";
 
 export const Database = ({ name, Icon }: ComponentNodeProps) => {
   return (
-    <div className="relative flex flex-col items-center text-gray-200">
-      {Icon && <Icon size={20} className="text-gray-300" />}
-      <Small className="text-gray-300">{name}</Small>
+    <div className="relative flex flex-col items-center text-gray-800 dark:text-gray-200">
+      {Icon && <Icon size={20} className="text-gray-700 dark:text-gray-300" />}
+      <Small className="text-gray-700 dark:text-gray-300">{name}</Small>
       <DatabaseSettings name={name} />
     </div>
   );
@@ -32,9 +32,9 @@ const DatabaseSettings = ({ name: id }: { name: string }) => {
 
   return (
     <WithSettings name={id}>
-      <div className="grid w-full grid-flow-row grid-cols-1 gap-4 text-gray-200">
+      <div className="grid w-full grid-flow-row grid-cols-1 gap-4 text-gray-800 dark:text-gray-200">
         <div className="flex flex-col gap-4">
-          <Label htmlFor="database-design" className="text-gray-300">Database design</Label>
+          <Label htmlFor="database-design" className="text-gray-700 dark:text-gray-300">Database design</Label>
           <ListAndDetails
             textareaRowsCount={10}
             items={models}
@@ -55,12 +55,12 @@ Urls table
           />
         </div>
         <div className="flex flex-col gap-4">
-          <Label htmlFor="database-purpose" className="text-gray-300">Database purpose</Label>
+          <Label htmlFor="database-purpose" className="text-gray-700 dark:text-gray-300">Database purpose</Label>
           <Textarea
             name="database-purpose"
             id="database-purpose"
             rows={10}
-            className="text-md bg-gray-800 text-gray-100 border-gray-700 focus:border-gray-600"
+            className="text-md bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 focus:border-gray-400 dark:focus:border-gray-600"
             value={purpose}
             onChange={(e) => setPurpose(e.target.value)}
           />

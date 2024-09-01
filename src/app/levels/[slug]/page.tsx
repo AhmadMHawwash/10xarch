@@ -22,7 +22,7 @@ export default function Level() {
       <ResizablePanel defaultSize={25} minSize={20}>
         <LevelContent />
       </ResizablePanel>
-      <ResizableHandle className="w-1 bg-gray-700 hover:bg-gray-600 transition-colors" />
+      <ResizableHandle className="w-1 bg-gray-300 dark:bg-gray-700 hover:bg-gray-400 dark:hover:bg-gray-600 transition-colors" />
       <ResizablePanel defaultSize={75} minSize={60}>
         <SystemBuilder />
       </ResizablePanel>
@@ -39,29 +39,29 @@ const LevelContent = () => {
     .reduce<string[]>((acc, stage) => acc.concat(stage.assumptions), []);
 
   return (
-    <div className="flex h-full max-h-[100vh] flex-col justify-between bg-gray-900 p-4 text-gray-200">
+    <div className="flex h-full max-h-[100vh] flex-col justify-between bg-white dark:bg-gray-900 p-4 text-gray-800 dark:text-gray-200">
       <div className="overflow-y-auto pb-8">
         <div className="min-w-[17vw]">
-          <div className="sticky top-0 w-full bg-gray-900 z-10">
-            <H5 className="text-gray-100 flex items-center justify-between">
+          <div className="sticky top-0 w-full bg-white dark:bg-gray-900 z-10">
+            <H5 className="text-gray-900 dark:text-gray-100 flex items-center justify-between">
               <span>{challenge.title}</span>
-              <Badge variant="outline" className="text-blue-400 border-blue-400">
+              <Badge variant="outline" className="text-blue-600 dark:text-blue-400 border-blue-600 dark:border-blue-400">
                 Stage {currentStageIndex + 1} of {challenge.stages.length}
               </Badge>
             </H5>
-            <Separator className="mb-5 mt-1 bg-gray-700" />
+            <Separator className="mb-5 mt-1 bg-gray-300 dark:bg-gray-700" />
           </div>
           <div className="flex flex-col gap-4">
             <Section title="Emerging Complexity" content={stage?.problem} />
             <Section title="Assumptions" content={
               <List className="!ml-2">
                 {oldAssumptions.map((assumption, index) => (
-                  <P key={index} className="!mt-0 ml-4 list-item list-decimal line-through opacity-50 text-gray-400">
+                  <P key={index} className="!mt-0 ml-4 list-item list-decimal line-through opacity-50 text-gray-600 dark:text-gray-400">
                     {assumption}
                   </P>
                 ))}
                 {stage?.assumptions.map((assumption, index) => (
-                  <P key={index} className="!mt-0 ml-4 list-item list-decimal text-gray-300">
+                  <P key={index} className="!mt-0 ml-4 list-item list-decimal text-gray-700 dark:text-gray-300">
                     {assumption}
                   </P>
                 ))}
@@ -70,7 +70,7 @@ const LevelContent = () => {
             <WithMarkdownDetails
               Icon={InfoIcon}
               trigger={
-                <Muted className="flex items-center gap-1 text-gray-400 cursor-pointer hover:text-gray-300 transition-colors">
+                <Muted className="flex items-center gap-1 text-gray-600 dark:text-gray-400 cursor-pointer hover:text-gray-800 dark:hover:text-gray-300 transition-colors">
                   <InfoIcon size="17" />
                   Elements of a successful system design
                 </Muted>
@@ -98,9 +98,9 @@ interface SectionProps {
 }
 
 const Section: React.FC<SectionProps> = ({ title, content }) => (
-  <div className="bg-gray-800 rounded-lg p-4 shadow-md">
-    <Muted className="text-gray-400 mb-2">{title}</Muted>
-    <div className="mt-0 text-gray-300">
+  <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 shadow-md">
+    <Muted className="text-gray-600 dark:text-gray-400 mb-2">{title}</Muted>
+    <div className="mt-0 text-gray-700 dark:text-gray-300">
       {typeof content === 'string' ? <P className="!mt-0">{content}</P> : content}
     </div>
   </div>
@@ -115,7 +115,7 @@ interface StageProgressProps {
 
 const StageProgress: React.FC<StageProgressProps> = ({ currentStage, totalStages, onPrevious, onNext }) => (
   <div className="flex items-center justify-between">
-    <Button size="sm" variant="outline" onClick={onPrevious} className="border-gray-600 text-gray-200 hover:bg-gray-700">
+    <Button size="sm" variant="outline" onClick={onPrevious} className="border-gray-400 dark:border-gray-600 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700">
       <ArrowLeft className="mr-1" /> Previous
     </Button>
     <div className="flex-grow mx-4 relative">
@@ -127,13 +127,13 @@ const StageProgress: React.FC<StageProgressProps> = ({ currentStage, totalStages
               className="w-full h-2"
             />
           </TooltipTrigger>
-          <TooltipContent side="top" className="bg-gray-800 text-gray-200">
+          <TooltipContent side="top" className="bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200">
             <p>Stage {currentStage + 1} of {totalStages}</p>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
     </div>
-    <Button size="sm" variant="outline" onClick={onNext} className="border-gray-600 text-gray-200 hover:bg-gray-700">
+    <Button size="sm" variant="outline" onClick={onNext} className="border-gray-400 dark:border-gray-600 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700">
       Next <ArrowRight className="ml-1" />
     </Button>
   </div>

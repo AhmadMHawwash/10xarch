@@ -15,18 +15,22 @@ import { Progress } from "@/components/ui/progress";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import { type ReactNode } from 'react';
+import { AIChatWidget } from "@/components/AIChatWidget";
 
 export default function Level() {
   return (
-    <ResizablePanelGroup direction="horizontal">
-      <ResizablePanel defaultSize={25} minSize={3}>
-        <LevelContent />
-      </ResizablePanel>
-      <ResizableHandle className="w-1 bg-gray-300 dark:bg-gray-700 hover:bg-gray-400 dark:hover:bg-gray-600 transition-colors" />
-      <ResizablePanel defaultSize={75} minSize={60}>
-        <SystemBuilder />
-      </ResizablePanel>
-    </ResizablePanelGroup>
+    <>
+      <ResizablePanelGroup direction="horizontal">
+        <ResizablePanel defaultSize={25} minSize={3}>
+          <LevelContent />
+        </ResizablePanel>
+        <ResizableHandle className="w-1 bg-gray-300 dark:bg-gray-700 hover:bg-gray-400 dark:hover:bg-gray-600 transition-colors" />
+        <ResizablePanel defaultSize={75} minSize={60}>
+          <SystemBuilder />
+        </ResizablePanel>
+      </ResizablePanelGroup>
+      {/* <AIChatWidget /> */}
+    </>
   );
 }
 

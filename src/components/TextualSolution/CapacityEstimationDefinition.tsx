@@ -20,18 +20,20 @@ export const CapacityEstimationDefinition = () => {
 
   return (
     <Dialog>
-      <DialogTrigger className="mt-1 font-medium w-full flex items-center border border-gray-400 dark:border-gray-600 rounded-md p-1 px-2 hover:border-gray-500 dark:hover:border-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all text-sm text-gray-800 dark:text-gray-200">
+      <DialogTrigger className="mt-1 flex w-full items-center rounded-md border border-gray-400 bg-gray-50 p-1 px-2 text-sm font-medium text-gray-800 transition-all hover:border-gray-500 hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200 dark:hover:border-gray-500 dark:hover:bg-gray-700">
         <>
           <NotebookPen size={15} className="mr-2" />
           Capacity Estimations
         </>
       </DialogTrigger>
-      <DialogContent className="max-w-4xl h-[90vh] bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 overflow-scroll">
+      <DialogContent className="h-[90vh] max-w-4xl overflow-scroll bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold mb-4">Capacity Estimation</DialogTitle>
+          <DialogTitle className="mb-4 text-2xl font-bold">
+            Capacity Estimation
+          </DialogTitle>
         </DialogHeader>
         <Tabs defaultValue="traffic" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-4">
+          <TabsList className="mb-4 grid w-full grid-cols-4">
             <TabsTrigger value="traffic">Traffic</TabsTrigger>
             <TabsTrigger value="storage">Storage</TabsTrigger>
             <TabsTrigger value="bandwidth">Bandwidth</TabsTrigger>
@@ -58,7 +60,9 @@ export const CapacityEstimationDefinition = () => {
           <TabsContent value="bandwidth">
             <CapacitySection
               value={capacity.Bandwidth}
-              onChange={(value) => setCapacity({ ...capacity, Bandwidth: value })}
+              onChange={(value) =>
+                setCapacity({ ...capacity, Bandwidth: value })
+              }
               placeholder="Example: URL Shortening Service bandwidth estimation..."
               infoContent={bandwidthEstimation}
               infoButtonText="How to estimate bandwidth"
@@ -93,7 +97,7 @@ const CapacitySection: React.FC<CapacitySectionProps> = ({
   onChange,
   placeholder,
   infoContent,
-  infoButtonText
+  infoButtonText,
 }) => (
   <div className="space-y-4">
     <Textarea
@@ -101,12 +105,16 @@ const CapacitySection: React.FC<CapacitySectionProps> = ({
       value={value}
       placeholder={placeholder}
       onChange={(e) => onChange(e.target.value)}
-      className="text-md bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 focus:border-gray-400 dark:focus:border-gray-600"
+      className="text-md border-gray-300 bg-gray-100 text-gray-900 focus:border-gray-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-gray-600"
     />
     <WithMarkdownDetails
       Icon={InfoIcon}
       trigger={
-        <Button variant="ghost" size="sm" className="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
+        >
           <InfoIcon className="mr-2" size={16} />
           {infoButtonText}
         </Button>

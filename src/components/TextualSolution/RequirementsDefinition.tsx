@@ -21,7 +21,7 @@ export const RequirementsDefinition: React.FC = () => {
 
   return (
     <Dialog>
-      <DialogTrigger className="mt-1 flex w-full items-center rounded-md border border-gray-400 p-1 px-2 text-sm font-medium text-gray-800 transition-all hover:border-gray-500 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-200 dark:hover:border-gray-500 dark:hover:bg-gray-800">
+      <DialogTrigger className="mt-1 flex w-full items-center rounded-md border border-gray-400 bg-gray-50 p-1 px-2 text-sm font-medium text-gray-800 transition-all hover:border-gray-500 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200 dark:hover:border-gray-500 dark:hover:bg-gray-800">
         <>
           <CogIcon size={15} className="mr-2" />
           Requirements

@@ -353,6 +353,8 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
   };
 
   const onSave = useCallback(() => {
+    if (typeof window === "undefined") return;
+
     if (reactFlowInstance) {
       const flow = reactFlowInstance.toObject();
       localStorage.setItem("reactflow", JSON.stringify(flow));
@@ -361,6 +363,8 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
 
   const onRestore = useCallback(() => {
     const restoreFlow = async () => {
+      if (typeof window === "undefined") return;
+      
       const flow: ReactFlowJsonObject = JSON.parse(
         localStorage.getItem("reactflow") ?? "{}",
       ) as ReactFlowJsonObject;

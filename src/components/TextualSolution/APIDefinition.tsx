@@ -26,13 +26,13 @@ export const APIDefinition = () => {
 
   return (
     <Dialog>
-      <DialogTrigger className="mt-1 font-medium w-full flex items-center border border-gray-400 dark:border-gray-600 rounded-md p-1 px-2 hover:border-gray-500 dark:hover:border-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all text-sm text-gray-800 dark:text-gray-200">
+      <DialogTrigger className="mt-1 flex w-full items-center rounded-md border border-gray-400 bg-gray-50 p-1 px-2 text-sm font-medium text-gray-800 transition-all hover:border-gray-500 hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200 dark:hover:border-gray-500 dark:hover:bg-gray-700">
         <>
           <CableIcon size={15} className="mr-2" />
           System API
         </>
       </DialogTrigger>
-      <DialogContent className="max-w-4xl h-[90vh] bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 overflow-scroll">
+      <DialogContent className="h-[90vh] max-w-4xl overflow-scroll bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100">
         <DialogHeader>
           <DialogTitle className="text-gray-900 dark:text-gray-100">
             System API definition
@@ -88,7 +88,7 @@ Example: URL Shortening Service
               trigger={
                 <Button
                   variant="link"
-                  className="pl-0 pt-0 text-gray-600 dark:text-gray-300 opacity-50 transition-all hover:opacity-100"
+                  className="pl-0 pt-0 text-gray-600 opacity-50 transition-all hover:opacity-100 dark:text-gray-300"
                 >
                   <InfoIcon className="mr-1" size={16} />
                   How clients interact with the system
@@ -180,7 +180,7 @@ export const ListAndDetails = ({
         {items.map(([key, value], index) => (
           <div
             className={cn(
-              "group relative flex border-b border-gray-300 dark:border-gray-600 transition-all hover:cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700",
+              "group relative flex border-b border-gray-300 transition-all hover:cursor-pointer hover:bg-gray-200 dark:border-gray-600 dark:hover:bg-gray-700",
               { [`bg-gray-200 dark:bg-gray-700`]: selectedKeyIndex === index },
             )}
             onClick={() => {
@@ -193,7 +193,7 @@ export const ListAndDetails = ({
             <Small className="mr-2 overflow-hidden p-2 text-gray-700 dark:text-gray-300">
               {key}
             </Small>
-            <span className="absolute right-2 top-2 rounded-full bg-gray-300 dark:bg-gray-600 opacity-0 hover:cursor-pointer group-hover:opacity-100">
+            <span className="absolute right-2 top-2 rounded-full bg-gray-300 opacity-0 hover:cursor-pointer group-hover:opacity-100 dark:bg-gray-600">
               <X
                 size={16}
                 onClick={(e) => {
@@ -209,7 +209,7 @@ export const ListAndDetails = ({
           size="xs"
           variant="ghost"
           onClick={onAdd}
-          className="text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+          className="text-gray-700 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-700"
         >
           <PlusIcon size="16" />
         </Button>
@@ -218,7 +218,7 @@ export const ListAndDetails = ({
         <div className="flex w-full flex-col">
           <Input
             type="text"
-            className="mb-2 h-8 border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+            className="mb-2 h-8 border-gray-300 bg-gray-100 text-gray-800 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
             value={inputValue}
             onChange={(e) => {
               setInputValue(e.target.value);
@@ -247,7 +247,7 @@ export const ListAndDetails = ({
             }}
             onChange={(e) => setTextareaValue(e.target.value)}
             placeholder={textareaPlaceholder}
-            className="text-md border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:border-gray-400 dark:focus:border-gray-600"
+            className="text-md border-gray-300 bg-gray-100 text-gray-900 focus:border-gray-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-gray-600"
           />
         </div>
       ) : (
@@ -293,7 +293,7 @@ export const ListAndMultiDetails = ({
         {apis.map(({ name: key, definition: def, flow }, index) => (
           <div
             className={cn(
-              "group relative flex border-b border-gray-300 dark:border-gray-600 transition-all hover:cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700",
+              "group relative flex border-b border-gray-300 transition-all hover:cursor-pointer hover:bg-gray-200 dark:border-gray-600 dark:hover:bg-gray-700",
               { [`bg-gray-200 dark:bg-gray-700`]: selectedKeyIndex === index },
             )}
             onClick={() => {
@@ -307,7 +307,7 @@ export const ListAndMultiDetails = ({
             <Small className="mr-2 overflow-hidden p-2 text-gray-700 dark:text-gray-300">
               {key}
             </Small>
-            <span className="absolute right-2 top-2 rounded-full bg-gray-300 dark:bg-gray-600 opacity-0 hover:cursor-pointer group-hover:opacity-100">
+            <span className="absolute right-2 top-2 rounded-full bg-gray-300 opacity-0 hover:cursor-pointer group-hover:opacity-100 dark:bg-gray-600">
               <X
                 size={16}
                 onClick={(e) => {
@@ -323,7 +323,7 @@ export const ListAndMultiDetails = ({
           size="xs"
           variant="ghost"
           onClick={onAddApi}
-          className="text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+          className="text-gray-700 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-700"
         >
           <PlusIcon size="16" />
         </Button>
@@ -331,7 +331,7 @@ export const ListAndMultiDetails = ({
       <div className="flex w-full flex-col">
         <Input
           type="text"
-          className="mb-2 h-8 border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+          className="mb-2 h-8 border-gray-300 bg-gray-100 text-gray-800 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
           value={inputValue}
           onChange={(e) => {
             setInputValue(e.target.value);
@@ -366,7 +366,7 @@ export const ListAndMultiDetails = ({
               }}
               onChange={(e) => setApiDefinition(e.target.value)}
               placeholder={apiPlaceholder}
-              className="text-md border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:border-gray-400 dark:focus:border-gray-600"
+              className="text-md border-gray-300 bg-gray-100 text-gray-900 focus:border-gray-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-gray-600"
             />
           </TabsContent>
           <TabsContent value="api-flow">
@@ -383,7 +383,7 @@ export const ListAndMultiDetails = ({
               }}
               onChange={(e) => setApiFlow(e.target.value)}
               placeholder={flowPlaceholder}
-              className="text-md border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:border-gray-400 dark:focus:border-gray-600"
+              className="text-md border-gray-300 bg-gray-100 text-gray-900 focus:border-gray-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-gray-600"
             />
           </TabsContent>
         </Tabs>

@@ -6,6 +6,8 @@ const useLocalStorageState = <T>(
   deserializer?: (value: string | null) => T,
 ): [T, React.Dispatch<React.SetStateAction<T>>] => {
   const [state, setState] = useState<T>(() => {
+    if (typeof window === "undefined") return defaultValue;
+    
     const storedValue = localStorage.getItem(key);
     if (storedValue !== null) {
       if (deserializer) {

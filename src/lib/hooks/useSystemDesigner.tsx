@@ -1,3 +1,4 @@
+"use client";
 import { getSystemComponent } from "@/components/Gallery";
 import {
   type OtherNodeDataProps,
@@ -56,6 +57,10 @@ interface SystemDesignerState {
     nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[],
   ) => void;
   setEdges: (edges: Edge[]) => void;
+  onSelectNode: (
+    node: Node<SystemComponentNodeDataProps | OtherNodeDataProps> | null,
+  ) => void;
+  selectedNode: Node<SystemComponentNodeDataProps | OtherNodeDataProps> | null;
   // toggleApiRequestFlowMode: () => void;
   // isApiRequestFlowMode: boolean;
   // selectedApiFlow?: string;
@@ -80,6 +85,8 @@ const SystemDesignerContext = createContext<SystemDesignerState>({
   onRestore: noop,
   setNodes: noop,
   setEdges: noop,
+  selectedNode: null,
+  onSelectNode: noop,
 });
 
 export const makeKey = (id: number, type: string) => `${type}-${id}`;
@@ -165,7 +172,9 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
     useState<ReactFlowInstance | null>(null);
   const { setViewport } = useReactFlow();
   const [isEdgeBeingConnected, setIsEdgeBeingConnected] = useState(false);
-
+  const [selectedNode, setSelectedNode] = useState<Node<
+    SystemComponentNodeDataProps | OtherNodeDataProps
+  > | null>(null);
   const { toast } = useToast();
 
   const onConnect: OnConnect = useCallback(
@@ -511,6 +520,8 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
         isEdgeBeingConnected,
         setNodes,
         setEdges,
+        selectedNode,
+        onSelectNode: setSelectedNode,
         // toggleApiRequestFlowMode,
         // isApiRequestFlowMode,
         // selectedApiFlow,

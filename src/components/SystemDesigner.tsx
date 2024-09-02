@@ -1,7 +1,6 @@
 "use client";
 import {
-  SystemDesignerProvider,
-  useSystemDesigner,
+  useSystemDesigner
 } from "@/lib/hooks/useSystemDesigner";
 import { type ComponentType } from "react";
 import ReactFlow, {
@@ -11,7 +10,6 @@ import ReactFlow, {
   Controls,
   MarkerType,
   Panel,
-  ReactFlowProvider,
   SelectionMode,
   type EdgeProps,
   type NodeProps,
@@ -20,10 +18,10 @@ import ReactFlow, {
 import "reactflow/dist/base.css";
 import "reactflow/dist/style.css";
 import { CustomEdge } from "./CustomEdge";
-import { FlowManager } from "./SolutionFlowManager";
 import Gallery from "./Gallery";
 import APIsNode from "./ReactflowCustomNodes/APIsNode";
 import SystemComponentNode from "./ReactflowCustomNodes/SystemComponentNode";
+import { FlowManager } from "./SolutionFlowManager";
 import { Whiteboard } from "./SystemComponents/Whiteboard";
 
 const nodeTypes: Record<string, ComponentType<NodeProps>> = {
@@ -49,6 +47,7 @@ const SystemDesigner = () => {
     onDrop,
     onConnectStart,
     onConnectEnd,
+    onSelectNode,
   } = useSystemDesigner();
 
   const handleConnect: OnConnect = (params) => {
@@ -59,7 +58,10 @@ const SystemDesigner = () => {
   };
 
   return (
-    <div className="relative flex h-full flex-grow flex-col bg-white dark:bg-gray-900" ref={initWrapper}>
+    <div
+      className="relative flex h-full flex-grow flex-col bg-white dark:bg-gray-900"
+      ref={initWrapper}
+    >
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -73,6 +75,8 @@ const SystemDesigner = () => {
         onDragOver={onDragOver}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
+        onNodeClick={(_, node) => onSelectNode(node)}
+        onPaneClick={() => onSelectNode(null)}
         defaultEdgeOptions={{
           markerEnd: { type: MarkerType.ArrowClosed },
           animated: true,
@@ -88,7 +92,12 @@ const SystemDesigner = () => {
         fitView={false}
         className="light-theme dark:dark-theme"
       >
-        <Background variant={BackgroundVariant.Dots} color="#4a5568" gap={12} size={1} />
+        <Background
+          variant={BackgroundVariant.Dots}
+          color="#4a5568"
+          gap={12}
+          size={1}
+        />
         <Panel position="bottom-center">
           <FlowManager />
         </Panel>
@@ -102,11 +111,5 @@ const SystemDesigner = () => {
 };
 
 export default function SystemBuilder() {
-  return (
-    <ReactFlowProvider>
-      <SystemDesignerProvider>
-        <SystemDesigner />
-      </SystemDesignerProvider>
-    </ReactFlowProvider>
-  );
+  return <SystemDesigner />;
 }

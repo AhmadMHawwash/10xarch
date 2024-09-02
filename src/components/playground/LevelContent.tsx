@@ -160,3 +160,24 @@ const StageProgress: React.FC<StageProgressProps> = ({
     </Button>
   </div>
 );
+
+
+const content = `
+### Elements of a successful system design
+&nbsp;
+#### A successful system design should include the following elements:
+- **Requirements**: 
+  - Functional 
+  - Non-functional requirements
+- **System API**: 
+  - API definitions
+  - API flows
+- **Capacity Estimations**: 
+  - Traffic estimates
+  - Storage estimates
+  - Bandwidth estimates
+  - Memory estimates
+- **High level design**: System components and their connections
+- **Database**: Models and purpose
+- And other system components purposes
+`;

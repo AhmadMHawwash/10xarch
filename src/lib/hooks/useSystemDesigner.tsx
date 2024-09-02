@@ -121,43 +121,45 @@ const componentTargets: Record<
   "Database Cluster": [],
 };
 
+const deserializeNodes = (nodes: string | null) => {
+  if (nodes === null) return [];
+  const parsedNodes = JSON.parse(nodes) as Node<
+    SystemComponentNodeDataProps | OtherNodeDataProps
+  >[];
+  return parsedNodes.map((node) => ({
+    ...node,
+    data: {
+      ...node.data,
+      name: node.data.name as SystemComponent["name"],
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      icon: getSystemComponent(node.data.name as SystemComponentType)?.icon,
+    },
+  }));
+};
+
+export const defaultStartingNodes: Node<
+  SystemComponentNodeDataProps | OtherNodeDataProps
+>[] = [
+  {
+    id: "Whiteboard-1",
+    type: "Whiteboard",
+    data: {
+      name: "Whiteboard",
+      id: "Whiteboard-1",
+      configs: {},
+    },
+    position: {
+      x: 100,
+      y: 100,
+    },
+  },
+];
+
 export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [nodes, setNodes] = useLocalStorageState<
     Node<SystemComponentNodeDataProps | OtherNodeDataProps>[]
-  >(
-    "reactflow-nodes",
-    [
-      {
-        id: "Whiteboard-1",
-        type: "Whiteboard",
-        data: {
-          name: "Whiteboard",
-          id: "Whiteboard-1",
-          configs: {},
-        },
-        position: {
-          x: 100,
-          y: 100,
-        },
-      },
-    ],
-    (nodes: string | null) => {
-      if (nodes === null) return [];
-      const parsedNodes = JSON.parse(nodes) as Node<
-        SystemComponentNodeDataProps | OtherNodeDataProps
-      >[];
-      return parsedNodes.map((node) => ({
-        ...node,
-        data: {
-          ...node.data,
-          name: node.data.name as SystemComponent["name"],
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-          icon: getSystemComponent(node.data.name as SystemComponentType)?.icon,
-        },
-      }));
-    },
-  );
+  >("reactflow-nodes", defaultStartingNodes, deserializeNodes);
   const [edges, setEdges] = useLocalStorageState<Edge[]>("reactflow-edges", []);
   const [reactFlowInstance, setReactFlowInstance] =
     useState<ReactFlowInstance | null>(null);
@@ -202,10 +204,7 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
         ),
       );
     },
-    [
-      nodes,
-      // isApiRequestFlowMode
-    ],
+    [nodes],
   );
 
   const onConnectStart: OnConnectStart = useCallback(
@@ -364,7 +363,7 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
   const onRestore = useCallback(() => {
     const restoreFlow = async () => {
       if (typeof window === "undefined") return;
-      
+
       const flow: ReactFlowJsonObject = JSON.parse(
         localStorage.getItem("reactflow") ?? "{}",
       ) as ReactFlowJsonObject;

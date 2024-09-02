@@ -1,5 +1,5 @@
 import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
-import { useSystemDesigner } from "@/lib/hooks/useSystemDesigner";
+import { defaultStartingNodes, useSystemDesigner } from "@/lib/hooks/useSystemDesigner";
 import { Check, ChevronUp, Loader2, RotateCcw, Play } from "lucide-react";
 import { useState } from "react";
 import { SolutionFeedback } from "./SolutionFeedback";
@@ -32,21 +32,7 @@ export const FlowManager: React.FC = () => {
   const [isFeedbackExpanded, setIsFeedbackExpanded] = useState(false);
 
   const resetFlow = () => {
-    setNodes([
-      {
-        id: "Whiteboard-1",
-        type: "Whiteboard",
-        data: {
-          name: "Whiteboard" as const,
-          id: "Whiteboard-1",
-          configs: {},
-        },
-        position: {
-          x: 100,
-          y: 100,
-        },
-      },
-    ]);
+    setNodes(defaultStartingNodes);
     setEdges([]);
     setResetDone(true);
     setTimeout(() => setResetDone(false), 1500); // Reset after 2 seconds

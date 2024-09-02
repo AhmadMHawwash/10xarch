@@ -20,11 +20,11 @@ export const CapacityEstimationDefinition = () => {
 
   return (
     <Dialog>
-      <DialogTrigger className="w-full">
-        <Button variant="outline" size="sm" className="w-full mt-1">
+      <DialogTrigger className="mt-1 font-medium w-full flex items-center border border-gray-400 dark:border-gray-600 rounded-md p-1 px-2 hover:border-gray-500 dark:hover:border-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all text-sm text-gray-800 dark:text-gray-200">
+        <>
           <NotebookPen size={15} className="mr-2" />
           Capacity Estimations
-        </Button>
+        </>
       </DialogTrigger>
       <DialogContent className="max-w-4xl h-[90vh] bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 overflow-scroll">
         <DialogHeader>

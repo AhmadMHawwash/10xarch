@@ -18,21 +18,23 @@ export const RequirementsDefinition: React.FC = () => {
   const { stage } = useChallengeManager();
   const { functional, nonfunctional, setFunctional, setNonfunctional } =
     useWhiteboard();
-    
+
   return (
     <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="w-full">
+      <DialogTrigger className="mt-1 flex w-full items-center rounded-md border border-gray-400 p-1 px-2 text-sm font-medium text-gray-800 transition-all hover:border-gray-500 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-200 dark:hover:border-gray-500 dark:hover:bg-gray-800">
+        <>
           <CogIcon size={15} className="mr-2" />
           Requirements
-        </Button>
+        </>
       </DialogTrigger>
-      <DialogContent className="max-w-4xl h-[90vh] bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 overflow-scroll">
+      <DialogContent className="h-[90vh] max-w-4xl overflow-scroll bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold mb-4">Requirements Definition</DialogTitle>
+          <DialogTitle className="mb-4 text-2xl font-bold">
+            Requirements Definition
+          </DialogTitle>
         </DialogHeader>
         <Tabs defaultValue="functional" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-4">
+          <TabsList className="mb-4 grid w-full grid-cols-2">
             <TabsTrigger value="functional">Functional</TabsTrigger>
             <TabsTrigger value="nonfunctional">Non-functional</TabsTrigger>
           </TabsList>
@@ -55,7 +57,9 @@ export const RequirementsDefinition: React.FC = () => {
             />
           </TabsContent>
         </Tabs>
-        <Hints hints={stage?.hintsPerArea.functionalAndNonFunctionalRequirements} />
+        <Hints
+          hints={stage?.hintsPerArea.functionalAndNonFunctionalRequirements}
+        />
       </DialogContent>
     </Dialog>
   );
@@ -74,7 +78,7 @@ const RequirementSection: React.FC<RequirementSectionProps> = ({
   onChange,
   placeholder,
   infoContent,
-  infoButtonText
+  infoButtonText,
 }) => (
   <div className="space-y-4">
     <Textarea
@@ -82,12 +86,16 @@ const RequirementSection: React.FC<RequirementSectionProps> = ({
       value={value}
       placeholder={placeholder}
       onChange={(e) => onChange(e.target.value)}
-      className="text-md bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 focus:border-gray-400 dark:focus:border-gray-600"
+      className="text-md border-gray-300 bg-gray-100 text-gray-900 focus:border-gray-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-gray-600"
     />
     <WithMarkdownDetails
       Icon={InfoIcon}
       trigger={
-        <Button variant="ghost" size="sm" className="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
+        >
           <InfoIcon className="mr-2" size={16} />
           {infoButtonText}
         </Button>
@@ -105,14 +113,17 @@ export const Hints: React.FC<HintsProps> = ({ hints = [] }) => {
   const { currentStageIndex, challenge } = useChallengeManager();
   if (!challenge || hints.length === 0) return null;
   return (
-    <div className="mt-6 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
-      <Muted className="flex items-center text-gray-700 dark:text-gray-300 mb-2">
+    <div className="mt-6 rounded-lg bg-gray-100 p-4 dark:bg-gray-800">
+      <Muted className="mb-2 flex items-center text-gray-700 dark:text-gray-300">
         <LightbulbIcon size={16} className="mr-2" />
-        Hints for {challenge.title} - Part {currentStageIndex + 1}/{challenge.stages.length}
+        Hints for {challenge.title} - Part {currentStageIndex + 1}/
+        {challenge.stages.length}
       </Muted>
-      <ul className="list-disc list-inside space-y-1">
+      <ul className="list-inside list-disc space-y-1">
         {hints.map((hint, index) => (
-          <li key={index} className="text-gray-800 dark:text-gray-200">{hint}</li>
+          <li key={index} className="text-gray-800 dark:text-gray-200">
+            {hint}
+          </li>
         ))}
       </ul>
     </div>

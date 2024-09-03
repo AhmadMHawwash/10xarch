@@ -26,7 +26,8 @@ export default function Page() {
     </ReactFlowProvider>
   );
 }
-function PageContent() {
+
+async function PageContent() {
   const { selectedNode } = useSystemDesigner();
   const { useSystemComponentConfigSlice } = usePlaygroundManager();
 
@@ -81,4 +82,3 @@ function PageContent() {
     </ResizablePanelGroup>
   );
 }
-

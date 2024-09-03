@@ -34,7 +34,7 @@ import {
 import { type SystemComponentType, type SystemComponent } from "../levels/type";
 import { componentsNumberingStore } from "../levels/utils";
 import { SYSTEM_COMPONENT_NODE } from "./useChallengeManager";
-import useLocalStorageState from "../utils/useLocalStorageState";
+import useLocalStorageState from "./useLocalStorageState";
 
 interface SystemDesignerState {
   nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[];

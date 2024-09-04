@@ -3,11 +3,12 @@ import "reactflow/dist/style.css";
 
 import { GeistSans } from "geist/font/sans";
 
-import { TRPCReactProvider } from "@/trpc/react";
-import { Toaster } from "@/components/ui/toaster";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import Navbar from "@/components/Navbar"; // Add this import
 import { ThemeProvider } from "@/components/ThemeProvider"; // Add this import
+import { Toaster } from "@/components/ui/toaster";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { createClient } from "@/lib/supabase/server";
+import { TRPCReactProvider } from "@/trpc/react";
 
 export const metadata = {
   title: "System Design Playground",
@@ -16,22 +17,23 @@ export const metadata = {
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
   return (
     <html lang="en" className={GeistSans.variable} suppressHydrationWarning>
-      <body className="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+      <body className="bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100">
         <TRPCReactProvider>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <TooltipProvider>
               <Toaster />
-              <Navbar />
-              <main className="h-[92vh]">
-                {children}
-              </main>
+              <Navbar user={user} />
+              <main className="h-[92vh]">{children}</main>
             </TooltipProvider>
           </ThemeProvider>
         </TRPCReactProvider>

@@ -1,60 +1,109 @@
-"use client"
-import Link from 'next/link';
-import { useState } from 'react';
-import { UserCircle, Menu, X } from 'lucide-react';
-import { ThemeToggle } from './ThemeToggle'; // Add this import
+"use client";
+import { type User } from "@supabase/supabase-js";
+import { Menu, UserCircle, X } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
+import { ThemeToggle } from "./ThemeToggle"; // Add this import
 
-const Navbar = () => {
+export default function Navbar({ user }: { user: User | null }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // Replace with actual auth state
 
   return (
-    <nav className="bg-slate-100 dark:bg-gray-800 shadow-md p-4 h-[8vh]">
-      <div className="mx-auto flex justify-between items-center">
-        <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">
+    <nav className="h-[8vh] bg-slate-100 p-4 shadow-md dark:bg-gray-800">
+      <div className="mx-auto flex items-center justify-between">
+        <Link
+          href="/"
+          className="text-xl font-bold text-gray-900 dark:text-white"
+        >
           System Design Playground
         </Link>
-        
-        <div className="hidden md:!flex space-x-4 items-center">
-          <Link href="/projects" className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">Projects</Link>
-          <Link href="/learn" className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">Learn</Link>
-          <Link href="/community" className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">Community</Link>
-          
-          {isLoggedIn ? (
-            <Link href="/profile" className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
-              <UserCircle className="inline-block w-6 h-6" />
+
+        <div className="hidden items-center space-x-4 md:!flex">
+          <Link
+            href="/playground"
+            className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
+          >
+            Playground
+          </Link>
+          {/* <Link
+            href="/learn"
+            className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
+          >
+            Learn
+          </Link>
+          <Link
+            href="/community"
+            className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
+          >
+            Community
+          </Link> */}
+
+          {user ? (
+            <Link
+              href="/profile"
+              className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
+            >
+              <UserCircle className="inline-block h-8 w-8 stroke-1" />
             </Link>
           ) : (
-            <Link href="/signin" className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">Sign In</Link>
+            <Link
+              href="/signin"
+              className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
+            >
+              Sign In
+            </Link>
           )}
           <ThemeToggle />
         </div>
-        
-        <div className="flex md:hidden items-center">
+
+        <div className="flex items-center md:hidden">
           <ThemeToggle />
           <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="ml-2">
             {isMenuOpen ? <X /> : <Menu />}
           </button>
         </div>
       </div>
-      
+
       {isMenuOpen && (
         <div className="md:hidden">
-          <div className="flex flex-col space-y-2 mt-2">
-            <Link href="/projects" className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">Projects</Link>
-            <Link href="/learn" className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">Learn</Link>
-            <Link href="/community" className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">Community</Link>
-            
-            {isLoggedIn ? (
-              <Link href="/profile" className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">Profile</Link>
+          <div className="mt-2 flex flex-col space-y-2">
+            <Link
+              href="/playground"
+              className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
+            >
+              Playground
+            </Link>
+            {/* <Link
+              href="/learn"
+              className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
+            >
+              Learn
+            </Link>
+            <Link
+              href="/community"
+              className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
+            >
+              Community
+            </Link> */}
+
+            {user ? (
+              <Link
+                href="/profile"
+                className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
+              >
+                Profile
+              </Link>
             ) : (
-              <Link href="/signin" className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">Sign In</Link>
+              <Link
+                href="/signin"
+                className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
+              >
+                Sign In
+              </Link>
             )}
           </div>
         </div>
       )}
     </nav>
   );
-};
-
-export default Navbar;
+}

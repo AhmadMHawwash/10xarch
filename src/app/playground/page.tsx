@@ -27,7 +27,7 @@ export default function Page() {
   );
 }
 
-async function PageContent() {
+function PageContent() {
   const { selectedNode } = useSystemDesigner();
   const { useSystemComponentConfigSlice } = usePlaygroundManager();
 

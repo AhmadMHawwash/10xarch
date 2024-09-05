@@ -6,7 +6,7 @@ export default {
   schema: "./src/server/db/schema.ts",
   dialect: "sqlite",
   dbCredentials: {
-    url: env.DATABASE_URL,
+    url: process.env.DATABASE_URL ?? "",
   },
   tablesFilter: ["system-design-playground_*"],
 } satisfies Config;

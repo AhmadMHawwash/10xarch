@@ -1,13 +1,15 @@
 import "@/styles/globals.css";
 import "reactflow/dist/style.css";
 
-import { GeistSans } from "geist/font/sans";
-
 import Navbar from "@/components/Navbar"; // Add this import
 import { ThemeProvider } from "@/components/ThemeProvider"; // Add this import
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { TRPCReactProvider } from "@/trpc/react";
+import { dark, neobrutalism, shadesOfPurple } from "@clerk/themes";
+
+import { ClerkProvider } from "@clerk/nextjs";
+import { GeistSans } from "geist/font/sans";
 
 export const metadata = {
   title: "System Design Playground",
@@ -24,15 +26,24 @@ export default async function RootLayout({
   return (
     <html lang="en" className={GeistSans.variable} suppressHydrationWarning>
       <body className="bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100">
-        <TRPCReactProvider>
-          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            <TooltipProvider>
-              <Toaster />
-              <Navbar user={null}/>
-              <main className="h-[92vh]">{children}</main>
-            </TooltipProvider>
-          </ThemeProvider>
-        </TRPCReactProvider>
+        <ClerkProvider
+          appearance={{
+            baseTheme: dark,
+            variables: {
+              colorBackground: "rgb(31 41 55)",
+            },
+          }}
+        >
+          <TRPCReactProvider>
+            <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+              <TooltipProvider>
+                <Toaster />
+                <Navbar user={null} />
+                <main className="h-[92vh]">{children}</main>
+              </TooltipProvider>
+            </ThemeProvider>
+          </TRPCReactProvider>
+        </ClerkProvider>
       </body>
     </html>
   );

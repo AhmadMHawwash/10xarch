@@ -3,6 +3,13 @@ import { Menu, UserCircle, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { ThemeToggle } from "./ThemeToggle"; // Add this import
+import {
+  ClerkProvider,
+  SignInButton,
+  SignedIn,
+  SignedOut,
+  UserButton,
+} from "@clerk/nextjs";
 
 export default function Navbar({ user }: { user: null }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -37,21 +44,12 @@ export default function Navbar({ user }: { user: null }) {
             Community
           </Link> */}
 
-          {user ? (
-            <Link
-              href="/profile"
-              className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
-            >
-              <UserCircle className="inline-block h-8 w-8 stroke-1" />
-            </Link>
-          ) : (
-            <Link
-              href="/signin"
-              className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
-            >
-              Sign In
-            </Link>
-          )}
+          <SignedOut>
+            <SignInButton />
+          </SignedOut>
+          <SignedIn>
+            <UserButton />
+          </SignedIn>
           <ThemeToggle />
         </div>
 
@@ -85,21 +83,12 @@ export default function Navbar({ user }: { user: null }) {
               Community
             </Link> */}
 
-            {user ? (
-              <Link
-                href="/profile"
-                className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
-              >
-                Profile
-              </Link>
-            ) : (
-              <Link
-                href="/signin"
-                className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
-              >
-                Sign In
-              </Link>
-            )}
+            <SignedOut>
+              <SignInButton />
+            </SignedOut>
+            <SignedIn>
+              <UserButton />
+            </SignedIn>
           </div>
         </div>
       )}

@@ -1,5 +1,7 @@
-import { type SystemComponentNodeDataProps } from "@/components/ReactflowCustomNodes/APIsNode";
-import { type OtherNodeDataProps } from "@/components/ReactflowCustomNodes/SystemComponentNode";
+import {
+  type SystemComponentNodeDataProps,
+  type OtherNodeDataProps,
+} from "@/components/ReactflowCustomNodes/SystemComponentNode";
 import challenges from "@/content/challenges";
 import { type Challenge } from "@/content/challenges/types";
 import { api } from "@/trpc/react";

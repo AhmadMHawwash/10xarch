@@ -19,15 +19,13 @@ import "reactflow/dist/base.css";
 import "reactflow/dist/style.css";
 import { CustomEdge } from "./CustomEdge";
 import Gallery from "./Gallery";
-import APIsNode from "./ReactflowCustomNodes/APIsNode";
 import SystemComponentNode from "./ReactflowCustomNodes/SystemComponentNode";
 import { FlowManager } from "./SolutionFlowManager";
 import { Whiteboard } from "./SystemComponents/Whiteboard";
 
 const nodeTypes: Record<string, ComponentType<NodeProps>> = {
   SystemComponentNode,
-  Whiteboard,
-  APIsNode,
+  Whiteboard
 };
 
 const edgeTypes: Record<string, ComponentType<EdgeProps>> = {

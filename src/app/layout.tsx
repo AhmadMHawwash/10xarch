@@ -6,7 +6,7 @@ import { ThemeProvider } from "@/components/ThemeProvider"; // Add this import
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { TRPCReactProvider } from "@/trpc/react";
-import { dark, neobrutalism, shadesOfPurple } from "@clerk/themes";
+import { dark } from "@clerk/themes";
 
 import { ClerkProvider } from "@clerk/nextjs";
 import { GeistSans } from "geist/font/sans";

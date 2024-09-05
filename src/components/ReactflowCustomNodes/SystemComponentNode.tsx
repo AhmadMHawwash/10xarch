@@ -5,7 +5,6 @@ import {
 } from "@/lib/levels/type";
 import { cn } from "@/lib/utils";
 import { InfoIcon, type PiIcon } from "lucide-react";
-import { memo, type FC } from "react";
 import { Handle, Position, type NodeProps } from "reactflow";
 import { getSystemComponent } from "../Gallery";
 import { Cache } from "../SystemComponents/Cache";
@@ -61,6 +60,7 @@ export default function SystemComponentNode({
             ? "bg-gray-200 dark:bg-gray-700"
             : "bg-gray-100 dark:bg-gray-800",
           isEdgeBeingConnected &&
+            // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
             !(data.withTargetHandle || data.withSourceHandle) &&
             "opacity-50",
         )}

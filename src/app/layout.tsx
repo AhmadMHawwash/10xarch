@@ -7,7 +7,6 @@ import Navbar from "@/components/Navbar"; // Add this import
 import { ThemeProvider } from "@/components/ThemeProvider"; // Add this import
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { createClient } from "@/lib/supabase/server";
 import { TRPCReactProvider } from "@/trpc/react";
 
 export const metadata = {
@@ -22,9 +21,6 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
   return (
     <html lang="en" className={GeistSans.variable} suppressHydrationWarning>
       <body className="bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100">
@@ -32,7 +28,7 @@ export default async function RootLayout({
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <TooltipProvider>
               <Toaster />
-              <Navbar user={user} />
+              <Navbar user={null}/>
               <main className="h-[92vh]">{children}</main>
             </TooltipProvider>
           </ThemeProvider>

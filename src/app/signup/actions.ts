@@ -1,6 +1,5 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { signUpFormSchema, type SignUpFormState } from "./formSchema";
@@ -19,24 +18,24 @@ export async function signup(
     };
   }
 
-  const supabase = createClient();
+  // // const supabase = createClient();
 
-  const { error } = await supabase.auth.signUp({
-    email: parsedData.data.email,
-    password: parsedData.data.password,
-    options: {
-      data: {
-        firstName: parsedData.data.firstName,
-        lastName: parsedData.data.lastName,
-      },
-    },
-  });
+  // // const { error } = await supabase.auth.signUp({
+  // //   email: parsedData.data.email,
+  // //   password: parsedData.data.password,
+  // //   options: {
+  // //     data: {
+  // //       firstName: parsedData.data.firstName,
+  // //       lastName: parsedData.data.lastName,
+  // //     },
+  // //   },
+  // // });
 
-  if (error) {
-    return {
-      message: error.message,
-    };
-  }
+  // if (error) {
+  //   return {
+  //     message: error.message,
+  //   };
+  // }
 
   revalidatePath("/", "layout");
   redirect("/");

@@ -1,11 +1,10 @@
 "use client";
-import { type User } from "@supabase/supabase-js";
 import { Menu, UserCircle, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { ThemeToggle } from "./ThemeToggle"; // Add this import
 
-export default function Navbar({ user }: { user: User | null }) {
+export default function Navbar({ user }: { user: null }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (

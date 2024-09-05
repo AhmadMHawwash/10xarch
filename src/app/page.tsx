@@ -1,6 +1,5 @@
+import { ArrowRight, BookOpen, Code, IterationCcw } from "lucide-react";
 import Link from "next/link";
-import { ArrowRight, Code, Users, BookOpen, IterationCcw } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
 
 export default async function Home() {
   return (

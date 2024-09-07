@@ -133,8 +133,10 @@ const deserializeNodes = (nodes: string | null) => {
   const parsedNodes = JSON.parse(nodes) as Node<
     SystemComponentNodeDataProps | OtherNodeDataProps
   >[];
+  componentsNumberingStore.getState().resetCounting();
   return parsedNodes.map((node) => ({
     ...node,
+    id: componentsNumberingStore.getState().getNextId(node.data.name as SystemComponent["name"]),
     data: {
       ...node.data,
       name: node.data.name as SystemComponent["name"],

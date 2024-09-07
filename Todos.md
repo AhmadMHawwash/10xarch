@@ -1,5 +1,7 @@
 # Todos:
 ## Playground features:
+[ ] rename components
+[x] fix component load
 [x] Pre filled components
 [x] Components terminals and what they can connect to. along with grey outs
 [x] Clean up AI input, to be as consice as possible

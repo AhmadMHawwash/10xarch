@@ -10,23 +10,7 @@ export const FlowManager: React.FC = () => {
   const {
     checkSolution,
     isLoadingAnswer,
-    answer= {
-      score: 90,
-      fixes: [
-        "Add client component to handle user input",
-        "Add server component to handle user input",
-        "Add database to handle user input",
-        "Add authentication to handle user input",
-        "Add authorization to handle user input",
-        "Add rate limiting to handle user input",
-        "Add caching to handle user input",
-        "Add logging to handle user input",
-        "Add monitoring to handle user input",
-        "Add alerting to handle user input",
-        "Add backup to handle user input",
-        "Add recovery to handle user input",
-      ],
-    },
+    answer,
   } = useChallengeManager();
   const { setNodes, setEdges } = useSystemDesigner();
   const [isFeedbackExpanded, setIsFeedbackExpanded] = useState(false);
@@ -35,7 +19,7 @@ export const FlowManager: React.FC = () => {
     setNodes(defaultStartingNodes);
     setEdges([]);
     setResetDone(true);
-    setTimeout(() => setResetDone(false), 1500); // Reset after 2 seconds
+    setTimeout(() => setResetDone(false), 1500); // Reset after 1.5 seconds
   };
 
   return (

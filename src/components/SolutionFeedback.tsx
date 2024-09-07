@@ -1,14 +1,10 @@
 import { cn } from "@/lib/utils";
 import {
   ChevronDown,
-  Loader2,
-  XCircle,
-  CheckCircle,
-  AlertCircle,
+  Loader2
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { ScrollArea } from "./ui/scroll-area";
-import { createElement } from "react";
 
 interface SolutionFeedbackProps {
   isLoadingAnswer: boolean;

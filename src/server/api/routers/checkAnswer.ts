@@ -1,3 +1,4 @@
+import { env } from "@/env";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import OpenAI from "openai";
 import { z } from "zod";
@@ -8,9 +9,9 @@ interface EvaluationResponse {
   fixes: string[];
 }
 
-// const openai = new OpenAI({
-//   apiKey: process.env.OPENAI_API_KEY,
-// });
+const openai = new OpenAI({
+  apiKey: env.OPENAI_API_KEY,
+});
 
 export const checkSolution = createTRPCRouter({
   hello: publicProcedure
@@ -24,106 +25,111 @@ export const checkSolution = createTRPCRouter({
       const { criteria, challengeAndSolutionPrompt } = input;
 
       try {
-//         const response = await openai.chat.completions.create({
-//           model: "gpt-4o-mini",
-//           messages: [
-//             {
-//               role: "system",
-//               content: [
-//                 {
-//                   type: "text",
-//                   text: "You are a system design evaluation expert. You will receive: \n1. The challenge description \n2. The current level of the challenge being addressed \n3. The user's proposed solution. \nYour task is to evaluate the provided solution in the context of: \n1. The challenge requirements, \n2. The system assumptions, \n3. Provided hints for solving the current level, \n4. The criteria that define a correct solution.",
-//                 },
-//               ],
-//             },
-//             {
-//               role: "assistant",
-//               content: [
-//                 {
-//                   type: "text",
-//                   text: `Accept the solution if it meets the following criteria: \n${JSON.stringify(criteria, null, 2)}. \nIf any criteria are not met, inform the user and reduce their overall score.`,
-//                 },
-//               ],
-//             },
-//             {
-//               role: "assistant",
-//               content: [
-//                 {
-//                   type: "text",
-//                   text: `General evaluation criteria: \n${JSON.stringify(
-//                     generalEvaluationCriteria,
-//                     null,
-//                     2,
-//                   )}`,
-//                 },
-//               ],
-//             },
-//             {
-//               role: "assistant",
-//               content: [
-//                 {
-//                   type: "text",
-//                   text: `Score the solution as follows:
-// - If the solution meets all criteria for the current challenge level, give a score of 90/100.
-// - If the solution goes beyond the provided criteria, give a score of 100/100.`,
-//                 },
-//               ],
-//             },
-//             {
-//               role: "user",
-//               content: [
-//                 {
-//                   type: "text",
-//                   text: challengeAndSolutionPrompt,
-//                 },
-//               ],
-//             },
-//             {
-//               role: "assistant",
-//               content: [
-//                 {
-//                   type: "text",
-//                   text: `Respond in JSON format {score: [score], fixes: [listOfElementsToBeFixed]}. Knowing that score range: 1 - 100, if any criteria is not met then take down from the score, other than that a 90/100 if and only if the solution met all the criteria then a 90/100 score is deserved. However a 100/100 is well deserved for exceeding the criteria)`,
-//                 },
-//               ],
-//             },
-//             {
-//               role: "assistant",
-//               content: [
-//                 {
-//                   type: "text",
-//                   text: "Provide a concise evaluation without any further explanation.",
-//                 },
-//               ],
-//             },
-//           ],
-//           temperature: 1,
-//           max_tokens: 256,
-//           top_p: 0,
-//           frequency_penalty: 0,
-//           presence_penalty: 0,
-//           response_format: {
-//             type: "text",
-//           },
-//         });
-        
-//         const content = response.choices[0]?.message.content ?? "No response generated";
-        
-//         // Parse the content as JSON with type checking
-//         try {
-//           const jsonResponse = JSON.parse(content) as EvaluationResponse;
-          
-//           // Validate the parsed response
-//           if (typeof jsonResponse.score !== 'number' || !Array.isArray(jsonResponse.fixes)) {
-//             throw new Error("Invalid response format");
-//           }
-          
-//           return jsonResponse;
-//         } catch (parseError) {
-//           console.error("Error parsing OpenAI response as JSON:", parseError);
-//           throw new Error("Failed to parse the evaluation result. Please try again later.");
-//         }
+        const response = await openai.chat.completions.create({
+          model: "gpt-4o-mini",
+          messages: [
+            {
+              role: "system",
+              content: [
+                {
+                  type: "text",
+                  text: "You are a system design evaluation expert. You will receive: \n1. The challenge description \n2. The current level of the challenge being addressed \n3. The user's proposed solution. \nYour task is to evaluate the provided solution in the context of: \n1. The challenge requirements, \n2. The system assumptions, \n3. Provided hints for solving the current level, \n4. The criteria that define a correct solution.",
+                },
+              ],
+            },
+            {
+              role: "assistant",
+              content: [
+                {
+                  type: "text",
+                  text: `Accept the solution if it meets the following criteria: \n${JSON.stringify(criteria, null, 2)}. \nIf any criteria are not met, inform the user and reduce their overall score.`,
+                },
+              ],
+            },
+            {
+              role: "assistant",
+              content: [
+                {
+                  type: "text",
+                  text: `General evaluation criteria: \n${JSON.stringify(
+                    generalEvaluationCriteria,
+                    null,
+                    2,
+                  )}`,
+                },
+              ],
+            },
+            {
+              role: "assistant",
+              content: [
+                {
+                  type: "text",
+                  text: `Score the solution as follows:
+- If the solution meets all criteria for the current challenge level, give a score of 90/100.
+- If the solution goes beyond the provided criteria, give a score of 100/100.`,
+                },
+              ],
+            },
+            {
+              role: "user",
+              content: [
+                {
+                  type: "text",
+                  text: challengeAndSolutionPrompt,
+                },
+              ],
+            },
+            {
+              role: "assistant",
+              content: [
+                {
+                  type: "text",
+                  text: `Respond in JSON format {score: [score], fixes: [listOfElementsToBeFixed]}. Knowing that score range: 1 - 100, if any criteria is not met then take down from the score, other than that a 90/100 if and only if the solution met all the criteria then a 90/100 score is deserved. However a 100/100 is well deserved for exceeding the criteria)`,
+                },
+              ],
+            },
+            {
+              role: "assistant",
+              content: [
+                {
+                  type: "text",
+                  text: "Provide a concise evaluation without any further explanation.",
+                },
+              ],
+            },
+          ],
+          temperature: 1,
+          max_tokens: 256,
+          top_p: 0,
+          frequency_penalty: 0,
+          presence_penalty: 0,
+          response_format: {
+            type: "text",
+          },
+        });
 
+        const content =
+          response.choices[0]?.message.content ?? "No response generated";
+
+        // Parse the content as JSON with type checking
+        try {
+          const jsonResponse = JSON.parse(content) as EvaluationResponse;
+
+          // Validate the parsed response
+          if (
+            typeof jsonResponse.score !== "number" ||
+            !Array.isArray(jsonResponse.fixes)
+          ) {
+            throw new Error("Invalid response format");
+          }
+
+          return jsonResponse;
+        } catch (parseError) {
+          console.error("Error parsing OpenAI response as JSON:", parseError);
+          throw new Error(
+            "Failed to parse the evaluation result. Please try again later.",
+          );
+        }
       } catch (error) {
         console.error("Error calling OpenAI API:", error);
         throw new Error(

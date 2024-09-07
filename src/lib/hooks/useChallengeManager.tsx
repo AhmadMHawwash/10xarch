@@ -186,7 +186,7 @@ const getLLMPromptBuilder = ({
       return {
         schema: (
           node.data.configs["Database models"] as [string, string][]
-        ).map(([name, definition]) => ({
+        )?.map(([name, definition]) => ({
           name,
           definition,
         })),

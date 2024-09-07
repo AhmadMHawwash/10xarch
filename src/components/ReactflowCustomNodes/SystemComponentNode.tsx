@@ -44,7 +44,7 @@ export default function SystemComponentNode({
   const Component = components[data.name] ?? DefaultComponent;
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const { icon: ComponentIcon, content } = getSystemComponent(data.name);
-
+  const displayName = data.configs["display name"] as string;
   return (
     <>
       {!withoutTargetHandle.includes(data.name) && (
@@ -67,7 +67,7 @@ export default function SystemComponentNode({
             "opacity-50",
         )}
       >
-        <Component name={data.displayName ?? data.id} Icon={data.icon} />
+        <Component name={displayName || data.id} Icon={data.icon} />
         {content && (
           <WithMarkdownDetails
             className="absolute left-0 top-[-17px] rounded-full bg-gray-200 opacity-0 transition-all group-hover:opacity-100 dark:bg-gray-700"

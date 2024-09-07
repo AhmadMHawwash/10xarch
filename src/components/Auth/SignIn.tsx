@@ -50,7 +50,6 @@ export function SignIn() {
         onSubmit={(evt) => {
           evt.preventDefault();
           void form.handleSubmit(async () => {
-            console.log("form submitted");
             formAction(new FormData(formRef.current!));
           })(evt);
         }}

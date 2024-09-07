@@ -8,7 +8,6 @@ export async function signin(
   prevState: SignInFormState,
   payload: FormData,
 ): Promise<SignInFormState> {
-  console.log("signin");
   const formData = Object.fromEntries(payload);
   const parsedData = signInFormSchema.safeParse(formData);
 

@@ -8,6 +8,9 @@ interface EvaluationResponse {
   score: number;
   fixes: string[];
 }
+interface PlaygroundResponse {
+  suggestions: string[];
+}
 
 const openai = new OpenAI({
   apiKey: env.OPENAI_API_KEY,
@@ -120,6 +123,93 @@ export const checkSolution = createTRPCRouter({
             typeof jsonResponse.score !== "number" ||
             !Array.isArray(jsonResponse.fixes)
           ) {
+            throw new Error("Invalid response format");
+          }
+
+          return jsonResponse;
+        } catch (parseError) {
+          console.error("Error parsing OpenAI response as JSON:", parseError);
+          throw new Error(
+            "Failed to parse the evaluation result. Please try again later.",
+          );
+        }
+      } catch (error) {
+        console.error("Error calling OpenAI API:", error);
+        throw new Error(
+          "Failed to evaluate the solution. Please try again later.",
+        );
+      }
+    }),
+  playground: publicProcedure
+    .input(
+      z.object({
+        systemDesign: z.string(),
+        systemDesignContext: z.string(),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      const { systemDesign, systemDesignContext } = input;
+
+      try {
+        const response = await openai.chat.completions.create({
+          model: "gpt-4o-mini",
+          messages: [
+            {
+              role: "system",
+              content: [
+                {
+                  type: "text",
+                  text: "You are a system design evaluation expert. You will receive: \n1. The systemDesignContext, which describes the system and business \n2. the systemDesign, which is the proposed solution. \nYour task is to evaluate the provided solution in the context of: \n1. systemDesignContext, \n2. The systemDesign. And then provide some suggestions for the user to improve their solution.",
+                },
+              ],
+            },
+            {
+              role: "assistant",
+              content: [
+                {
+                  type: "text",
+                  text: `Take a comprehensive look at the system design and provide suggestions for the user to improve their solution. Remember that you are the expert and the user is the one who needs to improve their solution.`,
+                },
+              ],
+            },
+            {
+              role: "user",
+              content: [
+                {
+                  type: "text",
+                  text: `systemDesignContext: ${systemDesignContext} \n systemDesign: ${systemDesign}`,
+                },
+              ],
+            },
+            {
+              role: "assistant",
+              content: [
+                {
+                  type: "text",
+                  text: `Respond in JSON format {suggestions: [listOfSuggestions]}. And be concise.`,
+                },
+              ],
+            },
+          ],
+          temperature: 1,
+          max_tokens: 256,
+          top_p: 0,
+          frequency_penalty: 0,
+          presence_penalty: 0,
+          response_format: {
+            type: "text",
+          },
+        });
+
+        const content =
+          response.choices[0]?.message.content ?? "No response generated";
+
+        // Parse the content as JSON with type checking
+        try {
+          const jsonResponse = JSON.parse(content) as PlaygroundResponse;
+
+          // Validate the parsed response
+          if (!Array.isArray(jsonResponse.suggestions)) {
             throw new Error("Invalid response format");
           }
 

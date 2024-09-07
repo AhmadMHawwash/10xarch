@@ -53,6 +53,8 @@ const SystemDesigner = () => {
     onConnect(params);
   };
 
+  const whiteboardNode = nodes.find((node) => node.type === "Whiteboard")!;
+
   return (
     <div
       className="relative flex h-full flex-grow flex-col bg-white dark:bg-gray-900"
@@ -71,21 +73,11 @@ const SystemDesigner = () => {
         onDragOver={onDragOver}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
-        onNodeClick={(_, node) => {
-          if (node.type === "Whiteboard") return;
-
-          onSelectNode(node);
-        }}
-        onNodeDragStart={(_, node) => {
-          if (node.type === "Whiteboard") return;
-
-          onSelectNode(node);
-        }}
-        onSelectionStart={() => {
-          onSelectNode(null);
-        }}
-        onNodesDelete={() => onSelectNode(null)}
-        onPaneClick={() => onSelectNode(null)}
+        onNodeClick={(_, node) => onSelectNode(node)}
+        onNodeDragStart={(_, node) => onSelectNode(node)}
+        onSelectionStart={() => onSelectNode(whiteboardNode)}
+        onNodesDelete={() => onSelectNode(whiteboardNode)}
+        onPaneClick={() => onSelectNode(whiteboardNode)}
         defaultEdgeOptions={{
           markerEnd: { type: MarkerType.ArrowClosed },
           animated: true,

@@ -17,7 +17,6 @@ import {
   useSystemDesigner,
 } from "@/lib/hooks/useSystemDesigner";
 import { cn } from "@/lib/utils";
-import { useEffect, useRef, useState } from "react";
 import { ReactFlowProvider } from "reactflow";
 
 export default function Page() {
@@ -32,15 +31,7 @@ export default function Page() {
 
 function PageContent() {
   const { selectedNode } = useSystemDesigner();
-  const { useSystemComponentConfigSlice, updateNodeDisplayName } =
-    usePlaygroundManager();
-
-  const [displayName, setDisplayName] = useState<string>(
-    selectedNode?.data.displayName ?? selectedNode?.data.id ?? "",
-  );
-  const previousSelectedNodeId = useRef<string | null>(
-    selectedNode?.id ?? null,
-  );
+  const { useSystemComponentConfigSlice } = usePlaygroundManager();
 
   const [todos, setTodos] = useSystemComponentConfigSlice<TodoItem[]>(
     selectedNode?.id ?? "",
@@ -57,29 +48,19 @@ function PageContent() {
     "context",
     "",
   );
-
-  useEffect(() => {
-    // @important: keep the order of the following operations as they are
-    // if selected node has changed
-    // 1. update the node display name on application state
-    updateNodeDisplayName(previousSelectedNodeId.current ?? "", displayName);
-
-    // 2. update the display name on local state
-    setDisplayName(
-      selectedNode?.data.displayName ?? selectedNode?.data.id ?? "",
-    );
-
-    // 3. update the previous selected node id on local state
-    previousSelectedNodeId.current = selectedNode?.id ?? null;
-  }, [selectedNode]);
+  const [displayName, setDisplayName] = useSystemComponentConfigSlice<string>(
+    selectedNode?.id ?? "",
+    "display name",
+    "",
+  );
 
   return (
     <ResizablePanelGroup direction="horizontal">
       <ResizablePanel defaultSize={25} minSize={3}>
-        <div className="flex w-[95%] min-w-[300px] flex-col">
+        <div className="flex w-[95%] min-w-[300px] flex-col items-center">
           <H3 className="p-2 pl-3">
-            {selectedNode?.data.id
-              ? `'${selectedNode?.data.displayName}' ${selectedNode?.data.name}`
+            {selectedNode?.data.id && selectedNode.type !== "Whiteboard"
+              ? `'${displayName || selectedNode.data.id}' ${selectedNode?.data.name}`
               : "System"}
           </H3>
           <Input
@@ -88,6 +69,7 @@ function PageContent() {
             value={displayName}
             onChange={(e) => {
               if (!selectedNode?.id) return;
+
               setDisplayName(e.target.value);
             }}
           />

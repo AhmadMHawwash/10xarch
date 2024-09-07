@@ -11,7 +11,6 @@ export async function signup(
   const formData = Object.fromEntries(payload);
   const parsedData = signUpFormSchema.safeParse(formData);
 
-  console.log(formData, parsedData);
   if (!parsedData.success) {
     return {
       message: parsedData.error.message,

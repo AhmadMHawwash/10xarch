@@ -1,9 +1,8 @@
 // import { type SystemComponentNodeDataProps } from "@/components/ReactflowCustomNodes/APIsNode";
 import {
-  type SystemComponentNodeDataProps,
   type OtherNodeDataProps,
+  type SystemComponentNodeDataProps,
 } from "@/components/ReactflowCustomNodes/SystemComponentNode";
-import { type Challenge } from "@/content/challenges/types";
 import { api } from "@/trpc/react";
 import { useParams } from "next/navigation";
 import { useCallback } from "react";
@@ -17,18 +16,18 @@ export const usePlaygroundManager = () => {
 
   const { updateNodes, nodes, edges } = useSystemDesigner();
 
-  const { mutate, data, isPending } = api.ai.hello.useMutation();
+  const { mutate, data, isPending } = api.ai.playground.useMutation();
 
   const checkSolution = async () => {
-    const promptBuilder = getLLMPromptBuilder({
-      nodes,
-      edges,
-    });
-    // const prompt = promptBuilder(challenge!, currentLevel!);
+    // const promptBuilder = getPrompt({
+    //   nodes,
+    //   edges,
+    // });
+    // const prompt = promptBuilder(challenge, currentLevel);
 
     // mutate({
-    //   challengeAndSolutionPrompt: prompt,
-    //   criteria: currentLevel?.criteria ?? [],
+    //   systemDesign: prompt,
+    //   systemDesignContext: prompt,
     // });
   };
 
@@ -66,7 +65,6 @@ export const usePlaygroundManager = () => {
   );
 
   const updateNodeDisplayName = (nodeId: string, displayName: string) => {
-    console.log("updateNodeDisplayName", nodeId, displayName);
     const updatedNodes = nodes.map((node) => {
       if (node.id === nodeId) {
         return {
@@ -97,10 +95,7 @@ const getLLMPromptBuilder = ({
 }: {
   nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[];
   edges: Edge[];
-}): ((
-  challenge: Challenge,
-  currentStage: Challenge["stages"][number],
-) => string) => {
+}): string => {
   const extractRequirements = (
     nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[],
   ) => {
@@ -164,41 +159,25 @@ const getLLMPromptBuilder = ({
       "and it targets these nodes": findTargets(node.id),
     }));
 
-  const buildLLMPrompt = (
-    challenge: Challenge,
-    currentStage: Challenge["stages"][number],
-  ) => {
-    const whiteboardData = extractRequirements(nodes);
+  const whiteboardData = extractRequirements(nodes);
 
-    const prompt = {
-      challenge: {
-        title: challenge?.title ?? "",
-        description: `${challenge?.description}. \nAnd this challenge has a set of levels ${challenge?.stages.length} to be exact, each level depend on the previous one, and the user tackles them one by one.`,
-      },
-      "Current level of the challenge": {
-        problem: currentStage?.problem ?? "",
-        assumptions: currentStage?.assumptions ?? [],
-        hintsPerArea: currentStage?.hintsPerArea ?? {},
-      },
-      solution: {
-        components: cleanedNodes,
-        "API definitions": whiteboardData?.apiDefinitions ?? [],
-        "Traffic capacity estimation ":
-          whiteboardData?.capacityEstimations?.traffic ?? "",
-        "Storage capacity estimation":
-          whiteboardData?.capacityEstimations?.storage ?? "",
-        "Bandwidth capacity estimation":
-          whiteboardData?.capacityEstimations?.bandwidth ?? "",
-        "Memory capacity estimation":
-          whiteboardData?.capacityEstimations?.memory ?? "",
-        "Functional requirments": whiteboardData?.functionalRequirements ?? "",
-        "Non functional requirments":
-          whiteboardData?.nonFunctionalRequirements ?? "",
-      },
-    };
-
-    return JSON.stringify(prompt, null, 2);
+  const prompt = {
+    solution: {
+      components: cleanedNodes,
+      "API definitions": whiteboardData?.apiDefinitions ?? [],
+      "Traffic capacity estimation ":
+        whiteboardData?.capacityEstimations?.traffic ?? "",
+      "Storage capacity estimation":
+        whiteboardData?.capacityEstimations?.storage ?? "",
+      "Bandwidth capacity estimation":
+        whiteboardData?.capacityEstimations?.bandwidth ?? "",
+      "Memory capacity estimation":
+        whiteboardData?.capacityEstimations?.memory ?? "",
+      "Functional requirments": whiteboardData?.functionalRequirements ?? "",
+      "Non functional requirments":
+        whiteboardData?.nonFunctionalRequirements ?? "",
+    },
   };
 
-  return buildLLMPrompt;
+  return JSON.stringify(prompt, null, 2);
 };

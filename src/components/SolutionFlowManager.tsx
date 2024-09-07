@@ -65,7 +65,7 @@ export const FlowManager: React.FC = () => {
               Reset
             </span>
           }
-          className="rounded-md border-gray-300 bg-gray-200 p-2 text-gray-800 transition-all hover:bg-gray-300 dark:border-gray-700 border dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-700"
+          className="rounded-md border border-gray-300 bg-background p-2 text-gray-800 transition-all hover:bg-gray-300 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700"
           onReset={() => {
             setResetDone(true);
             resetFlow();

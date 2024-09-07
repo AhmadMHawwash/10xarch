@@ -65,11 +65,29 @@ export const usePlaygroundManager = () => {
     [nodes, updateNodes],
   );
 
+  const updateNodeDisplayName = (nodeId: string, displayName: string) => {
+    console.log("updateNodeDisplayName", nodeId, displayName);
+    const updatedNodes = nodes.map((node) => {
+      if (node.id === nodeId) {
+        return {
+          ...node,
+          data: {
+            ...node.data,
+            displayName,
+          },
+        };
+      }
+      return node;
+    });
+    updateNodes(updatedNodes);
+  };
+
   return {
     checkSolution,
     useSystemComponentConfigSlice,
     isLoadingAnswer: isPending,
     answer: data,
+    updateNodeDisplayName,
   };
 };
 

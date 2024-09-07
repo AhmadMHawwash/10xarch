@@ -22,6 +22,7 @@ export type SystemComponentNodeDataProps = {
   withTargetHandle?: boolean;
   withSourceHandle?: boolean;
   configs: Record<string, unknown>;
+  displayName?: string;
 };
 
 export type OtherNodeDataProps = {
@@ -31,6 +32,7 @@ export type OtherNodeDataProps = {
   withTargetHandle?: boolean;
   withSourceHandle?: boolean;
   configs: Record<string, unknown>;
+  displayName?: string;
 };
 
 export default function SystemComponentNode({
@@ -65,7 +67,7 @@ export default function SystemComponentNode({
             "opacity-50",
         )}
       >
-        <Component name={data.id} Icon={data.icon} />
+        <Component name={data.displayName ?? data.id} Icon={data.icon} />
         {content && (
           <WithMarkdownDetails
             className="absolute left-0 top-[-17px] rounded-full bg-gray-200 opacity-0 transition-all group-hover:opacity-100 dark:bg-gray-700"

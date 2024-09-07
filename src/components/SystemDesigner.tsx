@@ -1,7 +1,5 @@
 "use client";
-import {
-  useSystemDesigner
-} from "@/lib/hooks/useSystemDesigner";
+import { useSystemDesigner } from "@/lib/hooks/useSystemDesigner";
 import { type ComponentType } from "react";
 import ReactFlow, {
   Background,
@@ -13,7 +11,7 @@ import ReactFlow, {
   SelectionMode,
   type EdgeProps,
   type NodeProps,
-  type OnConnect
+  type OnConnect,
 } from "reactflow";
 import "reactflow/dist/base.css";
 import "reactflow/dist/style.css";
@@ -25,7 +23,7 @@ import { Whiteboard } from "./SystemComponents/Whiteboard";
 
 const nodeTypes: Record<string, ComponentType<NodeProps>> = {
   SystemComponentNode,
-  Whiteboard
+  Whiteboard,
 };
 
 const edgeTypes: Record<string, ComponentType<EdgeProps>> = {
@@ -73,7 +71,20 @@ const SystemDesigner = () => {
         onDragOver={onDragOver}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
-        onNodeClick={(_, node) => onSelectNode(node)}
+        onNodeClick={(_, node) => {
+          if (node.type === "Whiteboard") return;
+
+          onSelectNode(node);
+        }}
+        onNodeDragStart={(_, node) => {
+          if (node.type === "Whiteboard") return;
+
+          onSelectNode(node);
+        }}
+        onSelectionStart={() => {
+          onSelectNode(null);
+        }}
+        onNodesDelete={() => onSelectNode(null)}
         onPaneClick={() => onSelectNode(null)}
         defaultEdgeOptions={{
           markerEnd: { type: MarkerType.ArrowClosed },

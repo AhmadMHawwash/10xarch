@@ -1,11 +1,11 @@
 import { Input } from "@/components/ui/input";
-import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
+import { Textarea } from "@/components/ui/textarea";
+import { useSystemDesigner } from "@/lib/hooks/useSystemDesigner";
 import { type ComponentNodeProps } from "../../ReactflowCustomNodes/SystemComponentNode";
 import { Label } from "../../ui/label";
 import { Small } from "../../ui/typography";
 import { WithSettings } from "../Wrappers/WithSettings";
-import { Textarea } from "@/components/ui/textarea";
-import { ListAndDetails } from "@/components/TextualSolution/APIDefinition";
+import { ListAndDetails } from "../Database";
 
 export const DatabaseCluster = ({ name, Icon }: ComponentNodeProps) => {
   return (
@@ -18,15 +18,16 @@ export const DatabaseCluster = ({ name, Icon }: ComponentNodeProps) => {
 };
 
 const DatabaseClusterSettings = ({ name: id }: { name: string }) => {
-  const { useSystemComponentConfigSlice } = useChallengeManager();
+  const { useSystemComponentConfigSlice } = useSystemDesigner();
 
   const [primaryInstancesCount, setPrimaryInstancesCount] =
-    useSystemComponentConfigSlice<number>(id, "Number of Primary instances");
+    useSystemComponentConfigSlice<number>(id, "Number of Primary instances", 1);
   const [replicaInstancesCount, setReplicaInstancesCount] =
-    useSystemComponentConfigSlice<number>(id, "Number of Replica instances");
+    useSystemComponentConfigSlice<number>(id, "Number of Replica instances", 0);
   const [purpose, setPurpose] = useSystemComponentConfigSlice<string>(
     id,
     "Database Cluster purpose",
+    ""
   );
   const [models, setModels] = useSystemComponentConfigSlice<[string, string][]>(
     id,
@@ -77,7 +78,7 @@ const DatabaseClusterSettings = ({ name: id }: { name: string }) => {
             textareaRowsCount={10}
             items={models}
             onChange={setModels}
-            onDelete={(index) => {
+            onDelete={(index: number) => {
               const newModels = models.filter((_, i) => i !== index);
               setModels(newModels);
             }}

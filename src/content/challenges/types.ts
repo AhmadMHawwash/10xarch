@@ -3,15 +3,17 @@ export type Challenge = {
   title: string;
   description: string;
   difficulty: "Easy" | "Medium" | "Hard";
-  stages: {
-    problem: string;
-    assumptions: string[];
-    hintsPerArea: {
-      functionalAndNonFunctionalRequirements: string[];
-      systemAPI: string[];
-      capacityEstimations: string[];
-      highLevelDesign: string[];
-    };
-    criteria: string[];
-  }[];
+  stages: Stage[];
+};
+
+export type Stage = {
+  problem: string;
+  assumptions: string[];
+  hintsPerArea: {
+    functionalAndNonFunctionalRequirements: string[];
+    systemAPI: string[];
+    capacityEstimations: string[];
+    highLevelDesign: string[];
+  };
+  criteria: string[];
 };

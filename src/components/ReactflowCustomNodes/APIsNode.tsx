@@ -1,4 +1,4 @@
-import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
+import { useSystemDesigner } from "@/lib/hooks/useSystemDesigner";
 
 export type SystemComponentNodeDataProps = {
   id: string;
@@ -23,7 +23,7 @@ export type SystemComponentNodeDataProps = {
 export type Capacity = "Traffic" | "Storage" | "Bandwidth" | "Memory";
 export type API = { name: string; definition: string; flow: string };
 export const useWhiteboard = () => {
-  const { useSystemComponentConfigSlice } = useChallengeManager();
+  const { useSystemComponentConfigSlice } = useSystemDesigner();
 
   const whiteboardId = "Whiteboard-1";
   const [apis, setApis] = useSystemComponentConfigSlice<API[]>(

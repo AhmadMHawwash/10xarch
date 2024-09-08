@@ -1,19 +1,18 @@
-import { env } from "@/env";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import OpenAI from "openai";
 import { z } from "zod";
 
 // Define the response type
-interface EvaluationResponse {
+export interface EvaluationResponse {
   score: number;
-  fixes: string[];
+  feedback: string[];
 }
-interface PlaygroundResponse {
-  suggestions: string[];
+export interface PlaygroundResponse {
+  feedback: string[];
 }
 
 const openai = new OpenAI({
-  apiKey: env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 export const checkSolution = createTRPCRouter({
@@ -87,7 +86,7 @@ export const checkSolution = createTRPCRouter({
               content: [
                 {
                   type: "text",
-                  text: `Respond in JSON format {score: [score], fixes: [listOfElementsToBeFixed]}. Knowing that score range: 1 - 100, if any criteria is not met then take down from the score, other than that a 90/100 if and only if the solution met all the criteria then a 90/100 score is deserved. However a 100/100 is well deserved for exceeding the criteria)`,
+                  text: `Respond in JSON format {score: [score], feedback: [listOfElementsToBeFixed]}. Knowing that score range: 1 - 100, if any criteria is not met then take down from the score, other than that a 90/100 if and only if the solution met all the criteria then a 90/100 score is deserved. However a 100/100 is well deserved for exceeding the criteria)`,
                 },
               ],
             },
@@ -102,7 +101,7 @@ export const checkSolution = createTRPCRouter({
             },
           ],
           temperature: 1,
-          max_tokens: 256,
+          max_tokens: 512,
           top_p: 0,
           frequency_penalty: 0,
           presence_penalty: 0,
@@ -112,7 +111,7 @@ export const checkSolution = createTRPCRouter({
         });
 
         const content =
-          response.choices[0]?.message.content ?? "No response generated";
+        response.choices[0]?.message.content ?? "No response generated";
 
         // Parse the content as JSON with type checking
         try {
@@ -121,7 +120,7 @@ export const checkSolution = createTRPCRouter({
           // Validate the parsed response
           if (
             typeof jsonResponse.score !== "number" ||
-            !Array.isArray(jsonResponse.fixes)
+            !Array.isArray(jsonResponse.feedback)
           ) {
             throw new Error("Invalid response format");
           }
@@ -159,7 +158,7 @@ export const checkSolution = createTRPCRouter({
               content: [
                 {
                   type: "text",
-                  text: "You are a system design evaluation expert. You will receive: \n1. The systemDesignContext, which describes the system and business \n2. the systemDesign, which is the proposed solution. \nYour task is to evaluate the provided solution in the context of: \n1. systemDesignContext, \n2. The systemDesign. And then provide some suggestions for the user to improve their solution.",
+                  text: "You are a system design evaluation expert. You will receive: \n1. The systemDesignContext, which describes the system and business \n2. the systemDesign, which is the proposed solution. \nYour task is to evaluate the provided solution in the context of: \n1. systemDesignContext, \n2. The systemDesign. And then provide some feedback for the user to improve their solution.",
                 },
               ],
             },
@@ -168,7 +167,7 @@ export const checkSolution = createTRPCRouter({
               content: [
                 {
                   type: "text",
-                  text: `Take a comprehensive look at the system design and provide suggestions for the user to improve their solution. Remember that you are the expert and the user is the one who needs to improve their solution.`,
+                  text: `Take a comprehensive look at the system design and provide feedback for the user to improve their solution. Remember that you are the expert and the user is the one who needs to improve their solution.`,
                 },
               ],
             },
@@ -186,13 +185,13 @@ export const checkSolution = createTRPCRouter({
               content: [
                 {
                   type: "text",
-                  text: `Respond in JSON format {suggestions: [listOfSuggestions]}. And be concise.`,
+                  text: `Respond concisely in JSON format {feedback: [string]}`,
                 },
               ],
             },
           ],
           temperature: 1,
-          max_tokens: 256,
+          max_tokens: 512,
           top_p: 0,
           frequency_penalty: 0,
           presence_penalty: 0,
@@ -209,7 +208,7 @@ export const checkSolution = createTRPCRouter({
           const jsonResponse = JSON.parse(content) as PlaygroundResponse;
 
           // Validate the parsed response
-          if (!Array.isArray(jsonResponse.suggestions)) {
+          if (!Array.isArray(jsonResponse.feedback)) {
             throw new Error("Invalid response format");
           }
 

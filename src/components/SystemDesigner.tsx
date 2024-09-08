@@ -1,6 +1,6 @@
 "use client";
 import { useSystemDesigner } from "@/lib/hooks/useSystemDesigner";
-import { type ComponentType } from "react";
+import { useEffect, type ComponentType } from "react";
 import ReactFlow, {
   Background,
   BackgroundVariant,
@@ -11,14 +11,13 @@ import ReactFlow, {
   SelectionMode,
   type EdgeProps,
   type NodeProps,
-  type OnConnect,
+  type OnConnect
 } from "reactflow";
 import "reactflow/dist/base.css";
 import "reactflow/dist/style.css";
 import { CustomEdge } from "./CustomEdge";
 import Gallery from "./Gallery";
 import SystemComponentNode from "./ReactflowCustomNodes/SystemComponentNode";
-import { FlowManager } from "./SolutionFlowManager";
 import { Whiteboard } from "./SystemComponents/Whiteboard";
 
 const nodeTypes: Record<string, ComponentType<NodeProps>> = {
@@ -30,7 +29,11 @@ const edgeTypes: Record<string, ComponentType<EdgeProps>> = {
   CustomEdge,
 };
 
-const SystemDesigner = () => {
+const SystemDesigner = ({
+  PassedFlowManager,
+}: {
+  PassedFlowManager: () => React.ReactNode;
+}) => {
   const {
     nodes,
     edges,
@@ -54,6 +57,10 @@ const SystemDesigner = () => {
   };
 
   const whiteboardNode = nodes.find((node) => node.type === "Whiteboard")!;
+
+  useEffect(() => {
+    onSelectNode(whiteboardNode);
+  }, []);
 
   return (
     <div
@@ -100,7 +107,7 @@ const SystemDesigner = () => {
           size={1}
         />
         <Panel position="bottom-center">
-          <FlowManager />
+          <PassedFlowManager />
         </Panel>
         <Panel position="top-right" className="m-auto flex">
           <Gallery />
@@ -111,6 +118,10 @@ const SystemDesigner = () => {
   );
 };
 
-export default function SystemBuilder() {
-  return <SystemDesigner />;
+export default function SystemBuilder({
+  PassedFlowManager,
+}: {
+  PassedFlowManager: () => React.ReactNode;
+}) {
+  return <SystemDesigner PassedFlowManager={PassedFlowManager} />;
 }

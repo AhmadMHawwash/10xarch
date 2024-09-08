@@ -8,7 +8,6 @@ import { useState } from "react";
 import SuperJSON from "superjson";
 
 import { type AppRouter } from "@/server/api/root";
-import { env } from "@/env";
 
 const createQueryClient = () => new QueryClient();
 
@@ -46,7 +45,7 @@ export function TRPCReactProvider(props: { children: React.ReactNode }) {
       links: [
         loggerLink({
           enabled: (op) =>
-            env.NODE_ENV === "development" ||
+            process.env.NODE_ENV === "development" ||
             (op.direction === "down" && op.result instanceof Error),
         }),
         unstable_httpBatchStreamLink({

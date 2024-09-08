@@ -2,6 +2,7 @@
 import Notes, { type Note } from "@/components/playground/Notes";
 import SystemContext from "@/components/playground/SystemContext";
 import TodoList, { type TodoItem } from "@/components/playground/TodoList";
+import { FlowManager } from "@/components/SolutionFlowManager";
 import SystemBuilder from "@/components/SystemDesigner";
 import { Input } from "@/components/ui/input";
 import {
@@ -30,8 +31,12 @@ export default function Page() {
 }
 
 function PageContent() {
-  const { selectedNode } = useSystemDesigner();
-  const { useSystemComponentConfigSlice } = usePlaygroundManager();
+  const { selectedNode, useSystemComponentConfigSlice } = useSystemDesigner();
+  const {
+    checkSolution,
+    answer: feedback,
+    isLoadingAnswer,
+  } = usePlaygroundManager();
 
   const [todos, setTodos] = useSystemComponentConfigSlice<TodoItem[]>(
     selectedNode?.id ?? "",
@@ -93,7 +98,15 @@ function PageContent() {
       </ResizablePanel>
       <ResizableHandle className="w-1 bg-gray-300 transition-colors hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600" />
       <ResizablePanel defaultSize={75} minSize={60}>
-        <SystemBuilder />
+        <SystemBuilder
+          PassedFlowManager={() => (
+            <FlowManager
+              checkSolution={checkSolution}
+              feedback={feedback}
+              isLoadingAnswer={isLoadingAnswer}
+            />
+          )}
+        />
       </ResizablePanel>
     </ResizablePanelGroup>
   );

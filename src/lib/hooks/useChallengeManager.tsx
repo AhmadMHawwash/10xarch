@@ -1,12 +1,11 @@
 import {
-  type SystemComponentNodeDataProps,
   type OtherNodeDataProps,
+  type SystemComponentNodeDataProps,
 } from "@/components/ReactflowCustomNodes/SystemComponentNode";
 import challenges from "@/content/challenges";
 import { type Challenge } from "@/content/challenges/types";
 import { api } from "@/trpc/react";
 import { useParams } from "next/navigation";
-import { useCallback } from "react";
 import { type Edge, type Node } from "reactflow";
 import { create } from "zustand";
 import { useSystemDesigner } from "./useSystemDesigner";
@@ -63,7 +62,7 @@ export const useChallengeManager = () => {
   const { mutate, data, isPending } = api.ai.hello.useMutation();
 
   const checkSolution = async () => {
-    const promptBuilder = getLLMPromptBuilder({
+    const promptBuilder = getChallengePrompt({
       nodes,
       edges,
     });
@@ -74,39 +73,6 @@ export const useChallengeManager = () => {
       criteria: currentLevel?.criteria ?? [],
     });
   };
-
-  const useSystemComponentConfigSlice = useCallback(
-    <T,>(
-      componentId: string,
-      configKey: string,
-      defaultValue?: T,
-    ): [T, (configValue: T) => void] => {
-      const component = nodes.find((node) => node.id === componentId);
-
-      return [
-        (component?.data.configs?.[configKey] ?? defaultValue) as T,
-        (configValue: T) => {
-          const updatedNodes = nodes.map((node) => {
-            if (node.id === componentId) {
-              return {
-                ...node,
-                data: {
-                  ...node.data,
-                  configs: {
-                    ...node.data.configs,
-                    [configKey]: configValue,
-                  },
-                },
-              };
-            }
-            return node;
-          });
-          updateNodes(updatedNodes);
-        },
-      ];
-    },
-    [nodes, updateNodes],
-  );
 
   return {
     challenge: challenge!,
@@ -124,15 +90,14 @@ export const useChallengeManager = () => {
       return;
     },
     checkSolution,
-    useSystemComponentConfigSlice,
     currentStageIndex,
     setChallenge,
     isLoadingAnswer: isPending,
-    answer: data,
+    feedback: data,
   };
 };
 
-const getLLMPromptBuilder = ({
+export const getChallengePrompt = ({
   nodes,
   edges,
 }: {

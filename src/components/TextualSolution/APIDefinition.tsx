@@ -9,7 +9,7 @@ import {
 import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
 import { cn } from "@/lib/utils";
 import { CableIcon, InfoIcon, PlusIcon, X } from "lucide-react";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { WithMarkdownDetails } from "../SystemComponents/Wrappers/WithMarkdownDetails";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -23,6 +23,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 export const APIDefinition = () => {
   const { stage } = useChallengeManager();
   const { apis, setApis } = useWhiteboard();
+
+  const handleApiChange = useCallback((newApis: API[]) => {
+    setApis(newApis);
+  }, [setApis]);
 
   return (
     <Dialog>
@@ -42,7 +46,7 @@ export const APIDefinition = () => {
 
             <ListAndMultiDetails
               apis={apis}
-              onChangeApi={setApis}
+              onChangeApi={handleApiChange}
               onDeleteApi={(index) => {
                 const newApis = apis.filter((_, i) => i !== index);
                 setApis(newApis);
@@ -151,114 +155,6 @@ POST /shorten {
 \`\`\`
 `;
 
-export const ListAndDetails = ({
-  items,
-  onChange,
-  onDelete,
-  onAdd,
-  textareaPlaceholder,
-  textareaRowsCount = 25,
-}: {
-  items: [string, string][];
-  onChange: (items: [string, string][]) => void;
-  onDelete: (index: number) => void;
-  onAdd: () => void;
-  textareaPlaceholder?: string;
-  textareaRowsCount?: number;
-}) => {
-  const [selectedKeyIndex, setSelectedKeyIndex] = useState<number>(0);
-  const [inputValue, setInputValue] = useState<string>(
-    items[selectedKeyIndex]?.[0] ?? "",
-  );
-  const [textareaValue, setTextareaValue] = useState<string>(
-    items[selectedKeyIndex]?.[1] ?? "",
-  );
-
-  return (
-    <div className="flex w-full flex-row">
-      <div className="mr-2 flex w-36 flex-col rounded-sm border border-gray-300 dark:border-gray-600">
-        {items.map(([key, value], index) => (
-          <div
-            className={cn(
-              "group relative flex border-b border-gray-300 transition-all hover:cursor-pointer hover:bg-gray-200 dark:border-gray-600 dark:hover:bg-gray-700",
-              { [`bg-gray-200 dark:bg-gray-700`]: selectedKeyIndex === index },
-            )}
-            onClick={() => {
-              setSelectedKeyIndex(index);
-              setInputValue(key);
-              setTextareaValue(value);
-            }}
-            key={key + index}
-          >
-            <Small className="mr-2 overflow-hidden p-2 text-gray-700 dark:text-gray-300">
-              {key}
-            </Small>
-            <span className="absolute right-2 top-2 rounded-full bg-gray-300 opacity-0 hover:cursor-pointer group-hover:opacity-100 dark:bg-gray-600">
-              <X
-                size={16}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onDelete(index);
-                }}
-                className="text-gray-700 dark:text-gray-300"
-              />
-            </span>
-          </div>
-        ))}
-        <Button
-          size="xs"
-          variant="ghost"
-          onClick={onAdd}
-          className="text-gray-700 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-700"
-        >
-          <PlusIcon size="16" />
-        </Button>
-      </div>
-      {!isNaN(selectedKeyIndex) ? (
-        <div className="flex w-full flex-col">
-          <Input
-            type="text"
-            className="mb-2 h-8 border-gray-300 bg-gray-100 text-gray-800 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
-            value={inputValue}
-            onChange={(e) => {
-              setInputValue(e.target.value);
-            }}
-            onBlur={() => {
-              const newApis = items.map(
-                ([name, value], i) =>
-                  (i === selectedKeyIndex
-                    ? [inputValue, value]
-                    : [name, value]) as [string, string],
-              );
-              onChange(newApis);
-            }}
-          />
-          <Textarea
-            rows={textareaRowsCount}
-            value={textareaValue}
-            onBlur={() => {
-              const newApis = items.map(
-                ([name, value], i) =>
-                  (i === selectedKeyIndex
-                    ? [name, textareaValue]
-                    : [name, value]) as [string, string],
-              );
-              onChange(newApis);
-            }}
-            onChange={(e) => setTextareaValue(e.target.value)}
-            placeholder={textareaPlaceholder}
-            className="text-md border-gray-300 bg-gray-100 text-gray-900 focus:border-gray-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-gray-600"
-          />
-        </div>
-      ) : (
-        <H6 className="text-center text-gray-700 dark:text-gray-300">
-          Select an API to view or add a new one
-        </H6>
-      )}
-    </div>
-  );
-};
-
 export const ListAndMultiDetails = ({
   apis,
   onChangeApi,
@@ -277,15 +173,13 @@ export const ListAndMultiDetails = ({
   textareaRowsCount?: number;
 }) => {
   const [selectedKeyIndex, setSelectedKeyIndex] = useState<number>(0);
-  const [inputValue, setInputValue] = useState<string>(
-    apis[selectedKeyIndex]?.name ?? "",
-  );
-  const [apiDefinition, setApiDefinition] = useState<string>(
-    apis[selectedKeyIndex]?.definition ?? "",
-  );
-  const [apiFlow, setApiFlow] = useState<string>(
-    apis[selectedKeyIndex]?.flow ?? "",
-  );
+
+  const handleInputChange = useCallback((index: number, field: keyof API, value: string) => {
+    const newApis = apis.map((api, i) =>
+      i === index ? { ...api, [field]: value } : api
+    );
+    onChangeApi(newApis);
+  }, [apis, onChangeApi]);
 
   return (
     <div className="flex w-full flex-row">
@@ -298,9 +192,6 @@ export const ListAndMultiDetails = ({
             )}
             onClick={() => {
               setSelectedKeyIndex(index);
-              setInputValue(key);
-              setApiDefinition(def);
-              setApiFlow(flow);
             }}
             key={key + index}
           >
@@ -332,16 +223,8 @@ export const ListAndMultiDetails = ({
         <Input
           type="text"
           className="mb-2 h-8 border-gray-300 bg-gray-100 text-gray-800 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
-          value={inputValue}
-          onChange={(e) => {
-            setInputValue(e.target.value);
-          }}
-          onBlur={() => {
-            const newApis = apis.map<API>((oldApi, i) =>
-              i === selectedKeyIndex ? { ...oldApi, name: inputValue } : oldApi,
-            );
-            onChangeApi(newApis);
-          }}
+          value={apis[selectedKeyIndex]?.name ?? ""}
+          onChange={(e) => handleInputChange(selectedKeyIndex, "name", e.target.value)}
         />
         <Tabs defaultValue="api-definition" className="w-full">
           <TabsList className="w-full bg-gray-200 dark:bg-gray-700">
@@ -355,16 +238,8 @@ export const ListAndMultiDetails = ({
           <TabsContent value="api-definition">
             <Textarea
               rows={textareaRowsCount}
-              value={apiDefinition}
-              onBlur={() => {
-                const newApis = apis.map<API>((oldApi, i) =>
-                  i === selectedKeyIndex
-                    ? { ...oldApi, definition: apiDefinition }
-                    : oldApi,
-                );
-                onChangeApi(newApis);
-              }}
-              onChange={(e) => setApiDefinition(e.target.value)}
+              value={apis[selectedKeyIndex]?.definition ?? ""}
+              onChange={(e) => handleInputChange(selectedKeyIndex, "definition", e.target.value)}
               placeholder={apiPlaceholder}
               className="text-md border-gray-300 bg-gray-100 text-gray-900 focus:border-gray-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-gray-600"
             />
@@ -372,16 +247,8 @@ export const ListAndMultiDetails = ({
           <TabsContent value="api-flow">
             <Textarea
               rows={textareaRowsCount}
-              value={apiFlow}
-              onBlur={() => {
-                const newApis = apis.map<API>((oldApi, i) =>
-                  i === selectedKeyIndex
-                    ? { ...oldApi, flow: apiFlow }
-                    : oldApi,
-                );
-                onChangeApi(newApis);
-              }}
-              onChange={(e) => setApiFlow(e.target.value)}
+              value={apis[selectedKeyIndex]?.flow ?? ""}
+              onChange={(e) => handleInputChange(selectedKeyIndex, "flow", e.target.value)}
               placeholder={flowPlaceholder}
               className="text-md border-gray-300 bg-gray-100 text-gray-900 focus:border-gray-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-gray-600"
             />

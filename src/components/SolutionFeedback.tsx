@@ -1,14 +1,15 @@
 import { cn } from "@/lib/utils";
 import {
-  ChevronDown,
-  Loader2
-} from "lucide-react";
+  type EvaluationResponse,
+  type PlaygroundResponse,
+} from "@/server/api/routers/checkAnswer";
+import { ChevronDown, Loader2 } from "lucide-react";
 import { Button } from "./ui/button";
 import { ScrollArea } from "./ui/scroll-area";
 
 interface SolutionFeedbackProps {
   isLoadingAnswer: boolean;
-  answer?: { score: number; fixes: string[] };
+  answer?: EvaluationResponse | PlaygroundResponse;
   isExpanded: boolean;
   onToggleExpand: (isExpanded: boolean) => void;
 }
@@ -40,39 +41,41 @@ export const SolutionFeedback: React.FC<SolutionFeedbackProps> = ({
             isExpanded ? "opacity-100" : "h-0 overflow-hidden opacity-0",
           )}
         >
-          <div className="rounded-lg bg-gray-200 dark:bg-gray-700 p-4">
+          <div className="rounded-lg bg-gray-200 p-4 dark:bg-gray-700">
             <div className="mb-4 flex items-center justify-between">
-              <div className="flex items-center">
-                <span className="mr-2 text-sm font-semibold">Score:</span>
-                <span
-                  className={`text-lg font-bold ${getScoreInfo(answer.score).color}`}
-                >
-                  {answer.score}%
-                </span>
-              </div>
+              {"score" in answer && (
+                <div className="flex items-center">
+                  <span className="mr-2 text-sm font-semibold">Score:</span>
+                  <span
+                    className={`text-lg font-bold ${getScoreInfo(answer.score).color}`}
+                  >
+                    {answer.score}%
+                  </span>
+                </div>
+              )}
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => onToggleExpand(false)}
-                className="text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
+                className="text-gray-700 hover:bg-gray-300 dark:text-gray-300 dark:hover:bg-gray-600"
               >
                 <ChevronDown className="mr-1 h-4 w-4" />
                 Hide
               </Button>
             </div>
-            {answer.fixes.length > 0 && (
+            {answer.feedback.length > 0 && (
               <div>
                 <span className="mb-2 block text-sm font-semibold">
                   Suggested improvements:
                 </span>
                 <ScrollArea className="h-56 w-full">
                   <ul className="space-y-2">
-                    {answer.fixes.map((fix, index) => (
+                    {answer.feedback.map((feedback, index) => (
                       <li
                         key={index}
-                        className="rounded bg-gray-300 dark:bg-gray-600 p-2 text-sm text-gray-700 dark:text-gray-300"
+                        className="rounded bg-gray-300 p-2 text-sm text-gray-700 dark:bg-gray-600 dark:text-gray-300"
                       >
-                        {fix}
+                        {feedback}
                       </li>
                     ))}
                   </ul>

@@ -1,4 +1,4 @@
-import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
+import { useSystemDesigner } from "@/lib/hooks/useSystemDesigner";
 import { type ComponentNodeProps } from "../ReactflowCustomNodes/SystemComponentNode";
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
@@ -18,7 +18,7 @@ export const Cache = ({ name, Icon }: ComponentNodeProps) => {
 // type CachePurpose = "Database Read/Write" | "User Session";
 
 const CacheSettings = ({ name: id }: { name: string }) => {
-  const { useSystemComponentConfigSlice } = useChallengeManager();
+  const { useSystemComponentConfigSlice } = useSystemDesigner();
 
   // const [cacheType, setCacheType] = useSystemComponentConfigSlice<CachePurpose>(
   //   id,

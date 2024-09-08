@@ -1,5 +1,5 @@
 import { Textarea } from "@/components/ui/textarea";
-import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
+import { useSystemDesigner } from "@/lib/hooks/useSystemDesigner";
 import { type ComponentNodeProps } from "../../ReactflowCustomNodes/SystemComponentNode";
 import { Label } from "../../ui/label";
 import { Small } from "../../ui/typography";
@@ -16,7 +16,7 @@ export const CacheCluster = ({ name, Icon }: ComponentNodeProps) => {
 };
 
 const CacheSettings = ({ name: id }: { name: string }) => {
-  const { useSystemComponentConfigSlice } = useChallengeManager();
+  const { useSystemComponentConfigSlice } = useSystemDesigner();
 
   const [purpose, setPurpose] = useSystemComponentConfigSlice<string>(
     id,
@@ -26,12 +26,17 @@ const CacheSettings = ({ name: id }: { name: string }) => {
     <WithSettings name={id}>
       <div className="grid w-full grid-flow-row grid-cols-1 gap-2 text-gray-800 dark:text-gray-200">
         <div className="flex flex-col gap-4">
-          <Label htmlFor="cache-purpose" className="text-gray-700 dark:text-gray-300">Cache purpose</Label>
+          <Label
+            htmlFor="cache-purpose"
+            className="text-gray-700 dark:text-gray-300"
+          >
+            Cache purpose
+          </Label>
           <Textarea
             name="cache-purpose"
             id="cache-purpose"
             rows={10}
-            className="text-md bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 focus:border-gray-400 dark:focus:border-gray-600"
+            className="text-md border-gray-300 bg-gray-100 text-gray-900 focus:border-gray-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-gray-600"
             value={purpose}
             onChange={(e) => setPurpose(e.target.value)}
           />

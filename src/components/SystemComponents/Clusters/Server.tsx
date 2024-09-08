@@ -1,10 +1,10 @@
 import { Input } from "@/components/ui/input";
-import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
+import { Textarea } from "@/components/ui/textarea";
+import { useSystemDesigner } from "@/lib/hooks/useSystemDesigner";
 import { type ComponentNodeProps } from "../../ReactflowCustomNodes/SystemComponentNode";
 import { Label } from "../../ui/label";
 import { Small } from "../../ui/typography";
 import { WithSettings } from "../Wrappers/WithSettings";
-import { Textarea } from "@/components/ui/textarea";
 
 export const ServerCluster = ({ name, Icon }: ComponentNodeProps) => {
   return (
@@ -17,7 +17,7 @@ export const ServerCluster = ({ name, Icon }: ComponentNodeProps) => {
 };
 
 const ServerClusterSettings = ({ name: id }: { name: string }) => {
-  const { useSystemComponentConfigSlice } = useChallengeManager();
+  const { useSystemComponentConfigSlice } = useSystemDesigner();
 
   const [serversCount, setServersCount] = useSystemComponentConfigSlice<number>(
     id,

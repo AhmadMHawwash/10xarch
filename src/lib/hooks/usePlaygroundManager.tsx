@@ -5,7 +5,6 @@ import {
 } from "@/components/ReactflowCustomNodes/SystemComponentNode";
 import { api } from "@/trpc/react";
 import { useParams } from "next/navigation";
-import { useCallback } from "react";
 import { type Edge, type Node } from "reactflow";
 import { useSystemDesigner } from "./useSystemDesigner";
 
@@ -16,80 +15,33 @@ export const usePlaygroundManager = () => {
 
   const { updateNodes, nodes, edges } = useSystemDesigner();
 
-  const { mutate, data, isPending } = api.ai.playground.useMutation();
-
+  
+  const { mutate, data, error, isPending } = api.ai.playground.useMutation();
+  console.log(data);
+  
   const checkSolution = async () => {
-    // const promptBuilder = getPrompt({
-    //   nodes,
-    //   edges,
-    // });
-    // const prompt = promptBuilder(challenge, currentLevel);
-
-    // mutate({
-    //   systemDesign: prompt,
-    //   systemDesignContext: prompt,
-    // });
-  };
-
-  const useSystemComponentConfigSlice = useCallback(
-    <T,>(
-      componentId: string,
-      configKey: string,
-      defaultValue?: T,
-    ): [T, (configValue: T) => void] => {
-      const component = nodes.find((node) => node.id === componentId);
-
-      return [
-        (component?.data.configs?.[configKey] ?? defaultValue) as T,
-        (configValue: T) => {
-          const updatedNodes = nodes.map((node) => {
-            if (node.id === componentId) {
-              return {
-                ...node,
-                data: {
-                  ...node.data,
-                  configs: {
-                    ...node.data.configs,
-                    [configKey]: configValue,
-                  },
-                },
-              };
-            }
-            return node;
-          });
-          updateNodes(updatedNodes);
-        },
-      ];
-    },
-    [nodes, updateNodes],
-  );
-
-  const updateNodeDisplayName = (nodeId: string, displayName: string) => {
-    const updatedNodes = nodes.map((node) => {
-      if (node.id === nodeId) {
-        return {
-          ...node,
-          data: {
-            ...node.data,
-            displayName,
-          },
-        };
-      }
-      return node;
+    const whiteboard = nodes.find((node) => node.type === "Whiteboard");
+    const prompt = getSystemDesignPrompt({
+      nodes,
+      edges,
     });
-    updateNodes(updatedNodes);
+
+    console.log(whiteboard?.data.configs.context, prompt);
+
+    mutate({
+      systemDesign: prompt,
+      systemDesignContext: whiteboard?.data.configs.context as string,
+    });
   };
 
   return {
     checkSolution,
-    useSystemComponentConfigSlice,
     isLoadingAnswer: isPending,
     answer: data,
-    updateNodeDisplayName,
   };
 };
 
-const getLLMPromptBuilder = ({
+const getSystemDesignPrompt = ({
   nodes,
   edges,
 }: {
@@ -105,6 +57,8 @@ const getLLMPromptBuilder = ({
     const configs = whiteboard.data.configs;
 
     return {
+      systemContext: configs.context as string,
+      systemName: configs.displayName as string,
       functionalRequirements: configs["functional requirements"] as string,
       nonFunctionalRequirements: configs[
         "non-functional requirements"
@@ -140,7 +94,7 @@ const getLLMPromptBuilder = ({
       return {
         schema: (
           node.data.configs["Database models"] as [string, string][]
-        ).map(([name, definition]) => ({
+        )?.map(([name, definition]) => ({
           name,
           definition,
         })),
@@ -166,13 +120,13 @@ const getLLMPromptBuilder = ({
       components: cleanedNodes,
       "API definitions": whiteboardData?.apiDefinitions ?? [],
       "Traffic capacity estimation ":
-        whiteboardData?.capacityEstimations?.traffic ?? "",
+        whiteboardData?.capacityEstimations?.Traffic ?? "",
       "Storage capacity estimation":
-        whiteboardData?.capacityEstimations?.storage ?? "",
+        whiteboardData?.capacityEstimations?.Storage ?? "",
       "Bandwidth capacity estimation":
-        whiteboardData?.capacityEstimations?.bandwidth ?? "",
+        whiteboardData?.capacityEstimations?.Bandwidth ?? "",
       "Memory capacity estimation":
-        whiteboardData?.capacityEstimations?.memory ?? "",
+        whiteboardData?.capacityEstimations?.Memory ?? "",
       "Functional requirments": whiteboardData?.functionalRequirements ?? "",
       "Non functional requirments":
         whiteboardData?.nonFunctionalRequirements ?? "",

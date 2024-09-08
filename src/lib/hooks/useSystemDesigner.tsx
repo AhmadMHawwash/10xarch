@@ -31,7 +31,7 @@ import {
   type ReactFlowInstance,
   type ReactFlowJsonObject,
 } from "reactflow";
-import { type SystemComponentType, type SystemComponent } from "../levels/type";
+import { type SystemComponent, type SystemComponentType } from "../levels/type";
 import { componentsNumberingStore } from "../levels/utils";
 import { SYSTEM_COMPONENT_NODE } from "./useChallengeManager";
 import useLocalStorageState from "./useLocalStorageState";
@@ -61,6 +61,11 @@ interface SystemDesignerState {
     node: Node<SystemComponentNodeDataProps | OtherNodeDataProps> | null,
   ) => void;
   selectedNode: Node<SystemComponentNodeDataProps | OtherNodeDataProps> | null;
+  useSystemComponentConfigSlice: <T>(
+    componentId: string,
+    configKey: string,
+    defaultValue?: T,
+  ) => [T, (configValue: T) => void];
   // toggleApiRequestFlowMode: () => void;
   // isApiRequestFlowMode: boolean;
   // selectedApiFlow?: string;
@@ -87,6 +92,7 @@ const SystemDesignerContext = createContext<SystemDesignerState>({
   setEdges: noop,
   selectedNode: null,
   onSelectNode: noop,
+  useSystemComponentConfigSlice: noop,
 });
 
 const componentTargets: Record<
@@ -124,9 +130,13 @@ const deserializeNodes = (nodes: string | null) => {
   >[];
   componentsNumberingStore.getState().resetCounting();
   return parsedNodes.map((node) => {
-    const id = componentsNumberingStore
-      .getState()
-      .getNextId(node.data.name as SystemComponent["name"]);
+    const id =
+      node.data.name === "Whiteboard"
+        ? "Whiteboard-1"
+        : componentsNumberingStore
+            .getState()
+            .getNextId(node.data.name as SystemComponent["name"]);
+
     return {
       ...node,
       id,
@@ -298,7 +308,6 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
         icon: component.icon,
         withTargetHandle: true,
         withSourceHandle: true,
-        
         id,
         configs: {},
       };
@@ -387,6 +396,38 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
     restoreFlow().catch(console.error);
   }, [setViewport]);
 
+  const useSystemComponentConfigSlice = useCallback(
+    <T,>(
+      componentId: string,
+      configKey: string,
+      defaultValue?: T,
+    ): [T, (configValue: T) => void] => {
+      const component = nodes.find((node) => node.id === componentId);
+      return [
+        (component?.data.configs?.[configKey] ?? defaultValue) as T,
+        (configValue: T) => {
+          const updatedNodes = nodes.map((node) => {
+            if (node.id === componentId) {
+              return {
+                ...node,
+                data: {
+                  ...node.data,
+                  configs: {
+                    ...node.data.configs,
+                    [configKey]: configValue,
+                  },
+                },
+              };
+            }
+            return node;
+          });
+          updateNodes(updatedNodes);
+        },
+      ];
+    },
+    [nodes, updateNodes],
+  );
+
   return (
     <SystemDesignerContext.Provider
       value={{
@@ -410,6 +451,7 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
         setEdges,
         selectedNode,
         onSelectNode: setSelectedNode,
+        useSystemComponentConfigSlice,
         // toggleApiRequestFlowMode,
         // isApiRequestFlowMode,
         // selectedApiFlow,

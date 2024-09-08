@@ -1,9 +1,12 @@
-import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
 import {
   defaultStartingNodes,
   useSystemDesigner,
 } from "@/lib/hooks/useSystemDesigner";
-import { Check, ChevronUp, Loader2, RotateCcw, Play } from "lucide-react";
+import {
+  type EvaluationResponse,
+  type PlaygroundResponse,
+} from "@/server/api/routers/checkAnswer";
+import { Check, ChevronUp, Loader2, Play, RotateCcw } from "lucide-react";
 import { useState } from "react";
 import { SolutionFeedback } from "./SolutionFeedback";
 import { Button } from "./ui/button";
@@ -16,9 +19,16 @@ import {
   DialogTrigger,
 } from "./ui/dialog";
 
-export const FlowManager: React.FC = () => {
+export const FlowManager = ({
+  checkSolution,
+  feedback,
+  isLoadingAnswer,
+}: {
+  checkSolution: () => void;
+  feedback?: EvaluationResponse | PlaygroundResponse;
+  isLoadingAnswer: boolean;
+}) => {
   const [resetDone, setResetDone] = useState(false);
-  const { checkSolution, isLoadingAnswer, answer } = useChallengeManager();
   const { setNodes, setEdges } = useSystemDesigner();
   const [isFeedbackExpanded, setIsFeedbackExpanded] = useState(false);
 
@@ -36,7 +46,7 @@ export const FlowManager: React.FC = () => {
       <SolutionFeedback
         isExpanded={isFeedbackExpanded}
         isLoadingAnswer={isLoadingAnswer}
-        answer={answer}
+        answer={feedback}
         onToggleExpand={setIsFeedbackExpanded}
       />
       <div className="flex items-center space-x-3">
@@ -74,7 +84,7 @@ export const FlowManager: React.FC = () => {
         />
         <Button
           size="sm"
-          onClick={checkSolution}
+          onClick={() => checkSolution()}
           disabled={isLoadingAnswer}
           title="Check solution"
           className="bg-blue-600 text-white transition-colors hover:bg-blue-700"
@@ -86,7 +96,7 @@ export const FlowManager: React.FC = () => {
           )}
           Run solution
         </Button>
-        {answer && !isFeedbackExpanded && (
+        {feedback && !isFeedbackExpanded && (
           <Button
             size="sm"
             variant="ghost"

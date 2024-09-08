@@ -9,7 +9,7 @@ import { ScrollArea } from "./ui/scroll-area";
 
 interface SolutionFeedbackProps {
   isLoadingAnswer: boolean;
-  answer?: EvaluationResponse | PlaygroundResponse;
+  answer: EvaluationResponse | PlaygroundResponse | null;
   isExpanded: boolean;
   onToggleExpand: (isExpanded: boolean) => void;
 }

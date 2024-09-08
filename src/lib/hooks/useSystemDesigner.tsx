@@ -6,6 +6,7 @@ import {
 } from "@/components/ReactflowCustomNodes/SystemComponentNode";
 import { useToast } from "@/components/ui/use-toast";
 import { noop } from "@/lib/utils";
+import { usePathname } from "next/navigation";
 import {
   createContext,
   useCallback,
@@ -171,11 +172,15 @@ export const defaultStartingNodes: Node<
 ];
 
 export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
+  const pathname = usePathname();
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [nodes, setNodes] = useLocalStorageState<
     Node<SystemComponentNodeDataProps | OtherNodeDataProps>[]
-  >("reactflow-nodes", defaultStartingNodes, deserializeNodes);
-  const [edges, setEdges] = useLocalStorageState<Edge[]>("reactflow-edges", []);
+  >(`${pathname}-reactflow-nodes`, defaultStartingNodes, deserializeNodes);
+  const [edges, setEdges] = useLocalStorageState<Edge[]>(
+    `${pathname}-reactflow-edges`,
+    [],
+  );
   const [reactFlowInstance, setReactFlowInstance] =
     useState<ReactFlowInstance | null>(null);
   const { setViewport } = useReactFlow();

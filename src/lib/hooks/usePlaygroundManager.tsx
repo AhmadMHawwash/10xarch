@@ -3,22 +3,22 @@ import {
   type OtherNodeDataProps,
   type SystemComponentNodeDataProps,
 } from "@/components/ReactflowCustomNodes/SystemComponentNode";
+import { type PlaygroundResponse } from "@/server/api/routers/checkAnswer";
 import { api } from "@/trpc/react";
-import { useParams } from "next/navigation";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { type Edge, type Node } from "reactflow";
 import { useSystemDesigner } from "./useSystemDesigner";
 
 export const SYSTEM_COMPONENT_NODE = "SystemComponentNode";
 
 export const usePlaygroundManager = () => {
-  const { slug } = useParams();
+  const pathname = usePathname();
+  const { nodes, edges } = useSystemDesigner();
+  const [feedback, setFeedback] = useState<PlaygroundResponse | null>(null);
 
-  const { updateNodes, nodes, edges } = useSystemDesigner();
+  const { mutate, data, isPending } = api.ai.playground.useMutation();
 
-  
-  const { mutate, data, error, isPending } = api.ai.playground.useMutation();
-  console.log(data);
-  
   const checkSolution = async () => {
     const whiteboard = nodes.find((node) => node.type === "Whiteboard");
     const prompt = getSystemDesignPrompt({
@@ -34,10 +34,23 @@ export const usePlaygroundManager = () => {
     });
   };
 
+  useEffect(() => {
+    if (data) {
+      localStorage.setItem(`${pathname}-feedback`, JSON.stringify(data));
+    }
+  }, [data, pathname]);
+
+  useEffect(() => {
+    const feedback = localStorage.getItem(`${pathname}-feedback`);
+    if (feedback) {
+      setFeedback(JSON.parse(feedback) as PlaygroundResponse);
+    }
+  }, [pathname]);
+
   return {
     checkSolution,
     isLoadingAnswer: isPending,
-    answer: data,
+    answer: feedback,
   };
 };
 

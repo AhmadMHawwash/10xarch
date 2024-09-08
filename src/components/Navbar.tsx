@@ -1,17 +1,11 @@
 "use client";
-import { Menu, UserCircle, X } from "lucide-react";
+import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
+import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { ThemeToggle } from "./ThemeToggle"; // Add this import
-import {
-  ClerkProvider,
-  SignInButton,
-  SignedIn,
-  SignedOut,
-  UserButton,
-} from "@clerk/nextjs";
 
-export default function Navbar({ user }: { user: null }) {
+export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
@@ -25,6 +19,12 @@ export default function Navbar({ user }: { user: null }) {
         </Link>
 
         <div className="hidden items-center space-x-4 md:!flex">
+          <Link
+            href="/challenges"
+            className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
+          >
+            Challenges
+          </Link>
           <Link
             href="/playground"
             className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"

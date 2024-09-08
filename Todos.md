@@ -1,16 +1,21 @@
 # Todos:
 ## Playground features:
-[ ] rename components
+[x] rename components
 [x] fix component load
 [x] Pre filled components
 [x] Components terminals and what they can connect to. along with grey outs
 [x] Clean up AI input, to be as consice as possible
-[ ] Sending data to AI, should have maximum tokens, otherwise we might get huge invoices
+[x] Sending data to AI, should have maximum tokens, otherwise we might get huge invoices
+[x] Playground
+[x] Personal signup
+[x] auto local save
+[x] being more strict and not too generous in challenges evaluation
+[ ] Save latest feedback in local storage
+[ ] Multiple playgrounds
 [ ] Stripe integration and Zenvoice
 [ ] Email integration
-[ ] Team/personal signup
+[ ] Team signup
 [ ] Buy credit hints (AI hints)
-[ ] auto local save
 [ ] what could happen if I modified this or that? (ask AI so it helps you understand more the system design)
 [ ] Train AI to do System design stuff (Or upload files and specific cases)
 [ ] Tell the AI to behave like backend for stats and reports

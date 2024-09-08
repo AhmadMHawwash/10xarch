@@ -57,7 +57,7 @@ export default function SystemComponentNode({
       )}
       <div
         className={cn(
-          "group flex flex-col items-center justify-center rounded-sm border border-gray-300 p-2 dark:border-gray-600",
+          "max-w-[200px] group flex flex-col items-center justify-center rounded-sm border border-gray-300 p-2 dark:border-gray-600",
           selected
             ? "bg-gray-200 dark:bg-gray-700"
             : "bg-gray-100 dark:bg-gray-800",

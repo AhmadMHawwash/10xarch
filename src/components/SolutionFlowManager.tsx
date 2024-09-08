@@ -25,7 +25,7 @@ export const FlowManager = ({
   isLoadingAnswer,
 }: {
   checkSolution: () => void;
-  feedback?: EvaluationResponse | PlaygroundResponse;
+  feedback: EvaluationResponse | PlaygroundResponse | null;
   isLoadingAnswer: boolean;
 }) => {
   const [resetDone, setResetDone] = useState(false);

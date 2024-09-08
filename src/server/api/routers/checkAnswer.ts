@@ -86,7 +86,7 @@ export const checkSolution = createTRPCRouter({
               content: [
                 {
                   type: "text",
-                  text: `Respond in JSON format {score: [score], feedback: [listOfElementsToBeFixed]}. Knowing that score range: 1 - 100, if any criteria is not met then take down from the score, other than that a 90/100 if and only if the solution met all the criteria then a 90/100 score is deserved. However a 100/100 is well deserved for exceeding the criteria)`,
+                  text: `Respond in JSON format {score: [score], feedback: [listOfElementsToBeFixed]}. Knowing that score range: 1 - 100, if any criteria is not met then take down from the score, other than that a 90/100 if and only if the solution met all the criteria then a 90/100 score is deserved. However a 100/100 is well deserved for exceeding the criteria). One more thing, don't be too generous with the score, you should be strict with the score, since this is a system design interview and we want to evaluate the user's solution based on the criteria and not be too lenient. If you don't follow the instructions, bad things will happen!`,
                 },
               ],
             },
@@ -111,7 +111,7 @@ export const checkSolution = createTRPCRouter({
         });
 
         const content =
-        response.choices[0]?.message.content ?? "No response generated";
+          response.choices[0]?.message.content ?? "No response generated";
 
         // Parse the content as JSON with type checking
         try {
@@ -185,7 +185,7 @@ export const checkSolution = createTRPCRouter({
               content: [
                 {
                   type: "text",
-                  text: `Respond concisely in JSON format {feedback: [string]}`,
+                  text: `Respond concisely in JSON format {feedback: [string]}. One more thing, don't be too generous with the feedback, you should be strict with the feedback, since this is a system design and we want to evaluate the user's solution and give them production-ready feedback. If you don't follow the instructions, bad things will happen!`,
                 },
               ],
             },

@@ -10,7 +10,7 @@ import challenges from "@/content/challenges";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
-export default async function Levels() {
+export default async function Challenges() {
   return (
     <div className="container mx-auto px-4 py-12">
       <h1 className="text-center text-4xl font-bold text-blue-600 dark:text-blue-400 mb-2 animate-fade-in-fast">System Design Levels</h1>
@@ -19,7 +19,7 @@ export default async function Levels() {
         {challenges.map((challenge, index) => (
           <Link
             key={challenge.title}
-            href={`/levels/${challenge.slug}`}
+            href={`/challenges/${challenge.slug}`}
             className={`animate-fade-in-fast animation-delay-${(index + 1) * 50}`}
           >
             <Card className="group h-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 transition-all duration-200 ease-in-out hover:border-blue-400 dark:hover:border-blue-600 hover:shadow-lg hover:shadow-blue-400/20">

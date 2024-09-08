@@ -38,7 +38,7 @@ export default async function RootLayout({
             <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
               <TooltipProvider>
                 <Toaster />
-                <Navbar user={null} />
+                <Navbar />
                 <main className="h-[92vh]">{children}</main>
               </TooltipProvider>
             </ThemeProvider>

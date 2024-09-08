@@ -5,10 +5,12 @@ import {
 import challenges from "@/content/challenges";
 import { type Challenge } from "@/content/challenges/types";
 import { api } from "@/trpc/react";
-import { useParams } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import { type Edge, type Node } from "reactflow";
 import { create } from "zustand";
 import { useSystemDesigner } from "./useSystemDesigner";
+import { useEffect, useState } from "react";
+import { type PlaygroundResponse } from "@/server/api/routers/checkAnswer";
 
 export const SYSTEM_COMPONENT_NODE = "SystemComponentNode";
 
@@ -52,12 +54,13 @@ const useLevelStore = create<{
 
 export const useChallengeManager = () => {
   const { slug } = useParams();
+  const pathname = usePathname();
   const challenge = challenges.find((challenge) => challenge.slug === slug);
   const { toNextStage, toPreviousStage, setChallenge, currentStageIndex } =
     useLevelStore((state) => state);
   const currentLevel = challenge?.stages[currentStageIndex];
-
-  const { updateNodes, nodes, edges } = useSystemDesigner();
+  const [feedback, setFeedback] = useState<PlaygroundResponse | null>(null);
+  const { nodes, edges } = useSystemDesigner();
 
   const { mutate, data, isPending } = api.ai.hello.useMutation();
 
@@ -73,6 +76,19 @@ export const useChallengeManager = () => {
       criteria: currentLevel?.criteria ?? [],
     });
   };
+
+  useEffect(() => {
+    if (data) {
+      localStorage.setItem(`${pathname}-feedback`, JSON.stringify(data));
+    }
+  }, [data, pathname]);
+
+  useEffect(() => {
+    const feedback = localStorage.getItem(`${pathname}-feedback`);
+    if (feedback) {
+      setFeedback(JSON.parse(feedback) as PlaygroundResponse);
+    }
+  }, [pathname]);
 
   return {
     challenge: challenge!,
@@ -93,7 +109,7 @@ export const useChallengeManager = () => {
     currentStageIndex,
     setChallenge,
     isLoadingAnswer: isPending,
-    feedback: data,
+    feedback,
   };
 };
 

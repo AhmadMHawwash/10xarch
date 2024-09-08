@@ -5,6 +5,7 @@ import TodoList, { type TodoItem } from "@/components/playground/TodoList";
 import { FlowManager } from "@/components/SolutionFlowManager";
 import SystemBuilder from "@/components/SystemDesigner";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -63,12 +64,16 @@ function PageContent() {
     <ResizablePanelGroup direction="horizontal">
       <ResizablePanel defaultSize={25} minSize={3}>
         <div className="flex w-[95%] min-w-[300px] flex-col items-center">
-          <H3 className="p-2 pl-3">
+          <H3 className="p-2 pl-3 self-start">
             {selectedNode?.data.id && selectedNode.type !== "Whiteboard"
-              ? `'${displayName || selectedNode.data.id}' ${selectedNode?.data.name}`
+              ? selectedNode?.data.name
               : "System"}
           </H3>
+          <Label htmlFor="name" className="self-start ml-3 mt-2">
+            Name
+          </Label>
           <Input
+            id="name"
             className={cn("m-2 w-[95%]", selectedNode ? "" : "hidden")}
             placeholder="Name"
             value={displayName}

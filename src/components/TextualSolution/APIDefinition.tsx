@@ -9,16 +9,16 @@ import {
 import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
 import { cn } from "@/lib/utils";
 import { CableIcon, InfoIcon, PlusIcon, X } from "lucide-react";
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
+import { type API, useWhiteboard } from "../ReactflowCustomNodes/APIsNode";
 import { WithMarkdownDetails } from "../SystemComponents/Wrappers/WithMarkdownDetails";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Separator } from "../ui/separator";
-import { Textarea } from "../ui/textarea";
-import { H6, Small } from "../ui/typography";
-import { Hints } from "./RequirementsDefinition";
-import { type API, useWhiteboard } from "../ReactflowCustomNodes/APIsNode";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
+import { Textarea } from "../ui/textarea";
+import { Small } from "../ui/typography";
+import { Hints } from "./RequirementsDefinition";
 
 export const APIDefinition = () => {
   const { stage } = useChallengeManager();
@@ -184,7 +184,7 @@ export const ListAndMultiDetails = ({
   return (
     <div className="flex w-full flex-row">
       <div className="mr-2 flex w-36 flex-col rounded-sm border border-gray-300 dark:border-gray-600">
-        {apis.map(({ name: key, definition: def, flow }, index) => (
+        {apis.map(({ name: key }, index) => (
           <div
             className={cn(
               "group relative flex border-b border-gray-300 transition-all hover:cursor-pointer hover:bg-gray-200 dark:border-gray-600 dark:hover:bg-gray-700",

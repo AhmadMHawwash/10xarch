@@ -6,16 +6,21 @@ import {
 import { type PlaygroundResponse } from "@/server/api/routers/checkAnswer";
 import { api } from "@/trpc/react";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { type Edge, type Node } from "reactflow";
 import { useSystemDesigner } from "./useSystemDesigner";
+import useLocalStorageState from "./useLocalStorageState";
 
 export const SYSTEM_COMPONENT_NODE = "SystemComponentNode";
 
 export const usePlaygroundManager = () => {
   const pathname = usePathname();
   const { nodes, edges } = useSystemDesigner();
-  const [feedback, setFeedback] = useState<PlaygroundResponse | null>(null);
+  const [feedback, setFeedback] =
+    useLocalStorageState<PlaygroundResponse | null>(
+      `playground-${pathname}-feedback`,
+      null,
+    );
 
   const { mutate, data, isPending } = api.ai.playground.useMutation();
 
@@ -36,16 +41,9 @@ export const usePlaygroundManager = () => {
 
   useEffect(() => {
     if (data) {
-      localStorage.setItem(`${pathname}-feedback`, JSON.stringify(data));
+      setFeedback(data);
     }
-  }, [data, pathname]);
-
-  useEffect(() => {
-    const feedback = localStorage.getItem(`${pathname}-feedback`);
-    if (feedback) {
-      setFeedback(JSON.parse(feedback) as PlaygroundResponse);
-    }
-  }, [pathname]);
+  }, [data, setFeedback]);
 
   return {
     checkSolution,

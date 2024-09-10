@@ -143,7 +143,7 @@ export const checkSolution = createTRPCRouter({
     .input(
       z.object({
         systemDesign: z.string(),
-        systemDesignContext: z.string(),
+        systemDesignContext: z.string().optional(),
       }),
     )
     .mutation(async ({ input }) => {

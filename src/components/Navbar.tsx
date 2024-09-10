@@ -4,6 +4,7 @@ import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { ThemeToggle } from "./ThemeToggle"; // Add this import
+import { Button } from "./ui/button";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -17,7 +18,6 @@ export default function Navbar() {
         >
           System Design Playground
         </Link>
-
         <div className="hidden items-center space-x-4 md:!flex">
           <Link
             href="/challenges"
@@ -31,18 +31,6 @@ export default function Navbar() {
           >
             Playground
           </Link>
-          {/* <Link
-            href="/learn"
-            className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
-          >
-            Learn
-          </Link>
-          <Link
-            href="/community"
-            className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
-          >
-            Community
-          </Link> */}
 
           <SignedOut>
             <SignInButton />
@@ -55,9 +43,13 @@ export default function Navbar() {
 
         <div className="flex items-center md:hidden">
           <ThemeToggle />
-          <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="ml-2">
+          <Button
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="ml-2"
+            variant="ghost"
+          >
             {isMenuOpen ? <X /> : <Menu />}
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -70,18 +62,6 @@ export default function Navbar() {
             >
               Playground
             </Link>
-            {/* <Link
-              href="/learn"
-              className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
-            >
-              Learn
-            </Link>
-            <Link
-              href="/community"
-              className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
-            >
-              Community
-            </Link> */}
 
             <SignedOut>
               <SignInButton />

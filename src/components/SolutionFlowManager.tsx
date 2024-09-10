@@ -7,7 +7,7 @@ import {
   type PlaygroundResponse,
 } from "@/server/api/routers/checkAnswer";
 import { Check, ChevronUp, Loader2, Play, RotateCcw } from "lucide-react";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { SolutionFeedback } from "./SolutionFeedback";
 import { Button } from "./ui/button";
 import {
@@ -43,12 +43,14 @@ export const FlowManager = ({
         isFeedbackExpanded ? "w-[1000px]" : "w-fit"
       } transition-all duration-300`}
     >
-      <SolutionFeedback
-        isExpanded={isFeedbackExpanded}
-        isLoadingAnswer={isLoadingAnswer}
-        answer={feedback}
-        onToggleExpand={setIsFeedbackExpanded}
-      />
+      <Suspense fallback={null}>
+        <SolutionFeedback
+          isExpanded={isFeedbackExpanded}
+          isLoadingAnswer={isLoadingAnswer}
+          answer={feedback}
+          onToggleExpand={setIsFeedbackExpanded}
+        />
+      </Suspense>
       <div className="flex items-center space-x-3">
         {/* <Button
           size="sm"
@@ -96,17 +98,19 @@ export const FlowManager = ({
           )}
           Run solution
         </Button>
-        {feedback && !isFeedbackExpanded && (
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => setIsFeedbackExpanded(true)}
-            className="text-gray-700 transition-colors hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-700"
-          >
-            <ChevronUp className="mr-2 h-4 w-4" />
-            Show feedback
-          </Button>
-        )}
+        <Suspense fallback={null}>
+          {feedback && !isFeedbackExpanded && (
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => setIsFeedbackExpanded(true)}
+              className="text-gray-700 transition-colors hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-700"
+            >
+              <ChevronUp className="mr-2 h-4 w-4" />
+              Show feedback
+            </Button>
+          )}
+        </Suspense>
       </div>
     </div>
   );

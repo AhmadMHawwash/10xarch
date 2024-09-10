@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/resizable";
 import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
 import { SystemDesignerProvider } from "@/lib/hooks/useSystemDesigner";
+import { notFound } from "next/navigation";
 import { ReactFlowProvider } from "reactflow";
 
 export default function LevelPage() {
@@ -22,7 +23,11 @@ export default function LevelPage() {
 }
 
 function Level() {
-  const { checkSolution, feedback, isLoadingAnswer } = useChallengeManager();
+  const { checkSolution, feedback, isLoadingAnswer, challenge } =
+    useChallengeManager();
+
+  if (!challenge) return notFound()
+
   return (
     <>
       <ResizablePanelGroup direction="horizontal">

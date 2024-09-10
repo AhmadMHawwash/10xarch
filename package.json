@@ -11,7 +11,10 @@
     "lint": "next lint",
     "start": "next start",
     "ts-check": "tsc --noEmit",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "ngrok": "ngrok http --domain=civil-roughly-feline.ngrok-free.app 3000",
+    "db:migrate": "npx drizzle-kit migrate",
+    "db:generate": "npx drizzle-kit generate"
   },
   "dependencies": {
     "@clerk/nextjs": "^5.4.1",
@@ -33,7 +36,7 @@
     "@radix-ui/react-toast": "^1.2.1",
     "@radix-ui/react-tooltip": "^1.1.2",
     "@t3-oss/env-nextjs": "^0.10.1",
-    "@tanstack/react-query": "^5.25.0",
+    "@tanstack/react-query": "^5.55.4",
     "@trpc/client": "next",
     "@trpc/react-query": "next",
     "@trpc/server": "next",
@@ -58,6 +61,7 @@
     "remark-gfm": "^4.0.0",
     "server-only": "^0.0.1",
     "superjson": "^2.2.1",
+    "svix": "^1.32.0",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.23.8",

@@ -36,3 +36,14 @@ export const posts = createTable(
     nameIndex: index("name_idx").on(example.name),
   }),
 );
+
+export type Post = typeof posts.$inferSelect;
+
+export const users = createTable('users', {
+  id: text('id').primaryKey(),
+  email: text('email').notNull().unique(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export type User = typeof users.$inferSelect;

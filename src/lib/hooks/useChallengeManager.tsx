@@ -53,11 +53,11 @@ const useLevelStore = create<{
 }));
 
 export const useChallengeManager = () => {
-  const { slug } = useParams();
+  const params = useParams<{ slug: string }>();
   const pathname = usePathname();
-  const challenge = challenges.find((challenge) => challenge.slug === slug);
+  const challenge = challenges.find((challenge) => challenge.slug === params?.slug);
   const { toNextStage, toPreviousStage, setChallenge, currentStageIndex } =
-    useLevelStore((state) => state);
+  useLevelStore((state) => state);
   const currentLevel = challenge?.stages[currentStageIndex];
   const [feedback, setFeedback] = useState<PlaygroundResponse | null>(null);
   const { nodes, edges } = useSystemDesigner();

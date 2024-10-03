@@ -13,10 +13,14 @@ import { Button } from "../ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Textarea } from "../ui/textarea";
 import { Hints } from "./RequirementsDefinition";
+import { useState } from "react";
+import { type Stage } from "@/content/challenges/types";
 
+const defaultValue = "traffic";
 export const CapacityEstimationDefinition = () => {
   const { capacity, setCapacity } = useWhiteboard();
   const { stage } = useChallengeManager();
+  const [tabValue, setTabValue] = useState<string>(defaultValue);
 
   return (
     <Dialog>
@@ -32,7 +36,11 @@ export const CapacityEstimationDefinition = () => {
             Capacity Estimation
           </DialogTitle>
         </DialogHeader>
-        <Tabs defaultValue="traffic" className="w-full">
+        <Tabs
+          defaultValue={defaultValue}
+          onValueChange={(v: string) => setTabValue(v)}
+          className="w-full"
+        >
           <TabsList className="mb-4 grid w-full grid-cols-4">
             <TabsTrigger value="traffic">Traffic</TabsTrigger>
             <TabsTrigger value="storage">Storage</TabsTrigger>
@@ -78,7 +86,13 @@ export const CapacityEstimationDefinition = () => {
             />
           </TabsContent>
         </Tabs>
-        <Hints hints={stage?.hintsPerArea.capacityEstimations} />
+        <Hints
+          hints={
+            stage?.hintsPerArea.capacityEstimations[
+              tabValue as keyof Stage["hintsPerArea"]["capacityEstimations"]
+            ]
+          }
+        />
       </DialogContent>
     </Dialog>
   );

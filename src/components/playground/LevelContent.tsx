@@ -20,9 +20,9 @@ export const LevelContent = () => {
   const { stage, toNextStage, toPreviousStage, challenge, currentStageIndex } =
     useChallengeManager();
 
-  const oldAssumptions = challenge.stages
+  const oldRequirements = challenge.stages
     .slice(0, currentStageIndex)
-    .reduce<string[]>((acc, stage) => acc.concat(stage.assumptions), []);
+    .reduce<string[]>((acc, stage) => acc.concat(stage.requirements), []);
 
   return (
     <div className="flex h-full max-h-[100vh] flex-col justify-between bg-white p-4 text-gray-800 dark:bg-gray-900 dark:text-gray-200">
@@ -43,23 +43,23 @@ export const LevelContent = () => {
           <div className="flex flex-col gap-4">
             <Section title="Emerging Complexity" content={stage?.problem} />
             <Section
-              title="Assumptions"
+              title="CTO/CPO Requirements"
               content={
                 <List className="!ml-2">
-                  {oldAssumptions.map((assumption, index) => (
+                  {oldRequirements.map((requirement, index) => (
                     <P
                       key={index}
                       className="!mt-0 ml-4 list-item list-decimal text-gray-600 line-through opacity-50 dark:text-gray-400"
                     >
-                      {assumption}
+                      {requirement}
                     </P>
                   ))}
-                  {stage?.assumptions.map((assumption, index) => (
+                  {stage?.requirements.map((requirement, index) => (
                     <P
                       key={index}
                       className="!mt-0 ml-4 list-item list-decimal text-gray-700 dark:text-gray-300"
                     >
-                      {assumption}
+                      {requirement}
                     </P>
                   ))}
                 </List>
@@ -123,6 +123,7 @@ const StageProgress: React.FC<StageProgressProps> = ({
 }) => (
   <div className="flex items-center justify-between">
     <Button
+      disabled={currentStage === 0}
       size="sm"
       variant="outline"
       onClick={onPrevious}
@@ -151,6 +152,7 @@ const StageProgress: React.FC<StageProgressProps> = ({
       </TooltipProvider>
     </div>
     <Button
+      disabled={currentStage === totalStages - 1}
       size="sm"
       variant="outline"
       onClick={onNext}
@@ -160,7 +162,6 @@ const StageProgress: React.FC<StageProgressProps> = ({
     </Button>
   </div>
 );
-
 
 const content = `
 ### Elements of a successful system design

@@ -46,6 +46,7 @@ export const RequirementsDefinition: React.FC = () => {
               infoContent={functionalRequirements}
               infoButtonText="What the system should do"
             />
+            <Hints hints={stage?.hintsPerArea.requirements.functional} />
           </TabsContent>
           <TabsContent value="nonfunctional">
             <RequirementSection
@@ -55,11 +56,9 @@ export const RequirementsDefinition: React.FC = () => {
               infoContent={nonFunctionalRequirements}
               infoButtonText="How the system should perform"
             />
+            <Hints hints={stage?.hintsPerArea.requirements.nonFunctional} />
           </TabsContent>
         </Tabs>
-        <Hints
-          hints={stage?.hintsPerArea.functionalAndNonFunctionalRequirements}
-        />
       </DialogContent>
     </Dialog>
   );

@@ -14,6 +14,11 @@ import { ServerCluster } from "../SystemComponents/Clusters/Server";
 import { Database } from "../SystemComponents/Database";
 import { WithMarkdownDetails } from "../SystemComponents/Wrappers/WithMarkdownDetails";
 import { Small } from "../ui/typography";
+import { Client } from "../SystemComponents/Client";
+import { Server } from "../SystemComponents/Server";
+import { LoadBalancer } from "../SystemComponents/LoadBalancer";
+import { CDN } from "../SystemComponents/CDN";
+import { MessageQueue } from "../SystemComponents/MessageQueue";
 
 export type SystemComponentNodeDataProps = {
   icon?: typeof PiIcon;
@@ -57,7 +62,7 @@ export default function SystemComponentNode({
       )}
       <div
         className={cn(
-          "max-w-[200px] group flex flex-col items-center justify-center rounded-sm border border-gray-300 p-2 dark:border-gray-600",
+          "group flex max-w-[200px] flex-col items-center justify-center rounded-sm border border-gray-300 p-2 dark:border-gray-600",
           selected
             ? "bg-gray-200 dark:bg-gray-700"
             : "bg-gray-100 dark:bg-gray-800",
@@ -107,8 +112,13 @@ const components: Partial<
     ({ name, Icon }: ComponentNodeProps) => React.ReactElement
   >
 > = {
+  Client,
+  Server,
   Database,
   Cache,
+  CDN,
+  "Message Queue": MessageQueue,
+  "Load Balancer": LoadBalancer,
   "Database Cluster": DatabaseCluster,
   "Cache Cluster": CacheCluster,
   "Server Cluster": ServerCluster,

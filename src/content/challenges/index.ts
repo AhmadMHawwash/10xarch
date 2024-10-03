@@ -1,5 +1,5 @@
-import { urlShorteningService } from "./url-shortening-service";
+import chatSystem from "./chat-system";
 
-const challenges = [urlShorteningService];
+const challenges = [chatSystem];
 
 export default challenges;

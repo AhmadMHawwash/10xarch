@@ -5,10 +5,14 @@ import { z } from "zod";
 // Define the response type
 export interface EvaluationResponse {
   score: number;
-  feedback: string[];
+  strengths: string[];
+  improvementAreas: string[];
+  recommendations: string[];
 }
 export interface PlaygroundResponse {
-  feedback: string[];
+  strengths: string[];
+  improvementAreas: string[];
+  recommendations: string[];
 }
 
 const openai = new OpenAI({
@@ -35,7 +39,7 @@ export const checkSolution = createTRPCRouter({
               content: [
                 {
                   type: "text",
-                  text: "You are a system design evaluation expert. You will receive: \n1. The challenge description \n2. The current level of the challenge being addressed \n3. The user's proposed solution. \nYour task is to evaluate the provided solution in the context of: \n1. The challenge requirements, \n2. The system assumptions, \n3. Provided hints for solving the current level, \n4. The criteria that define a correct solution.",
+                  text: "You are a system design evaluation expert. You will receive: \n1. The challenge description \n2. The current level of the challenge being addressed \n3. The user's proposed solution. \nYour task is to evaluate the provided solution in the context of: \n1. The challenge requirements, \n2. The system requirements provided by the CPO/CTO, \n3. Provided hints for solving the current level, \n4. The criteria that define a correct solution.",
                 },
               ],
             },
@@ -86,7 +90,10 @@ export const checkSolution = createTRPCRouter({
               content: [
                 {
                   type: "text",
-                  text: `Respond in JSON format {score: [score], feedback: [listOfElementsToBeFixed]}. Knowing that score range: 1 - 100, if any criteria is not met then take down from the score, other than that a 90/100 if and only if the solution met all the criteria then a 90/100 score is deserved. However a 100/100 is well deserved for exceeding the criteria). One more thing, don't be too generous with the score, you should be strict with the score, since this is a system design interview and we want to evaluate the user's solution based on the criteria and not be too lenient. If you don't follow the instructions, bad things will happen!`,
+                  text: `Respond in JSON format {score: [score], strengths: [string], improvementAreas: [string], recommendations: [string]}. 
+                  * Regarding score: score ranges from 0 to 100. When the provided solution fixes part of the given challenge (and current stage) then add score to the user score. If the user didn't solve anything, then they deserver a ZERO (0). One more thing, I want you to be quite strict with the score, since this is a system design interview and we want to evaluate the user's solution based on the criteria and not be too lenient. And as the user progresses in the challenge they should face strictier scoring approach. 
+                  * Regarding improvementAreas: each improvement area, should be one specific improvement. So if you have multiple improvements, you should list them separately.
+                  * Regarding rules: If you don't follow the instructions, bad things will happen!`,
                 },
               ],
             },
@@ -120,7 +127,9 @@ export const checkSolution = createTRPCRouter({
           // Validate the parsed response
           if (
             typeof jsonResponse.score !== "number" ||
-            !Array.isArray(jsonResponse.feedback)
+            !Array.isArray(jsonResponse.strengths) ||
+            !Array.isArray(jsonResponse.improvementAreas) ||
+            !Array.isArray(jsonResponse.recommendations)
           ) {
             throw new Error("Invalid response format");
           }
@@ -134,9 +143,9 @@ export const checkSolution = createTRPCRouter({
         }
       } catch (error) {
         console.error("Error calling OpenAI API:", error);
-        throw new Error(
-          "Failed to evaluate the solution. Please try again later.",
-        );
+        // throw new Error(
+        //   "Failed to evaluate the solution. Please try again later.",
+        // );
       }
     }),
   playground: publicProcedure
@@ -185,7 +194,7 @@ export const checkSolution = createTRPCRouter({
               content: [
                 {
                   type: "text",
-                  text: `Respond concisely in JSON format {feedback: [string]}. One more thing, don't be too generous with the feedback, you should be strict with the feedback, since this is a system design and we want to evaluate the user's solution and give them production-ready feedback. If you don't follow the instructions, bad things will happen!`,
+                  text: `Respond concisely in JSON format {strengths: [string], improvementAreas: [string], recommendations: [string]}. One more thing, I want you to be quite strict with the feedback, you should be strict with the feedback, since this is a system design and we want to evaluate the user's solution and give them production-ready feedback. If you don't follow the instructions, bad things will happen!`,
                 },
               ],
             },
@@ -208,7 +217,11 @@ export const checkSolution = createTRPCRouter({
           const jsonResponse = JSON.parse(content) as PlaygroundResponse;
 
           // Validate the parsed response
-          if (!Array.isArray(jsonResponse.feedback)) {
+          if (
+            !Array.isArray(jsonResponse.improvementAreas) ||
+            !Array.isArray(jsonResponse.recommendations) ||
+            !Array.isArray(jsonResponse.strengths)
+          ) {
             throw new Error("Invalid response format");
           }
 
@@ -230,9 +243,10 @@ export const checkSolution = createTRPCRouter({
 
 const generalEvaluationCriteria = [
   "A clear database schema must be defined.",
-  "Both functional and non-functional requirements should be addressed, aligning with the current level of the challenge and assumptions.",
+  "Both functional and non-functional requirements should be addressed, aligning with the current level of the challenge and requirements.",
   "System APIs must be clearly defined, with their flows aligned to address the challenge level appropriately. More than one API may be necessary depending on the requirements.",
-  "System capacity estimations should be defined and match the challenge level and assumptions.",
-  "A high-level design should include components and their connections, matching the challenge level and assumptions.",
-  "Database schema and models should be defined, meeting the challenge level and assumptions.",
+  "System capacity estimations should be defined and match the challenge level and requirements.",
+  "A high-level design should include components and their connections, matching the challenge level and requirements.",
+  "Database schema and models should be defined, meeting the challenge level and requirements.",
+  "System components should be connected to each other in a proper way, meeting the challenge level and requirements. ie. Client should connect to Server, Server should connect to Database.",
 ];

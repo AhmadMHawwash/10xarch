@@ -4,13 +4,14 @@ import {
 } from "@/components/ReactflowCustomNodes/SystemComponentNode";
 import challenges from "@/content/challenges";
 import { type Challenge } from "@/content/challenges/types";
+import { type PlaygroundResponse } from "@/server/api/routers/checkAnswer";
 import { api } from "@/trpc/react";
 import { useParams, usePathname } from "next/navigation";
+import { useEffect } from "react";
 import { type Edge, type Node } from "reactflow";
 import { create } from "zustand";
+import useLocalStorageState from "./useLocalStorageState";
 import { useSystemDesigner } from "./useSystemDesigner";
-import { useEffect, useState } from "react";
-import { type PlaygroundResponse } from "@/server/api/routers/checkAnswer";
 
 export const SYSTEM_COMPONENT_NODE = "SystemComponentNode";
 
@@ -55,11 +56,18 @@ const useLevelStore = create<{
 export const useChallengeManager = () => {
   const params = useParams<{ slug: string }>();
   const pathname = usePathname();
-  const challenge = challenges.find((challenge) => challenge.slug === params?.slug);
+  const challenge = challenges.find(
+    (challenge) => challenge.slug === params?.slug,
+  );
   const { toNextStage, toPreviousStage, setChallenge, currentStageIndex } =
-  useLevelStore((state) => state);
+    useLevelStore((state) => state);
   const currentLevel = challenge?.stages[currentStageIndex];
-  const [feedback, setFeedback] = useState<PlaygroundResponse | null>(null);
+  const [feedback, setFeedback] =
+    useLocalStorageState<PlaygroundResponse | null>(
+      `${pathname}-feedback`,
+      null,
+      (value) => (value ? (JSON.parse(value) as PlaygroundResponse) : null),
+    );
   const { nodes, edges } = useSystemDesigner();
 
   const { mutate, data, isPending } = api.ai.hello.useMutation();
@@ -71,6 +79,7 @@ export const useChallengeManager = () => {
     });
     const prompt = promptBuilder(challenge!, currentLevel!);
 
+    console.log(prompt);
     mutate({
       challengeAndSolutionPrompt: prompt,
       criteria: currentLevel?.criteria ?? [],
@@ -79,16 +88,9 @@ export const useChallengeManager = () => {
 
   useEffect(() => {
     if (data) {
-      localStorage.setItem(`${pathname}-feedback`, JSON.stringify(data));
+      setFeedback(data);
     }
-  }, [data, pathname]);
-
-  useEffect(() => {
-    const feedback = localStorage.getItem(`${pathname}-feedback`);
-    if (feedback) {
-      setFeedback(JSON.parse(feedback) as PlaygroundResponse);
-    }
-  }, [pathname]);
+  }, [data, setFeedback]);
 
   return {
     challenge: challenge!,
@@ -131,6 +133,7 @@ export const getChallengePrompt = ({
 
     const configs = whiteboard.data.configs;
 
+    console.log(configs);
     return {
       functionalRequirements: configs["functional requirements"] as string,
       nonFunctionalRequirements: configs[
@@ -199,20 +202,20 @@ export const getChallengePrompt = ({
       },
       "Current level of the challenge": {
         problem: currentStage?.problem ?? "",
-        assumptions: currentStage?.assumptions ?? [],
-        hintsPerArea: currentStage?.hintsPerArea ?? {},
+        requirements: currentStage?.metaRequirements ?? [],
+        // hintsPerArea: currentStage?.hintsPerArea ?? {},
       },
       solution: {
         components: cleanedNodes,
         "API definitions": whiteboardData?.apiDefinitions ?? [],
         "Traffic capacity estimation ":
-          whiteboardData?.capacityEstimations?.traffic ?? "",
+          whiteboardData?.capacityEstimations?.Traffic ?? "",
         "Storage capacity estimation":
-          whiteboardData?.capacityEstimations?.storage ?? "",
+          whiteboardData?.capacityEstimations?.Storage ?? "",
         "Bandwidth capacity estimation":
-          whiteboardData?.capacityEstimations?.bandwidth ?? "",
+          whiteboardData?.capacityEstimations?.Bandwidth ?? "",
         "Memory capacity estimation":
-          whiteboardData?.capacityEstimations?.memory ?? "",
+          whiteboardData?.capacityEstimations?.Memory ?? "",
         "Functional requirments": whiteboardData?.functionalRequirements ?? "",
         "Non functional requirments":
           whiteboardData?.nonFunctionalRequirements ?? "",

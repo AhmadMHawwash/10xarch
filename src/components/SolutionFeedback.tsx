@@ -1,90 +1,142 @@
-import { cn } from "@/lib/utils";
 import {
   type EvaluationResponse,
   type PlaygroundResponse,
 } from "@/server/api/routers/checkAnswer";
-import { ChevronDown, Loader2 } from "lucide-react";
+import {
+  Award,
+  ChevronDown,
+  Lightbulb,
+  Loader2,
+  TrendingUp
+} from "lucide-react";
+import React, { useState } from "react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "./ui/accordion";
 import { Button } from "./ui/button";
-import { ScrollArea } from "./ui/scroll-area";
+import { Progress } from "./ui/progress";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTrigger,
+} from "./ui/sheet";
 
 interface SolutionFeedbackProps {
   isLoadingAnswer: boolean;
   answer: EvaluationResponse | PlaygroundResponse | null;
-  isExpanded: boolean;
-  onToggleExpand: (isExpanded: boolean) => void;
 }
+
+const FeedbackList: React.FC<{
+  items: string[];
+  title: string;
+  icon: React.ReactNode;
+}> = ({ items, title, icon }) => (
+  <AccordionItem value={title}>
+    <AccordionTrigger className="text-lg font-semibold">
+      <div className="flex items-center">
+        {icon}
+        <span className="ml-2">{title}</span>
+      </div>
+    </AccordionTrigger>
+    <AccordionContent>
+      {items.length === 0 ? (
+        <p className="text-gray-600 dark:text-gray-400">
+          No feedback available
+        </p>
+      ) : (
+        <ul className="mt-2 space-y-2">
+          {items.map((item, index) => (
+            <li
+              key={index}
+              className="rounded-md bg-gray-100 p-3 text-sm text-gray-800 shadow-sm dark:bg-gray-700 dark:text-gray-200"
+            >
+              {item}
+            </li>
+          ))}
+        </ul>
+      )}
+    </AccordionContent>
+  </AccordionItem>
+);
+
+const ScoreDisplay: React.FC<{ score: number }> = ({ score }) => {
+  const getScoreColor = (score: number) => {
+    if (score < 50) return "text-red-500";
+    if (score < 80) return "text-yellow-500";
+    return "text-green-500";
+  };
+
+  return (
+    <div className="mb-6 text-center">
+      <div className="mb-2 text-2xl font-bold">Your Score</div>
+      <div className={`text-4xl font-bold ${getScoreColor(score)}`}>
+        {score}%
+      </div>
+      <Progress value={score} className="mt-2" />
+    </div>
+  );
+};
 
 export const SolutionFeedback: React.FC<SolutionFeedbackProps> = ({
   isLoadingAnswer,
   answer,
-  isExpanded,
-  onToggleExpand,
 }) => {
-  const getScoreInfo = (score: number) => {
-    if (score <= 50) return { color: "text-red-500" };
-    if (score >= 80) return { color: "text-green-500" };
-    return { color: "text-yellow-500" };
-  };
+  const [isOpen, setIsOpen] = useState(false);
 
   if (!answer && !isLoadingAnswer) return null;
 
   return (
-    <div className={cn("w-full", isExpanded ? "mb-4" : "mb-0")}>
-      {isLoadingAnswer ? (
-        <div className="flex justify-center py-4">
-          <Loader2 className="h-6 w-6 animate-spin text-blue-500" />
-        </div>
-      ) : answer ? (
-        <div
-          className={cn(
-            "transition-all duration-300",
-            isExpanded ? "opacity-100" : "h-0 overflow-hidden opacity-0",
-          )}
-        >
-          <div className="rounded-lg bg-gray-200 p-4 dark:bg-gray-700">
-            <div className="mb-4 flex items-center justify-between">
-              {"score" in answer && (
-                <div className="flex items-center">
-                  <span className="mr-2 text-sm font-semibold">Score:</span>
-                  <span
-                    className={`text-lg font-bold ${getScoreInfo(answer.score).color}`}
-                  >
-                    {answer.score}%
-                  </span>
-                </div>
-              )}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => onToggleExpand(false)}
-                className="text-gray-700 hover:bg-gray-300 dark:text-gray-300 dark:hover:bg-gray-600"
-              >
-                <ChevronDown className="mr-1 h-4 w-4" />
-                Hide
-              </Button>
-            </div>
-            {answer.feedback.length > 0 && (
-              <div>
-                <span className="mb-2 block text-sm font-semibold">
-                  Suggested improvements:
-                </span>
-                <ScrollArea className="h-56 w-full">
-                  <ul className="space-y-2">
-                    {answer.feedback.map((feedback, index) => (
-                      <li
-                        key={index}
-                        className="rounded bg-gray-300 p-2 text-sm text-gray-700 dark:bg-gray-600 dark:text-gray-300"
-                      >
-                        {feedback}
-                      </li>
-                    ))}
-                  </ul>
-                </ScrollArea>
-              </div>
-            )}
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
+      <SheetTrigger asChild>
+        <Button variant="outline">
+          <ChevronDown className="mr-2" size="20" />
+          Feedback
+        </Button>
+      </SheetTrigger>
+      <SheetContent
+        side="top"
+        className="overflow-y-auto bg-white dark:bg-gray-800"
+      >
+        <SheetHeader>
+          <SheetDescription className="text-xl font-bold text-gray-800 dark:text-gray-200">
+            Solution Feedback
+          </SheetDescription>
+        </SheetHeader>
+        {isLoadingAnswer ? (
+          <div className="flex h-full flex-col items-center justify-center">
+            <Loader2 className="mb-4 h-12 w-12 animate-spin text-blue-500" />
+            <p className="text-gray-600 dark:text-gray-300">
+              Analyzing your solution...
+            </p>
           </div>
-        </div>
-      ) : null}
-    </div>
+        ) : answer ? (
+          <div className="mt-6">
+            {"score" in answer && <ScoreDisplay score={answer.score} />}
+            <Accordion type="single" collapsible className="w-full">
+              <FeedbackList
+                items={answer.strengths}
+                title="Strengths"
+                icon={<Award className="text-green-500" size="20" />}
+              />
+              <FeedbackList
+                items={answer.improvementAreas}
+                title="Areas for Improvement"
+                icon={<TrendingUp className="text-yellow-500" size="20" />}
+              />
+              <FeedbackList
+                items={answer.recommendations}
+                title="Recommendations"
+                icon={<Lightbulb className="text-blue-500" size="20" />}
+              />
+            </Accordion>
+          </div>
+        ) : null}
+      </SheetContent>
+    </Sheet>
   );
 };

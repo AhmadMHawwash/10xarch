@@ -4,16 +4,27 @@ export type Challenge = {
   description: string;
   difficulty: "Easy" | "Medium" | "Hard";
   stages: Stage[];
+  generalLearnings: string[];
 };
 
 export type Stage = {
   problem: string;
-  assumptions: string[];
+  requirements: string[];
+  metaRequirements: string[];
   hintsPerArea: {
-    functionalAndNonFunctionalRequirements: string[];
+    requirements: {
+      functional: string[];
+      nonFunctional: string[];
+    };
     systemAPI: string[];
-    capacityEstimations: string[];
+    capacityEstimations: {
+      traffic: string[];
+      storage: string[];
+      memory: string[];
+      bandwidth: string[];
+    };
     highLevelDesign: string[];
   };
   criteria: string[];
+  learningsInMD: string;
 };

@@ -1,13 +1,15 @@
 // Example model schema from the Drizzle docs
 // https://orm.drizzle.team/docs/sql-schema-declaration
 
-import { sql } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   index,
   pgTableCreator,
+  serial,
   text,
   timestamp,
-  uuid
+  uuid,
+  varchar
 } from "drizzle-orm/pg-core";
 
 /**
@@ -17,7 +19,7 @@ import {
  * @see https://orm.drizzle.team/docs/goodies#multi-project-schema
  */
 export const createTable = pgTableCreator(
-  (name) => `system-design-playground_${name}`,
+  (name) => `sdp_${name}`,
 );
 
 export const posts = createTable(
@@ -39,11 +41,39 @@ export const posts = createTable(
 
 export type Post = typeof posts.$inferSelect;
 
-export const users = createTable('users', {
-  id: text('id').primaryKey(),
-  email: text('email').notNull().unique(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+export const users = createTable("users", {
+  id: text("id").primaryKey(),
+  email: text("email").notNull().unique(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 export type User = typeof users.$inferSelect;
+
+export const usersRelations = relations(users, ({ many }) => ({
+  playgrounds: many(playgrounds),
+}));
+
+export const playgrounds = createTable("playgrounds", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(),
+  content: text("content").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  ownerId: text("owner_id").references(() => users.id),
+});
+
+export type Playground = typeof playgrounds.$inferSelect;
+
+export const playgroundsRelations = relations(playgrounds, ({ one }) => ({
+  owner: one(users, {
+    fields: [playgrounds.ownerId],
+    references: [users.id],
+  }),
+}));
+
+export const waitlistTable = createTable("waitlist", {
+  id: serial("id").primaryKey(),
+  email: varchar("email", { length: 255 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});

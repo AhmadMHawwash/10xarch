@@ -8,6 +8,27 @@
       "when": 1725941898275,
       "tag": "0000_mute_lilandra",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1728238619404,
+      "tag": "0001_nebulous_valeria_richards",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1728238894275,
+      "tag": "0002_secret_scarlet_spider",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1728238945445,
+      "tag": "0003_volatile_serpent_society",
+      "breakpoints": true
     }
   ]
 }

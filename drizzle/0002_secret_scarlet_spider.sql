@@ -1,0 +1,1 @@
+ALTER TABLE "waitlist" RENAME TO "system-design-playground_waitlist";

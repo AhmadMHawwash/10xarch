@@ -27,10 +27,12 @@
 [ ] All criteria and assumptions for given stage should include all
 [ ] feedback about challenges with up/down vote
 [ ] modules/services (like authentication service - the solution designer doesn't have to design the whole auth service/pattern/module in order to pass the challenge) to drag and drop in their solution.
+[ ] Abstract concepts challenges (ie load balancing, clustering challenges)
+[ ] in the prompt, try without hints from AI (hints are now provided by AI, the hints might be misleading)
 ## Arch:
 [ ] Use Coolify instead of vercel
 
-## In game level ideas:
+## In game stage ideas:
 [ ] Having lots of databases? And lots of servers? Use clusters instead
 [ ] Your servers are under utilised? And at peak time you need more servers? Use "Pay as you go" arch (Same for replicas)
 [ ] Cache replica (For high availability)
@@ -40,7 +42,7 @@
 
 ## Explaining components:
 [ ] Explain it like I'm (5, 15, 25, 40) years old
-[ ] Explain in detail level (shallow, medium, deep)
+[ ] Explain in detail stage (shallow, medium, deep)
 [ ] Explain the What, Who, Where, When, Why
 
 ## Tracks:

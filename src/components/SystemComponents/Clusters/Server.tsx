@@ -23,9 +23,9 @@ const ServerClusterSettings = ({ name: id }: { name: string }) => {
     id,
     "servers count",
   );
-  const [purpose, setPurpose] = useSystemComponentConfigSlice<string>(
+  const [details, setDetails] = useSystemComponentConfigSlice<string>(
     id,
-    "Server purpose",
+    "Server details",
   );
 
   return (
@@ -49,16 +49,16 @@ const ServerClusterSettings = ({ name: id }: { name: string }) => {
           />
         </div>
         <div className="flex flex-col gap-4">
-          <Label htmlFor="server-purpose" className="text-gray-700 dark:text-gray-300">
-            Server purpose
+          <Label htmlFor="server-details" className="text-gray-700 dark:text-gray-300">
+            Server details
           </Label>
           <Textarea
-            name="server-purpose"
-            id="server-purpose"
+            name="server-details"
+            id="server-details"
             rows={10}
             className="text-md border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:border-gray-400 dark:focus:border-gray-600"
-            value={purpose}
-            onChange={(e) => setPurpose(e.target.value)}
+            value={details}
+            onChange={(e) => setDetails(e.target.value)}
           />
         </div>
       </div>

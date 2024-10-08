@@ -88,7 +88,7 @@ const componentSchema = z.union([
   }),
 ]);
 
-export const levelSchema = z.object({
+export const stageSchema = z.object({
   id: z.string(),
   name: z.string(),
   title: z.string(),
@@ -97,11 +97,11 @@ export const levelSchema = z.object({
   criteria: z.array(z.string()),
   dashboard: z
     .object({
-      beforeStartingLevel: z.object({
+      beforeStartingStage: z.object({
         reports: z.array(keyValueSchema),
         stats: z.array(keyValueSchema),
       }),
-      afterStartingLevel: z.object({
+      afterStartingStage: z.object({
         reports: z.array(keyValueSchema),
         stats: z.array(keyValueSchema),
       }),
@@ -118,7 +118,7 @@ const systemComponentSchema = z.object({
   content: z.string().optional(),
 });
 
-export type Level = z.infer<typeof levelSchema>;
+export type Stage = z.infer<typeof stageSchema>;
 export type UserSolution = z.infer<typeof userSolutionSchema>;
 export type SystemComponent = z.infer<typeof systemComponentSchema>;
 export type SystemComponentType = z.infer<typeof componentsListSchema>;

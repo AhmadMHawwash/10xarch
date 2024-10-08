@@ -1,9 +1,9 @@
-import { type Level } from "../type";
+import { type Stage } from "../type";
 import { componentsNumberingStore } from "../utils";
 
 const componentsNumberingStoreInstance = componentsNumberingStore.getState();
 
-export const sessionManagementLevelMaker = () => {
+export const sessionManagementStageMaker = () => {
   const client1 = componentsNumberingStoreInstance.getNextId("Client");
   const loadbalancer1 =
     componentsNumberingStoreInstance.getNextId("Load Balancer");
@@ -11,7 +11,7 @@ export const sessionManagementLevelMaker = () => {
   const server2 = componentsNumberingStoreInstance.getNextId("Server");
   const database1 = componentsNumberingStoreInstance.getNextId("Database");
 
-  const sessionManagement: Level = {
+  const sessionManagement: Stage = {
     id: "session-management",
     name: "Session Management",
     title: "Implement Session management for user experience consistency",

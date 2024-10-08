@@ -39,7 +39,7 @@ export const checkSolution = createTRPCRouter({
               content: [
                 {
                   type: "text",
-                  text: "You are a system design evaluation expert. You will receive: \n1. The challenge description \n2. The current level of the challenge being addressed \n3. The user's proposed solution. \nYour task is to evaluate the provided solution in the context of: \n1. The challenge requirements, \n2. The system requirements provided by the CPO/CTO, \n3. Provided hints for solving the current level, \n4. The criteria that define a correct solution.",
+                  text: "You are a system design evaluation expert. You will receive: \n1. The challenge description \n2. The current stage of the challenge being addressed \n3. The user's proposed solution. \nYour task is to evaluate the provided solution in the context of: \n1. The challenge requirements, \n2. The system requirements provided by the CPO/CTO, \n3. Provided hints for solving the current level, \n4. The criteria that define a correct solution.",
                 },
               ],
             },

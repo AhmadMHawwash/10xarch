@@ -1,9 +1,9 @@
-import { type Level } from "../type";
+import { type Stage } from "../type";
 import { componentsNumberingStore } from "../utils";
 
 const componentsNumberingStoreInstance = componentsNumberingStore.getState();
 
-export const databaseReplicationLevelMaker = () => {
+export const databaseReplicationStageMaker = () => {
   const client1 = componentsNumberingStoreInstance.getNextId("Client");
   const loadbalancer1 =
     componentsNumberingStoreInstance.getNextId("Load Balancer");
@@ -14,7 +14,7 @@ export const databaseReplicationLevelMaker = () => {
   const cdn1 = componentsNumberingStoreInstance.getNextId("CDN");
   const databaseCache1 = componentsNumberingStoreInstance.getNextId("Cache");
 
-  const databaseReplication: Level = {
+  const databaseReplication: Stage = {
     id: "database-replication",
     name: "Database Replication",
     title: "Implement Database Replication for High Availability",

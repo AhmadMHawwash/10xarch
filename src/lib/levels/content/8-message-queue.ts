@@ -3,7 +3,7 @@
 
 // const componentsNumberingStoreInstance = componentsNumberingStore.getState();
 
-// export const messageQueueLevelMaker = () => {
+// export const messageQueueStageMaker = () => {
 //   const client1 = componentsNumberingStoreInstance.getNextId("Client");
 //   const loadbalancer1 =
 //     componentsNumberingStoreInstance.getNextId("Load Balancer");

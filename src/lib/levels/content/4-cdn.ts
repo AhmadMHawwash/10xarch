@@ -1,9 +1,9 @@
-import { type Level } from "../type";
+import { type Stage } from "../type";
 import { componentsNumberingStore } from "../utils";
 
 const componentsNumberingStoreInstance = componentsNumberingStore.getState();
 
-export const cdnLevelMaker = () => {
+export const cdnStageMaker = () => {
   const client1 = componentsNumberingStoreInstance.getNextId("Client");
   const loadbalancer1 =
     componentsNumberingStoreInstance.getNextId("Load Balancer");
@@ -12,7 +12,7 @@ export const cdnLevelMaker = () => {
   const database1 = componentsNumberingStoreInstance.getNextId("Database");
   const sessionCache1 = componentsNumberingStoreInstance.getNextId("Cache");
 
-  const databaseReplication: Level = {
+  const databaseReplication: Stage = {
     id: "cdn",
     name: "Caching Static Content",
     title: "Implement a Content Delivery Network (CDN)",

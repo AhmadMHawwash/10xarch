@@ -1,7 +1,7 @@
-import { type Level } from "../type";
+import { type Stage } from "../type";
 
-export const basicLevelMaker = () => {
-  const loadBalancing: Level = {
+export const basicStageMaker = () => {
+  const loadBalancing: Stage = {
     id: "basic",
     name: "Basic Architecture",
     title: "Implement Basic Architecture",

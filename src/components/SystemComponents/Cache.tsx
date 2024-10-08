@@ -15,32 +15,26 @@ export const Cache = ({ name, Icon }: ComponentNodeProps) => {
   );
 };
 
-// type CachePurpose = "Database Read/Write" | "User Session";
-
 const CacheSettings = ({ name: id }: { name: string }) => {
   const { useSystemComponentConfigSlice } = useSystemDesigner();
 
-  // const [cacheType, setCacheType] = useSystemComponentConfigSlice<CachePurpose>(
-  //   id,
-  //   "type",
-  // );
-  const [purpose, setPurpose] = useSystemComponentConfigSlice<string>(
+  const [details, setDetails] = useSystemComponentConfigSlice<string>(
     id,
-    "purpose",
+    "details",
   );
 
   return (
     <WithSettings name={id}>
       <div className="grid w-full grid-flow-row grid-cols-1 gap-2 text-gray-800 dark:text-gray-200">
         <div className="flex flex-col gap-4">
-          <Label htmlFor="cache-purpose" className="text-gray-700 dark:text-gray-300">Cache purpose</Label>
+          <Label htmlFor="cache-details" className="text-gray-700 dark:text-gray-300">Cache details</Label>
           <Textarea
-            name="cache-purpose"
-            id="cache-purpose"
+            name="cache-details"
+            id="cache-details"
             rows={10}
             className="text-md bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 focus:border-gray-400 dark:focus:border-gray-600"
-            value={purpose}
-            onChange={(e) => setPurpose(e.target.value)}
+            value={details}
+            onChange={(e) => setDetails(e.target.value)}
           />
         </div>
       </div>

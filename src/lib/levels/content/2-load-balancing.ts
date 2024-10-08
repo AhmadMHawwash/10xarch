@@ -1,14 +1,14 @@
-import { type Level } from "../type";
+import { type Stage } from "../type";
 import { componentsNumberingStore } from "../utils";
 
 const componentsNumberingStoreInstance = componentsNumberingStore.getState();
 
-export const loadBalancingLevelMaker = () => {
+export const loadBalancingStageMaker = () => {
   const client1 = componentsNumberingStoreInstance.getNextId("Client");
   const server1 = componentsNumberingStoreInstance.getNextId("Server");
   const database1 = componentsNumberingStoreInstance.getNextId("Database");
 
-  const loadBalancing: Level = {
+  const loadBalancing: Stage = {
     id: "load-balancing",
     name: "Load Balancing",
     title: "Distribute Load Across Multiple Servers",

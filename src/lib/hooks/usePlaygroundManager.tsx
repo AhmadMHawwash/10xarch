@@ -109,7 +109,7 @@ const getSystemDesignPrompt = ({
           name,
           definition,
         })),
-        purpose: node.data.configs["Database purpose"],
+        details: node.data.configs["Database details"],
       };
     }
     return node.data.configs;

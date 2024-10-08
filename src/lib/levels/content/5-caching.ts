@@ -1,9 +1,9 @@
-import { type Level } from "../type";
+import { type Stage } from "../type";
 import { componentsNumberingStore } from "../utils";
 
 const componentsNumberingStoreInstance = componentsNumberingStore.getState();
 
-export const cachingLevelMaker = () => {
+export const cachingStageMaker = () => {
   const client1 = componentsNumberingStoreInstance.getNextId("Client");
   const loadbalancer1 =
     componentsNumberingStoreInstance.getNextId("Load Balancer");
@@ -13,7 +13,7 @@ export const cachingLevelMaker = () => {
   const sessionCache1 = componentsNumberingStoreInstance.getNextId("Cache");
   const cdn1 = componentsNumberingStoreInstance.getNextId("CDN");
 
-  const databaseReplication: Level = {
+  const databaseReplication: Stage = {
     id: "caching",
     name: "Caching",
     title: "Implement Caching to Improve Performance",

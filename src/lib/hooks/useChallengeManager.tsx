@@ -15,7 +15,7 @@ import { useSystemDesigner } from "./useSystemDesigner";
 
 export const SYSTEM_COMPONENT_NODE = "SystemComponentNode";
 
-const useLevelStore = create<{
+const useStageStore = create<{
   setChallenge: (challenge: Challenge) => void;
   challenge?: Challenge;
   toNextStage: () => void;
@@ -60,8 +60,8 @@ export const useChallengeManager = () => {
     (challenge) => challenge.slug === params?.slug,
   );
   const { toNextStage, toPreviousStage, setChallenge, currentStageIndex } =
-    useLevelStore((state) => state);
-  const currentLevel = challenge?.stages[currentStageIndex];
+    useStageStore((state) => state);
+  const currentStage = challenge?.stages[currentStageIndex];
   const [feedback, setFeedback] =
     useLocalStorageState<PlaygroundResponse | null>(
       `${pathname}-feedback`,
@@ -77,12 +77,12 @@ export const useChallengeManager = () => {
       nodes,
       edges,
     });
-    const prompt = promptBuilder(challenge!, currentLevel!);
+    const prompt = promptBuilder(challenge!, currentStage!);
 
     console.log(prompt);
     mutate({
       challengeAndSolutionPrompt: prompt,
-      criteria: currentLevel?.criteria ?? [],
+      criteria: currentStage?.criteria ?? [],
     });
   };
 
@@ -174,7 +174,7 @@ export const getChallengePrompt = ({
           name,
           definition,
         })),
-        purpose: node.data.configs["Database purpose"],
+        details: node.data.configs["Database details"],
       };
     }
     return node.data.configs;
@@ -198,9 +198,9 @@ export const getChallengePrompt = ({
     const prompt = {
       challenge: {
         title: challenge?.title ?? "",
-        description: `${challenge?.description}. \nAnd this challenge has a set of levels ${challenge?.stages.length} to be exact, each level depend on the previous one, and the user tackles them one by one.`,
+        description: `${challenge?.description}. \nAnd this challenge has a set of stages ${challenge?.stages.length} to be exact, each stage depend on the previous one, and the user tackles them one by one.`,
       },
-      "Current level of the challenge": {
+      "Current stage of the challenge": {
         problem: currentStage?.problem ?? "",
         requirements: currentStage?.metaRequirements ?? [],
         // hintsPerArea: currentStage?.hintsPerArea ?? {},

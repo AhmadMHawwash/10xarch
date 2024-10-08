@@ -24,9 +24,9 @@ const DatabaseClusterSettings = ({ name: id }: { name: string }) => {
     useSystemComponentConfigSlice<number>(id, "Number of Primary instances", 1);
   const [replicaInstancesCount, setReplicaInstancesCount] =
     useSystemComponentConfigSlice<number>(id, "Number of Replica instances", 0);
-  const [purpose, setPurpose] = useSystemComponentConfigSlice<string>(
+  const [details, setDetails] = useSystemComponentConfigSlice<string>(
     id,
-    "Database Cluster purpose",
+    "Database Cluster details",
     ""
   );
   const [models, setModels] = useSystemComponentConfigSlice<[string, string][]>(
@@ -94,14 +94,14 @@ Urls table (Sharded by id)
           />
         </div>
         <div className="flex flex-col gap-4">
-          <Label htmlFor="database-cluster-purpose" className="text-gray-700 dark:text-gray-300">Database Cluster purpose</Label>
+          <Label htmlFor="database-cluster-details" className="text-gray-700 dark:text-gray-300">Database Cluster details</Label>
           <Textarea
-            name="database-cluster-purpose"
-            id="database-cluster-purpose"
+            name="database-cluster-details"
+            id="database-cluster-details"
             rows={10}
             className="text-md bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 focus:border-gray-400 dark:focus:border-gray-600"
-            value={purpose}
-            onChange={(e) => setPurpose(e.target.value)}
+            value={details}
+            onChange={(e) => setDetails(e.target.value)}
           />
         </div>
       </div>

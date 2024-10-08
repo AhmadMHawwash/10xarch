@@ -1,9 +1,9 @@
-import { type Level } from "../type";
+import { type Stage } from "../type";
 import { componentsNumberingStore } from "../utils";
 
 const componentsNumberingStoreInstance = componentsNumberingStore.getState();
 
-export const clusteringLevelMaker = () => {
+export const clusteringStageMaker = () => {
   const client1 = componentsNumberingStoreInstance.getNextId("Client");
   const loadbalancer1 =
     componentsNumberingStoreInstance.getNextId("Load Balancer");
@@ -15,7 +15,7 @@ export const clusteringLevelMaker = () => {
   const cdn1 = componentsNumberingStoreInstance.getNextId("CDN");
   const databaseCache1 = componentsNumberingStoreInstance.getNextId("Cache");
 
-  const clustering: Level = {
+  const clustering: Stage = {
     id: "clustering",
     name: "Clustering",
     title: "Implement Clustering for Scalability and High Availability",

@@ -23,9 +23,9 @@ export const Database = ({ name, Icon }: ComponentNodeProps) => {
 const DatabaseSettings = ({ name: id }: { name: string }) => {
   const { useSystemComponentConfigSlice } = useSystemDesigner();
 
-  const [purpose, setPurpose] = useSystemComponentConfigSlice<string>(
+  const [details, setDetails] = useSystemComponentConfigSlice<string>(
     id,
-    "Database purpose",
+    "Database details",
   );
 
   const [models, setModels] = useSystemComponentConfigSlice<[string, string][]>(
@@ -59,14 +59,14 @@ Urls table
           />
         </div>
         <div className="flex flex-col gap-4">
-          <Label htmlFor="database-purpose" className="text-gray-700 dark:text-gray-300">Database purpose</Label>
+          <Label htmlFor="database-details" className="text-gray-700 dark:text-gray-300">Database details</Label>
           <Textarea
-            name="database-purpose"
-            id="database-purpose"
+            name="database-details"
+            id="database-details"
             rows={10}
             className="text-md bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 focus:border-gray-400 dark:focus:border-gray-600"
-            value={purpose}
-            onChange={(e) => setPurpose(e.target.value)}
+            value={details}
+            onChange={(e) => setDetails(e.target.value)}
           />
         </div>
       </div>

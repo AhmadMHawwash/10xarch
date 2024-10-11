@@ -10,6 +10,7 @@ import { dark } from "@clerk/themes";
 
 import { ClerkProvider } from "@clerk/nextjs";
 import { GeistSans } from "geist/font/sans";
+import { Hotjar } from "@/components/Hotjar";
 
 export const metadata = {
   title: "System Design Playground",
@@ -26,6 +27,7 @@ export default async function RootLayout({
   return (
     <html lang="en" className={GeistSans.variable} suppressHydrationWarning>
       <body className="bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100">
+        <Hotjar />
         <ClerkProvider
           appearance={{
             baseTheme: dark,

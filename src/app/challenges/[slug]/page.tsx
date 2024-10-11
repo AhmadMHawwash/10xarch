@@ -10,7 +10,9 @@ import {
 import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
 import { SystemDesignerProvider } from "@/lib/hooks/useSystemDesigner";
 import { notFound } from "next/navigation";
+import { useEffect, useState } from "react";
 import { ReactFlowProvider } from "reactflow";
+import { usePrevious } from "react-use";
 
 export default function LevelPage() {
   return (
@@ -25,8 +27,16 @@ export default function LevelPage() {
 function Level() {
   const { checkSolution, feedback, isLoadingAnswer, challenge } =
     useChallengeManager();
+  const [isFeedbackExpanded, setIsFeedbackExpanded] = useState(false);
+  const prevFeedback = usePrevious(feedback);
 
-  if (!challenge) return notFound()
+  useEffect(() => {
+    if (prevFeedback !== feedback && prevFeedback) {
+      setIsFeedbackExpanded(true);
+    }
+  }, [feedback, prevFeedback]);
+
+  if (!challenge) return notFound();
 
   return (
     <>
@@ -42,6 +52,9 @@ function Level() {
                 checkSolution={checkSolution}
                 feedback={feedback}
                 isLoadingAnswer={isLoadingAnswer}
+                isFeedbackExpanded={isFeedbackExpanded}
+                onOpen={() => setIsFeedbackExpanded(true)}
+                onClose={() => setIsFeedbackExpanded(false)}
               />
             )}
           />

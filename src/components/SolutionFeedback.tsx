@@ -7,9 +7,13 @@ import {
   ChevronDown,
   Lightbulb,
   Loader2,
-  TrendingUp
+  TrendingUp,
 } from "lucide-react";
-import React, { useState } from "react";
+import React from "react";
+import ReactMarkdown from "react-markdown";
+import rehypeRaw from "rehype-raw";
+import remarkGfm from "remark-gfm";
+import { components1 } from "./SystemComponents/Wrappers/WithMarkdownDetails";
 import {
   Accordion,
   AccordionContent,
@@ -21,18 +25,21 @@ import { Progress } from "./ui/progress";
 import {
   Sheet,
   SheetContent,
-  SheetDescription,
   SheetHeader,
+  SheetTitle,
   SheetTrigger,
 } from "./ui/sheet";
 
 interface SolutionFeedbackProps {
   isLoadingAnswer: boolean;
   answer: EvaluationResponse | PlaygroundResponse | null;
+  isOpen: boolean;
+  onClose: () => void;
+  onOpen: () => void;
 }
 
 const FeedbackList: React.FC<{
-  items: string[];
+  items: string;
   title: string;
   icon: React.ReactNode;
 }> = ({ items, title, icon }) => (
@@ -44,21 +51,28 @@ const FeedbackList: React.FC<{
       </div>
     </AccordionTrigger>
     <AccordionContent>
-      {items.length === 0 ? (
+      {!items ? (
         <p className="text-gray-600 dark:text-gray-400">
           No feedback available
         </p>
       ) : (
-        <ul className="mt-2 space-y-2">
-          {items.map((item, index) => (
-            <li
-              key={index}
-              className="rounded-md bg-gray-100 p-3 text-sm text-gray-800 shadow-sm dark:bg-gray-700 dark:text-gray-200"
-            >
-              {item}
-            </li>
-          ))}
-        </ul>
+        <ReactMarkdown
+          remarkPlugins={[remarkGfm]}
+          rehypePlugins={[rehypeRaw]} // Enable raw HTML parsing
+          components={components1}
+        >
+          {items}
+        </ReactMarkdown>
+        // <ul className="mt-2 space-y-2">
+        //   {items.map((item, index) => (
+        //     <li
+        //       key={index}
+        //       className="rounded-md bg-gray-100 p-3 text-sm text-gray-800 shadow-sm dark:bg-gray-700 dark:text-gray-200"
+        //     >
+        //       {item}
+        //     </li>
+        //   ))}
+        // </ul>
       )}
     </AccordionContent>
   </AccordionItem>
@@ -85,13 +99,14 @@ const ScoreDisplay: React.FC<{ score: number }> = ({ score }) => {
 export const SolutionFeedback: React.FC<SolutionFeedbackProps> = ({
   isLoadingAnswer,
   answer,
+  isOpen,
+  onClose,
+  onOpen,
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
-
   if (!answer && !isLoadingAnswer) return null;
 
   return (
-    <Sheet open={isOpen} onOpenChange={setIsOpen}>
+    <Sheet open={isOpen} onOpenChange={(v) => (v ? onOpen() : onClose())}>
       <SheetTrigger asChild>
         <Button variant="outline">
           <ChevronDown className="mr-2" size="20" />
@@ -103,9 +118,10 @@ export const SolutionFeedback: React.FC<SolutionFeedbackProps> = ({
         className="overflow-y-auto bg-white dark:bg-gray-800"
       >
         <SheetHeader>
-          <SheetDescription className="text-xl font-bold text-gray-800 dark:text-gray-200">
+          <SheetTitle className="text-xl">Solution Feedback</SheetTitle>
+          {/* <SheetDescription className="text-xl font-bold text-gray-800 dark:text-gray-200">
             Solution Feedback
-          </SheetDescription>
+          </SheetDescription> */}
         </SheetHeader>
         {isLoadingAnswer ? (
           <div className="flex h-full flex-col items-center justify-center">

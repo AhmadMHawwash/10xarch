@@ -19,6 +19,8 @@ import {
   useSystemDesigner,
 } from "@/lib/hooks/useSystemDesigner";
 import { cn } from "@/lib/utils";
+import { usePrevious } from "react-use";
+import { useEffect, useState } from "react";
 import { ReactFlowProvider } from "reactflow";
 
 export default function Page() {
@@ -38,6 +40,14 @@ function PageContent() {
     answer: feedback,
     isLoadingAnswer,
   } = usePlaygroundManager();
+  const [isFeedbackExpanded, setIsFeedbackExpanded] = useState(false);
+  const prevFeedback = usePrevious(feedback);
+
+  useEffect(() => {
+    if (prevFeedback !== feedback && prevFeedback) {
+      setIsFeedbackExpanded(true);
+    }
+  }, [feedback, prevFeedback]);
 
   const [todos, setTodos] = useSystemComponentConfigSlice<TodoItem[]>(
     selectedNode?.id ?? "",
@@ -64,12 +74,12 @@ function PageContent() {
     <ResizablePanelGroup direction="horizontal">
       <ResizablePanel defaultSize={25} minSize={3}>
         <div className="flex w-[95%] min-w-[300px] flex-col items-center">
-          <H3 className="p-2 pl-3 self-start">
+          <H3 className="self-start p-2 pl-3">
             {selectedNode?.data.id && selectedNode.type !== "Whiteboard"
               ? selectedNode?.data.name
               : "System"}
           </H3>
-          <Label htmlFor="name" className="self-start ml-3 mt-2">
+          <Label htmlFor="name" className="ml-3 mt-2 self-start">
             Name
           </Label>
           <Input
@@ -109,6 +119,9 @@ function PageContent() {
               checkSolution={checkSolution}
               feedback={feedback}
               isLoadingAnswer={isLoadingAnswer}
+              isFeedbackExpanded={isFeedbackExpanded}
+              onOpen={() => setIsFeedbackExpanded(true)}
+              onClose={() => setIsFeedbackExpanded(false)}
             />
           )}
         />

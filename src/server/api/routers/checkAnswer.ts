@@ -5,14 +5,14 @@ import { z } from "zod";
 // Define the response type
 export interface EvaluationResponse {
   score: number;
-  strengths: string[];
-  improvementAreas: string[];
-  recommendations: string[];
+  strengths: string;
+  improvementAreas: string;
+  recommendations: string;
 }
 export interface PlaygroundResponse {
-  strengths: string[];
-  improvementAreas: string[];
-  recommendations: string[];
+  strengths: string;
+  improvementAreas: string;
+  recommendations: string;
 }
 
 const openai = new OpenAI({
@@ -90,10 +90,11 @@ export const checkSolution = createTRPCRouter({
               content: [
                 {
                   type: "text",
-                  text: `Respond in JSON format {score: [score], strengths: [string], improvementAreas: [string], recommendations: [string]}. 
+                  text: `Respond in JSON format {score: number, strengths: string, improvementAreas: string, recommendations: string}. 
                   * Regarding score: score ranges from 0 to 100. When the provided solution fixes part of the given challenge (and current stage) then add score to the user score. If the user didn't solve anything, then they deserver a ZERO (0). One more thing, I want you to be quite strict with the score, since this is a system design interview and we want to evaluate the user's solution based on the criteria and not be too lenient. And as the user progresses in the challenge they should face strictier scoring approach. 
-                  * Regarding improvementAreas: each improvement area, should be one specific improvement. So if you have multiple improvements, you should list them separately.
-                  * Regarding rules: If you don't follow the instructions, bad things will happen!`,
+                  * Regarding improvementAreas: each improvement area, should be one specific improvement. So if you have multiple improvements, you should list them separately in markdown format.
+                  * Regarding strengths, improvementAreas and recommendations should be in markdown format.
+                  * Rules: 1. If you don't follow the instructions, bad things will happen! 2. Give the feedback like this {score: number, strengths: string, improvementAreas: string, recommendations: string}. No further wrapping`,
                 },
               ],
             },
@@ -107,9 +108,8 @@ export const checkSolution = createTRPCRouter({
               ],
             },
           ],
-          temperature: 1,
+          temperature: 0.2,
           max_tokens: 512,
-          top_p: 0,
           frequency_penalty: 0,
           presence_penalty: 0,
           response_format: {
@@ -123,16 +123,6 @@ export const checkSolution = createTRPCRouter({
         // Parse the content as JSON with type checking
         try {
           const jsonResponse = JSON.parse(content) as EvaluationResponse;
-
-          // Validate the parsed response
-          if (
-            typeof jsonResponse.score !== "number" ||
-            !Array.isArray(jsonResponse.strengths) ||
-            !Array.isArray(jsonResponse.improvementAreas) ||
-            !Array.isArray(jsonResponse.recommendations)
-          ) {
-            throw new Error("Invalid response format");
-          }
 
           return jsonResponse;
         } catch (parseError) {
@@ -194,14 +184,25 @@ export const checkSolution = createTRPCRouter({
               content: [
                 {
                   type: "text",
-                  text: `Respond concisely in JSON format {strengths: [string], improvementAreas: [string], recommendations: [string]}. One more thing, I want you to be quite strict with the feedback, you should be strict with the feedback, since this is a system design and we want to evaluate the user's solution and give them production-ready feedback. If you don't follow the instructions, bad things will happen!`,
+                  text: `Respond concisely in JSON format {strengths: string, improvementAreas: string, recommendations: string}. 
+                  * Regarding improvementAreas: each improvement area, should be one specific improvement. So if you have multiple improvements, you should list them separately in markdown format.
+                  * Regarding strengths, improvementAreas and recommendations should be in markdown format.
+                  * Rules: 1. If you don't follow the instructions, bad things will happen! 2. Give the feedback like this {score: number, strengths: string, improvementAreas: string, recommendations: string}. No further wrapping`,
+                },
+              ],
+            },
+            {
+              role: "assistant",
+              content: [
+                {
+                  type: "text",
+                  text: "Provide a concise evaluation without any further explanation.",
                 },
               ],
             },
           ],
-          temperature: 1,
+          temperature: 0.2,
           max_tokens: 512,
-          top_p: 0,
           frequency_penalty: 0,
           presence_penalty: 0,
           response_format: {
@@ -215,15 +216,6 @@ export const checkSolution = createTRPCRouter({
         // Parse the content as JSON with type checking
         try {
           const jsonResponse = JSON.parse(content) as PlaygroundResponse;
-
-          // Validate the parsed response
-          if (
-            !Array.isArray(jsonResponse.improvementAreas) ||
-            !Array.isArray(jsonResponse.recommendations) ||
-            !Array.isArray(jsonResponse.strengths)
-          ) {
-            throw new Error("Invalid response format");
-          }
 
           return jsonResponse;
         } catch (parseError) {

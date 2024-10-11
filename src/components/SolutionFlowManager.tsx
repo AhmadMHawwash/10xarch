@@ -1,3 +1,4 @@
+import { useFeatureCustomisation, useFeatures } from "@/lib/hooks/useFeatures";
 import {
   defaultStartingNodes,
   useSystemDesigner,
@@ -9,6 +10,7 @@ import {
 import { Check, Loader2, Play, RotateCcw } from "lucide-react";
 import React, { Suspense, useEffect, useState } from "react";
 import { SolutionFeedback } from "./SolutionFeedback";
+import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import {
   Dialog,
@@ -23,16 +25,23 @@ interface FlowManagerProps {
   checkSolution: () => void;
   feedback: EvaluationResponse | PlaygroundResponse | null;
   isLoadingAnswer: boolean;
+  isFeedbackExpanded: boolean;
+  onOpen: () => void;
+  onClose: () => void;
 }
 
 export const FlowManager: React.FC<FlowManagerProps> = ({
   checkSolution,
   feedback,
   isLoadingAnswer,
+  isFeedbackExpanded,
+  onOpen,
+  onClose,
 }) => {
+  const { runSolutionLabel } = useFeatureCustomisation();
+  const { canRunSolution } = useFeatures();
   const [resetDone, setResetDone] = useState(false);
   const { setNodes, setEdges } = useSystemDesigner();
-  const [isFeedbackExpanded, setIsFeedbackExpanded] = useState(false);
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
@@ -58,10 +67,22 @@ export const FlowManager: React.FC<FlowManagerProps> = ({
     >
       <div className="flex items-center space-x-3">
         <ResetFlowButton resetDone={resetDone} onReset={resetFlow} />
-        <RunSolutionButton
-          isLoading={isLoadingAnswer}
-          onClick={checkSolution}
-        />
+        <div className="relative">
+          {!canRunSolution && (
+            <Badge
+              variant="outline"
+              className="absolute -right-4 -top-3 z-10 opacity-80"
+            >
+              Coming soon
+            </Badge>
+          )}
+          <RunSolutionButton
+            isLoading={isLoadingAnswer}
+            onClick={checkSolution}
+            disabled={!canRunSolution}
+            label={runSolutionLabel}
+          />
+        </div>
         <Suspense
           fallback={
             <div className="h-8 w-full animate-pulse rounded bg-gray-200"></div>
@@ -70,6 +91,9 @@ export const FlowManager: React.FC<FlowManagerProps> = ({
           <SolutionFeedback
             isLoadingAnswer={isLoadingAnswer}
             answer={feedback}
+            isOpen={isFeedbackExpanded}
+            onClose={onClose}
+            onOpen={onOpen}
           />
         </Suspense>
       </div>
@@ -99,11 +123,13 @@ const ResetFlowButton: React.FC<{
 const RunSolutionButton: React.FC<{
   isLoading: boolean;
   onClick: () => void;
-}> = ({ isLoading, onClick }) => (
+  disabled?: boolean;
+  label?: string;
+}> = ({ isLoading, onClick, disabled, label }) => (
   <Button
     size="sm"
     onClick={onClick}
-    disabled={isLoading}
+    disabled={isLoading || disabled}
     className="bg-blue-600 text-white transition-colors hover:bg-blue-700"
   >
     {isLoading ? (
@@ -111,7 +137,7 @@ const RunSolutionButton: React.FC<{
     ) : (
       <Play className="mr-2 h-4 w-4" />
     )}
-    Run solution
+    {label}
   </Button>
 );
 

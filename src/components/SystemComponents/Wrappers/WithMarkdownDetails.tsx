@@ -22,7 +22,7 @@ import ReactMarkdown, { type Components } from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";
 
-const components1: Components = {
+export const components1: Components = {
   h1: ({ node: _, ...props }) => <H1 className="text-gray-100" {...props} />,
   h2: ({ node: _, ...props }) => <H2 className="text-gray-100" {...props} />,
   h3: ({ node: _, ...props }) => <H3 className="text-gray-100" {...props} />,

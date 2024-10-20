@@ -1,4 +1,13 @@
-import { useState } from "react";
+import { cache } from "@/content/cache";
+import { cacheCluster } from "@/content/cache-cluster";
+import { cdn } from "@/content/cdn";
+import { client } from "@/content/client";
+import { database } from "@/content/database";
+import { databaseCluster } from "@/content/database-cluster";
+import { loadBalancer } from "@/content/load-balancer";
+import { messageQueue } from "@/content/message-queue";
+import { server } from "@/content/server";
+import { serverCluster } from "@/content/server-cluster";
 import { type SystemComponent, type SystemComponentType } from "@/lib/levels/type";
 import {
   Database,
@@ -7,21 +16,12 @@ import {
   HardDriveDownload,
   MonitorSmartphone,
   Network,
-  Server,
   Search,
+  Server,
 } from "lucide-react";
 import type { DragEvent } from "react";
+import { useState } from "react";
 import { Lead } from "./ui/typography";
-import { server } from "@/content/server";
-import { loadBalancer } from "@/content/load-balancer";
-import { cache } from "@/content/cache";
-import { database } from "@/content/database";
-import { cdn } from "@/content/cdn";
-import { messageQueue } from "@/content/message-queue";
-import { databaseCluster } from "@/content/database-cluster";
-import { cacheCluster } from "@/content/cache-cluster";
-import { serverCluster } from "@/content/server-cluster";
-import { client } from "@/content/client";
 
 const components: Record<SystemComponentType, SystemComponent> = {
   Client: {

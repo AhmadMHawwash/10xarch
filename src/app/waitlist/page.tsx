@@ -1,5 +1,5 @@
 import { Separator } from "@/components/ui/separator";
-import { H1, H2, Muted } from "@/components/ui/typography";
+import { H2, Muted } from "@/components/ui/typography";
 import WaitlistForm from "@/components/Waitlist";
 
 export default function Home() {

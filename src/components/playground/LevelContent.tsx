@@ -121,45 +121,57 @@ const StageProgress: React.FC<StageProgressProps> = ({
   onPrevious,
   onNext,
 }) => (
-  <div className="flex items-center justify-between">
-    <Button
-      disabled={currentStage === 0}
-      size="sm"
-      variant="outline"
-      onClick={onPrevious}
-      className="border-gray-400 text-gray-800 hover:bg-gray-200 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700"
-    >
-      <ArrowLeft className="mr-1" /> Previous
-    </Button>
-    <div className="relative mx-4 flex-grow">
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger className="w-full">
-            <Progress
-              value={((currentStage + 1) / totalStages) * 100}
-              className="h-2 w-full"
-            />
-          </TooltipTrigger>
-          <TooltipContent
-            side="top"
-            className="bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200"
-          >
-            <p>
-              Stage {currentStage + 1} of {totalStages}
-            </p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+  <div className="flex flex-col justify-center">
+    <div className="flex items-center justify-between">
+      <Button
+        disabled={currentStage === 0}
+        size="sm"
+        variant="outline"
+        onClick={onPrevious}
+        className="border-gray-400 text-gray-800 hover:bg-gray-200 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700"
+      >
+        <ArrowLeft className="mr-1" /> Previous
+      </Button>
+      <div className="relative mx-4 flex-grow">
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger className="w-full">
+              <Progress
+                value={((currentStage + 1) / totalStages) * 100}
+                className="h-2 w-full"
+              />
+            </TooltipTrigger>
+            <TooltipContent
+              side="top"
+              className="bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200"
+            >
+              <p>
+                Stage {currentStage + 1} of {totalStages}
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
+      <Button
+        disabled={currentStage === totalStages - 1}
+        size="sm"
+        variant="outline"
+        onClick={onNext}
+        className="border-gray-400 text-gray-800 hover:bg-gray-200 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700"
+      >
+        Next <ArrowRight className="ml-1" />
+      </Button>
     </div>
-    <Button
-      disabled={currentStage === totalStages - 1}
-      size="sm"
-      variant="outline"
-      onClick={onNext}
-      className="border-gray-400 text-gray-800 hover:bg-gray-200 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700"
-    >
-      Next <ArrowRight className="ml-1" />
-    </Button>
+    {currentStage === totalStages - 1 ? (
+      <Button
+        size="sm"
+        variant="default"
+        onClick={onNext}
+        className="border-gray-400 bg-yellow-500 text-gray-800 hover:bg-gray-200 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700 mt-2"
+      >
+        Finish
+      </Button>
+    ) : null}
   </div>
 );
 

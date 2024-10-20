@@ -1,7 +1,3 @@
-import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
-import { ArrowLeft, ArrowRight, BookOpenText } from "lucide-react";
-import { Button } from "./ui/button";
-import { H5, Large, P } from "./ui/typography";
 import {
   Sheet,
   SheetContent,
@@ -9,7 +5,11 @@ import {
   SheetHeader,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
+import { ArrowLeft, ArrowRight, BookOpenText } from "lucide-react";
+import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
+import { H5, Large, P } from "./ui/typography";
 
 export const Dashboard = () => {
   const { stage, toNextStage, toPreviousStage, challenge } = useChallengeManager();

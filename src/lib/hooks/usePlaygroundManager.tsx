@@ -17,9 +17,9 @@ export const usePlaygroundManager = () => {
   const pathname = usePathname();
   const { nodes, edges } = useSystemDesigner();
   const [feedback, setFeedback] =
-    useLocalStorageState<PlaygroundResponse | null>(
+    useLocalStorageState<PlaygroundResponse | undefined>(
       `playground-${pathname}-feedback`,
-      null,
+      undefined,
     );
 
   const { mutate, data, isPending } = api.ai.playground.useMutation();

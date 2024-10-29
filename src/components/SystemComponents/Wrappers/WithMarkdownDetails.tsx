@@ -23,18 +23,18 @@ import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";
 
 export const components1: Components = {
-  h1: ({ node: _, ...props }) => <H1 className="text-gray-100" {...props} />,
-  h2: ({ node: _, ...props }) => <H2 className="text-gray-100" {...props} />,
-  h3: ({ node: _, ...props }) => <H3 className="text-gray-100" {...props} />,
-  h4: ({ node: _, ...props }) => <H4 className="text-gray-100" {...props} />,
-  h5: ({ node: _, ...props }) => <H5 className="text-gray-100" {...props} />,
-  h6: ({ node: _, ...props }) => <H6 className="text-gray-100" {...props} />,
-  p: ({ node: _, ...props }) => <P className="text-gray-300" {...props} />,
-  ul: ({ node: _, ...props }) => <List className="text-gray-300" {...props} />,
+  h1: ({ node: _, ...props }) => <H1 className="dark:text-gray-100 text-gray-800" {...props} />,
+  h2: ({ node: _, ...props }) => <H2 className="dark:text-gray-100 text-gray-800" {...props} />,
+  h3: ({ node: _, ...props }) => <H3 className="dark:text-gray-100 text-gray-800" {...props} />,
+  h4: ({ node: _, ...props }) => <H4 className="dark:text-gray-100 text-gray-800" {...props} />,
+  h5: ({ node: _, ...props }) => <H5 className="dark:text-gray-100 text-gray-800" {...props} />,
+  h6: ({ node: _, ...props }) => <H6 className="dark:text-gray-100 text-gray-800" {...props} />,
+  p: ({ node: _, ...props }) => <P className="dark:text-gray-300 text-gray-700" {...props} />,
+  ul: ({ node: _, ...props }) => <List className="dark:text-gray-300 text-gray-700" {...props} />,
   li: ({ node: _, ...props }) => (
-    <li className="list-item text-gray-300">{props.children}</li>
+    <li className="list-item dark:text-gray-300 text-gray-700">{props.children}</li>
   ),
-  blockquote: ({ node: _, ...props }) => <Quote className="text-gray-300" {...props} />,
+  blockquote: ({ node: _, ...props }) => <Quote className="dark:text-gray-300 text-gray-700" {...props} />,
   a: ({ node: _, ...props }) => (
     <a {...props} className="link text-blue-400 hover:text-blue-300">
       {props.children}

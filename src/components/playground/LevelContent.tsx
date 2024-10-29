@@ -17,8 +17,13 @@ import { ArrowLeft, ArrowRight, InfoIcon } from "lucide-react";
 import { type ReactNode } from "react";
 
 export const LevelContent = () => {
-  const { stage, toNextStage, toPreviousStage, challenge, currentStageIndex } =
-    useChallengeManager();
+  const {
+    stage,
+    toNextStage,
+    toPreviousStage,
+    challenge,
+    currentStageIndex,
+  } = useChallengeManager();
 
   const oldRequirements = challenge.stages
     .slice(0, currentStageIndex)
@@ -162,16 +167,6 @@ const StageProgress: React.FC<StageProgressProps> = ({
         Next <ArrowRight className="ml-1" />
       </Button>
     </div>
-    {currentStage === totalStages - 1 ? (
-      <Button
-        size="sm"
-        variant="default"
-        onClick={onNext}
-        className="border-gray-400 bg-yellow-500 text-gray-800 hover:bg-gray-200 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700 mt-2"
-      >
-        Finish
-      </Button>
-    ) : null}
   </div>
 );
 

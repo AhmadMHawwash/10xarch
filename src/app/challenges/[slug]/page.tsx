@@ -23,6 +23,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
+import { FeedbackList, ScoreDisplay } from "@/components/SolutionFeedback";
+import { Accordion } from "@/components/ui/accordion";
+import { Award, Lightbulb, TrendingUp } from "lucide-react";
+import Link from "next/link";
 
 export default function LevelPage() {
   return (
@@ -35,10 +39,17 @@ export default function LevelPage() {
 }
 
 function Level() {
-  const { checkSolution, feedback, isLoadingAnswer, challenge } =
-    useChallengeManager();
+  const {
+    checkSolution,
+    feedback,
+    isLoadingAnswer,
+    challenge,
+    currentStageIndex,
+  } = useChallengeManager();
 
   const [isFeedbackExpanded, setIsFeedbackExpanded] = useState(false);
+  const [isOpenClosure, setIsOpenClosure] = useState(false);
+
   const prevFeedback = usePrevious(feedback);
 
   useEffect(() => {
@@ -49,9 +60,14 @@ function Level() {
 
   if (!challenge) return notFound();
 
+  const isLastStage = currentStageIndex + 1 === challenge.stages.length;
   return (
     <>
       <ChallengeOverviewDialog />
+      <ChallengeClosureDialog
+        isOpen={isOpenClosure}
+        onClose={() => setIsOpenClosure(false)}
+      />
       <ResizablePanelGroup direction="horizontal">
         <ResizablePanel defaultSize={25} minSize={3}>
           <LevelContent />
@@ -64,9 +80,16 @@ function Level() {
                 checkSolution={checkSolution}
                 feedback={feedback}
                 isLoadingAnswer={isLoadingAnswer}
-                isFeedbackExpanded={isFeedbackExpanded}
-                onOpen={() => setIsFeedbackExpanded(true)}
-                onClose={() => setIsFeedbackExpanded(false)}
+                isFeedbackExpanded={isFeedbackExpanded && !isLastStage}
+                onOpen={() =>
+                  isLastStage
+                    ? setIsOpenClosure(true)
+                    : setIsFeedbackExpanded(true)
+                }
+                onClose={() => {
+                  setIsOpenClosure(false);
+                  setIsFeedbackExpanded(false);
+                }}
               />
             )}
           />
@@ -134,6 +157,91 @@ const ChallengeOverviewDialog = () => {
             Lets Go!
           </Button>
         </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+interface ChallengeClosureDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+const ChallengeClosureDialog = ({
+  isOpen,
+  onClose,
+}: ChallengeClosureDialogProps) => {
+  const { challenge, feedback } = useChallengeManager();
+
+  if (!challenge || !feedback) return null;
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-h-[85%] overflow-scroll bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 sm:max-w-[1025px]">
+        <DialogHeader>
+          <DialogTitle className="mb-4 text-center text-2xl font-bold">
+            {challenge.title} Challenge
+          </DialogTitle>
+        </DialogHeader>
+        <ScrollArea className="h-max-[60vh] overflow-scroll pr-4">
+          <Card className="mb-6 bg-white/50 backdrop-blur-sm dark:bg-gray-800/50">
+            <CardContent className="pt-6">
+              <h3 className="mb-2 text-lg font-semibold">
+                Challenge Description
+              </h3>
+              <p className="text-sm text-gray-700 dark:text-gray-300">
+                {challenge.description}
+              </p>
+            </CardContent>
+          </Card>
+          <Card className="mb-6 bg-white/50 backdrop-blur-sm dark:bg-gray-800/50">
+            <CardContent className="pt-6">
+              <h3 className="mb-4 text-lg font-semibold">General Learnings</h3>
+              <ul className="space-y-3">
+                {challenge.generalLearnings.map((learning, index) => (
+                  <li key={index} className="flex items-start">
+                    <Badge variant="secondary" className="mr-2 mt-1">
+                      {index + 1}
+                    </Badge>
+                    <p className="text-sm text-gray-700 dark:text-gray-300">
+                      {learning}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
+          <Card className="bg-white/50 backdrop-blur-sm dark:bg-gray-800/50">
+            <CardContent className="pt-6">
+              <h3 className="mb-4 text-lg font-semibold">Feedback</h3>
+              <div className="mt-6">
+                {"score" in feedback && <ScoreDisplay score={feedback.score} />}
+                <Accordion type="single" collapsible className="w-full">
+                  <FeedbackList
+                    items={feedback.strengths}
+                    title="Strengths"
+                    icon={<Award className="text-green-500" size="20" />}
+                  />
+                  <FeedbackList
+                    items={feedback.improvementAreas}
+                    title="Areas for Improvement"
+                    icon={<TrendingUp className="text-yellow-500" size="20" />}
+                  />
+                  <FeedbackList
+                    items={feedback.recommendations}
+                    title="Recommendations"
+                    icon={<Lightbulb className="text-blue-500" size="20" />}
+                  />
+                </Accordion>
+              </div>
+            </CardContent>
+          </Card>
+        </ScrollArea>
+        <Link
+          href="/challenges"
+          className="group inline-flex items-center rounded-full bg-blue-600 px-6 py-3 font-bold text-white hover:bg-blue-700 justify-center"
+        >
+          Go to Challenges list
+        </Link>
       </DialogContent>
     </Dialog>
   );

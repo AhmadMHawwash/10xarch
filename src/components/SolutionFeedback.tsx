@@ -32,13 +32,13 @@ import {
 
 interface SolutionFeedbackProps {
   isLoadingAnswer: boolean;
-  answer: EvaluationResponse | PlaygroundResponse | null;
+  answer: EvaluationResponse | PlaygroundResponse | undefined;
   isOpen: boolean;
   onClose: () => void;
   onOpen: () => void;
 }
 
-const FeedbackList: React.FC<{
+export const FeedbackList: React.FC<{
   items: string;
   title: string;
   icon: React.ReactNode;
@@ -78,7 +78,7 @@ const FeedbackList: React.FC<{
   </AccordionItem>
 );
 
-const ScoreDisplay: React.FC<{ score: number }> = ({ score }) => {
+export const ScoreDisplay: React.FC<{ score: number }> = ({ score }) => {
   const getScoreColor = (score: number) => {
     if (score < 50) return "text-red-500";
     if (score < 80) return "text-yellow-500";

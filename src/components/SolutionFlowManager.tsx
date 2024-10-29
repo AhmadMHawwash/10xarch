@@ -23,7 +23,7 @@ import {
 
 interface FlowManagerProps {
   checkSolution: () => void;
-  feedback: EvaluationResponse | PlaygroundResponse | null;
+  feedback: EvaluationResponse | PlaygroundResponse | undefined;
   isLoadingAnswer: boolean;
   isFeedbackExpanded: boolean;
   onOpen: () => void;
@@ -70,7 +70,7 @@ export const FlowManager: React.FC<FlowManagerProps> = ({
         <div className="relative">
           {!canRunSolution && (
             <Badge
-              variant="outline"
+              variant="default"
               className="absolute -right-4 -top-3 z-10 opacity-80"
             >
               Coming soon

@@ -12,7 +12,7 @@ import { Separator } from "./ui/separator";
 import { H5, Large, P } from "./ui/typography";
 
 export const Dashboard = () => {
-  const { stage, toNextStage, toPreviousStage, challenge } = useChallengeManager();
+  const { toNextStage, toPreviousStage, challenge } = useChallengeManager();
   
   return (
     <Sheet>

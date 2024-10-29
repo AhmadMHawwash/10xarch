@@ -4,7 +4,10 @@ import {
 } from "@/components/ReactflowCustomNodes/SystemComponentNode";
 import challenges from "@/content/challenges";
 import { type Challenge } from "@/content/challenges/types";
-import { type PlaygroundResponse } from "@/server/api/routers/checkAnswer";
+import {
+  type EvaluationResponse,
+  type PlaygroundResponse,
+} from "@/server/api/routers/checkAnswer";
 import { api } from "@/trpc/react";
 import { useParams, usePathname } from "next/navigation";
 import { useEffect } from "react";
@@ -62,12 +65,13 @@ export const useChallengeManager = () => {
   const { toNextStage, toPreviousStage, setChallenge, currentStageIndex } =
     useStageStore((state) => state);
   const currentStage = challenge?.stages[currentStageIndex];
-  const [feedback, setFeedback] =
-    useLocalStorageState<PlaygroundResponse | null>(
-      `${pathname}-feedback`,
-      null,
-      (value) => (value ? (JSON.parse(value) as PlaygroundResponse) : null),
-    );
+  const [feedbacks, setFeedbacks] = useLocalStorageState<
+    (PlaygroundResponse | EvaluationResponse)[]
+  >(`${pathname}-feedbacks`, [], (value) =>
+    value
+      ? (JSON.parse(value) as (PlaygroundResponse | EvaluationResponse)[])
+      : [],
+  );
   const { nodes, edges } = useSystemDesigner();
 
   const { mutate, data, isPending } = api.ai.hello.useMutation();
@@ -88,9 +92,11 @@ export const useChallengeManager = () => {
 
   useEffect(() => {
     if (data) {
-      setFeedback(data);
+      const newFeedbacks = [...feedbacks];
+      newFeedbacks[currentStageIndex] = data;
+      setFeedbacks(newFeedbacks);
     }
-  }, [data, setFeedback]);
+  }, [data]);
 
   return {
     challenge: challenge!,
@@ -111,7 +117,7 @@ export const useChallengeManager = () => {
     currentStageIndex,
     setChallenge,
     isLoadingAnswer: isPending,
-    feedback,
+    feedback: feedbacks[currentStageIndex],
   };
 };
 

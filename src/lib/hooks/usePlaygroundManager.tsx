@@ -3,26 +3,20 @@ import {
   type OtherNodeDataProps,
   type SystemComponentNodeDataProps,
 } from "@/components/ReactflowCustomNodes/SystemComponentNode";
-import { type PlaygroundResponse } from "@/server/api/routers/checkAnswer";
 import { api } from "@/trpc/react";
-import { usePathname } from "next/navigation";
-import { useEffect } from "react";
 import { type Edge, type Node } from "reactflow";
 import { useSystemDesigner } from "./useSystemDesigner";
-import useLocalStorageState from "./useLocalStorageState";
 
 export const SYSTEM_COMPONENT_NODE = "SystemComponentNode";
 
 export const usePlaygroundManager = () => {
-  const pathname = usePathname();
+  // const pathname = usePathname();
   const { nodes, edges } = useSystemDesigner();
-  const [feedback, setFeedback] =
-    useLocalStorageState<PlaygroundResponse | undefined>(
-      `playground-${pathname}-feedback`,
-      undefined,
-    );
+  // const [feedback, setFeedback] = useLocalStorageState<
+  //   PlaygroundResponse | null
+  // >(`playground-${pathname}-feedback`, null);
 
-  const { mutate, data, isPending } = api.ai.playground.useMutation();
+  const { mutate, isPending } = api.ai.playground.useMutation();
 
   const checkSolution = async () => {
     const whiteboard = nodes.find((node) => node.type === "Whiteboard");
@@ -39,16 +33,17 @@ export const usePlaygroundManager = () => {
     });
   };
 
-  useEffect(() => {
-    if (data) {
-      setFeedback(data);
-    }
-  }, [data, setFeedback]);
+  // useEffect(() => {
+  //   if (data) {
+  //     setFeedback(data);
+  //   }
+  // }, [data, setFeedback]);
 
   return {
     checkSolution,
     isLoadingAnswer: isPending,
-    answer: feedback,
+    answer: undefined,
+    // answer: feedback,
   };
 };
 

@@ -13,9 +13,9 @@ import { GeistSans } from "geist/font/sans";
 import { Hotjar } from "@/components/Hotjar";
 
 export const metadata = {
-  title: "System Design Playground",
+  title: "ArchPlayground",
   description:
-    "A system design playground for learning and practicing system design concepts.",
+    "ArchPlayground is system design playground for learning and practicing system design concepts interactively following industry grade challenges.",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 

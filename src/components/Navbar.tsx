@@ -16,7 +16,7 @@ export default function Navbar() {
           href="/"
           className="text-xl font-bold text-gray-900 dark:text-white"
         >
-          System Design Playground
+          ArchPlayground
         </Link>
         <div className="hidden items-center space-x-4 md:!flex">
           <Link

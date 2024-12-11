@@ -6,7 +6,7 @@ export default async function Home() {
     <div className="container mx-auto px-4 py-12">
       <header className="mb-16 text-center">
         <h1 className="mb-4 text-4xl font-bold text-gray-900 dark:text-white md:text-6xl">
-          ArchPlayground
+          ArchRound
         </h1>
         <p className="mb-8 text-xl text-gray-600 dark:text-gray-400">
           Learn, practice, and master system design concepts interactively

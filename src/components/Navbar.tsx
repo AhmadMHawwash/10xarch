@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { ThemeToggle } from "./ThemeToggle"; // Add this import
 import { Button } from "./ui/button";
+import { Logo } from "./icons/logo";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -14,9 +15,10 @@ export default function Navbar() {
       <div className="mx-auto flex items-center justify-between">
         <Link
           href="/"
-          className="text-xl font-bold text-gray-900 dark:text-white"
+          className="text-xl font-bold text-gray-900 dark:text-white flex gap-2"
         >
-          ArchPlayground
+          <Logo className="h-8 w-8 pt-0.5 pb-0.5" />
+          ArchRound
         </Link>
         <div className="hidden items-center space-x-4 md:!flex">
           <Link

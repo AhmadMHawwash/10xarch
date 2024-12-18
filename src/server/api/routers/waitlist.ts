@@ -12,7 +12,7 @@ export const waitlistRouter = createTRPCRouter({
         return { success: true };
       } catch (error) {
         console.error("Error inserting into waitlist:", error);
-        throw new Error("Failed to join waitlist");
+        return { success: false, error };
       }
     }),
 });

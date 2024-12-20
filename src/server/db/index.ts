@@ -11,7 +11,6 @@ let db: PostgresJsDatabase<typeof schema>;
 
 if (process.env.NODE_ENV === "production") {
   db = drizzle(postgres(process.env.DATABASE_URL!), { schema });
-  console.log(process.env.DATABASE_URL);
 } else {
   if (!global.db) {
     global.db = drizzle(postgres(process.env.DATABASE_URL!), { schema });

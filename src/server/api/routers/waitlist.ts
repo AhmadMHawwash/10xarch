@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import { waitlistTable } from "@/server/db/schema";
+import { TRPCError } from "@trpc/server";
 
 export const waitlistRouter = createTRPCRouter({
   joinWaitlist: publicProcedure
@@ -9,10 +10,13 @@ export const waitlistRouter = createTRPCRouter({
     .mutation(async ({ input, ctx }) => {
       try {
         await ctx.db.insert(waitlistTable).values({ email: input.email });
-        return { success: true };
+        return true;
       } catch (error) {
         console.error("Error inserting into waitlist:", error);
-        return { success: false, error };
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: `Failed to join waitlist. Reason: ${JSON.stringify(error)}`,
+        });
       }
     }),
 });

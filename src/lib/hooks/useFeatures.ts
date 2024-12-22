@@ -12,7 +12,7 @@ export const useFeatures = () => {
   return {
     canRunSolution: true,
   };
-}
+};
 
 export const useFeatureCustomisation = () => {
   const pathname = usePathname();
@@ -24,6 +24,6 @@ export const useFeatureCustomisation = () => {
   }
 
   return {
-    runSolutionLabel: "Run Solution",
+    runSolutionLabel: "Evaluate Solution",
   };
-}
+};

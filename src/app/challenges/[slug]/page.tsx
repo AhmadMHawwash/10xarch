@@ -27,6 +27,7 @@ import { FeedbackList, ScoreDisplay } from "@/components/SolutionFeedback";
 import { Accordion } from "@/components/ui/accordion";
 import { Award, Lightbulb, TrendingUp } from "lucide-react";
 import Link from "next/link";
+import { useWithLogin } from "@/lib/hooks/useWithLogin";
 
 export default function LevelPage() {
   return (
@@ -46,7 +47,7 @@ function Level() {
     challenge,
     currentStageIndex,
   } = useChallengeManager();
-
+  const { withLogin } = useWithLogin();
   const [isFeedbackExpanded, setIsFeedbackExpanded] = useState(false);
   const [isOpenClosure, setIsOpenClosure] = useState(false);
 
@@ -77,7 +78,7 @@ function Level() {
           <SystemBuilder
             PassedFlowManager={() => (
               <FlowManager
-                checkSolution={checkSolution}
+                checkSolution={withLogin(checkSolution)}
                 feedback={feedback}
                 isLoadingAnswer={isLoadingAnswer}
                 isFeedbackExpanded={isFeedbackExpanded && !isLastStage}
@@ -238,7 +239,7 @@ const ChallengeClosureDialog = ({
         </ScrollArea>
         <Link
           href="/challenges"
-          className="group inline-flex items-center rounded-full bg-blue-600 px-6 py-3 font-bold text-white hover:bg-blue-700 justify-center"
+          className="group inline-flex items-center justify-center rounded-full bg-blue-600 px-6 py-3 font-bold text-white hover:bg-blue-700"
         >
           Go to Challenges list
         </Link>

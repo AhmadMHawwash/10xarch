@@ -5,17 +5,21 @@ import {
 } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
-const isProtectedRoute = createRouteMatcher(["/challenges/:slug*"]);
+const isProtectedRoute = createRouteMatcher([
+  // "/challenges/:slug*"
+]);
 
 export default clerkMiddleware(async (auth, req) => {
+  const { userId, redirectToSignIn } = await auth();
+
   // Redirect to sign in if not authenticated
-  if (!auth().userId && isProtectedRoute(req)) {
-    return auth().redirectToSignIn();
+  if (!userId && isProtectedRoute(req)) {
+    return redirectToSignIn({ returnBackUrl: req.url });
   }
 
-  const usersCount = await clerkClient().users.getCount();
+  const usersCount = await (await clerkClient()).users.getCount();
 
-  if (usersCount > 50 && isProtectedRoute(req) && !auth().userId) {
+  if (usersCount > 50 && isProtectedRoute(req) && !userId) {
     return NextResponse.redirect(new URL("/waitlist", req.url).toString());
   }
 });

@@ -17,8 +17,8 @@
     "db:generate": "drizzle-kit generate"
   },
   "dependencies": {
-    "@clerk/nextjs": "^5.4.1",
-    "@clerk/themes": "^2.1.27",
+    "@clerk/nextjs": "^6.9.6",
+    "@clerk/themes": "^2.2.3",
     "@hookform/resolvers": "^3.9.0",
     "@hotjar/browser": "^1.0.9",
     "@libsql/client": "^0.6.0",

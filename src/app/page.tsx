@@ -4,12 +4,12 @@ import Link from "next/link";
 export default async function Home() {
   return (
     <div className="container mx-auto px-4 py-12">
-      <header className="mb-16 text-center">
+      <header className="mb-14 text-center">
         <h1 className="mb-4 text-4xl font-bold text-gray-900 dark:text-white md:text-6xl">
-          ArchRound
+          Archround
         </h1>
         <p className="mb-8 text-xl text-gray-600 dark:text-gray-400">
-          Learn, practice, and master system design concepts interactively
+          Learn, practice, and master system design concepts step by step.
         </p>
       </header>
 
@@ -26,7 +26,8 @@ export default async function Home() {
             href="/challenges"
             className="group inline-flex items-center rounded-full bg-blue-600 px-6 py-3 font-bold text-white hover:bg-blue-700"
           >
-            Start Challenges <ArrowRight className="ml-2 group-hover:ml-4 transition-all" />
+            Start Challenges{" "}
+            <ArrowRight className="ml-2 group-hover:ml-4 transition-all" />
           </Link>
         </div>
 
@@ -42,7 +43,8 @@ export default async function Home() {
             href="/playground"
             className="group inline-flex items-center rounded-full bg-blue-600 px-6 py-3 font-bold text-white hover:bg-blue-700"
           >
-            Open Playground <ArrowRight className="ml-2 group-hover:ml-4 transition-all" />
+            Open Playground{" "}
+            <ArrowRight className="ml-2 group-hover:ml-4 transition-all" />
           </Link>
         </div>
       </section>
@@ -92,6 +94,33 @@ export default async function Home() {
           Get Started <ArrowRight className="ml-2" />
         </Link>
       </section>
+
+      {/* Footer Section */}
+      <footer className="mt-16 border-t border-gray-200 py-8 text-center dark:border-gray-700">
+        <p className="mb-4 text-gray-600 dark:text-gray-400">
+          © {new Date().getFullYear()} ArchRound. All rights reserved.
+        </p>
+        <div className="flex items-center justify-center space-x-4">
+          <Link
+            href="/about"
+            className="text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
+          >
+            About
+          </Link>
+          <Link
+            href="/terms"
+            className="text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
+          >
+            Terms
+          </Link>
+          <Link
+            href="/privacy"
+            className="text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
+          >
+            Privacy
+          </Link>
+        </div>
+      </footer>
     </div>
   );
 }

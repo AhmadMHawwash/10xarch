@@ -73,7 +73,7 @@ export const FlowManager: React.FC<FlowManagerProps> = ({
               variant="default"
               className="absolute -right-4 -top-3 z-10 opacity-80"
             >
-              Coming soon
+              Soon
             </Badge>
           )}
           <RunSolutionButton

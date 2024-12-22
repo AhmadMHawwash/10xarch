@@ -60,10 +60,10 @@ export const WithMarkdownDetails = ({
       <DialogTrigger>
         <span className={className}>{trigger}</span>
       </DialogTrigger>
-      <DialogContent className="min-h-95 w-[70vw] max-w-5xl bg-gray-800 border-gray-700">
+      <DialogContent className="min-h-95 w-[70vw] max-w-5xl dark:bg-gray-800 dark:border-gray-700 bg-gray-200 border">
         <DialogHeader className="relative">
-          <span className="absolute -left-[104px] -top-0 rounded-md bg-gray-700 p-4">
-            <Icon className="text-gray-300" />
+          <span className="absolute -left-[104px] -top-0 rounded-md dark:bg-gray-700 bg-gray-200 p-4">
+            <Icon className="text-gray-300 dark:text-gray-600 stroke-gray-600 dark:stroke-gray-100" />
           </span>
           <div className="h-[90vh] overflow-scroll px-8 text-gray-200">
             <ReactMarkdown

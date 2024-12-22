@@ -22,6 +22,8 @@ import { cn } from "@/lib/utils";
 import { usePrevious } from "react-use";
 import { useEffect, useState } from "react";
 import { ReactFlowProvider } from "reactflow";
+import { getSystemComponent } from "@/components/Gallery";
+import { type SystemComponentType } from "@/lib/levels/type";
 
 export default function Page() {
   return (
@@ -70,21 +72,32 @@ function PageContent() {
     "",
   );
 
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const comp = getSystemComponent(
+    selectedNode?.data.name as SystemComponentType,
+  );
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const Icon = comp?.icon ?? (() => null);
+
   return (
     <ResizablePanelGroup direction="horizontal">
       <ResizablePanel defaultSize={25} minSize={3}>
-        <div className="flex w-[95%] min-w-[300px] flex-col items-center">
-          <H3 className="self-start p-2 pl-3">
-            {selectedNode?.data.id && selectedNode.type !== "Whiteboard"
-              ? selectedNode?.data.name
-              : "System"}
-          </H3>
-          <Label htmlFor="name" className="ml-3 mt-2 self-start">
+        <div className="flex w-[95%] min-w-[300px] flex-col items-center ml-2">
+          <div className="flex items-center justify-start w-full">
+            <Icon />
+            <H3 className="self-start p-2 pl-3">
+              {selectedNode?.data.id && selectedNode.type !== "Whiteboard"
+                ? selectedNode?.data.name
+                : "System"}
+            </H3>
+          </div>
+          <Label htmlFor="name" className="mt-2 ml-3 self-start">
             Name
           </Label>
           <Input
             id="name"
-            className={cn("m-2 w-[95%]", selectedNode ? "" : "hidden")}
+            className={cn("m-2 ml-0 w-[95%]", selectedNode ? "" : "hidden")}
             placeholder="Name"
             value={displayName}
             onChange={(e) => {

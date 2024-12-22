@@ -11,7 +11,7 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <nav className="h-[8vh] bg-slate-100 p-4 shadow-md dark:bg-gray-800">
+    <nav className="h-[7vh] bg-slate-100 p-4 shadow-md dark:bg-gray-800">
       <div className="mx-auto flex items-center justify-between">
         <Link
           href="/"

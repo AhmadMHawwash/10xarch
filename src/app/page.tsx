@@ -98,7 +98,7 @@ export default async function Home() {
       {/* Footer Section */}
       <footer className="mt-16 border-t border-gray-200 py-8 text-center dark:border-gray-700">
         <p className="mb-4 text-gray-600 dark:text-gray-400">
-          © {new Date().getFullYear()} ArchRound. All rights reserved.
+          © {new Date().getFullYear()} Archround. All rights reserved.
         </p>
         <div className="flex items-center justify-center space-x-4">
           <Link

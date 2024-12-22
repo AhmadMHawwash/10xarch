@@ -18,7 +18,7 @@ export default function Navbar() {
           className="text-xl font-bold text-gray-900 dark:text-white flex gap-2"
         >
           <Logo className="h-8 w-8 pt-0.5 pb-0.5" />
-          ArchRound
+          Archround
         </Link>
         <div className="hidden items-center space-x-4 md:!flex">
           <Link

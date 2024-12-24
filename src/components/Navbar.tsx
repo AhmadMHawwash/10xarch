@@ -1,82 +1,106 @@
 "use client";
-import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
-import { Menu, X } from "lucide-react";
+import { SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
+import { Button } from "./ui/button";
 import Link from "next/link";
 import { useState } from "react";
-import { ThemeToggle } from "./ThemeToggle"; // Add this import
-import { Button } from "./ui/button";
+import { useCredits } from "@/hooks/useCredits";
+import { Menu, X } from "lucide-react";
+import { ThemeToggle } from "./ThemeToggle";
 import { Logo } from "./icons/logo";
 
 export default function Navbar() {
+  const { user } = useUser();
+  const { credits, isLoading } = useCredits();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
     <nav className="h-[7vh] bg-slate-100 p-4 shadow-md dark:bg-gray-800">
-      <div className="mx-auto flex items-center justify-between">
-        <span className="flex items-center space-x-4">
-          <Link
-            href="/"
-            className="flex gap-2 text-xl font-bold text-gray-900 dark:text-white"
-          >
-            <Logo className="h-8 w-8 pb-0.5 pt-0.5" />
-            <span className="hidden md:block">Archround</span>
+      <div className="mx-auto flex max-w-7xl items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <Link href="/" className="flex items-center space-x-2">
+            <Logo className="h-8 w-8" />
+            <span className="text-xl font-bold">System Design</span>
           </Link>
-          <span className="flex items-center space-x-4 border-l border-gray-400 pl-4">
-            {[
-              { name: "Challenges", href: "/challenges" },
-              { name: "Playground", href: "/playground" },
-            ].map((item) => (
-              <Link
-                key={item.name}
-                href={item.href}
-                className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white underline-offset-4 hover:underline transition-colors duration-200"
-              >
-                {item.name}
+        </div>
+
+        <button
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          className="md:hidden"
+          aria-label="Toggle menu"
+        >
+          {isMenuOpen ? (
+            <X className="h-6 w-6" />
+          ) : (
+            <Menu className="h-6 w-6" />
+          )}
+        </button>
+
+        <div className="hidden items-center space-x-4 md:flex">
+          {!user && (
+            <SignInButton mode="modal">
+              <Button variant="outline">Sign In</Button>
+            </SignInButton>
+          )}
+          {user && (
+            <>
+              <div className="text-sm">
+                {isLoading ? (
+                  "Loading credits..."
+                ) : (
+                  <>Credits: {credits?.balance ?? 0}</>
+                )}
+              </div>
+              <Link href="/credits">
+                <Button variant="outline" size="sm">
+                  Buy Credits
+                </Button>
               </Link>
-            ))}
-          </span>
-        </span>
-        <div className="hidden items-center space-x-4 md:!flex">
-          <SignedOut>
-            <SignInButton />
-          </SignedOut>
-          <SignedIn>
-            <UserButton />
-          </SignedIn>
+              <SignOutButton>
+                <Button variant="outline" size="sm">
+                  Sign Out
+                </Button>
+              </SignOutButton>
+            </>
+          )}
           <ThemeToggle />
         </div>
 
-        <div className="flex items-center md:hidden">
-          <ThemeToggle />
-          <Button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="ml-2"
-            variant="ghost"
-          >
-            {isMenuOpen ? <X /> : <Menu />}
-          </Button>
-        </div>
-      </div>
-
-      {isMenuOpen && (
-        <div className="md:hidden">
-          <div className="mt-2 flex flex-col space-y-2">
-            <Link
-              href="/playground"
-              className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
-            >
-              Playground
-            </Link>
-
-            <SignedOut>
-              <SignInButton />
-            </SignedOut>
-            <SignedIn>
-              <UserButton />
-            </SignedIn>
+        {isMenuOpen && (
+          <div className="absolute left-0 right-0 top-[7vh] z-50 bg-slate-100 p-4 shadow-md dark:bg-gray-800 md:hidden">
+            {!user && (
+              <SignInButton mode="modal">
+                <Button variant="outline" className="w-full">
+                  Sign In
+                </Button>
+              </SignInButton>
+            )}
+            {user && (
+              <>
+                <div className="text-sm">
+                  {isLoading ? (
+                    "Loading credits..."
+                  ) : (
+                    <>Credits: {credits?.balance ?? 0}</>
+                  )}
+                </div>
+                <Link href="/credits">
+                  <Button variant="outline" className="mt-2 w-full">
+                    Buy Credits
+                  </Button>
+                </Link>
+                <SignOutButton>
+                  <Button variant="outline" className="mt-2 w-full">
+                    Sign Out
+                  </Button>
+                </SignOutButton>
+              </>
+            )}
+            <div className="pt-2">
+              <ThemeToggle />
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </nav>
   );
 }

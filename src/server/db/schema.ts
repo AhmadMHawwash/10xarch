@@ -4,12 +4,11 @@
 import { relations, sql } from "drizzle-orm";
 import {
   index,
+  integer,
   pgTableCreator,
-  serial,
   text,
   timestamp,
   uuid,
-  varchar
 } from "drizzle-orm/pg-core";
 
 /**
@@ -72,8 +71,37 @@ export const playgroundsRelations = relations(playgrounds, ({ one }) => ({
   }),
 }));
 
-export const waitlistTable = createTable("waitlist", {
-  id: serial("id").primaryKey(),
-  email: varchar("email", { length: 255 }).notNull(),
+export const credits = createTable("credits", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: text("user_id").references(() => users.id).notNull(),
+  balance: integer("balance").notNull().default(0),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const creditTransactions = createTable("credit_transactions", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: text("user_id").references(() => users.id).notNull(),
+  amount: integer("amount").notNull(),
+  type: text("type", { enum: ["purchase", "usage"] }).notNull(),
+  description: text("description"),
+  status: text("status", { enum: ["pending", "completed", "failed"] }).notNull(),
+  paymentId: text("payment_id"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+export type Credits = typeof credits.$inferSelect;
+export type CreditTransaction = typeof creditTransactions.$inferSelect;
+
+export const creditsRelations = relations(credits, ({ one }) => ({
+  user: one(users, {
+    fields: [credits.userId],
+    references: [users.id],
+  }),
+}));
+
+export const creditTransactionsRelations = relations(creditTransactions, ({ one }) => ({
+  user: one(users, {
+    fields: [creditTransactions.userId],
+    references: [users.id],
+  }),
+}));

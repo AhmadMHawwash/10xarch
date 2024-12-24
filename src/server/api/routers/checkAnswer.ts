@@ -1,6 +1,15 @@
-import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
+import { createTRPCRouter, protectedProcedure, t } from "@/server/api/trpc";
 import OpenAI from "openai";
 import { z } from "zod";
+import {
+  calculateTokens,
+  costToCredits,
+  TOKEN_COSTS,
+} from "@/lib/calculate-tokens";
+import { TRPCError } from "@trpc/server";
+import { creditsRouter } from "./credits";
+
+const createCaller = t.createCallerFactory(creditsRouter);
 
 // Define the response type
 export interface EvaluationResponse {
@@ -20,15 +29,40 @@ const openai = new OpenAI({
 });
 
 export const checkSolution = createTRPCRouter({
-  hello: publicProcedure
+  hello: protectedProcedure
     .input(
       z.object({
         criteria: z.array(z.string()),
         challengeAndSolutionPrompt: z.string(),
       }),
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       const { criteria, challengeAndSolutionPrompt } = input;
+
+      // Calculate input tokens
+      const systemPrompt = "You are a system design evaluation expert..."; // Add your full system prompt here
+      const inputText = [
+        systemPrompt,
+        JSON.stringify(criteria),
+        JSON.stringify(generalEvaluationCriteria),
+        challengeAndSolutionPrompt,
+      ].join("\n");
+
+      const inputTokens = calculateTokens(inputText);
+      const estimatedOutputTokens = 512; // max_tokens from the API call
+
+      // Calculate required credits
+      const inputCost = (inputTokens / 1000) * TOKEN_COSTS["gpt-4o-mini"].input;
+      const outputCost =
+        (estimatedOutputTokens / 1000) * TOKEN_COSTS["gpt-4o-mini"].output;
+      const totalCredits = costToCredits(inputCost + outputCost);
+
+      // Use credits via TRPC
+      const caller = createCaller(ctx);
+      await caller.use({
+        amount: totalCredits,
+        description: "AI Solution Evaluation",
+      });
 
       try {
         const response = await openai.chat.completions.create({
@@ -36,85 +70,49 @@ export const checkSolution = createTRPCRouter({
           messages: [
             {
               role: "system",
-              content: [
-                {
-                  type: "text",
-                  text: "You are a system design evaluation expert. You will receive: \n1. The challenge description \n2. The current stage of the challenge being addressed \n3. The user's proposed solution. \nYour task is to evaluate the provided solution in the context of: \n1. The challenge requirements, \n2. The system requirements provided by the CPO/CTO, \n3. Provided hints for solving the current level, \n4. The criteria that define a correct solution.",
-                },
-              ],
+              content:
+                "You are a system design evaluation expert. You will receive: \n1. The challenge description \n2. The current stage of the challenge being addressed \n3. The user's proposed solution. \nYour task is to evaluate the provided solution in the context of: \n1. The challenge requirements, \n2. The system requirements provided by the CPO/CTO, \n3. Provided hints for solving the current level, \n4. The criteria that define a correct solution.",
             },
             {
               role: "assistant",
-              content: [
-                {
-                  type: "text",
-                  text: `Accept the solution if it meets the following criteria: \n${JSON.stringify(criteria, null, 2)}. \nIf any criteria are not met, inform the user and reduce their overall score.`,
-                },
-              ],
+              content: `Accept the solution if it meets the following criteria: \n${JSON.stringify(criteria, null, 2)}. \nIf any criteria are not met, inform the user and reduce their overall score.`,
             },
             {
               role: "assistant",
-              content: [
-                {
-                  type: "text",
-                  text: `General evaluation criteria: \n${JSON.stringify(
-                    generalEvaluationCriteria,
-                    null,
-                    2,
-                  )}`,
-                },
-              ],
+              content: `General evaluation criteria: \n${JSON.stringify(
+                generalEvaluationCriteria,
+                null,
+                2,
+              )}`,
             },
             {
               role: "assistant",
-              content: [
-                {
-                  type: "text",
-                  text: `Score the solution as follows:
+              content: `Score the solution as follows:
 - If the solution meets all criteria for the current challenge level, give a score of 90/100.
 - If the solution goes beyond the provided criteria, give a score of 100/100.`,
-                },
-              ],
             },
             {
               role: "user",
-              content: [
-                {
-                  type: "text",
-                  text: challengeAndSolutionPrompt,
-                },
-              ],
+              content: challengeAndSolutionPrompt,
             },
             {
               role: "assistant",
-              content: [
-                {
-                  type: "text",
-                  text: `Respond in JSON format {score: number, strengths: string, improvementAreas: string, recommendations: string}. 
+              content: `Respond in JSON format {score: number, strengths: string, improvementAreas: string, recommendations: string}. 
                   * Regarding score: score ranges from 0 to 100. When the provided solution fixes part of the given challenge (and current stage) then add score to the user score. If the user didn't solve anything, then they deserver a ZERO (0). One more thing, I want you to be quite strict with the score, since this is a system design interview and we want to evaluate the user's solution based on the criteria and not be too lenient. And as the user progresses in the challenge they should face strictier scoring approach. 
                   * Regarding improvementAreas: each improvement area, should be one specific improvement. So if you have multiple improvements, you should list them separately in markdown format.
                   * Regarding strengths, improvementAreas and recommendations should be in markdown format.
                   * Rules: 1. If you don't follow the instructions, bad things will happen! 2. Give the feedback like this {score: number, strengths: string, improvementAreas: string, recommendations: string}. No further wrapping`,
-                },
-              ],
             },
             {
               role: "assistant",
-              content: [
-                {
-                  type: "text",
-                  text: "Provide a concise evaluation without any further explanation.",
-                },
-              ],
+              content:
+                "Provide a concise evaluation without any further explanation.",
             },
           ],
           temperature: 0.2,
           max_tokens: 512,
           frequency_penalty: 0,
           presence_penalty: 0,
-          response_format: {
-            type: "text",
-          },
         });
 
         const content =
@@ -123,30 +121,50 @@ export const checkSolution = createTRPCRouter({
         // Parse the content as JSON with type checking
         try {
           const jsonResponse = JSON.parse(content) as EvaluationResponse;
-
           return jsonResponse;
         } catch (parseError) {
           console.error("Error parsing OpenAI response as JSON:", parseError);
-          throw new Error(
-            "Failed to parse the evaluation result. Please try again later.",
-          );
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message:
+              "Failed to parse the evaluation result. Please try again later.",
+          });
         }
       } catch (error) {
         console.error("Error calling OpenAI API:", error);
-        // throw new Error(
-        //   "Failed to evaluate the solution. Please try again later.",
-        // );
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to evaluate the solution. Please try again later.",
+        });
       }
     }),
-  playground: publicProcedure
+  playground: protectedProcedure
     .input(
       z.object({
         systemDesign: z.string(),
         systemDesignContext: z.string().optional(),
       }),
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       const { systemDesign, systemDesignContext } = input;
+
+      // Calculate input tokens
+      const inputText = `systemDesignContext: ${systemDesignContext} \n systemDesign: ${systemDesign}`;
+      const inputTokens = calculateTokens(inputText);
+      const estimatedOutputTokens = 512; // max_tokens from the API call
+
+      // Calculate required credits
+      const inputCost = (inputTokens / 1000) * TOKEN_COSTS["gpt-4o-mini"].input;
+      const outputCost =
+        (estimatedOutputTokens / 1000) * TOKEN_COSTS["gpt-4o-mini"].output;
+      const totalCredits = costToCredits(inputCost + outputCost);
+
+      // Use credits via TRPC
+      const caller = createCaller(ctx);
+      await caller.use({
+        amount: totalCredits,
+        description: "AI Playground Feedback",
+      });
 
       try {
         const response = await openai.chat.completions.create({
@@ -154,60 +172,35 @@ export const checkSolution = createTRPCRouter({
           messages: [
             {
               role: "system",
-              content: [
-                {
-                  type: "text",
-                  text: "You are a system design evaluation expert. You will receive: \n1. The systemDesignContext, which describes the system and business \n2. the systemDesign, which is the proposed solution. \nYour task is to evaluate the provided solution in the context of: \n1. systemDesignContext, \n2. The systemDesign. And then provide some feedback for the user to improve their solution.",
-                },
-              ],
+              content:
+                "You are a system design evaluation expert. You will receive: \n1. The systemDesignContext, which describes the system and business \n2. the systemDesign, which is the proposed solution. \nYour task is to evaluate the provided solution in the context of: \n1. systemDesignContext, \n2. The systemDesign. And then provide some feedback for the user to improve their solution.",
             },
             {
               role: "assistant",
-              content: [
-                {
-                  type: "text",
-                  text: `Take a comprehensive look at the system design and provide feedback for the user to improve their solution. Remember that you are the expert and the user is the one who needs to improve their solution.`,
-                },
-              ],
+              content:
+                "Take a comprehensive look at the system design and provide feedback for the user to improve their solution. Remember that you are the expert and the user is the one who needs to improve their solution.",
             },
             {
               role: "user",
-              content: [
-                {
-                  type: "text",
-                  text: `systemDesignContext: ${systemDesignContext} \n systemDesign: ${systemDesign}`,
-                },
-              ],
+              content: `systemDesignContext: ${systemDesignContext} \n systemDesign: ${systemDesign}`,
             },
             {
               role: "assistant",
-              content: [
-                {
-                  type: "text",
-                  text: `Respond concisely in JSON format {strengths: string, improvementAreas: string, recommendations: string}. 
+              content: `Respond concisely in JSON format {strengths: string, improvementAreas: string, recommendations: string}. 
                   * Regarding improvementAreas: each improvement area, should be one specific improvement. So if you have multiple improvements, you should list them separately in markdown format.
                   * Regarding strengths, improvementAreas and recommendations should be in markdown format.
                   * Rules: 1. If you don't follow the instructions, bad things will happen! 2. Give the feedback like this {score: number, strengths: string, improvementAreas: string, recommendations: string}. No further wrapping`,
-                },
-              ],
             },
             {
               role: "assistant",
-              content: [
-                {
-                  type: "text",
-                  text: "Provide a concise evaluation without any further explanation.",
-                },
-              ],
+              content:
+                "Provide a concise evaluation without any further explanation.",
             },
           ],
           temperature: 0.2,
           max_tokens: 512,
           frequency_penalty: 0,
           presence_penalty: 0,
-          response_format: {
-            type: "text",
-          },
         });
 
         const content =
@@ -216,19 +209,21 @@ export const checkSolution = createTRPCRouter({
         // Parse the content as JSON with type checking
         try {
           const jsonResponse = JSON.parse(content) as PlaygroundResponse;
-
           return jsonResponse;
         } catch (parseError) {
           console.error("Error parsing OpenAI response as JSON:", parseError);
-          throw new Error(
-            "Failed to parse the evaluation result. Please try again later.",
-          );
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message:
+              "Failed to parse the evaluation result. Please try again later.",
+          });
         }
       } catch (error) {
         console.error("Error calling OpenAI API:", error);
-        throw new Error(
-          "Failed to evaluate the solution. Please try again later.",
-        );
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to evaluate the solution. Please try again later.",
+        });
       }
     }),
 });
@@ -236,9 +231,11 @@ export const checkSolution = createTRPCRouter({
 const generalEvaluationCriteria = [
   "A clear database schema must be defined.",
   "Both functional and non-functional requirements should be addressed, aligning with the current level of the challenge and requirements.",
-  "System APIs must be clearly defined, with their flows aligned to address the challenge level appropriately. More than one API may be necessary depending on the requirements.",
-  "System capacity estimations should be defined and match the challenge level and requirements.",
-  "A high-level design should include components and their connections, matching the challenge level and requirements.",
-  "Database schema and models should be defined, meeting the challenge level and requirements.",
-  "System components should be connected to each other in a proper way, meeting the challenge level and requirements. ie. Client should connect to Server, Server should connect to Database.",
+  "The solution should be scalable and maintainable.",
+  "The solution should follow best practices for the chosen technologies.",
+  "The solution should be secure and handle edge cases.",
+  "The solution should be well-documented and easy to understand.",
+  "The solution should be testable and include appropriate error handling.",
+  "The solution should consider performance implications.",
+  "The solution should follow SOLID principles where applicable.",
 ];

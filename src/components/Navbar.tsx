@@ -1,5 +1,5 @@
 "use client";
-import { SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
+import { SignInButton, useUser, UserButton } from "@clerk/nextjs";
 import { Button } from "./ui/button";
 import Link from "next/link";
 import { useState } from "react";
@@ -36,67 +36,51 @@ export default function Navbar() {
         </button>
 
         <div className="hidden items-center space-x-4 md:flex">
+          {user && (
+            <Link
+              href="/credits"
+              className="text-sm transition-none hover:text-gray-600 dark:hover:text-gray-300 hover:underline"
+            >
+              {isLoading ? (
+                "Loading credits..."
+              ) : (
+                <>Credits: {credits?.balance ?? 0}</>
+              )}
+            </Link>
+          )}
+          <ThemeToggle />
+          {user && <UserButton afterSignOutUrl="/" />}
           {!user && (
             <SignInButton mode="modal">
               <Button variant="outline">Sign In</Button>
             </SignInButton>
           )}
-          {user && (
-            <>
-              <div className="text-sm">
+        </div>
+
+        {isMenuOpen && (
+          <div className="absolute left-0 right-0 top-[7vh] z-50 bg-slate-100 p-4 shadow-md dark:bg-gray-800 md:hidden">
+            {user && (
+              <Link
+                href="/credits"
+                className="block py-2 text-sm transition-colors hover:text-gray-600 dark:hover:text-gray-300"
+              >
                 {isLoading ? (
                   "Loading credits..."
                 ) : (
                   <>Credits: {credits?.balance ?? 0}</>
                 )}
-              </div>
-              <Link href="/credits">
-                <Button variant="outline" size="sm">
-                  Buy Credits
-                </Button>
               </Link>
-              <SignOutButton>
-                <Button variant="outline" size="sm">
-                  Sign Out
-                </Button>
-              </SignOutButton>
-            </>
-          )}
-          <ThemeToggle />
-        </div>
-
-        {isMenuOpen && (
-          <div className="absolute left-0 right-0 top-[7vh] z-50 bg-slate-100 p-4 shadow-md dark:bg-gray-800 md:hidden">
-            {!user && (
-              <SignInButton mode="modal">
-                <Button variant="outline" className="w-full">
-                  Sign In
-                </Button>
-              </SignInButton>
             )}
-            {user && (
-              <>
-                <div className="text-sm">
-                  {isLoading ? (
-                    "Loading credits..."
-                  ) : (
-                    <>Credits: {credits?.balance ?? 0}</>
-                  )}
-                </div>
-                <Link href="/credits">
-                  <Button variant="outline" className="mt-2 w-full">
-                    Buy Credits
-                  </Button>
-                </Link>
-                <SignOutButton>
-                  <Button variant="outline" className="mt-2 w-full">
-                    Sign Out
-                  </Button>
-                </SignOutButton>
-              </>
-            )}
-            <div className="pt-2">
+            <div className="flex items-center justify-between pt-2">
               <ThemeToggle />
+              {user && <UserButton afterSignOutUrl="/" />}
+              {!user && (
+                <SignInButton mode="modal">
+                  <Button variant="outline" className="w-full">
+                    Sign In
+                  </Button>
+                </SignInButton>
+              )}
             </div>
           </div>
         )}

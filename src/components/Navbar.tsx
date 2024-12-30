@@ -19,7 +19,7 @@ export default function Navbar() {
         <div className="flex items-center space-x-4">
           <Link href="/" className="flex items-center space-x-2">
             <Logo className="h-8 w-8" />
-            <span className="text-xl font-bold">System Design</span>
+            <span className="text-xl font-bold">Archround</span>
           </Link>
         </div>
 

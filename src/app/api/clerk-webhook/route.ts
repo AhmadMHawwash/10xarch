@@ -4,7 +4,9 @@ import { type WebhookEvent } from "@clerk/nextjs/server";
 import { db } from "@/server/db";
 import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
-import { users } from "@/server/db/schema";
+import { credits, creditTransactions, users } from "@/server/db/schema";
+
+const FREE_SIGNUP_CREDITS = 50;
 
 export async function POST(req: NextRequest) {
   const webhookSecret = process.env.CLERK_WEBHOOK_SECRET;
@@ -69,6 +71,19 @@ export async function POST(req: NextRequest) {
             target: users.id,
             set: { email: evt.data.email_addresses[0].email_address },
           });
+
+        await db.insert(credits).values({
+          userId: evt.data.id,
+          balance: FREE_SIGNUP_CREDITS,
+        });
+
+        await db.insert(creditTransactions).values({
+          userId: evt.data.id,
+          amount: FREE_SIGNUP_CREDITS,
+          type: "purchase",
+          description: "Free signup credit",
+          status: "completed",
+        });
       }
       break;
     case "user.deleted":

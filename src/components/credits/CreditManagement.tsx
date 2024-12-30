@@ -16,7 +16,7 @@ import { useCredits } from "@/hooks/useCredits";
 type Transaction = RouterOutputs["credits"]["getTransactions"]["transactions"][number];
 
 export function CreditManagement() {
-  const { credits, isLoading } = useCredits();
+  const { balance: credits, isLoading } = useCredits();
   const { toast } = useToast();
 
   const { data: transactionData, isLoading: isLoadingTransactions } =
@@ -55,7 +55,7 @@ export function CreditManagement() {
         <h2 className="text-2xl font-bold">Credit Management</h2>
         <div className="rounded-lg border p-4">
           <p className="mb-4">
-            Current Balance: {credits?.balance ?? 0} credits
+            Current Balance: {credits} credits
           </p>
           <div className="flex flex-wrap gap-4">
             <Button

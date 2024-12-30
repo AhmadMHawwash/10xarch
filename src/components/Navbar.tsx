@@ -10,7 +10,7 @@ import { Logo } from "./icons/logo";
 
 export default function Navbar() {
   const { user } = useUser();
-  const { credits, isLoading } = useCredits();
+  const { balance: credits, isLoading } = useCredits();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
@@ -44,7 +44,7 @@ export default function Navbar() {
               {isLoading ? (
                 "Loading credits..."
               ) : (
-                <>Credits: {credits?.balance ?? 0}</>
+                <>Credits: {credits}</>
               )}
             </Link>
           )}
@@ -67,7 +67,7 @@ export default function Navbar() {
                 {isLoading ? (
                   "Loading credits..."
                 ) : (
-                  <>Credits: {credits?.balance ?? 0}</>
+                  <>Credits: {credits}</>
                 )}
               </Link>
             )}

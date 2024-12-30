@@ -60,6 +60,13 @@ export const creditsRouter = createTRPCRouter({
 
   use: protectedProcedure
     .input(useCreditsSchema)
+    .output(
+      z.object({
+        success: z.boolean(),
+        transaction: creditTransactionSchema,
+        left: z.number(),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
       const { userId } = await auth();
       if (!userId) {
@@ -100,12 +107,13 @@ export const creditsRouter = createTRPCRouter({
         });
       }
 
+      const left = userCredits.balance - input.amount;
       await ctx.db
         .update(credits)
-        .set({ balance: userCredits.balance - input.amount })
+        .set({ balance: left })
         .where(eq(credits.userId, userId));
 
-      return { success: true, transaction };
+      return { success: true, transaction, left };
     }),
 
   addCredits: protectedProcedure

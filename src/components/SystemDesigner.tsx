@@ -93,9 +93,6 @@ const SystemDesigner = ({
           hideAttribution: true,
         }}
         connectionMode={ConnectionMode.Loose}
-        panOnScroll
-        selectionOnDrag
-        panOnDrag={false}
         selectionMode={SelectionMode.Partial}
         fitView={false}
         className="light-theme dark:dark-theme"

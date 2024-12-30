@@ -9,20 +9,21 @@ import {
 import { TRPCError } from "@trpc/server";
 import { creditsRouter } from "./credits";
 
-const createCaller = t.createCallerFactory(creditsRouter);
+const createCreditsCaller = t.createCallerFactory(creditsRouter);
 
 // Define the response type
-export interface EvaluationResponse {
-  score: number;
-  strengths: string;
-  improvementAreas: string;
-  recommendations: string;
-}
-export interface PlaygroundResponse {
-  strengths: string;
-  improvementAreas: string;
-  recommendations: string;
-}
+const EvaluationResponseSchema = z.object({
+  score: z.number(),
+  strengths: z.string(),
+  improvementAreas: z.string(),
+  recommendations: z.string(),
+});
+
+export type EvaluationResponse = z.infer<typeof EvaluationResponseSchema>;
+export type PlaygroundResponse = Omit<
+  z.infer<typeof EvaluationResponseSchema>,
+  "score"
+>;
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -36,79 +37,57 @@ export const checkSolution = createTRPCRouter({
         challengeAndSolutionPrompt: z.string(),
       }),
     )
+    .output(EvaluationResponseSchema)
     .mutation(async ({ input, ctx }) => {
       const { criteria, challengeAndSolutionPrompt } = input;
 
-      // Calculate input tokens
-      const systemPrompt = "You are a system design evaluation expert..."; // Add your full system prompt here
-      const inputText = [
-        systemPrompt,
-        JSON.stringify(criteria),
-        JSON.stringify(generalEvaluationCriteria),
-        challengeAndSolutionPrompt,
-      ].join("\n");
-
-      const inputTokens = calculateTokens(inputText);
-      const estimatedOutputTokens = 512; // max_tokens from the API call
-
-      // Calculate required credits
-      const inputCost = (inputTokens / 1000) * TOKEN_COSTS["gpt-4o-mini"].input;
-      const outputCost =
-        (estimatedOutputTokens / 1000) * TOKEN_COSTS["gpt-4o-mini"].output;
-      const totalCredits = costToCredits(inputCost + outputCost);
-
-      // Use credits via TRPC
-      const caller = createCaller(ctx);
-      await caller.use({
-        amount: totalCredits,
-        description: "AI Solution Evaluation",
-      });
+      const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
+        {
+          role: "system",
+          content:
+            "You are a system design evaluation expert. You will receive: \n1. The challenge description \n2. The current stage of the challenge being addressed \n3. The user's proposed solution. \nYour task is to evaluate the provided solution in the context of: \n1. The challenge requirements, \n2. The system requirements provided by the CPO/CTO, \n3. Provided hints for solving the current level, \n4. The criteria that define a correct solution.",
+        },
+        {
+          role: "assistant",
+          content: `Accept the solution if it meets the following criteria: \n${JSON.stringify(criteria, null, 2)}. \nIf any criteria are not met, inform the user and reduce their overall score.`,
+        },
+        {
+          role: "assistant",
+          content: `General evaluation criteria: \n${JSON.stringify(
+            generalEvaluationCriteria,
+            null,
+            2,
+          )}`,
+        },
+        {
+          role: "assistant",
+          content: `Score the solution as follows:
+- If the solution meets all criteria for the current challenge level, give a score of 90/100.
+- If the solution goes beyond the provided criteria, give a score of 100/100.`,
+        },
+        {
+          role: "user",
+          content: challengeAndSolutionPrompt,
+        },
+        {
+          role: "assistant",
+          content: `Respond in JSON format {score: number, strengths: string, improvementAreas: string, recommendations: string}. 
+              * Regarding score: score ranges from 0 to 100. When the provided solution fixes part of the given challenge (and current stage) then add score to the user score. If the user didn't solve anything, then they deserver a ZERO (0). One more thing, I want you to be quite strict with the score, since this is a system design interview and we want to evaluate the user's solution based on the criteria and not be too lenient. And as the user progresses in the challenge they should face strictier scoring approach. 
+              * Regarding improvementAreas: each improvement area, should be one specific improvement. So if you have multiple improvements, you should list them separately in markdown format.
+              * Regarding strengths, improvementAreas and recommendations should be in markdown format.
+              * Rules: 1. If you don't follow the instructions, bad things will happen! 2. Give the feedback like this {score: number, strengths: string, improvementAreas: string, recommendations: string}. No further wrapping`,
+        },
+        {
+          role: "assistant",
+          content:
+            "Provide a concise evaluation without any further explanation.",
+        },
+      ];
 
       try {
         const response = await openai.chat.completions.create({
           model: "gpt-4o-mini",
-          messages: [
-            {
-              role: "system",
-              content:
-                "You are a system design evaluation expert. You will receive: \n1. The challenge description \n2. The current stage of the challenge being addressed \n3. The user's proposed solution. \nYour task is to evaluate the provided solution in the context of: \n1. The challenge requirements, \n2. The system requirements provided by the CPO/CTO, \n3. Provided hints for solving the current level, \n4. The criteria that define a correct solution.",
-            },
-            {
-              role: "assistant",
-              content: `Accept the solution if it meets the following criteria: \n${JSON.stringify(criteria, null, 2)}. \nIf any criteria are not met, inform the user and reduce their overall score.`,
-            },
-            {
-              role: "assistant",
-              content: `General evaluation criteria: \n${JSON.stringify(
-                generalEvaluationCriteria,
-                null,
-                2,
-              )}`,
-            },
-            {
-              role: "assistant",
-              content: `Score the solution as follows:
-- If the solution meets all criteria for the current challenge level, give a score of 90/100.
-- If the solution goes beyond the provided criteria, give a score of 100/100.`,
-            },
-            {
-              role: "user",
-              content: challengeAndSolutionPrompt,
-            },
-            {
-              role: "assistant",
-              content: `Respond in JSON format {score: number, strengths: string, improvementAreas: string, recommendations: string}. 
-                  * Regarding score: score ranges from 0 to 100. When the provided solution fixes part of the given challenge (and current stage) then add score to the user score. If the user didn't solve anything, then they deserver a ZERO (0). One more thing, I want you to be quite strict with the score, since this is a system design interview and we want to evaluate the user's solution based on the criteria and not be too lenient. And as the user progresses in the challenge they should face strictier scoring approach. 
-                  * Regarding improvementAreas: each improvement area, should be one specific improvement. So if you have multiple improvements, you should list them separately in markdown format.
-                  * Regarding strengths, improvementAreas and recommendations should be in markdown format.
-                  * Rules: 1. If you don't follow the instructions, bad things will happen! 2. Give the feedback like this {score: number, strengths: string, improvementAreas: string, recommendations: string}. No further wrapping`,
-            },
-            {
-              role: "assistant",
-              content:
-                "Provide a concise evaluation without any further explanation.",
-            },
-          ],
+          messages,
           temperature: 0.2,
           max_tokens: 512,
           frequency_penalty: 0,
@@ -120,7 +99,24 @@ export const checkSolution = createTRPCRouter({
 
         // Parse the content as JSON with type checking
         try {
+          const inputTokens = calculateTokens(JSON.stringify(messages));
+          const outputTokens = calculateTokens(content);
+
+          const inputCost =
+            (inputTokens / 1000) * TOKEN_COSTS["gpt-4o-mini"].input;
+          const outputCost =
+            (outputTokens / 1000) * TOKEN_COSTS["gpt-4o-mini"].output;
+          const totalCredits = costToCredits(inputCost + outputCost);
+
+          // Use credits via TRPC
+          const caller = createCreditsCaller(ctx);
+          await caller.use({
+            amount: totalCredits,
+            description: "AI Solution Evaluation",
+          });
+
           const jsonResponse = JSON.parse(content) as EvaluationResponse;
+
           return jsonResponse;
         } catch (parseError) {
           console.error("Error parsing OpenAI response as JSON:", parseError);
@@ -160,7 +156,7 @@ export const checkSolution = createTRPCRouter({
       const totalCredits = costToCredits(inputCost + outputCost);
 
       // Use credits via TRPC
-      const caller = createCaller(ctx);
+      const caller = createCreditsCaller(ctx);
       await caller.use({
         amount: totalCredits,
         description: "AI Playground Feedback",

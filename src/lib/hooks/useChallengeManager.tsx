@@ -15,6 +15,7 @@ import { type Edge, type Node } from "reactflow";
 import { create } from "zustand";
 import useLocalStorageState from "./useLocalStorageState";
 import { useSystemDesigner } from "./useSystemDesigner";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const SYSTEM_COMPONENT_NODE = "SystemComponentNode";
 
@@ -73,8 +74,15 @@ export const useChallengeManager = () => {
       : [],
   );
   const { nodes, edges } = useSystemDesigner();
-
-  const { mutate, data, isPending } = api.ai.hello.useMutation();
+  const queryClient = useQueryClient();
+  
+  const { mutate, data, isPending } = api.ai.hello.useMutation({
+    async onSuccess() {
+      await queryClient.refetchQueries({
+        queryKey: [["credits", "getBalance"], { type: "query" }],
+      });
+    },
+  });
 
   const checkSolution = async () => {
     const promptBuilder = getChallengePrompt({
@@ -83,7 +91,6 @@ export const useChallengeManager = () => {
     });
     const prompt = promptBuilder(challenge!, currentStage!);
 
-    console.log(prompt);
     mutate({
       challengeAndSolutionPrompt: prompt,
       criteria: currentStage?.criteria ?? [],

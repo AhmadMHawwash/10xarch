@@ -1,94 +1,94 @@
 @tailwind base;
-  @tailwind components;
-  @tailwind utilities;
+@tailwind components;
+@tailwind utilities;
 
-  @layer base {
-    :root {
-      --background: 0 0% 100%;
-      --foreground: 222.2 84% 4.9%;
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
 
-      --card: 0 0% 100%;
-      --card-foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
 
-      --popover: 0 0% 100%;
-      --popover-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
 
-      --primary: 222.2 47.4% 11.2%;
-      --primary-foreground: 210 40% 98%;
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
 
-      --secondary: 210 40% 96.1%;
-      --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
 
-      --muted: 210 40% 96.1%;
-      --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
 
-      --accent: 210 40% 96.1%;
-      --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
 
-      --destructive: 0 84.2% 60.2%;
-      --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
 
-      --border: 214.3 31.8% 91.4%;
-      --input: 214.3 31.8% 91.4%;
-      --ring: 200.2 40% 60.9%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 200.2 40% 60.9%;
 
-      --radius: 0.5rem;
-    }
-
-    .dark {
-      --background: 222.2 84% 4.9%;
-      --foreground: 210 40% 98%;
-
-      --card: 222.2 84% 4.9%;
-      --card-foreground: 210 40% 98%;
-
-      --popover: 222.2 84% 4.9%;
-      --popover-foreground: 210 40% 98%;
-
-      --primary: 210 40% 98%;
-      --primary-foreground: 222.2 47.4% 11.2%;
-
-      --secondary: 217.2 32.6% 17.5%;
-      --secondary-foreground: 210 40% 98%;
-
-      --muted: 217.2 32.6% 17.5%;
-      --muted-foreground: 215 20.2% 65.1%;
-
-      --accent: 217.2 32.6% 17.5%;
-      --accent-foreground: 210 40% 98%;
-
-      --destructive: 0 62.8% 30.6%;
-      --destructive-foreground: 210 40% 98%;
-
-      --border: 217.2 32.6% 17.5%;
-      --input: 217.2 32.6% 17.5%;
-      --ring: 200.2 40% 60.9%;
-    }
+    --radius: 0.5rem;
   }
 
-  @layer base {
-    * {
-      @apply border-border;
-    }
-    body {
-      @apply bg-background text-foreground;
-    }
-  }
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
 
-  .react-flow {
-    height: 100vh!important;
-    width: 100%!important;
-    .react-flow__edges{
-      z-index: 2000!important;
-    }
-    .react-flow__edgelabel-renderer{
-      z-index: 2000!important;
-    }
-  }
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
 
-  /* React Flow Styles */
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 200.2 40% 60.9%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+.react-flow {
+  height: 100vh !important;
+  width: 100% !important;
+  .react-flow__edges {
+    z-index: 2000 !important;
+  }
+  .react-flow__edgelabel-renderer {
+    z-index: 2000 !important;
+  }
+}
+
+/* React Flow Styles */
 .react-flow__node {
-  @apply bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 border-gray-300 dark:border-gray-600;
+  @apply border-gray-300 bg-white text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200;
 }
 
 .react-flow__edge-path {
@@ -96,19 +96,22 @@
 }
 
 .react-flow__controls {
-  @apply bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700;
+  @apply border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-800;
 }
 
 .react-flow__controls-button {
-  @apply bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-200;
+  @apply border-gray-300 bg-gray-100 text-gray-800 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200;
+  svg {
+    @apply fill-gray-700 dark:fill-gray-300;
+  }
 }
 
 .react-flow__minimap {
-  @apply bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700;
+  @apply border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-800;
 }
 
 .react-flow__attribution {
-  @apply bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200;
+  @apply bg-white text-gray-800 dark:bg-gray-800 dark:text-gray-200;
 }
 
 .react-flow__edge-text {
@@ -126,7 +129,7 @@
 .react-flow__node.selected,
 .react-flow__node:focus,
 .react-flow__node:focus-visible {
-  @apply ring-2 ring-blue-500 dark:ring-blue-400 rounded-md;
+  @apply rounded-md ring-2 ring-blue-500 dark:ring-blue-400;
 }
 
 /* Hover states for nodes */
@@ -141,7 +144,7 @@
 
 /* Style node handles consistently */
 .react-flow__handle {
-  @apply w-3 h-3 border-2 border-white dark:border-gray-800;
+  @apply h-3 w-3 border-2 border-white dark:border-gray-800;
 }
 
 /* Style the background */

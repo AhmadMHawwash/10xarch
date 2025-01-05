@@ -2,16 +2,23 @@
 import { SignInButton, useUser, UserButton } from "@clerk/nextjs";
 import { Button } from "./ui/button";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useCredits } from "@/hooks/useCredits";
+import { api } from "@/trpc/react";
 import { Menu, X } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 import { Logo } from "./icons/logo";
 
 export default function Navbar() {
   const { user } = useUser();
-  const { balance: credits, isLoading } = useCredits();
+  const { balance: credits, isLoading, refetch: refetchCredits } = useCredits();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      void refetchCredits();
+    }
+  }, [user, refetchCredits]);
 
   return (
     <nav className="h-[7vh] bg-slate-100 p-4 shadow-md dark:bg-gray-800">
@@ -39,13 +46,9 @@ export default function Navbar() {
           {user && (
             <Link
               href="/credits"
-              className="text-sm transition-none hover:text-gray-600 dark:hover:text-gray-300 hover:underline"
+              className="text-sm transition-none hover:text-gray-600 hover:underline dark:hover:text-gray-300"
             >
-              {isLoading ? (
-                "Loading credits..."
-              ) : (
-                <>Credits: {credits}</>
-              )}
+              {isLoading ? "Loading credits..." : <>Credits: {credits}</>}
             </Link>
           )}
           <ThemeToggle />
@@ -64,18 +67,14 @@ export default function Navbar() {
                 href="/credits"
                 className="block py-2 text-sm transition-colors hover:text-gray-600 dark:hover:text-gray-300"
               >
-                {isLoading ? (
-                  "Loading credits..."
-                ) : (
-                  <>Credits: {credits}</>
-                )}
+                {isLoading ? "Loading credits..." : <>Credits: {credits}</>}
               </Link>
             )}
             <div className="flex items-center justify-between pt-2">
               <ThemeToggle />
-              {user && <UserButton afterSignOutUrl="/" />}
+              {user && <UserButton />}
               {!user && (
-                <SignInButton mode="modal">
+                <SignInButton>
                   <Button variant="outline" className="w-full">
                     Sign In
                   </Button>

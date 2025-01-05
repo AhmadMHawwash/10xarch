@@ -49,9 +49,9 @@ export default function Navbar() {
             </Link>
           )}
           <ThemeToggle />
-          {user && <UserButton afterSignOutUrl="/" />}
+          {user && <UserButton />}
           {!user && (
-            <SignInButton mode="modal">
+            <SignInButton>
               <Button variant="outline">Sign In</Button>
             </SignInButton>
           )}

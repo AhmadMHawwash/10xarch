@@ -5,24 +5,35 @@ import {
 } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
-const isProtectedRoute = createRouteMatcher([
-  // "/challenges/:slug*"
-]);
+const isProtectedRoute = createRouteMatcher(["/sign-up(.*)"]);
 
+const MAX_USERS_COUNT = 50;
 export default clerkMiddleware(async (auth, req) => {
   const { userId, redirectToSignIn } = await auth();
 
-  // Redirect to sign in if not authenticated
+  // Get the current user count from Clerk
+  const usersCount = await (await clerkClient()).users.getCount();
+
+  // If we've hit the user limit and this is a protected route
+  if (usersCount >= MAX_USERS_COUNT && isProtectedRoute(req)) {
+    // Allow existing users to continue using the app
+    if (!userId) {
+      // For non-authenticated users, redirect to waitlist
+      // Don't redirect if they're already on the waitlist page
+      if (!req.url.includes("/waitlist")) {
+        return NextResponse.redirect(new URL("/waitlist", req.url));
+      }
+    }
+  }
+
+  // For protected routes, ensure user is authenticated
   if (!userId && isProtectedRoute(req)) {
     return redirectToSignIn({ returnBackUrl: req.url });
   }
 
-  const usersCount = await (await clerkClient()).users.getCount();
-
-  if (usersCount > 50 && isProtectedRoute(req) && !userId) {
-    return NextResponse.redirect(new URL("/waitlist", req.url).toString());
-  }
+  return NextResponse.next();
 });
+
 export const config = {
   matcher: [
     "/challenges/:slug*",

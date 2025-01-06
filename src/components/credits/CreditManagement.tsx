@@ -4,8 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { useToast } from "@/components/ui/use-toast";
 import { useCredits } from "@/hooks/useCredits";
-import { api, type RouterOutputs } from "@/trpc/react";
-import { useState } from "react";
+import { api } from "@/trpc/react";
 import {
   Table,
   TableBody,
@@ -14,87 +13,107 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
+import { useEffect, useState } from "react";
+import {
+  calculateTokens,
+  isValidAmount,
+  MIN_AMOUNT,
+  MAX_AMOUNT,
+} from "@/lib/tokens";
 
-// Token pricing based on gpt-4o-mini costs
-// Input: $0.01/1K tokens, Output: $0.03/1K tokens
-// Average cost per token = ($0.01 + $0.03) / 2 = $0.02 per 1K tokens
-// Per token cost = $0.00002
-// We charge 500x for profit margin
-const TOKEN_PRICE = 0.01; // $0.01 per token ($0.00002 * 500)
-const TOKENS_PER_DOLLAR = Math.floor(1 / TOKEN_PRICE); // 100 tokens per dollar
-const MIN_AMOUNT = 5;
-const MAX_AMOUNT = 100; // Maximum amount in dollars
+const formatCurrency = (amount: number) => {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(amount);
+};
 
-// Bonus tiers for token purchases
-const BONUS_TIERS = [
-  { threshold: 50, bonus: 1.5 }, // 50% bonus for $50+
-  { threshold: 25, bonus: 1.25 }, // 25% bonus for $25+
-  { threshold: 10, bonus: 1.1 }, // 10% bonus for $10+
-  { threshold: 0, bonus: 1 }, // Base rate
-];
-
-function calculateTokenBreakdown(dollars: number): {
-  baseTokens: number;
-  bonusTokens: number;
-  totalTokens: number;
-  bonusPercentage: number;
-} {
-  const baseTokens = Math.floor(dollars * TOKENS_PER_DOLLAR);
-  const tier = BONUS_TIERS.find((tier) => dollars >= tier.threshold);
-  const bonusMultiplier = tier?.bonus ?? 1;
-  const totalTokens = Math.floor(baseTokens * bonusMultiplier);
-  const bonusTokens = totalTokens - baseTokens;
-  const bonusPercentage = Math.round((bonusMultiplier - 1) * 100);
-
-  return {
-    baseTokens,
-    bonusTokens,
-    totalTokens,
-    bonusPercentage,
-  };
-}
-
-type Transaction =
-  RouterOutputs["credits"]["getTransactions"]["transactions"][number];
+type Transaction = {
+  id: string;
+  createdAt: Date;
+  type: string;
+  amount: number;
+  description: string | null;
+  status: string;
+};
 
 export function CreditManagement() {
-  const { balance: credits, isLoading } = useCredits();
   const { toast } = useToast();
-  const [amount, setAmount] = useState<string>("5");
-  const dollarAmount = parseFloat(amount) || 0;
+  const [amount, setAmount] = useState("5");
+  const [sessionId, setSessionId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    setSessionId(searchParams.get("session_id"));
+  }, []);
+
+  const {
+    balance: credits,
+    refetch: refetchCredits,
+    isLoading: isLoadingCredits,
+  } = useCredits();
+  const { data: session, isSuccess } = api.stripe.verifySession.useQuery(
+    {
+      sessionId: sessionId ?? "",
+    },
+    {
+      enabled: !!sessionId,
+    },
+  );
+
+  useEffect(() => {
+    if (isSuccess) {
+      if (session?.success) {
+        toast({
+          title: "Payment Successful",
+          description: `Added ${session.totalTokens.toLocaleString()} tokens to your account!`,
+        });
+      } else {
+        toast({
+          title: "Payment Issue",
+          description: session?.message ?? "There was an issue adding tokens to your account. Please contact support.",
+          variant: "destructive",
+        });
+      }
+      void refetchCredits();
+      // Clear the session_id from URL
+      window.history.replaceState({}, "", window.location.pathname);
+    }
+  }, [isSuccess, session, toast, refetchCredits]);
+
+  const addCreditsMutation = api.stripe.createCheckoutSession.useMutation();
+
   const { baseTokens, bonusTokens, totalTokens, bonusPercentage } =
-    calculateTokenBreakdown(dollarAmount);
-  const isValidAmount = dollarAmount >= MIN_AMOUNT;
+    calculateTokens(parseFloat(amount));
+
+  const validAmount = isValidAmount(parseFloat(amount));
+
+  const handleAddCredits = async () => {
+    const parsedAmount = parseFloat(amount);
+    if (!validAmount) {
+      toast({
+        title: "Invalid amount",
+        description: `Please enter an amount between ${formatCurrency(
+          MIN_AMOUNT,
+        )} and ${formatCurrency(MAX_AMOUNT)}`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const result = await addCreditsMutation.mutateAsync({
+      amount: parsedAmount,
+    });
+
+    if (result.url) {
+      window.location.href = result.url;
+    }
+  };
 
   const { data: transactionData, isLoading: isLoadingTransactions } =
     api.credits.getTransactions.useQuery();
 
-  const addCreditsMutation = api.credits.addCredits.useMutation({
-    onSuccess: () => {
-      setAmount("5");
-      toast({
-        title: "Credits added successfully!",
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: "Error adding credits",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const handleAddCredits = async (customAmount?: number) => {
-    try {
-      const amountToAdd = customAmount ?? totalTokens;
-      await addCreditsMutation.mutateAsync({ amount: amountToAdd });
-    } catch (error) {
-      // Error is handled by the mutation callbacks
-    }
-  };
-
-  if (isLoading) {
+  if (!credits && isLoadingCredits) {
     return <div>Loading...</div>;
   }
 
@@ -103,7 +122,9 @@ export function CreditManagement() {
       <div className="space-y-4 p-4">
         <h2 className="text-2xl font-bold">Credit Management</h2>
         <div className="rounded-lg border p-4">
-          <p className="mb-4">Current Balance: {credits} credits</p>
+          <p className="mb-4">
+            Current Balance: {credits?.toLocaleString()} credits
+          </p>
 
           <div className="mb-6 space-y-4">
             <div className="flex max-w-md flex-col space-y-4">
@@ -112,7 +133,7 @@ export function CreditManagement() {
                   htmlFor="amount"
                   className="mb-2 block text-sm font-medium"
                 >
-                  Amount (${MIN_AMOUNT} - ${MAX_AMOUNT})
+                  Amount ({formatCurrency(MIN_AMOUNT)} - {formatCurrency(MAX_AMOUNT)})
                 </label>
                 <div className="mb-2">
                   <div className="relative mb-6 mt-2">
@@ -123,7 +144,7 @@ export function CreditManagement() {
                       step={1}
                       value={[parseFloat(amount)]}
                       onValueChange={(value) =>
-                        setAmount(value?.[0]?.toString?.() ?? "5")
+                        setAmount(value?.[0]?.toString() ?? "5")
                       }
                       className="py-4"
                     />
@@ -134,7 +155,7 @@ export function CreditManagement() {
                         You pay
                       </div>
                       <div className="text-3xl font-bold text-gray-900 dark:text-white">
-                        ${amount}
+                        {formatCurrency(parseFloat(amount))}
                       </div>
                     </div>
                     <div className="flex flex-col items-end">
@@ -174,8 +195,8 @@ export function CreditManagement() {
               </div>
               <div className="mt-6 space-y-4">
                 <Button
-                  onClick={() => handleAddCredits()}
-                  disabled={!isValidAmount || addCreditsMutation.isPending}
+                  onClick={handleAddCredits}
+                  disabled={!!addCreditsMutation.isPending}
                   className="relative h-14 w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                   size="lg"
                 >
@@ -196,7 +217,7 @@ export function CreditManagement() {
                           •
                         </span>
                         <span className="text-lg font-bold text-gray-100 dark:text-gray-200">
-                          ${amount}
+                          {formatCurrency(parseFloat(amount))}
                         </span>
                       </>
                     )}
@@ -255,9 +276,9 @@ export function CreditManagement() {
                         {transaction.amount > 0 ? "+" : ""}
                         {transaction.amount}
                       </TableCell>
-                      <TableCell>{transaction.description}</TableCell>
+                      <TableCell>{transaction?.description ?? "-"}</TableCell>
                       <TableCell className="capitalize">
-                        {transaction.status}
+                        {transaction?.status}
                       </TableCell>
                     </TableRow>
                   ),

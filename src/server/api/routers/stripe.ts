@@ -29,7 +29,7 @@ export const stripeRouter = createTRPCRouter({
         throw new Error("Invalid amount");
       }
 
-      const { totalTokens } = calculateTokens(amount);
+      const { totalTokens, baseTokens, bonusTokens } = calculateTokens(amount);
       const { userId } = await auth();
 
       if (!userId) {
@@ -53,7 +53,7 @@ export const stripeRouter = createTRPCRouter({
                 currency: "usd",
                 product_data: {
                   name: "Credits Purchase",
-                  description: `${totalTokens.toLocaleString()} tokens`,
+                  description: `${baseTokens.toLocaleString()} tokens + ${bonusTokens.toLocaleString()} bonus tokens`,
                 },
                 unit_amount: Math.round(amount * 100), // Convert to cents
               },
@@ -67,10 +67,12 @@ export const stripeRouter = createTRPCRouter({
           metadata: {
             userId: user.id,
             totalTokens: totalTokens.toString(),
+            baseTokens: baseTokens.toString(),
+            bonusTokens: bonusTokens.toString(),
           },
         });
 
-        return { url: session.url };
+        return { id: session.id, url: session.url };
       } catch (error) {
         console.error("Error creating checkout session:", error);
         throw new Error("Failed to create checkout session");

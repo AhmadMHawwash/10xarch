@@ -20,6 +20,13 @@ import {
   MIN_AMOUNT,
   MAX_AMOUNT,
 } from "@/lib/tokens";
+import { loadStripe } from "@stripe/stripe-js";
+
+if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
+  throw new Error("Missing NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY");
+}
+
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 
 const formatCurrency = (amount: number) => {
   return new Intl.NumberFormat("en-US", {
@@ -86,11 +93,10 @@ export function CreditManagement() {
   const { baseTokens, bonusTokens, totalTokens, bonusPercentage } =
     calculateTokens(parseFloat(amount));
 
-  const validAmount = isValidAmount(parseFloat(amount));
-
   const handleAddCredits = async () => {
     const parsedAmount = parseFloat(amount);
-    if (!validAmount) {
+
+    if (!isValidAmount(parsedAmount)) {
       toast({
         title: "Invalid amount",
         description: `Please enter an amount between ${formatCurrency(
@@ -105,8 +111,27 @@ export function CreditManagement() {
       amount: parsedAmount,
     });
 
-    if (result.url) {
-      window.location.href = result.url;
+    const stripe = await stripePromise;
+    if (!stripe) {
+      toast({
+        title: "Error",
+        description: "Failed to load Stripe",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Redirect to Stripe Checkout
+    const { error } = await stripe.redirectToCheckout({
+      sessionId: result.id,
+    });
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
     }
   };
 

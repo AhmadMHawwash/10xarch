@@ -1454,7 +1454,7 @@
 
 "@stripe/stripe-js@^5.4.0":
   version "5.4.0"
-  resolved "https://registry.npmjs.org/@stripe/stripe-js/-/stripe-js-5.4.0.tgz"
+  resolved "https://registry.yarnpkg.com/@stripe/stripe-js/-/stripe-js-5.4.0.tgz#847e870ddfe9283432526867857a4c1fba9b11ed"
   integrity sha512-3tfMbSvLGB+OsJ2MsjWjWo+7sp29dwx+3+9kG/TEnZQJt+EwbF/Nomm43cSK+6oXZA9uhspgyrB+BbrPRumx4g==
 
 "@swc/counter@^0.1.3":

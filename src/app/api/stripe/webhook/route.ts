@@ -3,7 +3,6 @@ import { creditTransactions, users } from "@/server/db/schema";
 import { eq } from "drizzle-orm";
 import { buffer } from "node:stream/consumers";
 import Stripe from "stripe";
-import { calculateTokens } from "@/lib/tokens";
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error("Missing STRIPE_SECRET_KEY");
@@ -49,10 +48,12 @@ export async function POST(req: Request) {
         throw new Error("Missing userId in session metadata");
       }
 
-      // Get amount from session
-      const amount = session.amount_total ? session.amount_total / 100 : 0; // Convert from cents to dollars
-      const { totalTokens } = calculateTokens(amount);
-      console.log(` Processing ${totalTokens} tokens for user ${userId}`);
+      // Get tokens from metadata
+      const totalTokens = parseInt(session.metadata?.totalTokens ?? "0");
+      const baseTokens = parseInt(session.metadata?.baseTokens ?? "0");
+      const bonusTokens = parseInt(session.metadata?.bonusTokens ?? "0");
+      
+      console.log(` Processing purchase: ${baseTokens} base tokens + ${bonusTokens} bonus tokens = ${totalTokens} total tokens for user ${userId}`);
 
       const user = await db.query.users.findFirst({
         where: eq(users.id, userId),
@@ -73,7 +74,7 @@ export async function POST(req: Request) {
           userId,
           amount: totalTokens,
           type: "purchase",
-          description: `Purchased ${totalTokens.toLocaleString()} tokens`,
+          description: `Purchased ${baseTokens.toLocaleString()} tokens + ${bonusTokens.toLocaleString()} bonus tokens`,
           status: "completed",
         });
         console.log(" Transaction recorded:", txResult);

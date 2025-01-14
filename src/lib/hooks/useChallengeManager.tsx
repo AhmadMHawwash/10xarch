@@ -16,6 +16,7 @@ import { create } from "zustand";
 import useLocalStorageState from "./useLocalStorageState";
 import { useSystemDesigner } from "./useSystemDesigner";
 import { useQueryClient } from "@tanstack/react-query";
+import { useToast } from "@/components/ui/use-toast";
 
 export const SYSTEM_COMPONENT_NODE = "SystemComponentNode";
 
@@ -60,6 +61,9 @@ const useStageStore = create<{
 export const useChallengeManager = () => {
   const params = useParams<{ slug: string }>();
   const pathname = usePathname();
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  
   const challenge = challenges.find(
     (challenge) => challenge.slug === params?.slug,
   );
@@ -74,12 +78,18 @@ export const useChallengeManager = () => {
       : [],
   );
   const { nodes, edges } = useSystemDesigner();
-  const queryClient = useQueryClient();
   
   const { mutate, data, isPending } = api.challenges.submit.useMutation({
     async onSuccess() {
       await queryClient.refetchQueries({
         queryKey: [["credits", "getBalance"], { type: "query" }],
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: error.data?.code === "TOO_MANY_REQUESTS" ? "Rate Limit Exceeded" : "Error",
+        description: error.message,
+        variant: "destructive",
       });
     },
   });

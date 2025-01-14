@@ -39,12 +39,19 @@ export const challengesRouter = createTRPCRouter({
         // Get client IP for rate limiting
         const clientIp = ctx.headers.get("x-forwarded-for") ?? "127.0.0.1";
 
-        const { success } = await anonymousCreditsLimiter.limit(clientIp);
+        const response = await anonymousCreditsLimiter.limit(clientIp);
 
-        if (!success) {
+        if (!response.success) {
+          const resetDate = new Date(response.reset);
+          const formattedTime = resetDate.toLocaleTimeString([], { 
+            hour: 'numeric', 
+            minute: '2-digit',
+            hour12: true 
+          });
+
           throw new TRPCError({
             code: "TOO_MANY_REQUESTS",
-            message: "Rate limit exceeded for anonymous submissions",
+            message: `Rate limit exceeded. You can try again at ${formattedTime}`,
           });
         }
 

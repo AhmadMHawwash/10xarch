@@ -1,28 +1,57 @@
 "use client";
-import { SignInButton, useUser, UserButton } from "@clerk/nextjs";
-import { Button } from "./ui/button";
-import Link from "next/link";
-import { useState, useCallback, useEffect } from "react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import challenges from "@/content/challenges";
 import { useCredits } from "@/hooks/useCredits";
-import { api } from "@/trpc/react";
+import { cn } from "@/lib/utils";
+import { SignInButton, UserButton, useUser } from "@clerk/nextjs";
 import { Menu, X } from "lucide-react";
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import { useCallback, useState } from "react";
 import { ThemeToggle } from "./ThemeToggle";
 import { Logo } from "./icons/logo";
+import { Button } from "./ui/button";
+
+function FreeChallengeBadge() {
+  const params = useParams<{ slug: string }>();
+  const challenge = challenges.find((c) => c.slug === params?.slug);
+
+  // Only show for non-logged in users on free challenges
+  if (!params.slug || !challenge?.isFree) return null;
+
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div className="relative cursor-help text-sm">
+            <span className="font-medium text-primary">Free Challenge</span>
+          </div>
+        </TooltipTrigger>
+        <TooltipContent sideOffset={5} className="z-[100]" side="bottom" align="center">
+          <p>Rate limited to 40 submissions per day</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+}
 
 export default function Navbar() {
   const { user } = useUser();
-  const { balance: credits, isLoading, refetch: refetchCredits } = useCredits();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { balance: credits, isLoading: isLoadingCredits } = useCredits();
 
-  useEffect(() => {
-    if (user) {
-      void refetchCredits();
-    }
-  }, [user, refetchCredits]);
+  const toggleMenu = useCallback(() => {
+    setIsMenuOpen(!isMenuOpen);
+  }, [isMenuOpen]);
 
   return (
-    <nav className="h-[7vh] bg-slate-100 p-4 shadow-md dark:bg-gray-800">
-      <div className="mx-auto flex max-w-7xl items-center justify-between">
+    <nav className="relative z-50 h-[7vh] border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-full items-center justify-between">
         <div className="flex items-center space-x-4">
           <Link href="/" className="flex items-center space-x-2">
             <Logo className="h-8 w-8" />
@@ -31,29 +60,28 @@ export default function Navbar() {
         </div>
 
         <button
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className="md:hidden"
+          className="block p-2 md:hidden"
+          onClick={toggleMenu}
           aria-label="Toggle menu"
         >
-          {isMenuOpen ? (
-            <X className="h-6 w-6" />
-          ) : (
-            <Menu className="h-6 w-6" />
-          )}
+          {isMenuOpen ? <X /> : <Menu />}
         </button>
 
         <div className="hidden items-center space-x-4 md:flex">
+          <FreeChallengeBadge />
           {user && (
             <Link
               href="/credits"
-              className="text-sm transition-none hover:text-gray-600 hover:underline dark:hover:text-gray-300"
+              className={cn(
+                "text-sm text-muted-foreground hover:text-foreground",
+                isLoadingCredits && "animate-pulse",
+              )}
             >
-              {isLoading ? "Loading credits..." : <>Credits: {credits}</>}
+              {isLoadingCredits ? "Loading credits..." : <>Credits: {credits}</>}
             </Link>
           )}
           <ThemeToggle />
-          {user && <UserButton />}
-          {!user && (
+          {user ? <UserButton afterSignOutUrl="/" /> : (
             <SignInButton>
               <Button variant="outline">Sign In</Button>
             </SignInButton>
@@ -62,18 +90,21 @@ export default function Navbar() {
 
         {isMenuOpen && (
           <div className="absolute left-0 right-0 top-[7vh] z-50 bg-slate-100 p-4 shadow-md dark:bg-gray-800 md:hidden">
+            <FreeChallengeBadge />
             {user && (
               <Link
                 href="/credits"
-                className="block py-2 text-sm transition-colors hover:text-gray-600 dark:hover:text-gray-300"
+                className={cn(
+                  "block py-2 text-sm text-muted-foreground hover:text-foreground",
+                  isLoadingCredits && "animate-pulse",
+                )}
               >
-                {isLoading ? "Loading credits..." : <>Credits: {credits}</>}
+                {isLoadingCredits ? "Loading credits..." : <>Credits: {credits}</>}
               </Link>
             )}
-            <div className="flex items-center justify-between pt-2">
+            <div className="flex items-center justify-between py-2">
               <ThemeToggle />
-              {user && <UserButton />}
-              {!user && (
+              {user ? <UserButton afterSignOutUrl="/" /> : (
                 <SignInButton>
                   <Button variant="outline" className="w-full">
                     Sign In

@@ -13,7 +13,7 @@ const redis = new Redis({
 // Create a new ratelimiter that allows 5 tokens per IP per week
 export const anonymousCreditsLimiter = new Ratelimit({
   redis,
-  limiter: Ratelimit.slidingWindow(20, '1 h'),
+  limiter: Ratelimit.slidingWindow(40, '1 d'),
   analytics: true,
   prefix: '@upstash/ratelimit/anonymous-credits',
 })

@@ -7,10 +7,10 @@ import {
 import OpenAI from "openai";
 import { z } from "zod";
 import {
-  calculateTokens,
+  calculateTextTokens,
   costToCredits,
-  TOKEN_COSTS,
-} from "@/lib/calculate-tokens";
+  GPT_TOKEN_COSTS,
+} from "@/lib/tokens";
 import { TRPCError } from "@trpc/server";
 import { creditsRouter } from "./credits";
 import { auth } from "@clerk/nextjs/server";
@@ -119,13 +119,13 @@ export const checkSolution = createTRPCRouter({
         // Parse the content as JSON with type checking
         try {
           if (userId) {
-            const inputTokens = calculateTokens(JSON.stringify(messages));
-            const outputTokens = calculateTokens(content);
+            const inputTokens = calculateTextTokens(JSON.stringify(messages));
+            const outputTokens = calculateTextTokens(content);
 
             const inputCost =
-              (inputTokens / 1000) * TOKEN_COSTS["gpt-4o-mini"].input;
+              (inputTokens / 1000) * GPT_TOKEN_COSTS["gpt-4o-mini"].input;
             const outputCost =
-              (outputTokens / 1000) * TOKEN_COSTS["gpt-4o-mini"].output;
+              (outputTokens / 1000) * GPT_TOKEN_COSTS["gpt-4o-mini"].output;
             const totalCredits = costToCredits(inputCost + outputCost);
 
             // Use credits via TRPC
@@ -166,13 +166,13 @@ export const checkSolution = createTRPCRouter({
 
       // Calculate input tokens
       const inputText = `systemDesignContext: ${systemDesignContext} \n systemDesign: ${systemDesign}`;
-      const inputTokens = calculateTokens(inputText);
+      const inputTokens = calculateTextTokens(inputText);
       const estimatedOutputTokens = 512; // max_tokens from the API call
 
       // Calculate required credits
-      const inputCost = (inputTokens / 1000) * TOKEN_COSTS["gpt-4o-mini"].input;
+      const inputCost = (inputTokens / 1000) * GPT_TOKEN_COSTS["gpt-4o-mini"].input;
       const outputCost =
-        (estimatedOutputTokens / 1000) * TOKEN_COSTS["gpt-4o-mini"].output;
+        (estimatedOutputTokens / 1000) * GPT_TOKEN_COSTS["gpt-4o-mini"].output;
       const totalCredits = costToCredits(inputCost + outputCost);
 
       // Use credits via TRPC

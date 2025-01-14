@@ -4,7 +4,15 @@ import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { useToast } from "@/components/ui/use-toast";
 import { useCredits } from "@/hooks/useCredits";
+import {
+  calculatePurchaseTokens,
+  isValidAmount,
+  MAX_AMOUNT,
+  MIN_AMOUNT
+} from "@/lib/tokens";
 import { api } from "@/trpc/react";
+import { loadStripe } from "@stripe/stripe-js";
+import { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -13,20 +21,14 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-import { useEffect, useState } from "react";
-import {
-  calculateTokens,
-  isValidAmount,
-  MIN_AMOUNT,
-  MAX_AMOUNT,
-} from "@/lib/tokens";
-import { loadStripe } from "@stripe/stripe-js";
 
 if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
   throw new Error("Missing NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY");
 }
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
+const stripePromise = loadStripe(
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
+);
 
 const formatCurrency = (amount: number) => {
   return new Intl.NumberFormat("en-US", {
@@ -78,7 +80,9 @@ export function CreditManagement() {
       } else {
         toast({
           title: "Payment Issue",
-          description: session?.message ?? "There was an issue adding tokens to your account. Please contact support.",
+          description:
+            session?.message ??
+            "There was an issue adding tokens to your account. Please contact support.",
           variant: "destructive",
         });
       }
@@ -91,7 +95,7 @@ export function CreditManagement() {
   const addCreditsMutation = api.stripe.createCheckoutSession.useMutation();
 
   const { baseTokens, bonusTokens, totalTokens, bonusPercentage } =
-    calculateTokens(parseFloat(amount));
+    calculatePurchaseTokens(parseFloat(amount));
 
   const handleAddCredits = async () => {
     const parsedAmount = parseFloat(amount);
@@ -158,7 +162,8 @@ export function CreditManagement() {
                   htmlFor="amount"
                   className="mb-2 block text-sm font-medium"
                 >
-                  Amount ({formatCurrency(MIN_AMOUNT)} - {formatCurrency(MAX_AMOUNT)})
+                  Amount ({formatCurrency(MIN_AMOUNT)} -{" "}
+                  {formatCurrency(MAX_AMOUNT)})
                 </label>
                 <div className="mb-2">
                   <div className="relative mb-6 mt-2">

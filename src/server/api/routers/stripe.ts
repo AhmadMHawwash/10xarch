@@ -1,11 +1,13 @@
-import { z } from "zod";
+import {
+  calculatePurchaseTokens,
+  isValidAmount
+} from "@/lib/tokens";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
-import Stripe from "stripe";
+import { creditTransactions, users } from "@/server/db/schema";
 import { auth } from "@clerk/nextjs/server";
 import { eq } from "drizzle-orm";
-import { users } from "@/server/db/schema";
-import { calculateTokens, isValidAmount } from "@/lib/tokens";
-import { creditTransactions } from "@/server/db/schema";
+import Stripe from "stripe";
+import { z } from "zod";
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error("Missing STRIPE_SECRET_KEY");
@@ -24,12 +26,13 @@ export const stripeRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       const { amount } = input;
-      
+
       if (!isValidAmount(amount)) {
         throw new Error("Invalid amount");
       }
 
-      const { totalTokens, baseTokens, bonusTokens } = calculateTokens(amount);
+      const { totalTokens, baseTokens, bonusTokens } =
+        calculatePurchaseTokens(amount);
       const { userId } = await auth();
 
       if (!userId) {
@@ -113,13 +116,16 @@ export const stripeRouter = createTRPCRouter({
       // Verify that the transaction exists in our database
       const transaction = await ctx.db.query.creditTransactions.findFirst({
         where: eq(creditTransactions.userId, userId),
-        orderBy: (creditTransactions, { desc }) => [desc(creditTransactions.createdAt)],
+        orderBy: (creditTransactions, { desc }) => [
+          desc(creditTransactions.createdAt),
+        ],
       });
 
       if (!transaction || transaction.type !== "purchase") {
         return {
           success: false,
-          message: "Transaction not found. Please contact support if this issue persists.",
+          message:
+            "Transaction not found. Please contact support if this issue persists.",
           totalTokens: 0,
         };
       }

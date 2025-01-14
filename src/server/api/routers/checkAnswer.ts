@@ -1,4 +1,9 @@
-import { createTRPCRouter, protectedProcedure, t } from "@/server/api/trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+  t,
+} from "@/server/api/trpc";
 import OpenAI from "openai";
 import { z } from "zod";
 import {
@@ -8,6 +13,7 @@ import {
 } from "@/lib/calculate-tokens";
 import { TRPCError } from "@trpc/server";
 import { creditsRouter } from "./credits";
+import { auth } from "@clerk/nextjs/server";
 
 const createCreditsCaller = t.createCallerFactory(creditsRouter);
 
@@ -30,15 +36,26 @@ const openai = new OpenAI({
 });
 
 export const checkSolution = createTRPCRouter({
-  hello: protectedProcedure
+  hello: publicProcedure
     .input(
       z.object({
         criteria: z.array(z.string()),
         challengeAndSolutionPrompt: z.string(),
+        bypassInternalToken: z.string().optional(),
       }),
     )
     .output(EvaluationResponseSchema)
     .mutation(async ({ input, ctx }) => {
+      const { userId } = await auth();
+
+      const canUseAI =
+        input.bypassInternalToken === process.env.BYPASS_TOKEN || userId;
+      if (!canUseAI) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You are not authorized to use this endpoint",
+        });
+      }
       const { criteria, challengeAndSolutionPrompt } = input;
 
       const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
@@ -94,27 +111,30 @@ export const checkSolution = createTRPCRouter({
           presence_penalty: 0,
         });
 
+        console.log(response.choices[0]?.message.content);
+
         const content =
           response.choices[0]?.message.content ?? "No response generated";
 
         // Parse the content as JSON with type checking
         try {
-          const inputTokens = calculateTokens(JSON.stringify(messages));
-          const outputTokens = calculateTokens(content);
+          if (userId) {
+            const inputTokens = calculateTokens(JSON.stringify(messages));
+            const outputTokens = calculateTokens(content);
 
-          const inputCost =
-            (inputTokens / 1000) * TOKEN_COSTS["gpt-4o-mini"].input;
-          const outputCost =
-            (outputTokens / 1000) * TOKEN_COSTS["gpt-4o-mini"].output;
-          const totalCredits = costToCredits(inputCost + outputCost);
+            const inputCost =
+              (inputTokens / 1000) * TOKEN_COSTS["gpt-4o-mini"].input;
+            const outputCost =
+              (outputTokens / 1000) * TOKEN_COSTS["gpt-4o-mini"].output;
+            const totalCredits = costToCredits(inputCost + outputCost);
 
-          // Use credits via TRPC
-          const caller = createCreditsCaller(ctx);
-          await caller.use({
-            amount: totalCredits,
-            description: "AI Solution Evaluation",
-          });
-
+            // Use credits via TRPC
+            const caller = createCreditsCaller(ctx);
+            await caller.use({
+              amount: totalCredits,
+              description: "AI Solution Evaluation",
+            });
+          }
           const jsonResponse = JSON.parse(content) as EvaluationResponse;
 
           return jsonResponse;

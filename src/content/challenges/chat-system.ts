@@ -6,6 +6,7 @@ const challenge: Challenge = {
   description:
     "Design a chat application that allows users to send and receive messages in real-time.",
   difficulty: "Easy",
+  isFree: true, // This is a free challenge
   stages: [
     // Stage 1
     {

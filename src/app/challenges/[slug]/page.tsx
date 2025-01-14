@@ -1,33 +1,32 @@
 "use client";
 import { LevelContent } from "@/components/playground/LevelContent";
+import { FeedbackList, ScoreDisplay } from "@/components/SolutionFeedback";
 import { FlowManager } from "@/components/SolutionFlowManager";
 import SystemBuilder from "@/components/SystemDesigner";
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from "@/components/ui/resizable";
-import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
-import { SystemDesignerProvider } from "@/lib/hooks/useSystemDesigner";
-import { notFound } from "next/navigation";
-import { useEffect, useState } from "react";
-import { ReactFlowProvider } from "reactflow";
-import { useMount, usePrevious } from "react-use";
+import { Accordion } from "@/components/ui/accordion";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Button } from "@/components/ui/button";
-import { FeedbackList, ScoreDisplay } from "@/components/SolutionFeedback";
-import { Accordion } from "@/components/ui/accordion";
+import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
+import { SystemDesignerProvider } from "@/lib/hooks/useSystemDesigner";
 import { Award, Lightbulb, TrendingUp } from "lucide-react";
 import Link from "next/link";
-import { useWithLogin } from "@/lib/hooks/useWithLogin";
+import { notFound } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useMount, usePrevious } from "react-use";
+import { ReactFlowProvider } from "reactflow";
 
 export default function LevelPage() {
   return (
@@ -47,7 +46,6 @@ function Level() {
     challenge,
     currentStageIndex,
   } = useChallengeManager();
-  const { withLogin } = useWithLogin();
   const [isFeedbackExpanded, setIsFeedbackExpanded] = useState(false);
   const [isOpenClosure, setIsOpenClosure] = useState(false);
 
@@ -78,7 +76,7 @@ function Level() {
           <SystemBuilder
             PassedFlowManager={() => (
               <FlowManager
-                checkSolution={withLogin(checkSolution)}
+                checkSolution={checkSolution}
                 feedback={feedback}
                 isLoadingAnswer={isLoadingAnswer}
                 isFeedbackExpanded={isFeedbackExpanded && !isLastStage}

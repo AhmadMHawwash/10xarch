@@ -11,6 +11,7 @@ import superjson from "superjson";
 import { ZodError } from "zod";
 
 import { db } from "@/server/db";
+import { auth as clerkAuth } from "@clerk/nextjs/server";
 
 /**
  * 1. CONTEXT
@@ -88,13 +89,15 @@ export const publicProcedure = t.procedure;
  * This is the base piece you use to build new queries and mutations on your tRPC API that require authentication.
  * It guarantees that a user querying is authorized by throwing an error if they are not logged in.
  */
-export const protectedProcedure = t.procedure.use(({ next, ctx }) => {
-  if (!ctx.db) {
+export const protectedProcedure = t.procedure.use(async ({ next, ctx }) => {
+  const auth = await clerkAuth();
+  if (!auth.userId) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
   return next({
     ctx: {
       db: ctx.db,
+      auth
     },
   });
 });

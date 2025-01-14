@@ -76,7 +76,7 @@ export const useChallengeManager = () => {
   const { nodes, edges } = useSystemDesigner();
   const queryClient = useQueryClient();
   
-  const { mutate, data, isPending } = api.ai.hello.useMutation({
+  const { mutate, data, isPending } = api.challenges.submit.useMutation({
     async onSuccess() {
       await queryClient.refetchQueries({
         queryKey: [["credits", "getBalance"], { type: "query" }],
@@ -92,6 +92,7 @@ export const useChallengeManager = () => {
     const prompt = promptBuilder(challenge!, currentStage!);
 
     mutate({
+      challengeSlug: challenge?.slug ?? "",
       challengeAndSolutionPrompt: prompt,
       criteria: currentStage?.criteria ?? [],
     });
@@ -100,7 +101,7 @@ export const useChallengeManager = () => {
   useEffect(() => {
     if (data) {
       const newFeedbacks = [...feedbacks];
-      newFeedbacks[currentStageIndex] = data;
+      newFeedbacks[currentStageIndex] = data.evaluation;
       setFeedbacks(newFeedbacks);
     }
   }, [data]);
@@ -146,7 +147,6 @@ export const getChallengePrompt = ({
 
     const configs = whiteboard.data.configs;
 
-    console.log(configs);
     return {
       functionalRequirements: configs["functional requirements"] as string,
       nonFunctionalRequirements: configs[

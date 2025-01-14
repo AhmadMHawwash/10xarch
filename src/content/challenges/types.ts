@@ -3,6 +3,7 @@ export type Challenge = {
   title: string;
   description: string;
   difficulty: "Easy" | "Medium" | "Hard";
+  isFree: boolean;
   stages: Stage[];
   generalLearnings: string[];
 };

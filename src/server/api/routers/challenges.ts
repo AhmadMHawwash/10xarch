@@ -14,11 +14,21 @@ const submitChallengeSchema = z.object({
   challengeSlug: z.string(),
   criteria: z.array(z.string()),
   challengeAndSolutionPrompt: z.string(),
-  anonymousId: z.string().optional(),
 });
 
 export const challengesRouter = createTRPCRouter({
-  // Submit a solution to a challenge
+  getRateLimitInfo: publicProcedure.query(async ({ ctx }) => {
+    const { userId } = await auth();
+    const identifier = userId ?? ctx.headers.get("x-forwarded-for") ?? "127.0.0.1";
+    const { success, remaining, reset } = await anonymousCreditsLimiter.limit(identifier);
+    
+    return {
+      remaining,
+      reset,
+      limit: 40, // Daily submission limit
+    };
+  }),
+
   submit: publicProcedure
     .input(submitChallengeSchema)
     .mutation(async ({ ctx, input }) => {
@@ -34,12 +44,12 @@ export const challengesRouter = createTRPCRouter({
 
       const { userId } = await auth();
       
-      // Handle anonymous submission for free challenges
-      if (!userId && challenge.isFree) {
-        // Get client IP for rate limiting
-        const clientIp = ctx.headers.get("x-forwarded-for") ?? "127.0.0.1";
+      // Handle free challenges (both anonymous and authenticated users)
+      if (challenge.isFree) {
+        // Get client IP or user ID for rate limiting
+        const identifier = userId ?? ctx.headers.get("x-forwarded-for") ?? "127.0.0.1";
 
-        const response = await anonymousCreditsLimiter.limit(clientIp);
+        const response = await anonymousCreditsLimiter.limit(identifier);
 
         if (!response.success) {
           const resetDate = new Date(response.reset);
@@ -55,9 +65,8 @@ export const challengesRouter = createTRPCRouter({
           });
         }
 
-        // Process anonymous submission
+        // Process free challenge submission
         const aiCaller = createAICaller(ctx);
-
         const result = await aiCaller.hello({
           criteria: input.criteria,
           challengeAndSolutionPrompt: input.challengeAndSolutionPrompt,
@@ -67,7 +76,7 @@ export const challengesRouter = createTRPCRouter({
         return { success: true, evaluation: result };
       }
 
-      // Handle authenticated submission
+      // Handle paid challenges (must be authenticated)
       if (!userId) {
         throw new TRPCError({
           code: "UNAUTHORIZED",
@@ -75,30 +84,26 @@ export const challengesRouter = createTRPCRouter({
         });
       }
 
-      // For paid challenges, check and deduct credits
-      if (!challenge.isFree) {
-        const userCredits = await ctx.db.query.credits.findFirst({
-          where: eq(credits.userId, userId),
+      // Check and deduct credits for paid challenges
+      const userCredits = await ctx.db.query.credits.findFirst({
+        where: eq(credits.userId, userId),
+      });
+
+      if (!userCredits || userCredits.balance < 1) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Insufficient credits",
         });
-
-        if (!userCredits || userCredits.balance < 1) {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: "Insufficient credits",
-          });
-        }
-
-        // Deduct 1 credit for submission
-        await ctx.db
-          .update(credits)
-          .set({ balance: userCredits.balance - 1 })
-          .where(eq(credits.userId, userId));
       }
 
-      // Process authenticated submission
+      // Deduct 1 credit for submission
+      await ctx.db
+        .update(credits)
+        .set({ balance: userCredits.balance - 1 })
+        .where(eq(credits.userId, userId));
 
+      // Process paid challenge submission
       const aiCaller = createAICaller(ctx);
-
       const result = await aiCaller.hello({
         criteria: input.criteria,
         challengeAndSolutionPrompt: input.challengeAndSolutionPrompt,

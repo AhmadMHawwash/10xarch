@@ -16,12 +16,56 @@ import { useCallback, useState } from "react";
 import { ThemeToggle } from "./ThemeToggle";
 import { Logo } from "./icons/logo";
 import { Button } from "./ui/button";
+import { api } from "@/trpc/react";
+
+function RateLimitInfo() {
+  const rateLimitQuery = api.challenges.getRateLimitInfo.useQuery(undefined, {
+    refetchInterval: 1000 * 60, // Refresh every minute
+  });
+
+  if (rateLimitQuery.isLoading) {
+    return <p>Loading...</p>;
+  }
+
+  if (!rateLimitQuery.data) {
+    return null;
+  }
+
+  const { remaining, reset, limit } = rateLimitQuery.data;
+  const resetTime = new Date(reset);
+  const formattedTime = resetTime.toLocaleTimeString([], {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+
+  return (
+    <>
+      <p>
+        <span
+          className={cn(
+            "font-medium",
+            remaining === 0 ? "text-destructive" : "text-primary",
+          )}
+        >
+          {remaining}
+        </span>
+        <span className="text-muted-foreground">/{limit} submissions</span>
+      </p>
+      {remaining < limit && (
+        <p className="text-xs text-muted-foreground">
+          Resets at {formattedTime}
+        </p>
+      )}
+    </>
+  );
+}
 
 function FreeChallengeBadge() {
   const params = useParams<{ slug: string }>();
   const challenge = challenges.find((c) => c.slug === params?.slug);
 
-  // Only show for non-logged in users on free challenges
+  // Only show for free challenges
   if (!params.slug || !challenge?.isFree) return null;
 
   return (
@@ -32,8 +76,13 @@ function FreeChallengeBadge() {
             <span className="font-medium text-primary">Free Challenge</span>
           </div>
         </TooltipTrigger>
-        <TooltipContent sideOffset={5} className="z-[100]" side="bottom" align="center">
-          <p>Rate limited to 40 submissions per day</p>
+        <TooltipContent
+          sideOffset={5}
+          className="z-[100]"
+          side="bottom"
+          align="center"
+        >
+          <RateLimitInfo />
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
@@ -77,11 +126,17 @@ export default function Navbar() {
                 isLoadingCredits && "animate-pulse",
               )}
             >
-              {isLoadingCredits ? "Loading credits..." : <>Credits: {credits}</>}
+              {isLoadingCredits ? (
+                "Loading credits..."
+              ) : (
+                <>Credits: {credits}</>
+              )}
             </Link>
           )}
           <ThemeToggle />
-          {user ? <UserButton afterSignOutUrl="/" /> : (
+          {user ? (
+            <UserButton afterSignOutUrl="/" />
+          ) : (
             <SignInButton>
               <Button variant="outline">Sign In</Button>
             </SignInButton>
@@ -99,12 +154,18 @@ export default function Navbar() {
                   isLoadingCredits && "animate-pulse",
                 )}
               >
-                {isLoadingCredits ? "Loading credits..." : <>Credits: {credits}</>}
+                {isLoadingCredits ? (
+                  "Loading credits..."
+                ) : (
+                  <>Credits: {credits}</>
+                )}
               </Link>
             )}
             <div className="flex items-center justify-between py-2">
               <ThemeToggle />
-              {user ? <UserButton afterSignOutUrl="/" /> : (
+              {user ? (
+                <UserButton afterSignOutUrl="/" />
+              ) : (
                 <SignInButton>
                   <Button variant="outline" className="w-full">
                     Sign In

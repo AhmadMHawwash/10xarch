@@ -19,11 +19,13 @@ const submitChallengeSchema = z.object({
 export const challengesRouter = createTRPCRouter({
   getRateLimitInfo: publicProcedure.query(async ({ ctx }) => {
     const { userId } = await auth();
-    const identifier = userId ?? ctx.headers.get("x-forwarded-for") ?? "127.0.0.1";
-    
+    const identifier =
+      userId ?? ctx.headers.get("x-forwarded-for") ?? "127.0.0.1";
+
     // Use peek() to check rate limit info without consuming a submission
-    const { remaining, reset } = await freeChallengesLimiter.getRemaining(identifier);
-    
+    const { remaining, reset } =
+      await freeChallengesLimiter.getRemaining(identifier);
+
     return {
       remaining,
       reset,
@@ -45,20 +47,24 @@ export const challengesRouter = createTRPCRouter({
       }
 
       const { userId } = await auth();
-      
+      const identifier =
+        userId ?? ctx.headers.get("x-forwarded-for") ?? "127.0.0.1";
+
+      const { remaining } =
+        await freeChallengesLimiter.getRemaining(identifier);
+
       // Handle free challenges (both anonymous and authenticated users)
-      if (challenge.isFree) {
+      if (challenge.isFree && remaining > 0) {
         // Get client IP or user ID for rate limiting
-        const identifier = userId ?? ctx.headers.get("x-forwarded-for") ?? "127.0.0.1";
 
         const response = await freeChallengesLimiter.limit(identifier);
 
         if (!response.success) {
           const resetDate = new Date(response.reset);
-          const formattedTime = resetDate.toLocaleTimeString([], { 
-            hour: 'numeric', 
-            minute: '2-digit',
-            hour12: true 
+          const formattedTime = resetDate.toLocaleTimeString([], {
+            hour: "numeric",
+            minute: "2-digit",
+            hour12: true,
           });
 
           throw new TRPCError({

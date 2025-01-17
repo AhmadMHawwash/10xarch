@@ -42,23 +42,20 @@ function RateLimitInfo() {
 
   return (
     <div className="space-y-2 p-2 rounded-md bg-secondary/30">
-      {user && (
-        <p className="text-xs italic text-muted-foreground">
-          Free challenges do not use your credits
-        </p>
-      )}
+      <p className="text-xs italic text-muted-foreground">
+        Free submissions are used before credits are deducted
+      </p>
       <div className="flex items-center justify-between">
-        <span className="text-sm font-medium">Submissions:&nbsp;</span>
         <span className={cn(
           "font-bold",
           remaining === 0 ? "text-destructive" : "text-primary"
         )}>
-          {remaining}/{limit}
+          {remaining} of {limit} free submissions available
         </span>
       </div>
       {remaining < limit && (
         <p className="text-xs text-muted-foreground flex items-center justify-end">
-          <span className="mr-1">Resets at</span>
+          <span className="mr-1">Next reset:</span>
           <span className="font-medium">{formattedTime}</span>
         </p>
       )}

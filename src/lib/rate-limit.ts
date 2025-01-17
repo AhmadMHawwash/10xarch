@@ -22,7 +22,7 @@ export const anonymousCreditsLimiter = new Ratelimit({
 // Create a new ratelimiter that allows 30 submissions per day per IP/user
 export const freeChallengesLimiter = new Ratelimit({
   redis,
-  limiter: Ratelimit.fixedWindow(30, '1 d'),
+  limiter: Ratelimit.fixedWindow(15, '1 d'),
   analytics: true,
   prefix: '@upstash/ratelimit/free-challenges',
 })

@@ -3,7 +3,7 @@
 import HotjarUtil from "@hotjar/browser";
 import { useEffect } from "react";
 
-const siteId = 3856666;
+const siteId = 5271387;
 const hotjarVersion = 6;
 
 export const Hotjar = () => {

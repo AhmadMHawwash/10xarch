@@ -5,7 +5,8 @@ if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN
   throw new Error('Missing Upstash Redis environment variables')
 }
 
-const redis = new Redis({
+// Create Redis instance
+export const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL,
   token: process.env.UPSTASH_REDIS_REST_TOKEN,
 })
@@ -16,4 +17,12 @@ export const anonymousCreditsLimiter = new Ratelimit({
   limiter: Ratelimit.slidingWindow(40, '1 d'),
   analytics: true,
   prefix: '@upstash/ratelimit/anonymous-credits',
+})
+
+// Create a new ratelimiter that allows 30 submissions per day per IP/user
+export const freeChallengesLimiter = new Ratelimit({
+  redis,
+  limiter: Ratelimit.fixedWindow(30, '1 d'),
+  analytics: true,
+  prefix: '@upstash/ratelimit/free-challenges',
 })

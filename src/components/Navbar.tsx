@@ -19,6 +19,7 @@ import { Button } from "./ui/button";
 import { api } from "@/trpc/react";
 
 function RateLimitInfo() {
+  const { user } = useUser();
   const rateLimitQuery = api.challenges.getRateLimitInfo.useQuery(undefined, {
     refetchInterval: 1000 * 60, // Refresh every minute
   });
@@ -40,24 +41,28 @@ function RateLimitInfo() {
   });
 
   return (
-    <>
-      <p>
-        <span
-          className={cn(
-            "font-medium",
-            remaining === 0 ? "text-destructive" : "text-primary",
-          )}
-        >
-          {remaining}
-        </span>
-        <span className="text-muted-foreground">/{limit} submissions</span>
-      </p>
-      {remaining < limit && (
-        <p className="text-xs text-muted-foreground">
-          Resets at {formattedTime}
+    <div className="space-y-2 p-2 rounded-md bg-secondary/30">
+      {user && (
+        <p className="text-xs italic text-muted-foreground">
+          Free challenges do not use your credits
         </p>
       )}
-    </>
+      <div className="flex items-center justify-between">
+        <span className="text-sm font-medium">Submissions:&nbsp;</span>
+        <span className={cn(
+          "font-bold",
+          remaining === 0 ? "text-destructive" : "text-primary"
+        )}>
+          {remaining}/{limit}
+        </span>
+      </div>
+      {remaining < limit && (
+        <p className="text-xs text-muted-foreground flex items-center justify-end">
+          <span className="mr-1">Resets at</span>
+          <span className="font-medium">{formattedTime}</span>
+        </p>
+      )}
+    </div>
   );
 }
 

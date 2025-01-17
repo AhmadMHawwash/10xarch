@@ -1,5 +1,5 @@
 import challenges from "@/content/challenges";
-import { anonymousCreditsLimiter } from "@/lib/rate-limit";
+import { freeChallengesLimiter } from "@/lib/rate-limit";
 import { createTRPCRouter, publicProcedure, t } from "@/server/api/trpc";
 import { credits } from "@/server/db/schema";
 import { auth } from "@clerk/nextjs/server";
@@ -20,12 +20,14 @@ export const challengesRouter = createTRPCRouter({
   getRateLimitInfo: publicProcedure.query(async ({ ctx }) => {
     const { userId } = await auth();
     const identifier = userId ?? ctx.headers.get("x-forwarded-for") ?? "127.0.0.1";
-    const { success, remaining, reset } = await anonymousCreditsLimiter.limit(identifier);
+    
+    // Use peek() to check rate limit info without consuming a submission
+    const { remaining, reset } = await freeChallengesLimiter.getRemaining(identifier);
     
     return {
       remaining,
       reset,
-      limit: 40, // Daily submission limit
+      limit: 15, // Daily submission limit
     };
   }),
 
@@ -49,7 +51,7 @@ export const challengesRouter = createTRPCRouter({
         // Get client IP or user ID for rate limiting
         const identifier = userId ?? ctx.headers.get("x-forwarded-for") ?? "127.0.0.1";
 
-        const response = await anonymousCreditsLimiter.limit(identifier);
+        const response = await freeChallengesLimiter.limit(identifier);
 
         if (!response.success) {
           const resetDate = new Date(response.reset);
@@ -84,7 +86,7 @@ export const challengesRouter = createTRPCRouter({
         });
       }
 
-      // Check and deduct credits for paid challenges
+      // Only check and deduct credits for paid challenges
       const userCredits = await ctx.db.query.credits.findFirst({
         where: eq(credits.userId, userId),
       });
@@ -96,7 +98,7 @@ export const challengesRouter = createTRPCRouter({
         });
       }
 
-      // Deduct 1 credit for submission
+      // Deduct 1 credit for paid challenge submission
       await ctx.db
         .update(credits)
         .set({ balance: userCredits.balance - 1 })

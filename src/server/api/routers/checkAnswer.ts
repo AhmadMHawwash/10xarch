@@ -111,14 +111,12 @@ export const checkSolution = createTRPCRouter({
           presence_penalty: 0,
         });
 
-        console.log(response.choices[0]?.message.content);
-
         const content =
           response.choices[0]?.message.content ?? "No response generated";
 
         // Parse the content as JSON with type checking
         try {
-          if (userId) {
+          if (userId && input.bypassInternalToken !== process.env.BYPASS_TOKEN) {
             const inputTokens = calculateTextTokens(JSON.stringify(messages));
             const outputTokens = calculateTextTokens(content);
 
@@ -170,7 +168,8 @@ export const checkSolution = createTRPCRouter({
       const estimatedOutputTokens = 512; // max_tokens from the API call
 
       // Calculate required credits
-      const inputCost = (inputTokens / 1000) * GPT_TOKEN_COSTS["gpt-4o-mini"].input;
+      const inputCost =
+        (inputTokens / 1000) * GPT_TOKEN_COSTS["gpt-4o-mini"].input;
       const outputCost =
         (estimatedOutputTokens / 1000) * GPT_TOKEN_COSTS["gpt-4o-mini"].output;
       const totalCredits = costToCredits(inputCost + outputCost);

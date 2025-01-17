@@ -7,9 +7,10 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { TRPCReactProvider } from "@/trpc/react";
 import { dark } from "@clerk/themes";
-import { FeedbackButton } from "@/components/floating-button";
 import { ClerkProvider } from "@clerk/nextjs";
 import { GeistSans } from "geist/font/sans";
+import { Analytics } from "@vercel/analytics/react";
+import { Hotjar } from "@/components/Hotjar";
 
 export const metadata = {
   title: "Archround",
@@ -42,6 +43,7 @@ export default async function RootLayout({
         <link rel="manifest" href="/site.webmanifest" />
       </head>
       <body className="bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100">
+        <Hotjar />
         <ClerkProvider
           appearance={{
             baseTheme: dark,
@@ -53,10 +55,10 @@ export default async function RootLayout({
           <TRPCReactProvider>
             <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
               <TooltipProvider>
+                <Analytics />
                 <Toaster />
                 <Navbar />
                 <main className="h-[93vh]">{children}</main>
-                <FeedbackButton />
               </TooltipProvider>
             </ThemeProvider>
           </TRPCReactProvider>

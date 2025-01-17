@@ -3,7 +3,7 @@
 import { buttonVariants } from "@/components/ui/button";
 import { MessageCircle } from "lucide-react";
 
-export function FloatingButton() {
+export function FeedbackButton() {
   return (
     <a
       href="https://archround.userjot.com/"

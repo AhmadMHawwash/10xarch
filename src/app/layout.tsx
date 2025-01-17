@@ -1,17 +1,15 @@
 import "@/styles/globals.css";
 import "reactflow/dist/style.css";
 
-import Navbar from "@/components/Navbar"; 
-import { ThemeProvider } from "@/components/ThemeProvider"; 
+import Navbar from "@/components/Navbar";
+import { ThemeProvider } from "@/components/ThemeProvider";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { TRPCReactProvider } from "@/trpc/react";
 import { dark } from "@clerk/themes";
-
+import { FeedbackButton } from "@/components/floating-button";
 import { ClerkProvider } from "@clerk/nextjs";
 import { GeistSans } from "geist/font/sans";
-import { Hotjar } from "@/components/Hotjar";
-import { FloatingButton } from "@/components/floating-button";
 
 export const metadata = {
   title: "Archround",
@@ -44,7 +42,6 @@ export default async function RootLayout({
         <link rel="manifest" href="/site.webmanifest" />
       </head>
       <body className="bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100">
-        <Hotjar />
         <ClerkProvider
           appearance={{
             baseTheme: dark,
@@ -59,7 +56,7 @@ export default async function RootLayout({
                 <Toaster />
                 <Navbar />
                 <main className="h-[93vh]">{children}</main>
-                <FloatingButton />
+                <FeedbackButton />
               </TooltipProvider>
             </ThemeProvider>
           </TRPCReactProvider>

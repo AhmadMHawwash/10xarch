@@ -53,7 +53,10 @@ export function CreditManagement() {
 
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
-    setSessionId(searchParams.get("session_id"));
+    const sid = searchParams.get("session_id");
+    if (sid) {
+      setSessionId(sid);
+    }
   }, []);
 
   const {
@@ -61,36 +64,35 @@ export function CreditManagement() {
     refetch: refetchCredits,
     isLoading: isLoadingCredits,
   } = useCredits();
-  const { data: session, isSuccess } = api.stripe.verifySession.useQuery(
-    {
-      sessionId: sessionId ?? "",
-    },
-    {
-      enabled: !!sessionId,
-    },
-  );
 
-  useEffect(() => {
-    if (isSuccess) {
-      if (session?.success) {
+  const verifySessionMutation = api.stripe.verifySession.useMutation({
+    onSuccess: (data) => {
+      if (data.success) {
         toast({
           title: "Payment Successful",
-          description: `Added ${session.totalTokens.toLocaleString()} tokens to your account!`,
+          description: `Added ${data.totalTokens.toLocaleString()} tokens to your account!`,
         });
-      } else {
-        toast({
-          title: "Payment Issue",
-          description:
-            session?.message ??
-            "There was an issue adding tokens to your account. Please contact support.",
-          variant: "destructive",
-        });
+        void refetchCredits();
       }
-      void refetchCredits();
       // Clear the session_id from URL
       window.history.replaceState({}, "", window.location.pathname);
+    },
+    onError: (error) => {
+      toast({
+        title: "Payment Issue",
+        description: error.message,
+        variant: "destructive",
+      });
+      // Clear the session_id from URL
+      window.history.replaceState({}, "", window.location.pathname);
+    },
+  });
+
+  useEffect(() => {
+    if (sessionId) {
+      void verifySessionMutation.mutate({ sessionId });
     }
-  }, [isSuccess, session, toast, refetchCredits]);
+  }, [sessionId]);
 
   const addCreditsMutation = api.stripe.createCheckoutSession.useMutation();
 

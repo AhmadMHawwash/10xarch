@@ -87,6 +87,7 @@ export const creditTransactions = createTable("credit_transactions", {
   description: text("description"),
   status: text("status", { enum: ["pending", "completed", "failed"] }).notNull(),
   paymentId: text("payment_id"),
+  stripeSessionId: text("stripe_session_id").unique(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

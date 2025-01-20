@@ -1,7 +1,4 @@
-import {
-  calculatePurchaseTokens,
-  isValidAmount
-} from "@/lib/tokens";
+import { calculatePurchaseTokens, isValidAmount } from "@/lib/tokens";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { creditTransactions, users } from "@/server/db/schema";
 import { auth } from "@clerk/nextjs/server";
@@ -31,8 +28,6 @@ export const stripeRouter = createTRPCRouter({
         throw new Error("Invalid amount");
       }
 
-      const { totalTokens, baseTokens, bonusTokens } =
-        calculatePurchaseTokens(amount);
       const { userId } = await auth();
 
       if (!userId) {
@@ -46,6 +41,9 @@ export const stripeRouter = createTRPCRouter({
       if (!user) {
         throw new Error("User not found");
       }
+
+      const { totalTokens, baseTokens, bonusTokens } =
+        calculatePurchaseTokens(amount);
 
       try {
         const session = await stripe.checkout.sessions.create({
@@ -84,7 +82,7 @@ export const stripeRouter = createTRPCRouter({
 
   verifySession: protectedProcedure
     .input(z.object({ sessionId: z.string() }))
-    .query(async ({ ctx, input }) => {
+    .mutation(async ({ ctx, input }) => {
       const session = await stripe.checkout.sessions.retrieve(input.sessionId);
 
       if (!session) {
@@ -113,26 +111,54 @@ export const stripeRouter = createTRPCRouter({
         throw new Error("Invalid user");
       }
 
-      // Verify that the transaction exists in our database
-      const transaction = await ctx.db.query.creditTransactions.findFirst({
-        where: eq(creditTransactions.userId, userId),
-        orderBy: (creditTransactions, { desc }) => [
-          desc(creditTransactions.createdAt),
-        ],
+      // Check if we've already processed this session
+      const existingTransaction = await ctx.db.query.creditTransactions.findFirst({
+        where: eq(creditTransactions.stripeSessionId, session.id),
       });
 
-      if (!transaction || transaction.type !== "purchase") {
+      if (existingTransaction) {
         return {
-          success: false,
-          message:
-            "Transaction not found. Please contact support if this issue persists.",
-          totalTokens: 0,
+          success: true,
+          totalTokens: parseInt(session.metadata?.totalTokens ?? "0"),
         };
       }
 
+      const totalTokens = parseInt(session.metadata?.totalTokens ?? "0");
+      const baseTokens = parseInt(session.metadata?.baseTokens ?? "0");
+      const bonusTokens = parseInt(session.metadata?.bonusTokens ?? "0");
+
+      // Add credits to user's account
+      await ctx.db.transaction(async (tx) => {
+        // Record the transaction
+        await tx.insert(creditTransactions).values({
+          userId,
+          amount: totalTokens,
+          type: "purchase",
+          description: `Purchased ${baseTokens.toLocaleString()} tokens + ${bonusTokens.toLocaleString()} bonus tokens`,
+          status: "completed",
+          stripeSessionId: session.id, // Add this to prevent double-processing
+        });
+
+        // Get current credits
+        const currentCredits = await tx
+          .select({ value: users.credits })
+          .from(users)
+          .where(eq(users.id, userId))
+          .limit(1)
+          .then((result) => result[0]?.value ?? 0);
+
+        // Update user's credit balance
+        await tx
+          .update(users)
+          .set({
+            credits: currentCredits + totalTokens,
+          })
+          .where(eq(users.id, userId));
+      });
+
       return {
         success: true,
-        totalTokens: parseInt(session.metadata?.totalTokens ?? "0"),
+        totalTokens,
       };
     }),
 });

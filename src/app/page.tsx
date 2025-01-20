@@ -1,4 +1,11 @@
-import { ArrowRight, BookOpen, Code, CreditCard, IterationCcw, Layers } from "lucide-react";
+import {
+  ArrowRight,
+  BookOpen,
+  Code,
+  CreditCard,
+  IterationCcw,
+  Layers,
+} from "lucide-react";
 import Link from "next/link";
 
 export default async function Home() {
@@ -18,15 +25,15 @@ export default async function Home() {
           {/* Decorative elements */}
           <div className="absolute -right-20 -top-20 h-40 w-40 rounded-full bg-blue-100 opacity-50 blur-3xl dark:bg-blue-800"></div>
           <div className="absolute -bottom-20 -left-20 h-40 w-40 rounded-full bg-purple-100 opacity-50 blur-3xl dark:bg-purple-800"></div>
-          
+
           <div className="relative">
             <h2 className="mb-4 flex items-center text-3xl font-bold text-gray-900 dark:text-white">
-              <Code className="mr-3 h-8 w-8 text-blue-600 dark:text-blue-400" /> 
+              <Code className="mr-3 h-8 w-8 text-blue-600 dark:text-blue-400" />
               Challenges
             </h2>
             <p className="mb-6 text-lg text-gray-600 dark:text-gray-300">
-              Progress through structured system design challenges, from beginner
-              to advanced levels.
+              Progress through structured system design challenges, from
+              beginner to advanced levels.
             </p>
             <Link
               href="/challenges"
@@ -42,10 +49,10 @@ export default async function Home() {
           {/* Decorative elements */}
           <div className="absolute -right-20 -top-20 h-40 w-40 rounded-full bg-blue-100 opacity-50 blur-3xl dark:bg-blue-800"></div>
           <div className="absolute -bottom-20 -left-20 h-40 w-40 rounded-full bg-purple-100 opacity-50 blur-3xl dark:bg-purple-800"></div>
-          
+
           <div className="relative">
             <h2 className="mb-4 flex items-center text-3xl font-bold text-gray-900 dark:text-white">
-              <Layers className="mr-3 h-8 w-8 text-blue-600 dark:text-blue-400" /> 
+              <Layers className="mr-3 h-8 w-8 text-blue-600 dark:text-blue-400" />
               Playground
             </h2>
             <p className="mb-6 text-lg text-gray-600 dark:text-gray-300">
@@ -105,17 +112,17 @@ export default async function Home() {
           <p className="mb-8 text-xl text-gray-600 dark:text-gray-400">
             No subscriptions, no commitments. Pay only for what you use.
           </p>
-          
+
           <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 p-8 shadow-lg dark:from-gray-800 dark:to-blue-900">
             {/* Decorative elements */}
             <div className="absolute -right-20 -top-20 h-40 w-40 rounded-full bg-blue-100 opacity-50 blur-3xl dark:bg-blue-800"></div>
             <div className="absolute -bottom-20 -left-20 h-40 w-40 rounded-full bg-purple-100 opacity-50 blur-3xl dark:bg-purple-800"></div>
-            
+
             <div className="relative">
               <h3 className="mb-6 text-3xl font-bold text-gray-900 dark:text-white">
                 Pay As You Go
               </h3>
-              
+
               <div className="mb-8 grid gap-6 text-left md:grid-cols-2">
                 <div className="space-y-4">
                   <div className="flex items-start space-x-3">
@@ -123,7 +130,9 @@ export default async function Home() {
                       <CreditCard className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                     </div>
                     <div>
-                      <h4 className="font-semibold text-gray-900 dark:text-white">No Monthly Fees</h4>
+                      <h4 className="font-semibold text-gray-900 dark:text-white">
+                        No Monthly Fees
+                      </h4>
                       <p className="text-sm text-gray-600 dark:text-gray-400">
                         Zero subscriptions or recurring charges
                       </p>
@@ -134,21 +143,25 @@ export default async function Home() {
                       <Layers className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                     </div>
                     <div>
-                      <h4 className="font-semibold text-gray-900 dark:text-white">Flexible Pricing</h4>
+                      <h4 className="font-semibold text-gray-900 dark:text-white">
+                        Flexible Pricing
+                      </h4>
                       <p className="text-sm text-gray-600 dark:text-gray-400">
                         Start with just $5 worth of credits
                       </p>
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="space-y-4">
                   <div className="flex items-start space-x-3">
                     <div className="rounded-full bg-indigo-100 p-1 dark:bg-indigo-900">
                       <IterationCcw className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
                     </div>
                     <div>
-                      <h4 className="font-semibold text-gray-900 dark:text-white">Credits Never Expire</h4>
+                      <h4 className="font-semibold text-gray-900 dark:text-white">
+                        Credits Never Expire
+                      </h4>
                       <p className="text-sm text-gray-600 dark:text-gray-400">
                         Use your credits anytime you want
                       </p>
@@ -159,7 +172,9 @@ export default async function Home() {
                       <Code className="h-5 w-5 text-green-600 dark:text-green-400" />
                     </div>
                     <div>
-                      <h4 className="font-semibold text-gray-900 dark:text-white">Pay Per Use</h4>
+                      <h4 className="font-semibold text-gray-900 dark:text-white">
+                        Pay Per Use
+                      </h4>
                       <p className="text-sm text-gray-600 dark:text-gray-400">
                         Only pay for the tokens you consume
                       </p>
@@ -167,7 +182,7 @@ export default async function Home() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="flex justify-center">
                 <Link
                   href="/credits"
@@ -182,13 +197,12 @@ export default async function Home() {
         </div>
       </section>
 
-      
       {/* Footer Section */}
       <footer className="mt-16 border-t border-gray-200 py-8 text-center dark:border-gray-700">
         <p className="mb-4 text-gray-600 dark:text-gray-400">
           {new Date().getFullYear()} Archround. All rights reserved.
         </p>
-        <div className="flex items-center justify-center space-x-4">
+        {/* <div className="flex items-center justify-center space-x-4">
           <Link
             href="/about"
             className="text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
@@ -207,7 +221,7 @@ export default async function Home() {
           >
             Privacy
           </Link>
-        </div>
+        </div> */}
       </footer>
     </div>
   );

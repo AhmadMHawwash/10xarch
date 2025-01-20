@@ -1,6 +1,6 @@
 // Constants for credit purchase
 export const TOKENS_PER_DOLLAR = 200; // Base tokens per dollar
-export const MIN_AMOUNT = 5;
+export const MIN_AMOUNT = 1;
 export const MAX_AMOUNT = 100;
 
 export const BONUS_TIERS = [

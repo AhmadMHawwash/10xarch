@@ -1,274 +1,260 @@
 import { type Challenge } from "./types";
 
-const challenge: Challenge = {
-  slug: "real-time-chat-application",
-  title: "Real-Time Chat",
-  description:
-    "Design a chat application that allows users to send and receive messages in real-time.",
-  difficulty: "Easy",
-  isFree: true, // This is a free challenge
+const chatChallenge: Challenge = {
+  slug: "real-time-chat-app",
+  title: "Real-Time Chat Application Design",
+  description: "Design a scalable chat application supporting real-time messaging with progressive complexity",
+  difficulty: "Medium",
+  isFree: true,
   stages: [
-    // Stage 1
     {
-      problem: "Users want to send and receive messages in real-time.",
+      problem: "Users need basic real-time text communication",
       requirements: [
-        "Build a chat application that allows users to send and receive messages in real-time.",
+        "Instant message delivery between users",
+        "Support 10k concurrent connections",
+        "Text-only messages (max 280 chars)",
+        "No persistence required"
       ],
       metaRequirements: [
-        "The application allows users to send and receive messages in real-time.",
+        "Instant message delivery between users",
+        "Support 10k concurrent connections",
+        "Text-only messages (max 280 chars)",
+        "No persistence required"
       ],
       hintsPerArea: {
         requirements: {
-          functional: [
-            "Allow users to send messages.",
-            "Allow users to receive messages in real-time.",
-          ],
-          nonFunctional: [
-            "Ensure low latency in message delivery.",
-            "Support a small number of concurrent users (e.g., 100 users).",
-          ],
+          functional: ["WebSocket connections", "Message broadcasting"],
+          nonFunctional: ["Low latency (<100ms)", "Connection management"]
         },
         systemAPI: [
-          "Design an API that supports real-time messaging.",
-          "Consider using WebSocket protocols.",
+          "POST /send-message {text, sender}",
+          "WS /listen-messages"
         ],
         capacityEstimations: {
-          traffic: [
-            "Estimate messages per second (e.g., 10 messages per second).",
-          ],
-          storage: ["No message storage needed at this stage."],
-          memory: ["Estimate memory required for handling active connections."],
-          bandwidth: [
-            "Calculate bandwidth per user for sending and receiving messages.",
-          ],
+          traffic: ["10k users sending 1 msg/10s = 1k msg/s"],
+          storage: ["No persistent storage needed"],
+          memory: ["In-memory message queues"],
+          bandwidth: ["280 chars * 1k msg/s = ~280KB/s"]
         },
         highLevelDesign: [
-          "Use a client-server model.",
-          "Implement real-time communication using WebSockets.",
-        ],
+          "WebSocket server cluster",
+          "Pub/Sub architecture",
+          "Load balancer for connections"
+        ]
       },
       criteria: [
-        "Users can send messages.",
-        "Users can receive messages in real-time.",
-        "The system handles the estimated load.",
+        "Real-time delivery demonstrated",
+        "Handles 10k concurrent connections",
+        "No message persistence"
       ],
-      learningsInMD: `### Key Learnings
-  
-  - Understanding client-server architecture.
-  - Implementing real-time communication using WebSockets.
-  - Basics of capacity estimation for network applications.`,
+      learningsInMD: `
+- WebSocket protocol fundamentals
+- Pub/Sub pattern implementation
+- Connection pooling strategies
+- Basic load balancing concepts`
     },
-    // Stage 2
     {
-      problem:
-        "Users want to have unique identities and only authorized users should access the system.",
+      problem: "Unauthorized access to chat features",
       requirements: [
-        "Implement user authentication to ensure that only registered users can send and receive messages.",
+        "Add JWT-based authentication",
+        "Associate messages with user IDs",
+        "Maintain <200ms latency",
+        "Support 100k user accounts"
       ],
       metaRequirements: [
-        "The application allows users to send and receive messages in real-time.",
-        "Users must authenticate before accessing the chat functionality.",
+        "Authenticated message delivery",
+        "Support 100k user accounts",
+        "Text-only messages (max 280 chars)",
+        "<200ms end-to-end latency",
+        "JWT-based authentication"
       ],
       hintsPerArea: {
         requirements: {
-          functional: [
-            "Provide user registration and login features.",
-            "Authenticate users before allowing access to messaging.",
-          ],
-          nonFunctional: [
-            "Securely store user credentials.",
-            "Ensure the authentication system can scale with the number of users.",
-          ],
+          functional: ["Auth service separation", "Token validation"],
+          nonFunctional: ["Security compliance", "Session management"]
         },
         systemAPI: [
-          "Design APIs for user registration and authentication.",
-          "Consider token-based authentication mechanisms.",
+          "POST /login {username, password}",
+          "Auth middleware for WebSocket upgrade"
         ],
         capacityEstimations: {
-          traffic: [
-            "Estimate the number of authentication requests per second.",
-          ],
-          storage: [
-            "Estimate storage needed for user credentials (e.g., 1,000 users).",
-          ],
-          memory: ["Consider memory impact of maintaining user sessions."],
-          bandwidth: ["Include bandwidth for authentication data."],
+          traffic: ["Add 10% auth-related requests"],
+          storage: ["User credentials database"],
+          memory: ["Token blacklist caching"],
+          bandwidth: ["Add JWT header overhead"]
         },
         highLevelDesign: [
-          "Implement secure password storage using hashing algorithms.",
-          "Use session tokens or JWT for maintaining user sessions.",
-        ],
+          "Stateless auth service",
+          "Redis session cache",
+          "HTTPS encryption"
+        ]
       },
       criteria: [
-        "Users can register and log in.",
-        "Only authenticated users can send and receive messages.",
-        "User credentials are stored securely.",
+        "All messages require valid JWT",
+        "User context in messages",
+        "Latency under 200ms"
       ],
-      learningsInMD: `### Key Learnings
-  
-  - Implementing user authentication and authorization.
-  - Securely storing user credentials.
-  - Integrating authentication into existing systems.`,
+      learningsInMD: `
+- Token-based authentication flows
+- Security best practices
+- Stateless vs stateful services
+- Session caching patterns`
     },
-    // Stage 3
     {
-      problem:
-        "Users want to create and join chat rooms to communicate with groups.",
+      problem: "Users want organized group conversations",
       requirements: [
-        "Implement chat rooms where multiple users can join and chat together.",
+        "Create/join chat rooms",
+        "Room-specific messaging",
+        "List active rooms",
+        "Support 1k rooms concurrently"
       ],
       metaRequirements: [
-        "The application allows users to send and receive messages in real-time.",
-        "Users must authenticate before accessing the chat functionality.",
-        "Users can create, join, and leave chat rooms.",
+        "Authenticated message delivery",
+        "Support 100k user accounts",
+        "Text-only messages (max 280 chars)",
+        "<200ms end-to-end latency",
+        "Room-based communication",
+        "1k concurrent active rooms"
       ],
       hintsPerArea: {
         requirements: {
-          functional: [
-            "Allow users to create new chat rooms.",
-            "Enable users to join existing chat rooms.",
-            "Support multiple users in a single chat room.",
-          ],
-          nonFunctional: [
-            "Ensure real-time message delivery within chat rooms.",
-            "Manage chat room scalability for up to 50 concurrent users per room.",
-          ],
+          functional: ["Room management API", "Namespace separation"],
+          nonFunctional: ["Group messaging efficiency", "Discovery features"]
         },
         systemAPI: [
-          "Design APIs for creating, joining, and leaving chat rooms.",
-          "Consider how to route messages to the correct chat room.",
+          "POST /rooms {name, creator}",
+          "WS /rooms/{id}/listen"
         ],
         capacityEstimations: {
-          traffic: ["Estimate the number of chat rooms and messages per room."],
-          storage: ["Still minimal storage as messages are not persisted."],
-          memory: ["Account for memory usage per chat room."],
-          bandwidth: ["Calculate bandwidth for multiple users in chat rooms."],
+          traffic: ["10 messages/sec per room average"],
+          storage: ["Room metadata storage"],
+          memory: ["Room state management"],
+          bandwidth: ["Multiply by active rooms"]
         },
         highLevelDesign: [
-          "Use room identifiers to manage message broadcasting.",
-          "Consider data structures for managing chat rooms and user memberships.",
-        ],
+          "Topic-based pub/sub",
+          "Room metadata service",
+          "Distributed state management"
+        ]
       },
       criteria: [
-        "Users can create chat rooms.",
-        "Users can join and leave chat rooms.",
-        "Messages are delivered in real-time within chat rooms.",
+        "Room creation/joining implemented",
+        "Messages scoped to rooms",
+        "Active room listing"
       ],
-      learningsInMD: `### Key Learnings
-  
-  - Designing systems to handle group communication.
-  - Managing state for multiple chat rooms and user memberships.
-  - Routing messages to specific groups of users.`,
+      learningsInMD: `
+- Namespace management in pub/sub
+- Group communication patterns
+- Distributed state synchronization
+- Service discovery mechanisms`
     },
-    // Stage 4
     {
-      problem:
-        "Users want their messages to be saved so they can view past conversations.",
+      problem: "Users request message history access",
       requirements: [
-        "Implement message persistence so that messages are stored and can be retrieved later.",
+        "Store messages for 30 days",
+        "Message retrieval API",
+        "Search within chat history",
+        "Handle 1TB message storage"
       ],
       metaRequirements: [
-        "The application allows users to send and receive messages in real-time.",
-        "Users must authenticate before accessing the chat functionality.",
-        "Users can create, join, and leave chat rooms.",
-        "Messages are stored persistently and can be retrieved later.",
+        "Authenticated message delivery",
+        "30-day message persistence",
+        "Text message search",
+        "1TB storage capacity",
+        "Room-based communication"
       ],
       hintsPerArea: {
         requirements: {
-          functional: [
-            "Store messages in a database.",
-            "Retrieve and display past messages when a user joins a chat room.",
-          ],
-          nonFunctional: [
-            "Ensure message retrieval is fast.",
-            "Handle increasing data volume efficiently.",
-          ],
+          functional: ["Message archiving", "Historical queries"],
+          nonFunctional: ["Storage optimization", "Search performance"]
         },
         systemAPI: [
-          "Update APIs to include message retrieval.",
-          "Consider pagination or limits on message history retrieval.",
+          "GET /messages?room=X&search=Y",
+          "Message archival scheduler"
         ],
         capacityEstimations: {
-          traffic: ["Estimate read and write operations per second."],
-          storage: [
-            "Estimate storage needs based on message volume over time.",
-          ],
-          memory: ["Consider caching recent messages in memory."],
-          bandwidth: ["Include bandwidth for message history retrieval."],
+          traffic: ["Add 20% read requests"],
+          storage: ["1TB = 1B msgs * 1KB each"],
+          memory: ["Cache frequent queries"],
+          bandwidth: ["History download traffic"]
         },
         highLevelDesign: [
-          "Choose an appropriate database (SQL vs. NoSQL).",
-          "Design data models for storing messages.",
-        ],
+          "Time-series database",
+          "Message archive service",
+          "Cache-aside pattern"
+        ]
       },
       criteria: [
-        "Messages are stored in a database.",
-        "Users can retrieve past messages when joining a chat room.",
-        "Message retrieval performance meets user expectations.",
+        "Message persistence implemented",
+        "Searchable history",
+        "Storage scaling plan"
       ],
-      learningsInMD: `### Key Learnings
-  
-  - Implementing data persistence in applications.
-  - Choosing appropriate databases for storing message data.
-  - Designing efficient data retrieval mechanisms.`,
+      learningsInMD: `
+- Database sharding techniques
+- Time-series data management
+- Cache-aside pattern
+- Search index optimization`
     },
-    // Stage 5
     {
-      problem:
-        "The application needs to handle increased load as the user base grows.",
+      problem: "Need content moderation capabilities",
       requirements: [
-        "Design the system to be scalable to support up to 10,000 concurrent users.",
+        "Real-time profanity filtering",
+        "Message reporting system",
+        "Moderator dashboard",
+        "<50ms filtering overhead"
       ],
       metaRequirements: [
-        "The application allows users to send and receive messages in real-time.",
-        "Users must authenticate before accessing the chat functionality.",
-        "Users can create, join, and leave chat rooms.",
-        "Messages are stored persistently and can be retrieved later.",
-        "The system supports up to 10,000 concurrent users.",
+        "Authenticated message delivery",
+        "Real-time content filtering",
+        "User reporting system",
+        "Moderation dashboard",
+        "30-day message persistence"
       ],
       hintsPerArea: {
         requirements: {
-          functional: [
-            "Maintain all existing functionalities under increased load.",
-          ],
-          nonFunctional: [
-            "Ensure system scalability and high availability.",
-            "Optimize for performance under heavy traffic.",
-          ],
+          functional: ["Message pipeline processing", "Moderator workflows"],
+          nonFunctional: ["Low-latency filtering", "Audit logging"]
         },
         systemAPI: [
-          "APIs should handle increased traffic efficiently.",
-          "Consider rate limiting or throttling mechanisms.",
+          "POST /report {messageId}",
+          "Moderator ban endpoint"
         ],
         capacityEstimations: {
-          traffic: ["Re-estimate message throughput for 10,000 users."],
-          storage: ["Plan for increased data storage needs."],
-          memory: ["Assess memory requirements for more connections."],
-          bandwidth: ["Calculate total bandwidth required for 10,000 users."],
+          traffic: ["Add 5% moderation-related"],
+          storage: ["Audit logs storage"],
+          memory: ["Filter pattern caching"],
+          bandwidth: ["Filtering service overhead"]
         },
         highLevelDesign: [
-          "Implement load balancing across multiple servers.",
-          "Consider stateless server design or session management strategies.",
-          "Use caching to reduce database load.",
-        ],
+          "Message processing pipeline",
+          "Bloom filter for banned words",
+          "Moderation event queue"
+        ]
       },
       criteria: [
-        "The system can handle 10,000 concurrent users.",
-        "Performance remains acceptable under increased load.",
-        "System components scale horizontally as needed.",
+        "Real-time content filtering",
+        "User reporting system",
+        "Moderation interface"
       ],
-      learningsInMD: `### Key Learnings
-  
-  - Designing systems for scalability.
-  - Implementing load balancing and horizontal scaling.
-  - Optimizing system performance under heavy load.`,
-    },
+      learningsInMD: `
+- Real-time stream processing
+- Pattern matching algorithms
+- Privilege separation
+- Audit logging best practices`
+    }
   ],
   generalLearnings: [
-    "Understanding the fundamentals of designing a scalable, real-time chat application.",
-    "Applying system design principles to handle authentication, data persistence, and scalability.",
-    "Learning how to incrementally add features while considering performance and user experience.",
-  ],
+    "WebSocket connection lifecycle management",
+    "Horizontal scaling strategies for real-time systems",
+    "Database sharding and replication patterns",
+    "Security tradeoffs in distributed systems",
+    "Event-driven architecture design",
+    "Content delivery network integration",
+    "Load testing and capacity planning",
+    "Graceful degradation strategies",
+    "Monitoring and observability in real-time systems",
+    "CI/CD pipelines for high-availability services"
+  ]
 };
 
-export default challenge;
+export default chatChallenge;

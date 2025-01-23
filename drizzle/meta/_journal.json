@@ -15,6 +15,13 @@
       "when": 1737352939641,
       "tag": "0001_dry_zemo",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1737612299792,
+      "tag": "0002_last_slapstick",
+      "breakpoints": true
     }
   ]
 }

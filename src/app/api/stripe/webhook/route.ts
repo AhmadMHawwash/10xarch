@@ -1,5 +1,5 @@
 import { db } from "@/server/db";
-import { creditTransactions, users } from "@/server/db/schema";
+import { creditTransactions, credits, users } from "@/server/db/schema";
 import { eq } from "drizzle-orm";
 import { buffer } from "node:stream/consumers";
 import Stripe from "stripe";
@@ -76,28 +76,33 @@ export async function POST(req: Request) {
           type: "purchase",
           description: `Purchased ${baseTokens.toLocaleString()} tokens + ${bonusTokens.toLocaleString()} bonus tokens`,
           status: "completed",
+          stripeSessionId: session.id,
         });
         console.log(" Transaction recorded:", txResult);
 
         // Get current credits
-        const currentCredits = await tx
-          .select({ value: users.credits })
-          .from(users)
-          .where(eq(users.id, userId))
-          .limit(1)
-          .then((result) => result[0]?.value ?? 0);
-        
-        console.log(` Current credits: ${currentCredits}`);
+        const userCredits = await tx.query.credits.findFirst({
+          where: eq(credits.userId, userId),
+        });
 
-        // Update user's credit balance
-        const updateResult = await tx
-          .update(users)
-          .set({
-            credits: currentCredits + totalTokens,
-          })
-          .where(eq(users.id, userId));
-        
-        console.log(" Credits updated:", updateResult);
+        // Should never happen, because users have free credits on signup
+        if (!userCredits) {
+          // Create initial credits record if it doesn't exist
+          await tx.insert(credits).values({
+            userId,
+            balance: totalTokens,
+          });
+          console.log(` Created new credits record with ${totalTokens} tokens`);
+        } else {
+          // Update existing credit balance
+          const updateResult = await tx
+            .update(credits)
+            .set({
+              balance: userCredits.balance + totalTokens,
+            })
+            .where(eq(credits.userId, userId));
+          console.log(` Updated credits from ${userCredits.balance} to ${userCredits.balance + totalTokens}`);
+        }
       });
 
       console.log(` Successfully processed ${totalTokens} tokens for user ${userId}`);

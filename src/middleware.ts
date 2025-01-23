@@ -6,7 +6,7 @@ import {
 import { NextResponse } from "next/server";
 
 const isProtectedFromSignupsRoute = createRouteMatcher(["/sign-up(.*)"]);
-const isProtectedFromSigninsRoute = createRouteMatcher([]);
+const isProtectedFromSigninsRoute = createRouteMatcher(["/credits(.*)"]);
 
 const MAX_USERS_COUNT = 50;
 export default clerkMiddleware(async (auth, req) => {

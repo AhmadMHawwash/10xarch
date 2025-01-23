@@ -1,0 +1,1 @@
+ALTER TABLE "sdp_users" DROP COLUMN IF EXISTS "credits";

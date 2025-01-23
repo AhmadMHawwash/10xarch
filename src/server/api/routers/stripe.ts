@@ -1,6 +1,6 @@
 import { calculatePurchaseTokens, isValidAmount } from "@/lib/tokens";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
-import { creditTransactions, users } from "@/server/db/schema";
+import { creditTransactions, credits, users } from "@/server/db/schema";
 import { auth } from "@clerk/nextjs/server";
 import { eq } from "drizzle-orm";
 import Stripe from "stripe";
@@ -140,20 +140,26 @@ export const stripeRouter = createTRPCRouter({
         });
 
         // Get current credits
-        const currentCredits = await tx
-          .select({ value: users.credits })
-          .from(users)
-          .where(eq(users.id, userId))
-          .limit(1)
-          .then((result) => result[0]?.value ?? 0);
+        const userCredits = await tx.query.credits.findFirst({
+          where: eq(credits.userId, userId),
+        });
 
-        // Update user's credit balance
-        await tx
-          .update(users)
-          .set({
-            credits: currentCredits + totalTokens,
-          })
-          .where(eq(users.id, userId));
+        // Should never happen, because users have free credits on signup
+        if (!userCredits) {
+          // Create initial credits record if it doesn't exist
+          await tx.insert(credits).values({
+            userId,
+            balance: totalTokens,
+          });
+        } else {
+          // Update existing credit balance
+          await tx
+            .update(credits)
+            .set({
+              balance: userCredits.balance + totalTokens,
+            })
+            .where(eq(credits.userId, userId));
+        }
       });
 
       return {

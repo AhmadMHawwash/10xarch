@@ -1,3 +1,4 @@
+import { Footer } from "@/components/Footer";
 import {
   ArrowRight,
   BookOpen,
@@ -196,33 +197,7 @@ export default async function Home() {
           </div>
         </div>
       </section>
-
-      {/* Footer Section */}
-      <footer className="mt-16 border-t border-gray-200 py-8 text-center dark:border-gray-700">
-        <p className="mb-4 text-gray-600 dark:text-gray-400">
-          {new Date().getFullYear()} Archround. All rights reserved.
-        </p>
-        {/* <div className="flex items-center justify-center space-x-4">
-          <Link
-            href="/about"
-            className="text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
-          >
-            About
-          </Link>
-          <Link
-            href="/terms"
-            className="text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
-          >
-            Terms
-          </Link>
-          <Link
-            href="/privacy"
-            className="text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
-          >
-            Privacy
-          </Link>
-        </div> */}
-      </footer>
+      <Footer />
     </div>
   );
 }

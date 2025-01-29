@@ -16,6 +16,7 @@ import { H5, List, Muted, P } from "@/components/ui/typography";
 import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
 import { ArrowLeft, ArrowRight, InfoIcon } from "lucide-react";
 import { type ReactNode } from "react";
+import { PanelChat } from "@/components/ai-chat/PanelChat";
 
 export const LevelContent = () => {
   const {
@@ -47,6 +48,7 @@ export const LevelContent = () => {
             <Separator className="mb-5 mt-1 bg-gray-300 dark:bg-gray-700" />
           </div>
           <div className="flex flex-col gap-4">
+            <PanelChat />
             <Section title="Emerging Complexity" content={stage?.problem} />
             <Section
               title="CTO/CPO Requirements"

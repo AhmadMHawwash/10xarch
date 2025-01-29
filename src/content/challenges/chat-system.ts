@@ -6,7 +6,7 @@ const challenge: Challenge = {
   description:
     "Design a chat application that allows users to send and receive messages in real-time.",
   difficulty: "Medium",
-  isFree: true,
+  isFree: false,
   stages: [
     {
       problem: "Users want to send and receive messages in real-time.",
@@ -56,6 +56,39 @@ const challenge: Challenge = {
   - Understanding client-server architecture.
   - Implementing real-time communication using WebSockets.
   - Basics of capacity estimation for network applications.`,
+      resources: {
+        documentation: [
+          {
+            title: "WebSocket API",
+            url: "https://developer.mozilla.org/en-US/docs/Web/API/WebSocket",
+            description: "Official MDN documentation for WebSocket API implementation"
+          },
+          {
+            title: "Socket.IO Documentation",
+            url: "https://socket.io/docs/v4/",
+            description: "Comprehensive guide for real-time bidirectional event-based communication"
+          }
+        ],
+        realWorldCases: [
+          {
+            name: "WhatsApp Architecture",
+            url: "https://www.youtube.com/watch?v=vvhC64hQZMk",
+            description: "Deep dive into WhatsApp's real-time messaging architecture"
+          }
+        ],
+        bestPractices: [
+          {
+            title: "WebSocket Connection Management",
+            description: "Implement heartbeat mechanism to detect connection drops",
+            example: "Send ping frames every 30 seconds and expect pong responses"
+          },
+          {
+            title: "Message Queue Implementation",
+            description: "Use message queues to handle high message volumes",
+            example: "Implement Redis pub/sub for message broadcasting"
+          }
+        ]
+      }
     },
     // Stage 2
     {
@@ -105,9 +138,42 @@ const challenge: Challenge = {
       ],
       learningsInMD: `### Key Learnings
   
-  - Implementing user authentication and authorization.
-  - Securely storing user credentials.
+  - Understanding authentication flows.
+  - Implementing secure password storage.
   - Integrating authentication into existing systems.`,
+      resources: {
+        documentation: [
+          {
+            title: "JWT Authentication",
+            url: "https://jwt.io/introduction",
+            description: "Comprehensive guide to JSON Web Tokens"
+          },
+          {
+            title: "OAuth 2.0",
+            url: "https://oauth.net/2/",
+            description: "Industry-standard protocol for authorization"
+          }
+        ],
+        realWorldCases: [
+          {
+            name: "Discord Authentication System",
+            url: "https://discord.com/developers/docs/topics/oauth2",
+            description: "Discord's implementation of OAuth2 for chat authentication"
+          }
+        ],
+        bestPractices: [
+          {
+            title: "Password Storage",
+            description: "Use strong hashing algorithms with salt for password storage",
+            example: "bcrypt.hash(password, 10) with unique salt per user"
+          },
+          {
+            title: "Token Management",
+            description: "Implement token refresh mechanism and proper expiration",
+            example: "Use short-lived access tokens (15min) with longer refresh tokens (7days)"
+          }
+        ]
+      }
     },
     // Stage 3
     {
@@ -155,9 +221,42 @@ const challenge: Challenge = {
       ],
       learningsInMD: `### Key Learnings
   
-  - Designing systems to handle group communication.
-  - Managing state for multiple chat rooms and user memberships.
-  - Routing messages to specific groups of users.`,
+  - Implementing persistent storage.
+  - Managing data relationships.
+  - Designing efficient data retrieval mechanisms.`,
+      resources: {
+        documentation: [
+          {
+            title: "MongoDB Documentation",
+            url: "https://docs.mongodb.com/",
+            description: "Official MongoDB documentation for NoSQL database implementation"
+          },
+          {
+            title: "Redis Documentation",
+            url: "https://redis.io/documentation",
+            description: "Redis guide for message caching and real-time features"
+          }
+        ],
+        realWorldCases: [
+          {
+            name: "Slack's Database Architecture",
+            url: "https://slack.engineering/flannel-an-application-level-edge-cache-to-make-slack-scale/",
+            description: "How Slack handles message storage and retrieval at scale"
+          }
+        ],
+        bestPractices: [
+          {
+            title: "Message Storage Schema",
+            description: "Design efficient schema for quick message retrieval",
+            example: "Use compound indexes on (chatRoom, timestamp) for range queries"
+          },
+          {
+            title: "Caching Strategy",
+            description: "Implement multi-level caching for frequent message access",
+            example: "Cache last 100 messages per chat room in Redis"
+          }
+        ]
+      }
     },
     // Stage 4
     {
@@ -207,9 +306,42 @@ const challenge: Challenge = {
       ],
       learningsInMD: `### Key Learnings
   
-  - Implementing data persistence in applications.
-  - Choosing appropriate databases for storing message data.
-  - Designing efficient data retrieval mechanisms.`,
+  - Understanding load balancing concepts.
+  - Implementing horizontal scaling.
+  - Managing distributed systems.`,
+      resources: {
+        documentation: [
+          {
+            title: "HAProxy Documentation",
+            url: "http://www.haproxy.org/#docs",
+            description: "Load balancing and proxy server implementation guide"
+          },
+          {
+            title: "Kubernetes Documentation",
+            url: "https://kubernetes.io/docs/home/",
+            description: "Container orchestration for scaling chat applications"
+          }
+        ],
+        realWorldCases: [
+          {
+            name: "Facebook Messenger Architecture",
+            url: "https://engineering.fb.com/2018/06/26/core-data/migrating-messenger-storage-to-optimize-performance/",
+            description: "How Facebook Messenger handles billions of messages"
+          }
+        ],
+        bestPractices: [
+          {
+            title: "WebSocket Load Balancing",
+            description: "Use sticky sessions for WebSocket connections",
+            example: "Configure HAProxy with sticky sessions based on client IP"
+          },
+          {
+            title: "Service Discovery",
+            description: "Implement service discovery for chat server instances",
+            example: "Use Consul for service registration and health checks"
+          }
+        ]
+      }
     },
     // Stage 5
     {
@@ -258,9 +390,42 @@ const challenge: Challenge = {
       ],
       learningsInMD: `### Key Learnings
   
-  - Designing systems for scalability.
-  - Implementing load balancing and horizontal scaling.
-  - Optimizing system performance under heavy load.`,
+  - Managing group chat dynamics.
+  - Implementing presence detection.
+  - Handling concurrent updates.`,
+      resources: {
+        documentation: [
+          {
+            title: "Firebase Realtime Database",
+            url: "https://firebase.google.com/docs/database",
+            description: "Real-time database for managing group chat state"
+          },
+          {
+            title: "Redis PubSub",
+            url: "https://redis.io/topics/pubsub",
+            description: "Redis PubSub for real-time message broadcasting"
+          }
+        ],
+        realWorldCases: [
+          {
+            name: "Telegram Group Chat System",
+            url: "https://telegram.org/blog/shared-files",
+            description: "How Telegram implements large group chats"
+          }
+        ],
+        bestPractices: [
+          {
+            title: "Group Chat Management",
+            description: "Implement efficient message fan-out for group chats",
+            example: "Use Redis pub/sub for real-time group message delivery"
+          },
+          {
+            title: "Presence System",
+            description: "Design efficient online/offline status tracking",
+            example: "Heartbeat system with Redis TTL for presence detection"
+          }
+        ]
+      }
     },
   ],
   generalLearnings: [

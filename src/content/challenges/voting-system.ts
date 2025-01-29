@@ -1,202 +1,387 @@
 import { type Challenge } from "./types";
 
-const votingChallenge: Challenge = {
-  slug: "simple-polling-service",
-  title: "Basic Voting System Design",
+export const RealTimeVotingChallenge: Challenge = {
+  slug: "real-time-voting",
+  title: "Real-Time Voting System Design",
   description:
-    "Design a simple voting system for creating polls and collecting responses",
-  difficulty: "Easy",
+    "Design a scalable real-time voting system that can handle millions of concurrent votes while maintaining consistency and providing instant results updates.",
+  difficulty: "Medium",
   isFree: false,
+  generalLearnings: [
+    "Real-time data processing and propagation techniques",
+    "Consistency patterns in distributed systems",
+    "Scalable vote counting and aggregation strategies",
+    "WebSocket and real-time communication protocols",
+    "Race condition handling in distributed systems",
+    "Message queue patterns for real-time updates",
+  ],
   stages: [
+    // Stage 1: Basic Voting
     {
-      problem: "Users want to create simple yes/no polls",
+      problem: "Users need to cast votes and see results for a single poll",
       requirements: [
-        "Create polls with questions",
-        "Vote submission system",
-        "Display real-time results",
-        "Handle 500 concurrent users",
+        "System should handle 100 votes per second for a single poll with results updated within 1 second",
       ],
       metaRequirements: [
-        "Poll creation and management",
-        "Real-time vote counting",
-        "Anonymous voting",
-        "500 concurrent users",
+        "System should handle 100 votes per second for a single poll with results updated within 1 second",
       ],
       hintsPerArea: {
         requirements: {
-          functional: ["Simple voting mechanism", "Results calculation"],
-          nonFunctional: ["Immediate results update", "Concurrency handling"],
+          functional: [
+            "Consider vote validation rules",
+            "Think about results calculation approach",
+          ],
+          nonFunctional: [
+            "Results must update within 1 second",
+            "Consider vote durability guarantees",
+          ],
         },
         systemAPI: [
-          "POST /polls {question}",
-          "POST /polls/{id}/vote {choice}",
-          "GET /polls/{id}/results",
+          "What endpoints needed for voting?",
+          "How to structure real-time updates?",
         ],
         capacityEstimations: {
-          traffic: ["1 vote/sec peak", "100 new polls/day"],
-          storage: ["In-memory storage initially"],
-          memory: ["Store polls and vote counts"],
-          bandwidth: ["Small JSON payloads"],
+          traffic: [
+            "Calculate votes per second",
+            "Estimate result update frequency",
+          ],
+          storage: [
+            "Calculate vote storage size",
+            "Consider results storage approach",
+          ],
+          memory: [
+            "Estimate active poll data size",
+            "Consider caching strategy",
+          ],
+          bandwidth: [
+            "Calculate vote submission size",
+            "Estimate results update size",
+          ],
         },
         highLevelDesign: [
-          "REST API service",
-          "In-memory data store",
-          "Atomic counters for votes",
+          "Consider WebSocket for real-time updates",
+          "Think about vote storage design",
         ],
       },
       criteria: [
-        "Poll creation implemented",
-        "Vote submission working",
-        "Real-time results display",
+        "Can process votes correctly",
+        "Updates results within 1 second",
+        "Maintains vote integrity",
       ],
       learningsInMD: `
-- Basic REST API design
-- Atomic operations for concurrency
-- Simple data modeling
-- In-memory storage tradeoffs`,
+## Key Learnings
+- Real-time update patterns
+- Basic vote processing
+- WebSocket implementation
+- Simple data consistency
+
+## Technical Concepts
+- WebSocket vs HTTP polling
+- Vote aggregation methods
+- Basic race condition handling
+      `,
+      resources: {
+        documentation: [
+          {
+            title: "WebSocket Protocol",
+            url: "https://developer.mozilla.org/en-US/docs/Web/API/WebSocket",
+            description: "Understanding WebSocket for real-time communication",
+          },
+        ],
+        realWorldCases: [
+          {
+            name: "Twitter Polls",
+            url: "https://blog.twitter.com/engineering",
+            description: "Real-world implementation of real-time voting",
+          },
+        ],
+        bestPractices: [
+          {
+            title: "Vote Processing",
+            description:
+              "Implement atomic vote counting to prevent race conditions",
+            example: "Using Redis INCR for atomic counters",
+          },
+        ],
+      },
     },
+    // Stage 2: Multiple Concurrent Polls
     {
-      problem: "Polls reset when server restarts",
+      problem:
+        "System needs to handle multiple concurrent polls with high vote volume",
       requirements: [
-        "Persist polls and votes",
-        "Support 10,000 active polls",
-        "Ensure vote integrity",
-        "Maintain <1s response time",
+        "System should handle 1000 concurrent polls with 10,000 total votes per second while maintaining real-time updates",
       ],
       metaRequirements: [
-        "Persistent poll storage",
-        "10,000 active polls capacity",
-        "Vote integrity guarantees",
-        "<1s response time",
+        "System should handle 100 votes per second for a single poll with results updated within 1 second",
+        "System should handle 1000 concurrent polls with 10,000 total votes per second while maintaining real-time updates",
       ],
       hintsPerArea: {
         requirements: {
-          functional: ["Database selection", "ACID transactions"],
-          nonFunctional: ["Durability requirements", "Read performance"],
+          functional: [
+            "Consider vote distribution across polls",
+            "Think about result aggregation strategy",
+          ],
+          nonFunctional: [
+            "Maintain update latency under load",
+            "Consider system scalability",
+          ],
         },
-        systemAPI: ["Database schema design", "Batch vote processing"],
+        systemAPI: [
+          "How to handle poll creation/management?",
+          "What batch operations might help?",
+        ],
         capacityEstimations: {
-          traffic: ["10 votes/sec sustained"],
-          storage: ["10KB per poll = 100MB total"],
-          memory: ["Cache popular polls"],
-          bandwidth: ["Small JSON payloads"],
+          traffic: [
+            "Calculate peak vote rates",
+            "Estimate WebSocket connections",
+          ],
+          storage: [
+            "Calculate multi-poll storage needs",
+            "Consider result history storage",
+          ],
+          memory: [
+            "Estimate active polls memory usage",
+            "Calculate connection state size",
+          ],
+          bandwidth: [
+            "Calculate total update bandwidth",
+            "Consider connection overhead",
+          ],
         },
         highLevelDesign: [
-          "Relational database",
-          "Connection pooling",
-          "Cache-aside pattern",
+          "Consider message queue integration",
+          "Think about connection management",
         ],
       },
       criteria: [
-        "Data persistence implemented",
-        "Vote counts preserved",
-        "Response time maintained",
+        "Handles multiple concurrent polls",
+        "Maintains performance under load",
+        "Scales horizontally",
       ],
       learningsInMD: `
-- Database normalization basics
-- ACID transactions
-- Caching strategies
-- Connection management`,
+## Key Learnings
+- Horizontal scaling patterns
+- Connection pooling
+- Message queue usage
+- Load distribution
+
+## Technical Concepts
+- WebSocket clustering
+- Vote aggregation at scale
+- Message queue patterns
+      `,
+      resources: {
+        documentation: [
+          {
+            title: "Scaling WebSocket",
+            url: "https://www.nginx.com/blog/websocket-nginx",
+            description: "Strategies for scaling WebSocket connections",
+          },
+        ],
+        realWorldCases: [
+          {
+            name: "Reddit Live Voting",
+            url: "https://www.reddit.com/r/engineering",
+            description: "Large-scale voting system implementation",
+          },
+        ],
+        bestPractices: [
+          {
+            title: "Connection Management",
+            description:
+              "Implement connection pooling and heartbeat mechanisms",
+            example: "Using Socket.IO with Redis adapter",
+          },
+        ],
+      },
     },
+    // Stage 3: Vote Security and Integrity
     {
-      problem: "Users want multiple-choice polls",
+      problem:
+        "System needs to prevent vote manipulation and ensure one vote per user",
       requirements: [
-        "Support 2-5 options per poll",
-        "Prevent duplicate votes",
-        "Handle 1000 votes/minute",
-        "Visualize vote distribution",
+        "Implement secure voting with deduplication while maintaining system performance",
       ],
       metaRequirements: [
-        "Multiple-choice polls",
-        "Duplicate vote prevention",
-        "1000 votes/minute capacity",
-        "Results visualization",
+        "System should handle 100 votes per second for a single poll with results updated within 1 second",
+        "System should handle 1000 concurrent polls with 10,000 total votes per second while maintaining real-time updates",
+        "Implement secure voting with deduplication while maintaining system performance",
       ],
       hintsPerArea: {
         requirements: {
-          functional: ["IP-based tracking", "Options validation"],
-          nonFunctional: ["Storage optimization", "UI rendering"],
+          functional: [
+            "Consider user authentication method",
+            "Think about vote verification process",
+          ],
+          nonFunctional: [
+            "Maintain vote integrity",
+            "Consider security overhead",
+          ],
         },
-        systemAPI: ["PUT /polls/{id} (add options)", "GET /polls/{id}/chart"],
+        systemAPI: [
+          "How to handle user authentication?",
+          "What verification endpoints needed?",
+        ],
         capacityEstimations: {
-          traffic: ["16 votes/sec"],
-          storage: ["Option-based vote counting"],
-          memory: ["IP address tracking store"],
-          bandwidth: ["Small JSON payloads"],
+          traffic: [
+            "Calculate verification overhead",
+            "Estimate authentication rate",
+          ],
+          storage: [
+            "Calculate user tracking storage",
+            "Consider audit log size",
+          ],
+          memory: [
+            "Estimate session data size",
+            "Calculate verification cache size",
+          ],
+          bandwidth: [
+            "Calculate authentication overhead",
+            "Estimate verification traffic",
+          ],
         },
         highLevelDesign: [
-          "Redis for IP tracking",
-          "Chart generation service",
-          "Vertical scaling strategy",
+          "Consider authentication service",
+          "Think about vote verification flow",
         ],
       },
       criteria: [
-        "Multiple-choice support",
-        "Duplicate voting prevention",
-        "Visualization endpoint",
+        "Prevents duplicate votes",
+        "Ensures vote authenticity",
+        "Maintains system performance",
       ],
       learningsInMD: `
-- IP tracking limitations
-- Server-side chart generation
-- Vertical scaling concepts
-- Data structure optimization`,
+## Key Learnings
+- Authentication patterns
+- Vote verification strategies
+- Security in distributed systems
+- Rate limiting approaches
+
+## Technical Concepts
+- Distributed session management
+- Vote deduplication techniques
+- Rate limiting algorithms
+      `,
+      resources: {
+        documentation: [
+          {
+            title: "Distributed Rate Limiting",
+            url: "https://redis.io/commands/incr",
+            description: "Implementation of distributed rate limiting",
+          },
+        ],
+        realWorldCases: [
+          {
+            name: "Facebook Polls Security",
+            url: "https://engineering.fb.com",
+            description: "Security measures in large-scale voting",
+          },
+        ],
+        bestPractices: [
+          {
+            title: "Vote Verification",
+            description: "Implement token-based voting with rate limiting",
+            example: "Using JWT tokens with Redis rate limiting",
+          },
+        ],
+      },
     },
+    // Stage 4: Global Distribution
     {
-      problem: "Need basic user authentication",
+      problem:
+        "System needs to handle voters from multiple geographic regions with low latency",
       requirements: [
-        "Email-based signup",
-        "User-owned polls",
-        "Vote history tracking",
-        "Handle 10k registered users",
+        "Support global voting with regional latency under 100ms while maintaining vote consistency",
       ],
       metaRequirements: [
-        "User authentication",
-        "Poll ownership",
-        "Vote history",
-        "10k user capacity",
+        "System should handle 100 votes per second for a single poll with results updated within 1 second",
+        "System should handle 1000 concurrent polls with 10,000 total votes per second while maintaining real-time updates",
+        "Implement secure voting with deduplication while maintaining system performance",
+        "Support global voting with regional latency under 100ms while maintaining vote consistency",
       ],
       hintsPerArea: {
         requirements: {
-          functional: ["Session management", "Ownership mapping"],
-          nonFunctional: ["Privacy requirements", "Data isolation"],
+          functional: [
+            "Consider regional vote processing",
+            "Think about global result aggregation",
+          ],
+          nonFunctional: [
+            "Maintain global consistency",
+            "Consider regional failures",
+          ],
         },
-        systemAPI: ["POST /signup", "GET /users/{id}/polls"],
+        systemAPI: [
+          "How to handle regional endpoints?",
+          "What changes for global aggregation?",
+        ],
         capacityEstimations: {
-          traffic: ["Add 5% auth-related requests"],
-          storage: ["User credentials storage"],
-          memory: ["Session storage"],
-          bandwidth: ["Small JSON payloads"],
+          traffic: [
+            "Calculate regional vote distribution",
+            "Estimate cross-region traffic",
+          ],
+          storage: [
+            "Consider regional storage needs",
+            "Calculate replication overhead",
+          ],
+          memory: [
+            "Estimate regional cache sizes",
+            "Consider global state size",
+          ],
+          bandwidth: [
+            "Calculate cross-region bandwidth",
+            "Estimate replication traffic",
+          ],
         },
         highLevelDesign: [
-          "Password hashing",
-          "Relationship mapping in DB",
-          "Index optimization",
+          "Consider global load balancing",
+          "Think about regional processing",
         ],
       },
       criteria: [
-        "User registration implemented",
-        "Poll ownership tracking",
-        "Vote history storage",
+        "Provides low-latency global access",
+        "Maintains vote consistency",
+        "Handles regional failures",
       ],
       learningsInMD: `
-- Basic auth implementation
-- Password security
-- Database relationships
-- Ownership patterns`,
+## Key Learnings
+- Global system design
+- Consistency patterns
+- Regional processing
+- Failure handling
+
+## Technical Concepts
+- Global load balancing
+- Regional data processing
+- Cross-region replication
+- CAP theorem implications
+      `,
+      resources: {
+        documentation: [
+          {
+            title: "Global Application Architecture",
+            url: "https://aws.amazon.com/global-accelerator",
+            description: "Building globally distributed applications",
+          },
+        ],
+        realWorldCases: [
+          {
+            name: "Instagram Polls",
+            url: "https://instagram-engineering.com",
+            description: "Global voting system implementation",
+          },
+        ],
+        bestPractices: [
+          {
+            title: "Global Distribution",
+            description:
+              "Implement regional processing with global aggregation",
+            example: "Using AWS Global Accelerator with regional processing",
+          },
+        ],
+      },
     },
-  ],
-  generalLearnings: [
-    "CRUD operations design",
-    "Database schema modeling",
-    "Basic authentication flows",
-    "Concurrency control basics",
-    "Simple visualization techniques",
-    "Capacity planning fundamentals",
-    "API versioning basics",
-    "Data integrity patterns",
-    "Vertical scaling approaches",
-    "Basic monitoring setup",
   ],
 };
 
-export default votingChallenge;
+export default RealTimeVotingChallenge;

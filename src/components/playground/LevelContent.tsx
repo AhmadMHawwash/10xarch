@@ -1,6 +1,7 @@
 "use client";
 
 import { WithMarkdownDetails } from "@/components/SystemComponents/Wrappers/WithMarkdownDetails";
+import { Resources } from "@/components/resources";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -70,6 +71,13 @@ export const LevelContent = () => {
                 </List>
               }
             />
+            {stage?.resources && (
+              <Resources
+                documentation={stage.resources.documentation}
+                realWorldCases={stage.resources.realWorldCases}
+                bestPractices={stage.resources.bestPractices}
+              />
+            )}
             <WithMarkdownDetails
               Icon={InfoIcon}
               trigger={

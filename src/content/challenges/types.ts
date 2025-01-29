@@ -28,4 +28,21 @@ export type Stage = {
   };
   criteria: string[];
   learningsInMD: string;
+  resources: {
+    documentation: Array<{
+      title: string;
+      url: string;
+      description: string;
+    }>;
+    realWorldCases: Array<{
+      name: string;
+      url: string;
+      description: string;
+    }>;
+    bestPractices: Array<{
+      title: string;
+      description: string;
+      example?: string;
+    }>;
+  };
 };

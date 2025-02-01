@@ -4,6 +4,7 @@ import { checkSolution } from "./routers/checkAnswer";
 import { creditsRouter } from "@/server/api/routers/credits";
 import { stripeRouter } from "./routers/stripe";
 import { challengesRouter } from "./routers/challenges";
+import { chatRouter } from "@/server/api/routers/chat";
 
 /**
  * This is the primary router for your server.
@@ -16,6 +17,7 @@ export const appRouter = createTRPCRouter({
   credits: creditsRouter,
   stripe: stripeRouter,
   challenges: challengesRouter,
+  chat: chatRouter,
 });
 
 // export type definition of API

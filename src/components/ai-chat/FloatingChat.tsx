@@ -24,13 +24,14 @@ export function FloatingChat() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="fixed bottom-24 right-6 h-[600px] w-[400px] overflow-hidden rounded-lg border bg-background shadow-xl"
+            className="fixed bottom-24 right-6 h-[600px] w-[414px] overflow-hidden rounded-lg border bg-background shadow-xl"
             style={{ zIndex: 50 }}
           >
-            <div className="flex items-center justify-between border-b bg-muted/50 p-2">
-              <span className="text-sm font-medium">
-                AI Assistant
-              </span>
+            <div className="flex items-center justify-between border-b px-4 py-2.5">
+              <div className="flex items-center gap-2">
+                <Bot className="h-5 w-5" />
+                <span className="text-base font-medium">AI Assistant</span>
+              </div>
               <Button
                 variant="ghost"
                 size="icon"

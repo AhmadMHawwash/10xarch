@@ -100,42 +100,6 @@ export function ChatUI({ sessionId, challengeId, onClose }: ChatUIProps) {
 
   return (
     <div className="flex h-full w-full flex-col">
-      <div className="flex items-center justify-between border-b px-5 py-4">
-        <div className="flex flex-col gap-2">
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <MessageSquare className="h-4 w-4" />
-              <span>{remainingMessages} / 10 free prompts</span>
-              {remainingMessages === 0 && (
-                <span className="text-sm">(resets in 1 hour)</span>
-              )}
-            </div>
-            {credits > 0 && (
-              <div className="flex items-center gap-2 text-sm text-yellow-500">
-                <Coins className="h-4 w-4" />
-                <span>{credits} credits available</span>
-              </div>
-            )}
-          </div>
-        </div>
-        <div className="flex items-center gap-3">
-          <Progress
-            value={progressPercentage}
-            indicatorColor={isLowOnMessages ? "bg-red-500" : "bg-green-500"}
-            className="h-1.5 w-28"
-          />
-          {onClose && (
-            <Button
-              size="icon"
-              variant="ghost"
-              className="h-8 w-8"
-              onClick={onClose}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          )}
-        </div>
-      </div>
       <ScrollArea ref={scrollAreaRef} className="flex-1">
         <div className="space-y-4 p-4">
           {messages.length === 0 && (
@@ -174,8 +138,21 @@ export function ChatUI({ sessionId, challengeId, onClose }: ChatUIProps) {
           <div ref={messagesEndRef} />
         </div>
       </ScrollArea>
-      <form onSubmit={handleSubmit} className="border-t p-4">
-        <div className="flex gap-4">
+      <div className="border-t border-border/40 bg-background/95">
+        <div className="flex items-center justify-between px-4 py-2 text-xs text-muted-foreground">
+          <div className="flex items-center gap-2">
+            <MessageSquare className="h-3.5 w-3.5" />
+            <span>{remainingMessages}/10 free</span>
+            {remainingMessages === 0 && <span>(resets in 1h)</span>}
+          </div>
+          {credits > 0 && (
+            <div className="flex items-center gap-2 text-yellow-500">
+              <Coins className="h-3.5 w-3.5" />
+              <span>{credits} credits</span>
+            </div>
+          )}
+        </div>
+        <form onSubmit={handleSubmit} className="flex gap-2 p-3">
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -185,17 +162,19 @@ export function ChatUI({ sessionId, challengeId, onClose }: ChatUIProps) {
                 : "No prompts remaining. Please wait for reset or purchase credits."
             }
             disabled={isLoading || !hasAvailablePrompts}
-            className="flex-1"
+            className="flex-1 bg-muted/50"
           />
-          <Button
-            type="submit"
+          <Button 
+            type="submit" 
+            size="icon" 
+            variant="secondary"
             disabled={isLoading || !hasAvailablePrompts}
-            size="icon"
-            >
+            className="shrink-0"
+          >
             <Send className="h-4 w-4" />
           </Button>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   );
 }

@@ -22,19 +22,19 @@ const getTransactionsOutputSchema = z.object({
 export const creditsRouter = createTRPCRouter({
   getBalance: protectedProcedure.query(async ({ ctx }) => {
     const { userId } = await auth();
-    if (!userId) {
+      if (!userId) {
       throw new TRPCError({
         code: "UNAUTHORIZED",
         message: "Not authenticated",
       });
-    }
+      }
 
-    const userCredits = await ctx.db.query.credits.findFirst({
-      where: eq(credits.userId, userId),
-    });
+      const userCredits = await ctx.db.query.credits.findFirst({
+        where: eq(credits.userId, userId),
+      });
 
     return { credits: userCredits };
-  }),
+    }),
 
   getTransactions: protectedProcedure
     .output(getTransactionsOutputSchema)

@@ -1,6 +1,10 @@
 import challenges from "@/content/challenges";
 import { freeChallengesLimiter } from "@/lib/rate-limit";
-import { createTRPCRouter, publicProcedure, t } from "@/server/api/trpc";
+import {
+  createCallerFactory,
+  createTRPCRouter,
+  publicProcedure,
+} from "@/server/api/trpc";
 import { credits } from "@/server/db/schema";
 import { auth } from "@clerk/nextjs/server";
 import { TRPCError } from "@trpc/server";
@@ -8,7 +12,7 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { checkSolution } from "./checkAnswer";
 
-const createAICaller = t.createCallerFactory(checkSolution);
+const createAICaller = createCallerFactory(checkSolution);
 
 const submitChallengeSchema = z.object({
   challengeSlug: z.string(),

@@ -6,12 +6,14 @@ import { Bot, X } from 'lucide-react'
 import { useSessionId } from '@/hooks/useSessionId'
 import { ChatUI } from './ChatUI'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useParams } from 'next/navigation'
 
 export function FloatingChat() {
   const [isOpen, setIsOpen] = useState(false)
   const sessionId = useSessionId()
+  const params = useParams<{ slug: string }>()
 
-  if (!sessionId) return null
+  if (!sessionId || !params.slug) return null
 
   return (
     <>
@@ -37,7 +39,7 @@ export function FloatingChat() {
               </Button>
             </div>
             <div className="h-[calc(100%-48px)]">
-              <ChatUI sessionId={sessionId} />
+              <ChatUI sessionId={sessionId} challengeId={params.slug} />
             </div>
           </motion.div>
         )}

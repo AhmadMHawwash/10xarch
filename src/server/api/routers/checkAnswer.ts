@@ -1,8 +1,8 @@
 import {
+  createCallerFactory,
   createTRPCRouter,
   protectedProcedure,
   publicProcedure,
-  t,
 } from "@/server/api/trpc";
 import OpenAI from "openai";
 import { z } from "zod";
@@ -15,7 +15,7 @@ import { TRPCError } from "@trpc/server";
 import { creditsRouter } from "./credits";
 import { auth } from "@clerk/nextjs/server";
 
-const createCreditsCaller = t.createCallerFactory(creditsRouter);
+const createCreditsCaller = createCallerFactory(creditsRouter);
 
 // Define the response type
 const EvaluationResponseSchema = z.object({

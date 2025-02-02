@@ -7,12 +7,14 @@ import { useSessionId } from '@/hooks/useSessionId'
 import { ChatUI } from './ChatUI'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Separator } from '@/components/ui/separator'
+import { useParams } from 'next/navigation'
 
 export function PanelChat() {
   const [isOpen, setIsOpen] = useState(false)
   const sessionId = useSessionId()
+  const params = useParams<{ slug: string }>()
 
-  if (!sessionId) return null
+  if (!sessionId || !params.slug) return null
 
   return (
     <div className="relative">
@@ -37,7 +39,7 @@ export function PanelChat() {
               </Button>
             </div>
             <div className="h-[calc(400px-48px)]">
-              <ChatUI sessionId={sessionId} />
+              <ChatUI sessionId={sessionId} challengeId={params.slug} />
             </div>
           </motion.div>
         )}

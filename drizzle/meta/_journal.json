@@ -22,6 +22,20 @@
       "when": 1737612299792,
       "tag": "0002_last_slapstick",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1738419063476,
+      "tag": "0003_tough_zombie",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1738420060470,
+      "tag": "0004_fine_infant_terrible",
+      "breakpoints": true
     }
   ]
 }

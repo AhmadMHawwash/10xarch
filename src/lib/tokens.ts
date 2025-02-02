@@ -68,3 +68,15 @@ export function costToCredits(cost: number): number {
 export function isValidAmount(amount: number): boolean {
   return !isNaN(amount) && amount >= MIN_AMOUNT && amount <= MAX_AMOUNT;
 }
+
+// Utility functions for token cost calculations
+export function calculateTokenCost(tokens: number, costPer1K: number): number {
+  return (tokens / 1000) * costPer1K;
+}
+
+export function calculateGPTCost(inputTokens: number, outputTokens: number, model: keyof typeof GPT_TOKEN_COSTS = 'gpt-4'): number {
+  const costs = GPT_TOKEN_COSTS[model];
+  const inputCost = calculateTokenCost(inputTokens, costs.input);
+  const outputCost = calculateTokenCost(outputTokens, costs.output);
+  return inputCost + outputCost;
+}

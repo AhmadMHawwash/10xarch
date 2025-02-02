@@ -1,19 +1,19 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Bot, X } from 'lucide-react'
-import { useSessionId } from '@/hooks/useSessionId'
-import { ChatUI } from './ChatUI'
-import { motion, AnimatePresence } from 'framer-motion'
-import { useParams } from 'next/navigation'
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Bot, X } from "lucide-react";
+import { useSessionId } from "@/hooks/useSessionId";
+import { ChatUI } from "./ChatUI";
+import { motion, AnimatePresence } from "framer-motion";
+import { useParams } from "next/navigation";
 
 export function FloatingChat() {
-  const [isOpen, setIsOpen] = useState(false)
-  const sessionId = useSessionId()
-  const params = useParams<{ slug: string }>()
+  const [isOpen, setIsOpen] = useState(false);
+  const sessionId = useSessionId();
+  const params = useParams<{ slug: string }>();
 
-  if (!sessionId || !params.slug) return null
+  if (!sessionId || !params.slug) return null;
 
   return (
     <>
@@ -24,11 +24,13 @@ export function FloatingChat() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="fixed bottom-24 right-6 w-[400px] h-[600px] bg-background border rounded-lg shadow-xl overflow-hidden"
+            className="fixed bottom-24 right-6 h-[600px] w-[400px] overflow-hidden rounded-lg border bg-background shadow-xl"
             style={{ zIndex: 50 }}
           >
-            <div className="flex items-center justify-between p-2 border-b bg-muted/50">
-              <span className="text-sm font-medium">AI Assistant</span>
+            <div className="flex items-center justify-between border-b bg-muted/50 p-2">
+              <span className="text-sm font-medium">
+                AI Assistant
+              </span>
               <Button
                 variant="ghost"
                 size="icon"
@@ -48,14 +50,10 @@ export function FloatingChat() {
       <Button
         size="icon"
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-24 h-12 w-12 rounded-full shadow-lg hover:shadow-xl transition-all duration-200"
+        className="fixed bottom-6 right-24 h-12 w-12 rounded-full shadow-lg transition-all duration-200 hover:shadow-xl"
       >
-        {isOpen ? (
-          <X className="h-6 w-6" />
-        ) : (
-          <Bot className="h-6 w-6" />
-        )}
+        {isOpen ? <X className="h-6 w-6" /> : <Bot className="h-6 w-6" />}
       </Button>
     </>
-  )
+  );
 }

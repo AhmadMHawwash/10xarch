@@ -106,3 +106,4 @@ export const creditTransactionsRelations = relations(creditTransactions, ({ one 
     references: [users.id],
   }),
 }));
+

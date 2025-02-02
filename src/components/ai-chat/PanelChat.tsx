@@ -1,20 +1,20 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Bot, X } from 'lucide-react'
-import { useSessionId } from '@/hooks/useSessionId'
-import { ChatUI } from './ChatUI'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Separator } from '@/components/ui/separator'
-import { useParams } from 'next/navigation'
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Bot, X } from "lucide-react";
+import { useSessionId } from "@/hooks/useSessionId";
+import { ChatUI } from "./ChatUI";
+import { motion, AnimatePresence } from "framer-motion";
+import { Separator } from "@/components/ui/separator";
+import { useParams } from "next/navigation";
 
 export function PanelChat() {
-  const [isOpen, setIsOpen] = useState(false)
-  const sessionId = useSessionId()
-  const params = useParams<{ slug: string }>()
+  const [isOpen, setIsOpen] = useState(false);
+  const sessionId = useSessionId();
+  const params = useParams<{ slug: string }>();
 
-  if (!sessionId || !params.slug) return null
+  if (!sessionId || !params.slug) return null;
 
   return (
     <div className="relative">
@@ -25,10 +25,12 @@ export function PanelChat() {
             animate={{ opacity: 1, height: 400 }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
-            className="w-full bg-background border rounded-lg shadow-sm overflow-hidden mb-4"
+            className="mb-4 w-full overflow-hidden rounded-lg border bg-background shadow-sm"
           >
-            <div className="flex items-center justify-between p-2 border-b bg-muted/50">
-              <span className="text-sm font-medium">AI Assistant</span>
+            <div className="flex items-center justify-between border-b bg-muted/50 p-2">
+              <span className="text-sm font-medium flex items-center gap-2">
+                <Bot className="h-5 w-5" /> AI Assistant
+              </span>
               <Button
                 variant="ghost"
                 size="icon"
@@ -45,18 +47,18 @@ export function PanelChat() {
         )}
       </AnimatePresence>
 
-      <div className="flex items-center gap-2 mb-4">
+      <div className="mb-4 flex items-center gap-2">
         <Button
           variant="outline"
           size="sm"
           onClick={() => setIsOpen(!isOpen)}
-          className="w-full flex items-center gap-2"
+          className="flex w-full items-center gap-2"
         >
           <Bot className="h-4 w-4" />
-          {isOpen ? 'Hide AI Assistant' : 'Show AI Assistant'}
+          {isOpen ? "Hide AI Assistant" : "Show AI Assistant"}
         </Button>
       </div>
       <Separator className="mb-4" />
     </div>
-  )
+  );
 }

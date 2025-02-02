@@ -33,4 +33,4 @@ export const chatMessagesLimiter = new Ratelimit({
   limiter: Ratelimit.slidingWindow(10, '1 h'),
   analytics: true,
   prefix: '@upstash/ratelimit/chat-messages',
-})
+});

@@ -4,10 +4,10 @@ import { useState, useRef, useEffect } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Send, Bot, MessageSquare, Coins, X } from "lucide-react";
+import { Send, MessageSquare, Coins, X } from "lucide-react";
 import { api } from "@/trpc/react";
 import { useChatMessages } from "@/lib/hooks/useChatMessages";
-import { Progress } from "@/components/ui/progress";
+import { useCredits } from "@/hooks/useCredits";
 
 interface Message {
   role: "user" | "assistant" | "system";
@@ -17,14 +17,13 @@ interface Message {
 interface ChatUIProps {
   sessionId: string;
   challengeId: string;
-  onClose?: () => void;
 }
 
-export function ChatUI({ sessionId, challengeId, onClose }: ChatUIProps) {
+export function ChatUI({ sessionId, challengeId }: ChatUIProps) {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [remainingMessages, setRemainingMessages] = useState(10);
-  const [credits, setCredits] = useState(0);
+  const { balance: credits, refetch: refetchCredits } = useCredits();
   const { getMessages, addMessage } = useChatMessages();
   const messages = getMessages(sessionId);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -35,16 +34,13 @@ export function ChatUI({ sessionId, challengeId, onClose }: ChatUIProps) {
     challengeId,
   });
 
-  // Update remaining messages and credits when rate limit info changes
+  // Update remaining messages when rate limit info changes
   useEffect(() => {
     if (rateLimitInfo) {
       setRemainingMessages(rateLimitInfo.remaining);
-      setCredits(rateLimitInfo.credits);
     }
   }, [rateLimitInfo]);
 
-  const progressPercentage = (remainingMessages / 10) * 100;
-  const isLowOnMessages = remainingMessages <= 3 && credits === 0;
   const hasAvailablePrompts = remainingMessages > 0 || credits > 0;
 
   // Scroll to bottom when messages change
@@ -60,14 +56,15 @@ export function ChatUI({ sessionId, challengeId, onClose }: ChatUIProps) {
   }, [messages, isLoading]);
 
   const sendMessage = api.chat.sendMessage.useMutation({
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       const assistantMessage: Message = {
         role: "assistant",
         content: data.message,
       };
       addMessage(sessionId, assistantMessage);
       setRemainingMessages(data.remainingMessages);
-      setCredits(data.credits);
+      // Refetch credits to update the navbar
+      await refetchCredits();
       setIsLoading(false);
     },
     onError: (error) => {

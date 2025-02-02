@@ -28,6 +28,18 @@ export function ChatUI({ sessionId, challengeId }: ChatUIProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
+  // Get remaining prompts on load
+  const { data: rateLimitInfo } = api.chat.getRemainingPrompts.useQuery(
+    { challengeId }
+  );
+
+  // Update remaining messages when rate limit info changes
+  useEffect(() => {
+    if (rateLimitInfo?.remaining !== undefined) {
+      setRemainingMessages(rateLimitInfo.remaining);
+    }
+  }, [rateLimitInfo]);
+
   const progressPercentage = (remainingMessages / 10) * 100;
   const isLowOnMessages = remainingMessages <= 3;
 
@@ -74,7 +86,6 @@ export function ChatUI({ sessionId, challengeId }: ChatUIProps) {
 
     sendMessage.mutate({
       message: input,
-      sessionId,
       challengeId,
       history: messages,
     });

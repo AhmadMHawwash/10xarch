@@ -1,4 +1,4 @@
-import { ChatMessagesProvider } from '@/lib/hooks/useChatMessages'
+import { ChatMessagesProvider } from '@/lib/hooks/useChatMessages_'
 
 export default function ChallengeLayout({
   children,

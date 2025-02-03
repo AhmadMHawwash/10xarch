@@ -4,13 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useCredits } from "@/hooks/useCredits";
-import { useChatMessages } from "@/lib/hooks/useChatMessages";
 import { useSystemDesigner } from "@/lib/hooks/useSystemDesigner";
 import { api } from "@/trpc/react";
 import { Coins, MessageSquare, Send } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import ReactMarkdown from "react-markdown";
 import { cn } from "@/lib/utils";
+import { useChatMessages } from "@/lib/hooks/useChatMessages_";
 
 interface Message {
   role: "user" | "assistant" | "system";
@@ -18,7 +18,6 @@ interface Message {
 }
 
 interface ChatUIProps {
-  sessionId: string;
   challengeId: string;
   stageIndex: number;
 }
@@ -39,13 +38,27 @@ interface WhiteboardConfigs {
   "non-functional requirements"?: string;
 }
 
-export function ChatUI({ sessionId, challengeId, stageIndex = 0 }: ChatUIProps) {
+export function ChatUI({ challengeId, stageIndex = 0 }: ChatUIProps) {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [remainingMessages, setRemainingMessages] = useState(10);
   const { balance: credits, refetch: refetchCredits } = useCredits();
   const { getMessages, addMessage } = useChatMessages();
-  const messages = getMessages(sessionId);
+  const [mounted, setMounted] = useState(false);
+  
+  // Create a stable chat session ID that persists across component mounts
+  const chatSessionId = useMemo(() => `chat:${challengeId}`, [challengeId]);
+  
+  // Only get messages after component is mounted to avoid hydration issues
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  
+  const messages = useMemo(() => 
+    mounted ? getMessages(chatSessionId) : [],
+    [mounted, getMessages, chatSessionId]
+  );
+  
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { nodes } = useSystemDesigner();
@@ -82,7 +95,7 @@ export function ChatUI({ sessionId, challengeId, stageIndex = 0 }: ChatUIProps) 
         role: "assistant",
         content: data.message,
       };
-      addMessage(sessionId, assistantMessage);
+      addMessage(chatSessionId, assistantMessage);
       setRemainingMessages(data.remainingMessages);
       // Refetch credits to update the navbar
       await refetchCredits();
@@ -96,7 +109,7 @@ export function ChatUI({ sessionId, challengeId, stageIndex = 0 }: ChatUIProps) 
         role: "system",
         content: error.message,
       };
-      addMessage(sessionId, errorMessage);
+      addMessage(chatSessionId, errorMessage);
     },
   });
 
@@ -132,7 +145,7 @@ export function ChatUI({ sessionId, challengeId, stageIndex = 0 }: ChatUIProps) 
     if (!input.trim() || isLoading) return;
 
     const userMessage: Message = { role: "user", content: input };
-    addMessage(sessionId, userMessage);
+    addMessage(chatSessionId, userMessage);
     setInput("");
     setIsLoading(true);
 

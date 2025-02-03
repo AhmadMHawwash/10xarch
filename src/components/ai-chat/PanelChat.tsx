@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { useSessionId } from "@/hooks/useSessionId";
 import { AnimatePresence, motion } from "framer-motion";
 import { Bot, X } from "lucide-react";
 import { useParams } from "next/navigation";
@@ -11,10 +10,9 @@ import { AIChatAssistant } from ".";
 
 export function PanelChat() {
   const [isOpen, setIsOpen] = useState(false);
-  const sessionId = useSessionId();
   const params = useParams<{ slug: string }>();
 
-  if (!sessionId || !params.slug) return null;
+  if (!params.slug) return null;
 
   return (
     <div className="relative">

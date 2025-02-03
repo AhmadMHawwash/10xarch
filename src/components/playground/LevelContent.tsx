@@ -85,7 +85,7 @@ export const LevelContent = () => {
               trigger={
                 <Muted className="flex cursor-pointer items-center gap-1 text-gray-600 transition-colors hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-300">
                   <InfoIcon size="17" />
-                  Elements of a successful system design
+                  Key System Design Components
                 </Muted>
               }
               content={content}
@@ -181,21 +181,23 @@ const StageProgress: React.FC<StageProgressProps> = ({
 );
 
 const content = `
-### Elements of a successful system design
+### Key System Design Components
 &nbsp;
-#### A successful system design should include the following elements:
-- **Requirements**: 
-  - Functional 
-  - Non-functional requirements
-- **System API**: 
-  - API definitions
-  - API flows
-- **Capacity Estimations**: 
-  - Traffic estimates
-  - Storage estimates
-  - Bandwidth estimates
-  - Memory estimates
-- **High level design**: System components and their connections
-- **Database**: Models and purpose
-- And other system components purposes
+#### A well-structured system design should address:
+- **Requirements Analysis**:
+  - Core functionality
+  - System constraints & scalability
+- **API Design**:
+  - Endpoints & interfaces
+  - Data flow patterns
+- **System Calculations**:
+  - Load & traffic patterns
+  - Resource requirements
+  - Performance metrics
+- **Architecture Overview**:
+  - Component interactions
+  - System boundaries
+- **Data Layer**:
+  - Schema design
+  - Storage solutions
 `;

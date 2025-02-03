@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { createTRPCRouter, publicProcedure } from '@/server/api/trpc'
-import { openai, SYSTEM_PROMPT } from '@/lib/openai'
+import { openai, CHAT_SYSTEM_PROMPT } from '@/lib/openai'
 import { TRPCError } from '@trpc/server'
 import { chatMessagesLimiter } from '@/lib/rate-limit'
 import { auth } from '@clerk/nextjs/server'
@@ -119,7 +119,7 @@ Keep these requirements in mind when providing assistance. Guide the user withou
       
       // Prepare messages for OpenAI with challenge context
       const messages = [
-        { role: 'system' as const, content: SYSTEM_PROMPT },
+        { role: 'system' as const, content: CHAT_SYSTEM_PROMPT },
         { role: 'system' as const, content: challengeContext },
         ...history,
         { role: 'user' as const, content: message },
@@ -149,10 +149,10 @@ Keep these requirements in mind when providing assistance. Guide the user withou
 
         // Call OpenAI API
         const completion = await openai.chat.completions.create({
-          model: 'gpt-4-turbo-preview',
+          model: 'gpt-4o-mini',
           messages: messages.map(({ role, content }) => ({ role, content })),
           temperature: 0.1,
-          max_tokens: 100,
+          max_tokens: 200,
         })
 
         const response = completion.choices[0]?.message?.content ?? 'No response generated.'
@@ -198,7 +198,7 @@ Keep these requirements in mind when providing assistance. Guide the user withou
 
       // Using free prompts
       const completion = await openai.chat.completions.create({
-        model: 'gpt-4-turbo-preview',
+        model: 'gpt-4o-mini',
         messages: messages.map(({ role, content }) => ({ role, content })),
         temperature: 0.1,
         max_tokens: 100,

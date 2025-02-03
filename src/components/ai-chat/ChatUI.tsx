@@ -9,6 +9,8 @@ import { useSystemDesigner } from "@/lib/hooks/useSystemDesigner";
 import { api } from "@/trpc/react";
 import { Coins, MessageSquare, Send } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import ReactMarkdown from "react-markdown";
+import { cn } from "@/lib/utils";
 
 interface Message {
   role: "user" | "assistant" | "system";
@@ -143,6 +145,54 @@ export function ChatUI({ sessionId, challengeId, stageIndex = 0 }: ChatUIProps) 
     });
   }
 
+  const renderMessage = (message: Message) => {
+    const isUser = message.role === "user";
+    const isSystem = message.role === "system";
+
+    return (
+      <div
+        className={cn(
+          "flex",
+          isUser ? "justify-end" : "justify-start"
+        )}
+      >
+        <div
+          className={cn(
+            "max-w-[80%] rounded-lg px-4 py-2",
+            isUser
+              ? "bg-primary text-primary-foreground"
+              : isSystem
+                ? "bg-destructive text-destructive-foreground"
+                : "bg-muted"
+          )}
+        >
+          {isUser ? (
+            <div className="whitespace-pre-wrap">{message.content}</div>
+          ) : (
+            <ReactMarkdown
+              className={cn(
+                "prose prose-sm max-w-none",
+                isSystem
+                  ? "prose-invert"
+                  : "prose-neutral dark:prose-invert",
+                "break-words [&_p:last-child]:mb-0",
+                "[&_p]:my-1 [&_ul]:my-1 [&_ol]:my-1 [&_li]:my-0.5",
+                "[&_pre]:my-1 [&_code]:my-1",
+                "[&_pre]:bg-secondary/50 [&_pre]:p-2 [&_pre]:rounded",
+                "[&_code]:bg-secondary/50 [&_code]:px-1 [&_code]:py-0.5 [&_code]:rounded",
+                "[&_a]:text-primary [&_a:hover]:underline",
+                "[&_table]:border-collapse [&_td]:border [&_th]:border [&_td]:px-2 [&_th]:px-2",
+                "[&_blockquote]:border-l-4 [&_blockquote]:border-primary/20 [&_blockquote]:pl-4 [&_blockquote]:italic"
+              )}
+            >
+              {message.content}
+            </ReactMarkdown>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="flex h-full w-full flex-col">
       <ScrollArea ref={scrollAreaRef} className="flex-1">
@@ -154,23 +204,8 @@ export function ChatUI({ sessionId, challengeId, stageIndex = 0 }: ChatUIProps) 
             </div>
           )}
           {messages.map((message, i) => (
-            <div
-              key={i}
-              className={`flex ${
-                message.role === "user" ? "justify-end" : "justify-start"
-              }`}
-            >
-              <div
-                className={`max-w-[80%] rounded-lg px-4 py-2 ${
-                  message.role === "user"
-                    ? "bg-primary text-primary-foreground"
-                    : message.role === "system"
-                      ? "bg-destructive text-destructive-foreground"
-                      : "bg-muted"
-                }`}
-              >
-                {message.content}
-              </div>
+            <div key={i}>
+              {renderMessage(message)}
             </div>
           ))}
           {isLoading && (

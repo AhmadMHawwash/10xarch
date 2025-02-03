@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Bot, X } from "lucide-react";
-import { useSessionId } from "@/hooks/useSessionId";
-import { ChatUI } from "./ChatUI";
-import { motion, AnimatePresence } from "framer-motion";
 import { Separator } from "@/components/ui/separator";
+import { useSessionId } from "@/hooks/useSessionId";
+import { AnimatePresence, motion } from "framer-motion";
+import { Bot, X } from "lucide-react";
 import { useParams } from "next/navigation";
+import { useState } from "react";
+import { AIChatAssistant } from ".";
 
 export function PanelChat() {
   const [isOpen, setIsOpen] = useState(false);
@@ -28,7 +28,7 @@ export function PanelChat() {
             className="mb-4 w-full overflow-hidden rounded-lg border bg-background shadow-sm"
           >
             <div className="flex items-center justify-between border-b bg-muted/50 p-2">
-              <span className="text-sm font-medium flex items-center gap-2">
+              <span className="flex items-center gap-2 text-sm font-medium">
                 <Bot className="h-5 w-5" /> AI Assistant
               </span>
               <Button
@@ -41,7 +41,7 @@ export function PanelChat() {
               </Button>
             </div>
             <div className="h-[calc(400px-48px)]">
-              <ChatUI sessionId={sessionId} challengeId={params.slug} />
+              <AIChatAssistant />
             </div>
           </motion.div>
         )}

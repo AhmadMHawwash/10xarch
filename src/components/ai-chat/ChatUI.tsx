@@ -1,13 +1,14 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Send, MessageSquare, Coins, X } from "lucide-react";
-import { api } from "@/trpc/react";
-import { useChatMessages } from "@/lib/hooks/useChatMessages";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { useCredits } from "@/hooks/useCredits";
+import { useChatMessages } from "@/lib/hooks/useChatMessages";
+import { useSystemDesigner } from "@/lib/hooks/useSystemDesigner";
+import { api } from "@/trpc/react";
+import { Coins, MessageSquare, Send } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 interface Message {
   role: "user" | "assistant" | "system";
@@ -17,9 +18,26 @@ interface Message {
 interface ChatUIProps {
   sessionId: string;
   challengeId: string;
+  stageIndex: number;
 }
 
-export function ChatUI({ sessionId, challengeId }: ChatUIProps) {
+interface WhiteboardConfigs {
+  "API definitions and flows"?: Array<{
+    name: string;
+    definition: string;
+    flow: string;
+  }>;
+  "Capacity estimations"?: {
+    Traffic?: string;
+    Storage?: string;
+    Bandwidth?: string;
+    Memory?: string;
+  };
+  "functional requirements"?: string;
+  "non-functional requirements"?: string;
+}
+
+export function ChatUI({ sessionId, challengeId, stageIndex = 0 }: ChatUIProps) {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [remainingMessages, setRemainingMessages] = useState(10);
@@ -28,6 +46,7 @@ export function ChatUI({ sessionId, challengeId }: ChatUIProps) {
   const messages = getMessages(sessionId);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const { nodes } = useSystemDesigner();
 
   // Get remaining prompts on load
   const { data: rateLimitInfo } = api.chat.getRemainingPrompts.useQuery({
@@ -79,6 +98,33 @@ export function ChatUI({ sessionId, challengeId }: ChatUIProps) {
     },
   });
 
+  // Extract solution data
+  const extractSolutionData = () => {
+    const whiteboardNode = nodes.find((node) => node.type === "Whiteboard");
+    const configs = whiteboardNode?.data.configs as WhiteboardConfigs | undefined ?? {};
+
+    const cleanedNodes = nodes
+      .filter((node) => node.type !== "Whiteboard")
+      .map((node) => ({
+        type: node.data.name,
+        id: node.id,
+        configs: node.data.configs,
+      }));
+
+    return {
+      components: cleanedNodes,
+      apiDefinitions: configs["API definitions and flows"] ?? [],
+      capacityEstimations: {
+        traffic: configs["Capacity estimations"]?.Traffic ?? "",
+        storage: configs["Capacity estimations"]?.Storage ?? "",
+        bandwidth: configs["Capacity estimations"]?.Bandwidth ?? "",
+        memory: configs["Capacity estimations"]?.Memory ?? "",
+      },
+      functionalRequirements: configs["functional requirements"] ?? "",
+      nonFunctionalRequirements: configs["non-functional requirements"] ?? "",
+    };
+  };
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
@@ -91,7 +137,9 @@ export function ChatUI({ sessionId, challengeId }: ChatUIProps) {
     sendMessage.mutate({
       message: input,
       challengeId,
+      stageIndex: stageIndex ?? 0,
       history: messages,
+      solution: extractSolutionData(),
     });
   }
 

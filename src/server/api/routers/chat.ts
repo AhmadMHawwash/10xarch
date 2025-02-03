@@ -7,6 +7,7 @@ import { auth } from '@clerk/nextjs/server'
 import { eq } from 'drizzle-orm'
 import { credits } from '@/server/db/schema'
 import { calculateTextTokens, costToCredits, calculateGPTCost } from '@/lib/tokens'
+import challenges from "@/content/challenges"
 
 export const chatRouter = createTRPCRouter({
   getRemainingPrompts: publicProcedure
@@ -40,27 +41,86 @@ export const chatRouter = createTRPCRouter({
       z.object({
         message: z.string(),
         challengeId: z.string(),
+        stageIndex: z.number().min(0),
         history: z.array(
           z.object({
             role: z.enum(['user', 'assistant', 'system']),
             content: z.string(),
           })
         ),
+        solution: z.object({
+          components: z.array(z.any()),
+          apiDefinitions: z.array(z.any()).optional(),
+          capacityEstimations: z.object({
+            traffic: z.string().optional(),
+            storage: z.string().optional(),
+            bandwidth: z.string().optional(),
+            memory: z.string().optional(),
+          }).optional(),
+          functionalRequirements: z.string().optional(),
+          nonFunctionalRequirements: z.string().optional(),
+        }).optional(),
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const { message, challengeId, history } = input
+      const { message, challengeId, stageIndex, history, solution } = input
       const { userId } = await auth();
       const identifier = ctx.headers.get("x-forwarded-for") ?? "127.0.0.1"
+
+      // Get challenge context
+      const challenge = challenges.find((c) => c.slug === challengeId);
+      if (!challenge) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Challenge not found',
+        })
+      }
+
+      // Get current stage
+      const currentStage = challenge.stages[stageIndex]
+      if (!currentStage) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'Invalid stage index',
+        })
+      }
+
+      const challengeContext = `
+You are helping with the "${challenge.title}" challenge (${challenge.difficulty} difficulty).
+
+Current stage (${stageIndex + 1}/${challenge.stages.length}):
+${currentStage.problem}
+
+Requirements:
+${currentStage.requirements.map(req => `- ${req}`).join('\n')}
+
+Meta Requirements:
+${currentStage.metaRequirements.map(req => `- ${req}`).join('\n')}
+
+${solution ? `
+Current Solution State:
+- Components: ${solution.components.length} components defined
+${solution.apiDefinitions?.length ? `- API Definitions: ${solution.apiDefinitions.length} endpoints defined` : ''}
+${solution.capacityEstimations?.traffic ? `- Traffic Estimation: ${solution.capacityEstimations.traffic}` : ''}
+${solution.capacityEstimations?.storage ? `- Storage Estimation: ${solution.capacityEstimations.storage}` : ''}
+${solution.capacityEstimations?.bandwidth ? `- Bandwidth Estimation: ${solution.capacityEstimations.bandwidth}` : ''}
+${solution.capacityEstimations?.memory ? `- Memory Estimation: ${solution.capacityEstimations.memory}` : ''}
+${solution.functionalRequirements ? `- Functional Requirements: ${solution.functionalRequirements}` : ''}
+${solution.nonFunctionalRequirements ? `- Non-Functional Requirements: ${solution.nonFunctionalRequirements}` : ''}
+` : ''}
+
+Keep these requirements in mind when providing assistance. Guide the user without giving direct solutions.
+`
 
       // Check rate limit for free prompts
       const { success, reset, remaining } = await chatMessagesLimiter.limit(
         `${identifier}:${challengeId}`
       )
       
-      // Prepare messages for OpenAI
+      // Prepare messages for OpenAI with challenge context
       const messages = [
         { role: 'system' as const, content: SYSTEM_PROMPT },
+        { role: 'system' as const, content: challengeContext },
         ...history,
         { role: 'user' as const, content: message },
       ]

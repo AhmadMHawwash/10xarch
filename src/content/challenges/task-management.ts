@@ -1,262 +1,482 @@
 import { type Challenge } from "./types";
 
 const taskManagementChallenge: Challenge = {
-  slug: "task-management-system",
+  slug: "basic-task-management",
   title: "Task Management System Design",
-  description: "Design a simple task management system that allows users to create, organize, and track their tasks. Perfect for learning basic system design concepts and data modeling.",
+  description: "Design a task management system focusing on data organization, task tracking, and collaboration. Learn core system design concepts through practical task management features.",
   difficulty: "Easy",
   isFree: true,
   stages: [
     {
       problem: "Users need to create and manage their personal tasks",
       requirements: [
-        "Build a task management system that can handle 1000 tasks per user with < 100ms response time"
+        "Implement basic CRUD operations for personal tasks"
       ],
       metaRequirements: [
-        "Build a task management system that can handle 1000 tasks per user with < 100ms response time"
+        "Implement basic CRUD operations for personal tasks"
       ],
       hintsPerArea: {
         requirements: {
           functional: [
-            "Design task CRUD operations",
-            "Plan task list organization",
-            "Consider task status tracking"
+            "Think about task properties (title, description, status)",
+            "Consider task state transitions (todo, in-progress, done)"
           ],
           nonFunctional: [
-            "Response time under 100ms",
-            "Support multiple task lists",
-            "Ensure data persistence"
+            "Consider response time expectations",
+            "Think about data consistency needs"
           ]
         },
         systemAPI: [
-          "Task management endpoints",
-          "List organization API",
-          "Task status endpoints"
+          "What endpoints do you need for task management?",
+          "How would you structure the task data?",
+          "Consider API versioning approach"
         ],
         capacityEstimations: {
           traffic: [
-            "Calculate tasks per user",
-            "Estimate API request frequency"
+            "How many tasks per user?",
+            "What's your expected user base?"
           ],
           storage: [
-            "Task data size per user",
-            "User metadata storage"
+            "How much data per task?",
+            "Consider task history needs"
           ],
           memory: [
-            "Active user cache size",
-            "Task list cache requirements"
+            "What data needs caching?",
+            "Think about active user sessions"
           ],
           bandwidth: [
-            "Task operation payload size",
-            "List view data transfer"
+            "Calculate task payload size",
+            "Consider request frequency"
           ]
         },
         highLevelDesign: [
-          "Basic service architecture",
-          "Data storage design",
-          "Caching strategy"
+          "Where will you store tasks?",
+          "How will you handle task updates?",
+          "Consider basic data access patterns"
         ]
       },
       criteria: [
-        "System handles 1000 tasks per user",
-        "Response time is under 100ms",
-        "Basic CRUD operations work correctly"
+        "Users can create, read, update, and delete tasks",
+        "Task status changes are tracked",
+        "Basic task data is persisted"
       ],
-      learningsInMD: "Learn about basic CRUD operations, data modeling, and simple caching strategies.",
+      learningsInMD: `
+## Key Learnings
+
+### Data Modeling
+- Basic entity design
+- State management
+- Storage patterns
+
+### API Design
+- RESTful endpoints
+- Resource modeling
+- Basic CRUD operations
+      `,
       resources: {
         documentation: [
           {
-            title: "RESTful API Design",
-            url: "https://restfulapi.net/",
-            description: "Understanding REST API principles for task management"
+            title: "REST API Design",
+            url: "https://docs.microsoft.com/en-us/azure/architecture/best-practices/api-design",
+            description: "Best practices for REST API design"
           }
         ],
         realWorldCases: [
           {
-            name: "Todoist",
-            url: "https://todoist.com/",
-            description: "How Todoist manages task organization"
+            name: "Trello Architecture",
+            url: "https://tech.trello.com/how-we-built-trello",
+            description: "Basic task management system architecture"
           }
         ],
         bestPractices: [
           {
-            title: "Task Organization",
-            description: "Implement hierarchical task lists with basic sorting and filtering",
-            example: "Group tasks by projects/lists and allow status-based filtering"
+            title: "Task Data Model",
+            description: "Include essential task metadata",
+            example: "id, title, status, created_at, updated_at"
           }
         ]
       }
     },
     {
-      problem: "Users want to set due dates and receive notifications for their tasks",
+      problem: "Users want to share and collaborate on task lists with team members",
       requirements: [
-        "Implement task scheduling and notification system supporting 10,000 daily notifications with 99% delivery rate"
+        "Add multi-user collaboration features for task management"
       ],
       metaRequirements: [
-        "Build a task management system that can handle 1000 tasks per user with < 100ms response time",
-        "Implement task scheduling and notification system supporting 10,000 daily notifications with 99% delivery rate"
+        "Implement basic CRUD operations for personal tasks",
+        "Add multi-user collaboration features for task management"
       ],
       hintsPerArea: {
         requirements: {
           functional: [
-            "Design notification system",
-            "Plan scheduling mechanism",
-            "Consider notification preferences"
+            "Think about access controls",
+            "Consider collaboration modes"
           ],
           nonFunctional: [
-            "99% notification delivery rate",
-            "Handle timezone differences",
-            "Ensure notification timing"
+            "Consider data isolation",
+            "Think about concurrent updates"
           ]
         },
         systemAPI: [
-          "Due date management API",
-          "Notification preferences endpoints",
-          "Notification delivery API"
+          "How will you handle permissions?",
+          "Consider team management APIs",
+          "Think about sharing mechanisms"
         ],
         capacityEstimations: {
           traffic: [
-            "Daily notification volume",
-            "Schedule check frequency"
+            "How many users per task list?",
+            "Consider collaborative access patterns"
           ],
           storage: [
-            "Notification preferences size",
-            "Schedule data volume"
+            "Think about permission data size",
+            "Consider team data storage"
           ],
           memory: [
-            "Active schedule cache",
-            "Notification queue size"
+            "What team data to cache?",
+            "Consider active collaboration sessions"
           ],
           bandwidth: [
-            "Notification payload size",
-            "Schedule update volume"
+            "Calculate team data transfer needs",
+            "Consider update notifications"
           ]
         },
         highLevelDesign: [
-          "Notification service design",
-          "Scheduling system",
-          "Delivery mechanism"
+          "How will you manage permissions?",
+          "Consider team data organization",
+          "Think about update distribution"
         ]
       },
       criteria: [
-        "System handles 10,000 daily notifications",
-        "Achieves 99% delivery rate",
-        "Notifications are timely"
+        "Users can share task lists",
+        "Team members can collaborate on tasks",
+        "Basic access control works"
       ],
-      learningsInMD: "Learn about scheduling systems, notification delivery mechanisms, and handling time-based operations.",
+      learningsInMD: `
+## Key Learnings
+
+### Multi-user Systems
+- Access control patterns
+- Collaboration models
+- Permission management
+
+### Data Organization
+- Team-based data structures
+- Sharing mechanisms
+- Concurrent access handling
+      `,
       resources: {
         documentation: [
           {
-            title: "Cron Scheduling",
-            url: "https://en.wikipedia.org/wiki/Cron",
-            description: "Understanding time-based job scheduling"
+            title: "Role-Based Access Control",
+            url: "https://auth0.com/docs/authorization/rbac",
+            description: "Understanding RBAC for collaboration"
           }
         ],
         realWorldCases: [
           {
-            name: "Microsoft To Do",
-            url: "https://todo.microsoft.com/",
-            description: "Microsoft To Do's reminder system"
+            name: "Asana Teams",
+            url: "https://asana.com/guide/team",
+            description: "How Asana implements team collaboration"
+          }
+        ],
+        bestPractices: [
+          {
+            title: "Permission Model",
+            description: "Implement granular access controls",
+            example: "view, edit, admin permission levels"
+          }
+        ]
+      }
+    },
+    {
+      problem: "Task lists are loading slowly as they grow larger",
+      requirements: [
+        "Optimize task list loading and management for larger scales"
+      ],
+      metaRequirements: [
+        "Implement basic CRUD operations for personal tasks",
+        "Add multi-user collaboration features for task management",
+        "Optimize task list loading and management for larger scales"
+      ],
+      hintsPerArea: {
+        requirements: {
+          functional: [
+            "Consider pagination needs",
+            "Think about search capabilities"
+          ],
+          nonFunctional: [
+            "Consider response time goals",
+            "Think about data retrieval efficiency"
+          ]
+        },
+        systemAPI: [
+          "How will you implement pagination?",
+          "Consider filtering options",
+          "Think about search endpoints"
+        ],
+        capacityEstimations: {
+          traffic: [
+            "What's your largest task list size?",
+            "Consider query patterns"
+          ],
+          storage: [
+            "Think about index size",
+            "Consider search data structures"
+          ],
+          memory: [
+            "What to cache for faster access?",
+            "Consider pagination cache"
+          ],
+          bandwidth: [
+            "Calculate paginated response size",
+            "Consider data transfer optimization"
+          ]
+        },
+        highLevelDesign: [
+          "How will you implement search?",
+          "Consider caching strategy",
+          "Think about data indexing"
+        ]
+      },
+      criteria: [
+        "Task lists load quickly",
+        "Pagination works efficiently",
+        "Basic search functionality works"
+      ],
+      learningsInMD: `
+## Key Learnings
+
+### Performance Optimization
+- Pagination patterns
+- Caching strategies
+- Search implementation
+
+### Data Access
+- Indexing basics
+- Query optimization
+- Efficient data retrieval
+      `,
+      resources: {
+        documentation: [
+          {
+            title: "Database Indexing",
+            url: "https://use-the-index-luke.com/",
+            description: "Understanding database indexing"
+          }
+        ],
+        realWorldCases: [
+          {
+            name: "Monday.com Performance",
+            url: "https://monday.com/blog/tech/performance",
+            description: "How Monday.com optimizes performance"
+          }
+        ],
+        bestPractices: [
+          {
+            title: "Pagination",
+            description: "Implement cursor-based pagination",
+            example: "Use task ID as cursor for consistent ordering"
+          }
+        ]
+      }
+    },
+    {
+      problem: "Users want to be notified of task updates and assignments",
+      requirements: [
+        "Implement task notification system"
+      ],
+      metaRequirements: [
+        "Implement basic CRUD operations for personal tasks",
+        "Add multi-user collaboration features for task management",
+        "Optimize task list loading and management for larger scales",
+        "Implement task notification system"
+      ],
+      hintsPerArea: {
+        requirements: {
+          functional: [
+            "Consider notification types",
+            "Think about delivery methods"
+          ],
+          nonFunctional: [
+            "Consider notification timing",
+            "Think about delivery reliability"
+          ]
+        },
+        systemAPI: [
+          "How will you trigger notifications?",
+          "Consider notification preferences",
+          "Think about delivery status"
+        ],
+        capacityEstimations: {
+          traffic: [
+            "How many notifications per update?",
+            "Consider notification patterns"
+          ],
+          storage: [
+            "Think about notification history",
+            "Consider preference storage"
+          ],
+          memory: [
+            "What notification data to cache?",
+            "Consider delivery queues"
+          ],
+          bandwidth: [
+            "Calculate notification payload",
+            "Consider delivery protocols"
+          ]
+        },
+        highLevelDesign: [
+          "How will you queue notifications?",
+          "Consider delivery system",
+          "Think about failure handling"
+        ]
+      },
+      criteria: [
+        "Users receive task update notifications",
+        "Notification preferences work",
+        "Notifications are reliable"
+      ],
+      learningsInMD: `
+## Key Learnings
+
+### Event Processing
+- Notification systems
+- Event queuing
+- Delivery patterns
+
+### Asynchronous Systems
+- Message queues
+- Event handling
+- Delivery guarantees
+      `,
+      resources: {
+        documentation: [
+          {
+            title: "RabbitMQ Tutorials",
+            url: "https://www.rabbitmq.com/getstarted.html",
+            description: "Understanding message queues"
+          }
+        ],
+        realWorldCases: [
+          {
+            name: "Jira Notifications",
+            url: "https://confluence.atlassian.com/jirasoftwarecloud/notifications",
+            description: "How Jira handles notifications"
           }
         ],
         bestPractices: [
           {
             title: "Notification Design",
-            description: "Implement flexible notification preferences with reliable delivery",
-            example: "Allow users to choose notification channels (email, push, etc.) and timing preferences"
+            description: "Implement notification preferences",
+            example: "Allow per-event and per-channel settings"
           }
         ]
       }
     },
     {
-      problem: "Users need to categorize and search their tasks efficiently",
+      problem: "System becomes unresponsive during backup and maintenance",
       requirements: [
-        "Support task categorization and search functionality with < 200ms search response time across 10,000 tasks"
+        "Implement basic high availability for the task system"
       ],
       metaRequirements: [
-        "Build a task management system that can handle 1000 tasks per user with < 100ms response time",
-        "Implement task scheduling and notification system supporting 10,000 daily notifications with 99% delivery rate",
-        "Support task categorization and search functionality with < 200ms search response time across 10,000 tasks"
+        "Implement basic CRUD operations for personal tasks",
+        "Add multi-user collaboration features for task management",
+        "Optimize task list loading and management for larger scales",
+        "Implement task notification system",
+        "Implement basic high availability for the task system"
       ],
       hintsPerArea: {
         requirements: {
           functional: [
-            "Design tagging system",
-            "Plan search functionality",
-            "Consider filtering options"
+            "Consider backup procedures",
+            "Think about maintenance windows"
           ],
           nonFunctional: [
-            "Search response under 200ms",
-            "Support multiple categories",
-            "Enable efficient filtering"
+            "Consider availability goals",
+            "Think about data durability"
           ]
         },
         systemAPI: [
-          "Category management API",
-          "Search endpoints",
-          "Filter management API"
+          "How will you handle failover?",
+          "Consider health checks",
+          "Think about backup APIs"
         ],
         capacityEstimations: {
           traffic: [
-            "Search requests per second",
-            "Category operations rate"
+            "What's your backup data size?",
+            "Consider maintenance impact"
           ],
           storage: [
-            "Category metadata size",
-            "Search index volume"
+            "Think about backup storage",
+            "Consider redundancy needs"
           ],
           memory: [
-            "Search index cache",
-            "Category cache size"
+            "What fails over to backup?",
+            "Consider recovery state"
           ],
           bandwidth: [
-            "Search result payload",
-            "Category update size"
+            "Calculate backup transfer needs",
+            "Consider replication traffic"
           ]
         },
         highLevelDesign: [
-          "Search service design",
-          "Category system",
-          "Index management"
+          "How will you handle failover?",
+          "Consider backup strategy",
+          "Think about monitoring"
         ]
       },
       criteria: [
-        "Search completes within 200ms",
-        "Category operations work correctly",
-        "Filtering is accurate"
+        "System remains available during maintenance",
+        "Backups don't impact performance",
+        "Basic failover works"
       ],
-      learningsInMD: "Learn about search system design, categorization mechanisms, and efficient data indexing.",
+      learningsInMD: `
+## Key Learnings
+
+### High Availability
+- Backup strategies
+- Failover patterns
+- Maintenance procedures
+
+### System Operations
+- Monitoring basics
+- Backup management
+- Recovery procedures
+      `,
       resources: {
         documentation: [
           {
-            title: "Search Indexing",
-            url: "https://www.elastic.co/guide/en/elasticsearch/guide/current/indexing-performance.html",
-            description: "Understanding search index design"
+            title: "Database Replication",
+            url: "https://docs.mongodb.com/manual/replication/",
+            description: "Understanding database replication"
           }
         ],
         realWorldCases: [
           {
-            name: "Trello",
-            url: "https://trello.com/",
-            description: "Trello's label and search system"
+            name: "Todoist Reliability",
+            url: "https://blog.todoist.com/reliability",
+            description: "How Todoist maintains availability"
           }
         ],
         bestPractices: [
           {
-            title: "Category Design",
-            description: "Implement flexible categorization with efficient search",
-            example: "Use tags/labels with full-text search and category-based filtering"
+            title: "Backup Strategy",
+            description: "Implement incremental backups",
+            example: "Use write-ahead logs for point-in-time recovery"
           }
         ]
       }
     }
   ],
   generalLearnings: [
-    "Basic system design principles",
-    "Simple data modeling and storage",
-    "Notification system design",
-    "Search and categorization concepts",
-    "Performance optimization basics"
+    "Basic CRUD system design",
+    "Multi-user collaboration patterns",
+    "Performance optimization techniques",
+    "Event-driven architecture basics",
+    "High availability fundamentals",
+    "Data modeling and storage patterns",
+    "API design principles",
+    "Basic system scaling approaches"
   ]
 };
 

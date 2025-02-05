@@ -1,262 +1,274 @@
 import { type Challenge } from "./types";
 
 const fileStorageChallenge: Challenge = {
-  slug: "file-storage-service",
-  title: "File Storage Service System Design",
-  description: "Design a scalable file storage service focusing on efficient file upload/download, synchronization, and sharing capabilities. Learn key concepts in distributed storage systems and content delivery.",
+  slug: "file-storage-system",
+  title: "File Storage System Design",
+  description: "Design a scalable file storage system that allows users to upload, download, and manage files securely with features like sharing and version control.",
   difficulty: "Medium",
   isFree: true,
   stages: [
     {
-      problem: "Users need to upload and download files reliably with support for large files",
+      problem: "Users need to upload and download personal files to the cloud securely",
       requirements: [
-        "Support reliable file uploads up to 5GB with resumable upload capability and 99.9% upload success rate"
+        "Allow users to upload files up to 100MB in size and download them later"
       ],
       metaRequirements: [
-        "Support reliable file uploads up to 5GB with resumable upload capability and 99.9% upload success rate"
+        "Allow users to upload files up to 100MB in size and download them later"
       ],
       hintsPerArea: {
         requirements: {
           functional: [
-            "Design chunked upload mechanism",
-            "Plan upload resumption strategy",
-            "Consider file integrity verification"
+            "Consider how to handle file upload interruptions",
+            "Think about file integrity verification"
           ],
           nonFunctional: [
-            "Handle network interruptions gracefully",
-            "Ensure upload reliability",
-            "Maintain data integrity"
+            "Consider upload/download speed requirements",
+            "Think about concurrent upload/download limits"
           ]
         },
         systemAPI: [
-          "Chunk upload endpoints",
-          "Upload status tracking API",
-          "File metadata endpoints"
+          "Design endpoints for file upload and download operations",
+          "Consider chunked upload API design for large files",
+          "Think about resumable upload capabilities"
         ],
         capacityEstimations: {
           traffic: [
-            "Calculate concurrent uploads",
-            "Estimate chunk size and frequency"
+            "Estimate average file size and daily active users",
+            "Calculate peak upload/download operations per second"
           ],
           storage: [
-            "File storage requirements",
-            "Metadata storage size"
+            "Calculate total storage needed based on user growth",
+            "Consider storage needed for file metadata"
           ],
           memory: [
-            "Upload session tracking",
-            "Chunk assembly buffer"
+            "Estimate memory needed for active upload/download sessions",
+            "Consider caching requirements for frequently accessed files"
           ],
           bandwidth: [
-            "Upload bandwidth per user",
-            "Total system bandwidth"
+            "Calculate network bandwidth for peak upload times",
+            "Estimate concurrent download bandwidth requirements"
           ]
         },
         highLevelDesign: [
-          "Upload service architecture",
-          "Storage system design",
-          "Metadata service"
+          "Consider separation of metadata and actual file storage",
+          "Think about upload/download service architecture"
         ]
       },
       criteria: [
-        "System can handle file uploads up to 5GB",
-        "Upload success rate meets 99.9%",
-        "Uploads are resumable after interruption"
+        "System can handle file uploads up to 100MB",
+        "Files can be downloaded reliably",
+        "Basic error handling for failed uploads/downloads is implemented"
       ],
-      learningsInMD: "Learn about chunked upload mechanisms, handling large files, and ensuring data integrity in distributed systems.",
+      learningsInMD: `
+# Key Learnings
+- Designing large file upload systems
+- Handling network interruptions
+- Basic file storage architecture
+- API design for file operations
+- Capacity planning for storage systems
+      `,
       resources: {
         documentation: [
           {
-            title: "Chunked Transfer Encoding",
-            url: "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Transfer-Encoding",
-            description: "Understanding chunked transfer encoding for large file uploads"
+            title: "AWS S3 Design Patterns",
+            url: "https://aws.amazon.com/s3/",
+            description: "Learn about industry-standard object storage design patterns"
           }
         ],
         realWorldCases: [
           {
-            name: "Dropbox",
-            url: "https://dropbox.tech/infrastructure/streaming-file-synchronization",
-            description: "How Dropbox handles file synchronization"
+            name: "Dropbox Architecture",
+            url: "https://dropbox.tech/infrastructure/",
+            description: "How Dropbox handles millions of file operations"
           }
         ],
         bestPractices: [
           {
-            title: "Resumable Uploads",
-            description: "Implement upload resumption using chunk tracking and temporary storage",
-            example: "Store upload progress in metadata service and allow clients to resume from last successful chunk"
+            title: "Chunked Upload Design",
+            description: "Break large files into smaller chunks for reliable upload",
+            example: "Use 5MB chunks with separate upload sessions"
           }
         ]
       }
     },
     {
-      problem: "System needs to efficiently synchronize files across multiple devices",
+      problem: "Users want to share files with others and control access permissions",
       requirements: [
-        "Implement file synchronization across devices with conflict resolution and <1 minute sync delay for 100,000 concurrent users"
+        "Enable file sharing with specific users and manage access permissions (read/write)"
       ],
       metaRequirements: [
-        "Support reliable file uploads up to 5GB with resumable upload capability and 99.9% upload success rate",
-        "Implement file synchronization across devices with conflict resolution and <1 minute sync delay for 100,000 concurrent users"
+        "Allow users to upload files up to 100MB in size and download them later",
+        "Enable file sharing with specific users and manage access permissions (read/write)"
       ],
       hintsPerArea: {
         requirements: {
           functional: [
-            "Design sync notification system",
-            "Plan conflict resolution strategy",
-            "Consider delta sync mechanism"
+            "Consider different sharing permission levels",
+            "Think about sharing link expiration"
           ],
           nonFunctional: [
-            "Sync delay under 1 minute",
-            "Handle concurrent modifications",
-            "Ensure data consistency"
+            "Consider access control performance",
+            "Think about permission propagation delays"
           ]
         },
         systemAPI: [
-          "File change notification API",
-          "Delta sync endpoints",
-          "Conflict resolution API"
+          "Design sharing invitation endpoints",
+          "Consider permission management APIs",
+          "Think about shared file discovery endpoints"
         ],
         capacityEstimations: {
           traffic: [
-            "Sync operations per second",
-            "Change notification frequency"
+            "Estimate sharing operations per second",
+            "Calculate permission checks per file access"
           ],
           storage: [
-            "Version history size",
-            "Delta storage requirements"
+            "Calculate storage for sharing metadata",
+            "Estimate permission table size"
           ],
           memory: [
-            "Active sync session cache",
-            "Change notification queue"
+            "Consider caching for frequently accessed permissions",
+            "Estimate memory for active sharing sessions"
           ],
           bandwidth: [
-            "Delta sync bandwidth",
-            "Notification payload size"
+            "Calculate additional bandwidth for shared file access",
+            "Estimate notification system bandwidth"
           ]
         },
         highLevelDesign: [
-          "Sync service architecture",
-          "Notification system design",
-          "Conflict resolution system"
+          "Design permission management service",
+          "Consider sharing notification system"
         ]
       },
       criteria: [
-        "Files sync across devices within 1 minute",
-        "System handles conflicts correctly",
-        "Supports 100,000 concurrent users"
+        "Users can share files with specific permissions",
+        "Access control is properly enforced",
+        "Sharing operations are tracked and logged"
       ],
-      learningsInMD: "Learn about file synchronization mechanisms, conflict resolution strategies, and real-time notification systems.",
+      learningsInMD: `
+# Key Learnings
+- Designing access control systems
+- Permission management at scale
+- Sharing system architecture
+- Security considerations for shared resources
+      `,
       resources: {
         documentation: [
           {
-            title: "Vector Clocks",
-            url: "https://en.wikipedia.org/wiki/Vector_clock",
-            description: "Understanding vector clocks for distributed system synchronization"
+            title: "Google Drive Sharing Model",
+            url: "https://developers.google.com/drive/api/guides/about-sharing",
+            description: "Learn about enterprise-grade file sharing systems"
           }
         ],
         realWorldCases: [
           {
-            name: "Google Drive",
-            url: "https://www.google.com/drive/download/",
-            description: "Google Drive's approach to file synchronization"
-          }
-        ],
-        bestPractices: [
-          {
-            title: "Delta Sync",
-            description: "Only sync changed portions of files to reduce bandwidth",
-            example: "Use rolling checksums to identify changed blocks and sync only those blocks"
-          }
-        ]
-      }
-    },
-    {
-      problem: "Users need to share files and collaborate with others",
-      requirements: [
-        "Enable file sharing and collaboration features supporting 1 million shared files with appropriate access controls"
-      ],
-      metaRequirements: [
-        "Support reliable file uploads up to 5GB with resumable upload capability and 99.9% upload success rate",
-        "Implement file synchronization across devices with conflict resolution and <1 minute sync delay for 100,000 concurrent users",
-        "Enable file sharing and collaboration features supporting 1 million shared files with appropriate access controls"
-      ],
-      hintsPerArea: {
-        requirements: {
-          functional: [
-            "Design sharing permission system",
-            "Plan collaboration features",
-            "Consider access control mechanisms"
-          ],
-          nonFunctional: [
-            "Maintain access control security",
-            "Handle concurrent access",
-            "Ensure permission propagation"
-          ]
-        },
-        systemAPI: [
-          "Sharing management API",
-          "Permission check endpoints",
-          "Collaboration features API"
-        ],
-        capacityEstimations: {
-          traffic: [
-            "Permission checks per second",
-            "Sharing operations rate"
-          ],
-          storage: [
-            "Permission data size",
-            "Sharing metadata volume"
-          ],
-          memory: [
-            "Active permission cache",
-            "Collaboration session data"
-          ],
-          bandwidth: [
-            "Permission update propagation",
-            "Collaboration data sync"
-          ]
-        },
-        highLevelDesign: [
-          "Permission service design",
-          "Sharing system architecture",
-          "Collaboration service"
-        ]
-      },
-      criteria: [
-        "System handles 1 million shared files",
-        "Access controls work correctly",
-        "Sharing operations are secure"
-      ],
-      learningsInMD: "Learn about implementing secure file sharing, access control systems, and collaboration features in distributed systems.",
-      resources: {
-        documentation: [
-          {
-            title: "Access Control Lists",
-            url: "https://en.wikipedia.org/wiki/Access-control_list",
-            description: "Understanding ACLs for file permissions"
-          }
-        ],
-        realWorldCases: [
-          {
-            name: "Box",
-            url: "https://box.com/",
-            description: "Box's enterprise file sharing and collaboration features"
+            name: "Box Enterprise Sharing",
+            url: "https://box.com/enterprise",
+            description: "How Box implements enterprise file sharing"
           }
         ],
         bestPractices: [
           {
             title: "Hierarchical Permissions",
-            description: "Implement hierarchical permission system with inheritance",
-            example: "Child objects inherit permissions from parent folders with option to override"
+            description: "Implement hierarchical permission model for efficient access control",
+            example: "Owner > Editor > Viewer permission hierarchy"
+          }
+        ]
+      }
+    },
+    {
+      problem: "Users need file version control and recovery options",
+      requirements: [
+        "Implement file versioning with ability to restore previous versions up to 30 days"
+      ],
+      metaRequirements: [
+        "Allow users to upload files up to 100MB in size and download them later",
+        "Enable file sharing with specific users and manage access permissions (read/write)",
+        "Implement file versioning with ability to restore previous versions up to 30 days"
+      ],
+      hintsPerArea: {
+        requirements: {
+          functional: [
+            "Consider version retention policies",
+            "Think about version restoration process"
+          ],
+          nonFunctional: [
+            "Consider storage efficiency for versions",
+            "Think about version retrieval performance"
+          ]
+        },
+        systemAPI: [
+          "Design version history endpoints",
+          "Consider version restoration APIs",
+          "Think about version cleanup endpoints"
+        ],
+        capacityEstimations: {
+          traffic: [
+            "Estimate version creation frequency",
+            "Calculate version restoration operations"
+          ],
+          storage: [
+            "Calculate storage for version history",
+            "Estimate version metadata size"
+          ],
+          memory: [
+            "Consider caching for recent versions",
+            "Estimate memory for version comparison"
+          ],
+          bandwidth: [
+            "Calculate bandwidth for version retrieval",
+            "Estimate version backup bandwidth"
+          ]
+        },
+        highLevelDesign: [
+          "Design version tracking service",
+          "Consider delta storage system"
+        ]
+      },
+      criteria: [
+        "System maintains file versions for 30 days",
+        "Users can view and restore previous versions",
+        "Version storage is optimized for space efficiency"
+      ],
+      learningsInMD: `
+# Key Learnings
+- Version control system design
+- Delta storage optimization
+- Backup and recovery systems
+- Storage efficiency strategies
+      `,
+      resources: {
+        documentation: [
+          {
+            title: "Git Internal Design",
+            url: "https://git-scm.com/book/en/v2/Git-Internals-Plumbing-and-Porcelain",
+            description: "Learn about efficient version control systems"
+          }
+        ],
+        realWorldCases: [
+          {
+            name: "OneDrive Version History",
+            url: "https://support.microsoft.com/en-us/office/restore-a-previous-version-of-a-file-stored-in-onedrive-159cad6d-d76e-4981-88ef-de6e96c93893",
+            description: "How OneDrive implements file versioning"
+          }
+        ],
+        bestPractices: [
+          {
+            title: "Delta Compression",
+            description: "Store only changes between versions to optimize storage",
+            example: "Store full copy for major versions, deltas for minor versions"
           }
         ]
       }
     }
   ],
   generalLearnings: [
-    "Designing distributed storage systems",
-    "Implementing efficient file transfer mechanisms",
-    "Building reliable synchronization systems",
-    "Creating secure sharing and collaboration features",
-    "Handling large-scale concurrent operations"
+    "Designing scalable storage systems",
+    "Implementing secure file sharing mechanisms",
+    "Managing file versions efficiently",
+    "Handling large file uploads/downloads",
+    "Designing permission and access control systems",
+    "Optimizing storage and retrieval operations",
+    "Implementing backup and recovery mechanisms"
   ]
 };
 

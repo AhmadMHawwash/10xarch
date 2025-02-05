@@ -1,626 +1,475 @@
 import { type Challenge } from "./types";
 
-const blogPlatformChallenge: Challenge = {
+const bloggingPlatformChallenge: Challenge = {
   slug: "blogging-platform",
-  title: "Blogging Platform System Design",
-  description:
-    "Design a scalable blogging platform focusing on content delivery, user engagement, and performance optimization. Learn key concepts in distributed systems and content management.",
+  title: "Medium-Scale Blogging Platform Design",
+  description: "Design a scalable blogging platform that supports content creation, distribution, and engagement while ensuring good performance and reliability.",
   difficulty: "Medium",
-  isFree: false,
+  isFree: true,
   stages: [
     {
-      problem:
-        "Users need a platform to write and publish blog posts with basic formatting capabilities",
+      problem: "Writers need a platform to create, edit, and publish blog posts with rich text formatting and image support.",
       requirements: [
-        "Support creating, reading, updating, and deleting blog posts with rich text formatting for 10,000 daily active users",
+        "Create a service that handles blog post creation and storage with rich media support"
       ],
       metaRequirements: [
-        "Support creating, reading, updating, and deleting blog posts with rich text formatting for 10,000 daily active users",
+        "Create a service that handles blog post creation and storage with rich media support"
       ],
       hintsPerArea: {
         requirements: {
           functional: [
-            "Consider how to store formatted text data efficiently",
-            "Think about post metadata structure (title, author, timestamp)",
-            "Plan for draft saves and publishing workflow",
+            "Consider content format and storage structure",
+            "Think about media upload and processing needs"
           ],
           nonFunctional: [
-            "Posts should load within 2 seconds",
-            "System should handle multiple concurrent editors",
-            "Consider data consistency requirements for editing",
-          ],
+            "Consider draft autosave frequency",
+            "Think about editor responsiveness"
+          ]
         },
         systemAPI: [
-          "RESTful endpoints for CRUD operations",
-          "Authentication headers structure",
-          "Pagination parameters for post listings",
+          "What endpoints are needed for CRUD operations?",
+          "How to handle draft vs published states?",
+          "How to structure the content API?"
         ],
         capacityEstimations: {
           traffic: [
-            "Calculate read vs. write ratio for blog posts",
-            "Factor in concurrent users during peak hours",
+            "How many concurrent writers might be editing?",
+            "What's the expected post creation rate?"
           ],
           storage: [
-            "Average post size including formatting",
-            "Metadata storage requirements",
-            "Draft version storage impact",
+            "Calculate average post size with media",
+            "Consider metadata storage needs"
           ],
           memory: [
-            "Session data size per user",
-            "Caching requirements for popular posts",
+            "Estimate draft state caching needs",
+            "Consider session data requirements"
           ],
           bandwidth: [
-            "Data transfer for post creation/updates",
-            "Bandwidth needs for serving posts to readers",
-          ],
+            "Calculate media upload bandwidth",
+            "Estimate content delivery needs"
+          ]
         },
         highLevelDesign: [
-          "Consider separation of read and write paths",
-          "Think about where to store post content vs metadata",
-          "Plan for user authentication service placement",
-        ],
+          "Consider separation of content and media services",
+          "Think about draft state management"
+        ]
       },
       criteria: [
-        "System can handle CRUD operations for blog posts",
-        "Rich text formatting data is properly stored and retrieved",
-        "Basic user authentication is implemented",
-        "Posts are served within 2 seconds",
+        "Writers can create and edit posts with rich text",
+        "System supports image uploads",
+        "Posts can be saved as drafts or published",
+        "Content is persistently stored"
       ],
       learningsInMD: `
-## Key Learnings from Stage 1
-
-### Data Modeling
-- Structuring blog post content and metadata
-- Handling rich text storage efficiently
-- Managing relationships between posts and users
-
-### API Design
-- RESTful API principles for content management
-- Authentication and authorization basics
-- Pagination and filtering strategies
-
-### Storage Considerations
-- Choosing between SQL and NoSQL for post storage
-- Metadata indexing strategies
-- Draft version management
+## Key Learnings
+- Content management system design
+- BLOB storage patterns
+- Draft state management
+- Rich text data modeling
       `,
       resources: {
         documentation: [
           {
-            title: "Database Schemas for Blog Platforms",
-            url: "https://docs.mongodb.com/manual/core/data-modeling-introduction/",
-            description:
-              "Learn about effective schema design for content management systems",
-          },
+            title: "Content Management Systems",
+            url: "https://docs.microsoft.com/en-us/azure/architecture/guide/architecture-styles/web-queue-worker",
+            description: "Architecture patterns for content management"
+          }
         ],
         realWorldCases: [
           {
-            name: "Medium's Technical Architecture",
-            url: "https://medium.engineering/",
-            description:
-              "How Medium handles content storage and delivery at scale",
-          },
+            name: "Ghost",
+            url: "https://ghost.org/",
+            description: "Open source publishing platform architecture"
+          }
         ],
         bestPractices: [
           {
-            title: "Content Storage Optimization",
-            description:
-              "Store metadata and content separately for better performance",
-            example: "Use a document store for content and RDBMS for metadata",
-          },
-        ],
-      },
+            title: "Content Storage",
+            description: "Separate content and media storage",
+            example: "Use document DB for content, object storage for media"
+          }
+        ]
+      }
     },
     {
-      problem:
-        "Users are experiencing slow load times for blog posts with high traffic",
+      problem: "Readers are experiencing slow page loads, especially for posts with many images.",
       requirements: [
-        "Reduce post load time to under 500ms for 100,000 daily active users",
+        "Optimize content delivery speed across regions"
       ],
       metaRequirements: [
-        "Support creating, reading, updating, and deleting blog posts with rich text formatting for 100,000 daily active users",
-        "Reduce post load time to under 500ms for 100,000 daily active users",
+        "Create a service that handles blog post creation and storage with rich media support",
+        "Optimize content delivery speed across regions"
       ],
       hintsPerArea: {
         requirements: {
           functional: [
-            "Implement content caching strategy",
-            "Consider CDN integration for static content",
-            "Plan cache invalidation approach",
+            "Consider image optimization and resizing",
+            "Think about content caching strategy"
           ],
           nonFunctional: [
-            "Maintain consistency across caching layers",
-            "Handle cache misses gracefully",
-            "Consider regional performance differences",
-          ],
+            "Consider target page load times",
+            "Think about image quality vs size trade-offs"
+          ]
         },
         systemAPI: [
-          "Cache-Control header usage",
-          "ETags for content validation",
-          "CDN configuration endpoints",
+          "How to handle image variants?",
+          "What cache control headers to use?",
+          "How to structure CDN paths?"
         ],
         capacityEstimations: {
           traffic: [
-            "Cache hit ratio expectations",
-            "Traffic distribution across regions",
+            "Calculate read-to-write ratio",
+            "Estimate peak reading times"
           ],
-          storage: ["Cache size requirements", "CDN storage needs"],
+          storage: [
+            "Calculate storage for image variants",
+            "Estimate CDN storage needs"
+          ],
           memory: [
-            "Memory requirements for caching layer",
-            "Cache eviction policy impact",
+            "Calculate cache size requirements",
+            "Consider hot content patterns"
           ],
           bandwidth: [
-            "CDN bandwidth calculations",
-            "Origin server bandwidth requirements",
-          ],
+            "Estimate CDN bandwidth needs",
+            "Calculate origin server traffic"
+          ]
         },
         highLevelDesign: [
-          "Placement of caching layers",
-          "CDN integration points",
-          "Cache update flow",
-        ],
+          "Consider CDN placement",
+          "Think about image processing pipeline"
+        ]
       },
       criteria: [
-        "Posts load in under 500ms for 95th percentile",
-        "Cache hit ratio > 80%",
-        "System handles 100,000 daily active users",
-        "Cache consistency maintained during updates",
+        "Writers can create and edit posts with rich text",
+        "System supports image uploads",
+        "Posts can be saved as drafts or published",
+        "Content is persistently stored",
+        "Content loads quickly across regions",
+        "Images are optimized for delivery"
       ],
       learningsInMD: `
-## Key Learnings from Stage 2
-
-### Caching Strategies
-- Multi-layer caching architecture
-- Cache invalidation patterns
-- Content delivery optimization
-
-### Performance Optimization
-- CDN integration and configuration
-- Regional performance considerations
-- Load time optimization techniques
-
-### Scalability
-- Horizontal scaling approaches
-- Traffic management
-- Resource optimization
+## Key Learnings
+- CDN architecture and configuration
+- Image optimization pipelines
+- Cache strategy design
+- Performance optimization techniques
       `,
       resources: {
         documentation: [
           {
             title: "CDN Best Practices",
             url: "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/best-practices.html",
-            description: "Learn about CDN configuration and optimization",
-          },
+            description: "AWS CDN implementation patterns"
+          }
         ],
         realWorldCases: [
           {
-            name: "WordPress.com Architecture",
-            url: "https://wordpress.com/tech/",
-            description: "How WordPress.com handles global content delivery",
-          },
+            name: "Medium",
+            url: "https://medium.com/",
+            description: "Content delivery architecture for large scale blogging"
+          }
         ],
         bestPractices: [
           {
-            title: "Cache Strategy",
-            description:
-              "Implement multiple caching layers with appropriate TTLs",
-            example:
-              "Browser cache -> CDN -> Application cache -> Database cache",
-          },
-        ],
-      },
+            title: "Media Optimization",
+            description: "Implement automated image processing",
+            example: "Use serverless functions for image resizing and optimization"
+          }
+        ]
+      }
     },
     {
-      problem:
-        "Users want to interact with blog posts through comments and reactions",
+      problem: "The platform is experiencing database bottlenecks as user engagement (comments, likes) grows rapidly.",
       requirements: [
-        "Support real-time comments and reactions for posts with 500,000 daily active users",
+        "Scale user engagement handling"
       ],
       metaRequirements: [
-        "Support creating, reading, updating, and deleting blog posts with rich text formatting for 500,000 daily active users",
-        "Reduce post load time to under 500ms for 500,000 daily active users",
-        "Support real-time comments and reactions for posts with 500,000 daily active users",
+        "Create a service that handles blog post creation and storage with rich media support",
+        "Optimize content delivery speed across regions",
+        "Scale user engagement handling"
       ],
       hintsPerArea: {
         requirements: {
           functional: [
-            "Design real-time comment system",
-            "Plan reaction types and storage",
-            "Consider notification system for responses",
+            "Consider comment threading structure",
+            "Think about engagement analytics"
           ],
           nonFunctional: [
-            "Ensure real-time updates under 100ms",
-            "Handle comment threading efficiently",
-            "Maintain comment order consistency",
-          ],
+            "Consider engagement data consistency",
+            "Think about real-time update needs"
+          ]
         },
         systemAPI: [
-          "WebSocket endpoints for real-time updates",
-          "Comment pagination and threading API",
-          "Reaction aggregation endpoints",
+          "How to structure engagement endpoints?",
+          "What real-time protocols to use?",
+          "How to paginate comments?"
         ],
         capacityEstimations: {
           traffic: [
-            "WebSocket connection overhead",
-            "Comment rate during peak times",
+            "Calculate engagement actions per post",
+            "Estimate comment volume"
           ],
-          storage: ["Comment data structure size", "Reaction counter storage"],
+          storage: [
+            "Calculate engagement data size",
+            "Estimate analytics storage needs"
+          ],
           memory: [
-            "Active WebSocket connection state",
-            "Real-time update buffers",
+            "Consider hot post engagement caching",
+            "Calculate real-time data needs"
           ],
           bandwidth: [
-            "WebSocket message frequency",
-            "Real-time update payload size",
-          ],
+            "Estimate WebSocket traffic",
+            "Calculate analytics event volume"
+          ]
         },
         highLevelDesign: [
-          "WebSocket server architecture",
-          "Comment storage and indexing",
-          "Real-time update propagation",
-        ],
+          "Consider database sharding strategy",
+          "Think about event processing pipeline"
+        ]
       },
       criteria: [
-        "Comments appear in real-time (<100ms)",
-        "System handles 500k daily active users",
-        "Comment threading supports up to 5 levels",
-        "Reactions update instantly for all viewers",
+        "Writers can create and edit posts with rich text",
+        "System supports image uploads",
+        "Posts can be saved as drafts or published",
+        "Content is persistently stored",
+        "Content loads quickly across regions",
+        "Images are optimized for delivery",
+        "System handles high engagement volume",
+        "Engagement updates are real-time"
       ],
       learningsInMD: `
-## Key Learnings from Stage 3
-
-### Real-time Systems
-- WebSocket implementation
-- Real-time data propagation
-- Connection management
-
-### Data Consistency
-- Eventual consistency patterns
-- Real-time update ordering
-- Conflict resolution
-
-### Engagement Features
-- Comment system architecture
-- Reaction system design
-- Notification system integration
+## Key Learnings
+- Database sharding strategies
+- Real-time update systems
+- Event processing patterns
+- Analytics pipeline design
       `,
       resources: {
         documentation: [
           {
-            title: "WebSocket Best Practices",
-            url: "https://docs.aws.amazon.com/apigateway/latest/developerguide/websocket-api.html",
-            description: "Learn about WebSocket implementation patterns",
-          },
+            title: "Database Sharding",
+            url: "https://docs.mongodb.com/manual/sharding/",
+            description: "MongoDB sharding patterns and practices"
+          }
         ],
         realWorldCases: [
           {
-            name: "Disqus Architecture",
-            url: "https://disqus.com/engineering/",
-            description: "How Disqus handles millions of comments",
-          },
+            name: "Reddit",
+            url: "https://reddit.com/",
+            description: "Large-scale comment and engagement system"
+          }
         ],
         bestPractices: [
           {
-            title: "Real-time Updates",
-            description:
-              "Use WebSocket for real-time features with fallback to long polling",
-            example: "WebSocket for comments, REST for historical data",
-          },
-        ],
-      },
+            title: "Engagement Processing",
+            description: "Use event-driven architecture for engagement",
+            example: "Implement message queues for async processing"
+          }
+        ]
+      }
     },
     {
-      problem: "Users need to search through blog content efficiently",
+      problem: "Writers are requesting better analytics about their content performance and reader behavior.",
       requirements: [
-        "Implement full-text search with results returned in under 200ms for 1 million blog posts",
+        "Implement comprehensive analytics system"
       ],
       metaRequirements: [
-        "Support creating, reading, updating, and deleting blog posts with rich text formatting for 500,000 daily active users",
-        "Reduce post load time to under 500ms for 500,000 daily active users",
-        "Support real-time comments and reactions for posts with 500,000 daily active users",
-        "Implement full-text search with results returned in under 200ms for 1 million blog posts",
+        "Create a service that handles blog post creation and storage with rich media support",
+        "Optimize content delivery speed across regions",
+        "Scale user engagement handling",
+        "Implement comprehensive analytics system"
       ],
       hintsPerArea: {
         requirements: {
           functional: [
-            "Design full-text search capability",
-            "Plan for search result ranking",
-            "Consider faceted search features",
+            "Consider metrics to track",
+            "Think about analytics aggregation"
           ],
           nonFunctional: [
-            "Search results in under 200ms",
-            "Support fuzzy matching",
-            "Handle partial word matches",
-          ],
+            "Consider analytics query performance",
+            "Think about data retention periods"
+          ]
         },
         systemAPI: [
-          "Search query API structure",
-          "Filter and facet parameters",
-          "Search result pagination",
-        ],
-        capacityEstimations: {
-          traffic: ["Search queries per second", "Index update frequency"],
-          storage: ["Search index size", "Index replication needs"],
-          memory: ["Search index memory requirements", "Query cache size"],
-          bandwidth: ["Search result payload size", "Index update bandwidth"],
-        },
-        highLevelDesign: [
-          "Search service architecture",
-          "Index update pipeline",
-          "Results ranking system",
-        ],
-      },
-      criteria: [
-        "Search results return in <200ms",
-        "System handles 1M indexed posts",
-        "Search supports fuzzy matching",
-        "Results are properly ranked",
-      ],
-      learningsInMD: `
-## Key Learnings from Stage 4
-
-### Search Systems
-- Full-text search implementation
-- Search index design
-- Query optimization
-
-### Information Retrieval
-- Text analysis and tokenization
-- Ranking algorithms
-- Faceted search implementation
-
-### Performance Optimization
-- Search index optimization
-- Query caching strategies
-- Result ranking efficiency
-      `,
-      resources: {
-        documentation: [
-          {
-            title: "Elasticsearch Guide",
-            url: "https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html",
-            description: "Learn about implementing full-text search",
-          },
-        ],
-        realWorldCases: [
-          {
-            name: "Algolia Architecture",
-            url: "https://www.algolia.com/blog/engineering/",
-            description: "How Algolia implements fast search",
-          },
-        ],
-        bestPractices: [
-          {
-            title: "Search Implementation",
-            description: "Use dedicated search service with proper indexing",
-            example: "Elasticsearch with custom analyzers and mapping",
-          },
-        ],
-      },
-    },
-    {
-      problem: "System needs to handle content moderation and spam prevention",
-      requirements: [
-        "Implement automated content moderation with 99.9% spam detection rate for 1 million daily posts/comments",
-      ],
-      metaRequirements: [
-        "Support creating, reading, updating, and deleting blog posts with rich text formatting for 500,000 daily active users",
-        "Reduce post load time to under 500ms for 500,000 daily active users",
-        "Support real-time comments and reactions for posts with 500,000 daily active users",
-        "Implement full-text search with results returned in under 200ms for 1 million blog posts",
-        "Implement automated content moderation with 99.9% spam detection rate for 1 million daily posts/comments",
-      ],
-      hintsPerArea: {
-        requirements: {
-          functional: [
-            "Design content moderation pipeline",
-            "Plan spam detection system",
-            "Consider user reporting mechanism",
-          ],
-          nonFunctional: [
-            "Process content in under 1 second",
-            "Maintain false positive rate < 0.1%",
-            "Support multiple moderation rules",
-          ],
-        },
-        systemAPI: [
-          "Content moderation webhook",
-          "User reporting endpoints",
-          "Moderation status updates",
+          "How to structure analytics APIs?",
+          "What aggregation endpoints needed?",
+          "How to handle custom queries?"
         ],
         capacityEstimations: {
           traffic: [
-            "Content moderation requests/second",
-            "User reports volume",
+            "Calculate events per page view",
+            "Estimate analytics query volume"
           ],
-          storage: ["Moderation rules storage", "Flagged content history"],
-          memory: ["Active moderation rules cache", "Processing queue size"],
-          bandwidth: [
-            "Content analysis payload size",
-            "Moderation result updates",
+          storage: [
+            "Calculate raw event storage",
+            "Estimate aggregation storage"
           ],
-        },
-        highLevelDesign: [
-          "Moderation service architecture",
-          "Machine learning pipeline",
-          "User reporting flow",
-        ],
-      },
-      criteria: [
-        "99.9% spam detection rate",
-        "Content moderation < 1 second",
-        "False positive rate < 0.1%",
-        "User reports handled within 5 minutes",
-      ],
-      learningsInMD: `
-## Key Learnings from Stage 5
-
-### Content Moderation
-- Automated moderation systems
-- Machine learning integration
-- User reporting workflows
-
-### Risk Management
-- Spam prevention strategies
-- Content filtering techniques
-- Abuse prevention measures
-
-### Processing Pipeline
-- Real-time content analysis
-- Moderation workflow design
-- Scalable processing systems
-      `,
-      resources: {
-        documentation: [
-          {
-            title: "Content Moderation Best Practices",
-            url: "https://aws.amazon.com/rekognition/content-moderation/",
-            description: "Learn about implementing content moderation",
-          },
-        ],
-        realWorldCases: [
-          {
-            name: "Reddit's Spam Prevention",
-            url: "https://www.reddit.com/wiki/contentpolicy/",
-            description: "How Reddit handles content moderation",
-          },
-        ],
-        bestPractices: [
-          {
-            title: "Moderation Pipeline",
-            description:
-              "Implement multi-layer moderation with ML and human review",
-            example:
-              "Automated ML screening -> Rule-based filtering -> Human review for edge cases",
-          },
-        ],
-      },
-    },
-    {
-      problem:
-        "Platform needs personalized content recommendations and analytics for writers",
-      requirements: [
-        "Implement real-time analytics and personalized content recommendations for 1 million monthly active users",
-      ],
-      metaRequirements: [
-        "Support creating, reading, updating, and deleting blog posts with rich text formatting for 500,000 daily active users",
-        "Reduce post load time to under 500ms for 500,000 daily active users",
-        "Support real-time comments and reactions for posts with 500,000 daily active users",
-        "Implement full-text search with results returned in under 200ms for 1 million blog posts",
-        "Implement automated content moderation with 99.9% spam detection rate for 1 million daily posts/comments",
-        "Implement real-time analytics and personalized content recommendations for 1 million monthly active users",
-      ],
-      hintsPerArea: {
-        requirements: {
-          functional: [
-            "Design real-time analytics pipeline",
-            "Plan recommendation engine",
-            "Consider A/B testing system",
-          ],
-          nonFunctional: [
-            "Analytics updates within 30 seconds",
-            "Recommendation generation under 100ms",
-            "Support multiple recommendation algorithms",
-          ],
-        },
-        systemAPI: [
-          "Analytics data collection endpoints",
-          "Recommendation API structure",
-          "A/B test configuration API",
-        ],
-        capacityEstimations: {
-          traffic: [
-            "User activity events per second",
-            "Recommendation requests rate",
-          ],
-          storage: ["User behavior data size", "Analytics data retention"],
           memory: [
-            "Active user preferences cache",
-            "Recommendation model size",
+            "Consider query cache requirements",
+            "Calculate aggregation memory needs"
           ],
           bandwidth: [
-            "Analytics event stream size",
-            "Recommendation response payload",
-          ],
+            "Estimate event ingestion bandwidth",
+            "Calculate query response size"
+          ]
         },
         highLevelDesign: [
-          "Analytics processing pipeline",
-          "Recommendation system architecture",
-          "A/B testing framework",
-        ],
+          "Consider analytics pipeline architecture",
+          "Think about data warehouse design"
+        ]
       },
       criteria: [
-        "Analytics updated within 30 seconds",
-        "Recommendations generated in <100ms",
-        "System handles 1M monthly active users",
-        "A/B testing framework operational",
+        "Writers can create and edit posts with rich text",
+        "System supports image uploads",
+        "Posts can be saved as drafts or published",
+        "Content is persistently stored",
+        "Content loads quickly across regions",
+        "Images are optimized for delivery",
+        "System handles high engagement volume",
+        "Engagement updates are real-time",
+        "Writers can access detailed analytics",
+        "Analytics queries perform well"
       ],
       learningsInMD: `
-## Key Learnings from Stage 6
-
-### Analytics Systems
-- Real-time analytics pipeline
-- Event processing architecture
-- Data aggregation patterns
-
-### Recommendation Systems
-- Content recommendation algorithms
-- Personalization techniques
-- User preference modeling
-
-### A/B Testing
-- Test framework design
-- Statistical analysis systems
-- Feature flagging implementation
-
-### Data Processing
-- Stream processing patterns
-- Batch processing systems
-- Real-time aggregation techniques
+## Key Learnings
+- Analytics system design
+- Data warehouse architecture
+- ETL pipeline patterns
+- Query optimization techniques
       `,
       resources: {
         documentation: [
           {
-            title: "Real-time Analytics",
-            url: "https://docs.aws.amazon.com/kinesis/latest/dev/introduction.html",
-            description:
-              "Learn about implementing real-time analytics pipelines",
-          },
+            title: "Analytics Architecture",
+            url: "https://docs.aws.amazon.com/quicksight/latest/user/creating-data-sets.html",
+            description: "AWS analytics and data warehouse patterns"
+          }
         ],
         realWorldCases: [
           {
-            name: "Netflix Recommendations",
-            url: "https://netflixtechblog.com/",
-            description: "How Netflix implements personalized recommendations",
-          },
+            name: "Substack",
+            url: "https://substack.com/",
+            description: "Writer analytics platform architecture"
+          }
         ],
         bestPractices: [
           {
-            title: "Analytics Pipeline",
-            description:
-              "Use stream processing for real-time analytics with batch processing backup",
-            example:
-              "Kafka -> Spark Streaming -> Redis (real-time) + Hadoop (batch)",
-          },
-        ],
-      },
+            title: "Analytics Processing",
+            description: "Implement real-time and batch processing",
+            example: "Use Lambda for real-time and Spark for batch"
+          }
+        ]
+      }
     },
+    {
+      problem: "Recent security audit revealed vulnerabilities in content access control and user authentication.",
+      requirements: [
+        "Implement robust security measures"
+      ],
+      metaRequirements: [
+        "Create a service that handles blog post creation and storage with rich media support",
+        "Optimize content delivery speed across regions",
+        "Scale user engagement handling",
+        "Implement comprehensive analytics system",
+        "Implement robust security measures"
+      ],
+      hintsPerArea: {
+        requirements: {
+          functional: [
+            "Consider access control model",
+            "Think about authentication flows"
+          ],
+          nonFunctional: [
+            "Consider security response times",
+            "Think about audit requirements"
+          ]
+        },
+        systemAPI: [
+          "How to structure auth endpoints?",
+          "What security headers needed?",
+          "How to handle tokens?"
+        ],
+        capacityEstimations: {
+          traffic: [
+            "Calculate auth requests volume",
+            "Estimate audit log volume"
+          ],
+          storage: [
+            "Calculate user security metadata",
+            "Estimate audit log storage"
+          ],
+          memory: [
+            "Consider session cache size",
+            "Calculate token cache needs"
+          ],
+          bandwidth: [
+            "Estimate auth service traffic",
+            "Calculate security event volume"
+          ]
+        },
+        highLevelDesign: [
+          "Consider auth service architecture",
+          "Think about security monitoring"
+        ]
+      },
+      criteria: [
+        "Writers can create and edit posts with rich text",
+        "System supports image uploads",
+        "Posts can be saved as drafts or published",
+        "Content is persistently stored",
+        "Content loads quickly across regions",
+        "Images are optimized for delivery",
+        "System handles high engagement volume",
+        "Engagement updates are real-time",
+        "Writers can access detailed analytics",
+        "Analytics queries perform well",
+        "System has robust access control",
+        "Security monitoring is in place"
+      ],
+      learningsInMD: `
+## Key Learnings
+- Authentication system design
+- Authorization patterns
+- Security monitoring
+- Audit logging architecture
+      `,
+      resources: {
+        documentation: [
+          {
+            title: "Security Best Practices",
+            url: "https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/welcome.html",
+            description: "AWS security architecture patterns"
+          }
+        ],
+        realWorldCases: [
+          {
+            name: "WordPress.com",
+            url: "https://wordpress.com/",
+            description: "Large-scale blogging platform security"
+          }
+        ],
+        bestPractices: [
+          {
+            title: "Security Architecture",
+            description: "Implement defense in depth",
+            example: "Use WAF, IAM, and encryption at rest/transit"
+          }
+        ]
+      }
+    }
   ],
   generalLearnings: [
-    "Content management system architecture patterns",
-    "Scalable content delivery strategies",
-    "Caching architecture and optimization",
+    "Content management system architecture",
+    "Media processing and delivery optimization",
+    "Database scaling and sharding strategies",
+    "Real-time update systems",
+    "Analytics pipeline design",
+    "Security and access control patterns",
     "Performance optimization techniques",
-    "Database design for content management",
-    "API design for content platforms",
-    "Load balancing and traffic management",
-    "Real-time system implementation",
-    "Search system architecture",
-    "Content moderation and safety",
-    "Data consistency patterns",
-    "Distributed system scalability",
-    "Security and authentication practices",
-  ],
+    "Distributed system monitoring",
+    "Event-driven architecture patterns",
+    "Data consistency models"
+  ]
 };
 
-export default blogPlatformChallenge;
+export default bloggingPlatformChallenge;

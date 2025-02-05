@@ -1,383 +1,448 @@
 import { type Challenge } from "./types";
-export const URLShortenerChallenge: Challenge = {
+
+const urlShortenerChallenge: Challenge = {
   slug: "url-shortener",
   title: "URL Shortener System Design",
-  description:
-    "Design a scalable URL shortening service like bit.ly that converts long URLs into short, unique aliases and handles redirects efficiently.",
+  description: "Design a scalable URL shortening service that converts long URLs into short, unique identifiers while ensuring high availability and quick access.",
   difficulty: "Easy",
   isFree: true,
-  generalLearnings: [
-    "Understand trade-offs between different hashing algorithms and ID generation strategies",
-    "Learn about caching strategies and their impact on system performance",
-    "Experience designing for horizontal scalability",
-    "Practice capacity estimation and back-of-envelope calculations",
-    "Learn about database selection and data modeling for high-throughput systems",
-    "Understand monitoring and analytics in distributed systems",
-    "Experience with high availability and fault tolerance design",
-  ],
   stages: [
-    // Stage 1: Basic URL Shortening
     {
-      problem:
-        "Users need to convert long URLs into shorter, shareable versions",
+      problem: "Users need a way to convert their long URLs into shorter, more manageable versions that can be easily shared.",
       requirements: [
-        "System should generate a unique short URL for any given long URL",
+        "Create a service that can convert long URLs into short ones"
       ],
       metaRequirements: [
-        "System should generate a unique short URL for any given long URL",
+        "Create a service that can convert long URLs into short ones"
       ],
       hintsPerArea: {
         requirements: {
           functional: [
-            "Consider using base62 encoding for URL-safe characters",
-            "Think about URL length constraints",
+            "Consider what characters should be allowed in the short URL",
+            "Think about URL validation before shortening"
           ],
           nonFunctional: [
-            "Short URLs should be reasonably short (e.g., 6-8 characters)",
-            "Generation should be quick (<100ms)",
-          ],
+            "Consider the length of the shortened URL",
+            "Think about URL readability"
+          ]
         },
         systemAPI: [
-          "What HTTP methods would be appropriate for URL creation?",
-          "What response format would be most useful for clients?",
+          "What HTTP method is appropriate for URL creation?",
+          "What should the response format look like?"
         ],
         capacityEstimations: {
           traffic: [
-            "Start with 100 URL creations per second",
-            "Consider read:write ratio for URL accesses",
+            "How many new URLs might be shortened per day?",
+            "What's the read-to-write ratio for URL access?"
           ],
           storage: [
-            "Calculate storage needed for URLs and metadata",
-            "Consider URL retention period",
+            "How much space does each URL mapping need?",
+            "How long should we keep URLs?"
           ],
           memory: [
-            "Would caching benefit the system at this stage?",
-            "What cache size would be appropriate?",
+            "Which data should we keep in memory?",
+            "How much memory would caching require?"
           ],
           bandwidth: [
             "Calculate incoming traffic for URL creation",
-            "Calculate outgoing traffic for redirects",
-          ],
+            "Calculate outgoing traffic for URL redirection"
+          ]
         },
         highLevelDesign: [
           "Start with a simple client-server architecture",
-          "Consider separation of URL generation and storage",
-        ],
+          "Consider where to store URL mappings"
+        ]
       },
       criteria: [
-        "Can create short URLs",
-        "Short URLs are unique",
-        "System handles basic redirects",
+        "System can accept a long URL and return a shortened version",
+        "System can redirect users from short URL to original URL"
       ],
       learningsInMD: `
 ## Key Learnings
-- URL shortening algorithms and their trade-offs
-- Basic API design principles
-- Simple data modeling for URL mapping
-- Basic capacity estimation techniques
-
-## Technical Concepts
-- HTTP redirects (301 vs 302)
-- Hash function properties
-- Database indexing basics
+- Basic client-server architecture design
+- RESTful API design principles
+- Data storage considerations
+- URL validation and processing
       `,
       resources: {
         documentation: [
           {
-            title: "Base62 Encoding",
-            url: "https://www.rfc-editor.org/rfc/rfc4648",
-            description: "Understanding base encoding for URLs",
-          },
+            title: "RESTful API Design",
+            url: "https://docs.microsoft.com/en-us/azure/architecture/best-practices/api-design",
+            description: "Best practices for designing RESTful APIs"
+          }
         ],
         realWorldCases: [
           {
-            name: "Bitly's Architecture",
-            url: "https://bitly.com/blog/architecture",
-            description: "Overview of a production URL shortener",
-          },
+            name: "Bitly",
+            url: "https://bitly.com/",
+            description: "Popular URL shortening service with enterprise features"
+          }
         ],
         bestPractices: [
           {
-            title: "URL Length Considerations",
-            description:
-              "Keep generated URLs between 6-8 characters for balance between uniqueness and usability",
-            example: "bit.ly/2mP8oK9",
-          },
-        ],
-      },
+            title: "URL Validation",
+            description: "Always validate URLs before shortening",
+            example: "Check URL format, accessibility, and potential security risks"
+          }
+        ]
+      }
     },
-    // Stage 2: Handling Scale
     {
-      problem: "System is experiencing high load with 1000 requests per second",
+      problem: "Users are reporting slow response times when accessing shortened URLs.",
       requirements: [
-        "System should handle 1000 requests per second with latency under 100ms",
+        "Reduce access time to shortened URLs"
       ],
       metaRequirements: [
-        "System should generate a unique short URL for any given long URL",
-        "System should handle 1000 requests per second with latency under 100ms",
+        "Create a service that can convert long URLs into short ones",
+        "Reduce access time to shortened URLs"
       ],
       hintsPerArea: {
         requirements: {
           functional: [
-            "Consider distributed URL generation",
-            "Think about collision handling",
+            "Consider caching frequently accessed URLs",
+            "Think about cache eviction policies"
           ],
           nonFunctional: [
-            "Maintain latency under 100ms at scale",
-            "Consider availability requirements",
-          ],
+            "Consider response time requirements",
+            "Think about cache hit ratio targets"
+          ]
         },
         systemAPI: [
-          "How would you handle bulk URL creation?",
-          "What rate limiting might be needed?",
-        ],
-        capacityEstimations: {
-          traffic: ["Calculate peak vs average load", "Estimate growth rate"],
-          storage: [
-            "Project storage needs for 1 year",
-            "Consider cleanup policies",
-          ],
-          memory: [
-            "Calculate hit rate improvements with caching",
-            "Estimate memory needs for hot URLs",
-          ],
-          bandwidth: [
-            "Calculate bandwidth needs at peak load",
-            "Consider CDN benefits",
-          ],
-        },
-        highLevelDesign: [
-          "Consider adding load balancer",
-          "Think about caching layer placement",
-        ],
-      },
-      criteria: [
-        "Handles 1000 RPS",
-        "Maintains latency under 100ms",
-        "No single points of failure",
-      ],
-      learningsInMD: `
-## Key Learnings
-- Horizontal scaling principles
-- Load balancing strategies
-- Caching architecture
-- Performance optimization techniques
-
-## Technical Concepts
-- Cache eviction policies
-- Load balancer algorithms
-- Database replication basics
-      `,
-      resources: {
-        documentation: [
-          {
-            title: "System Design Primer - Scaling",
-            url: "https://github.com/donnemartin/system-design-primer#scaling",
-            description: "Comprehensive guide on scaling distributed systems",
-          },
-        ],
-        realWorldCases: [
-          {
-            name: "TinyURL Architecture",
-            url: "https://medium.com/@narengowda/system-design-url-shortening-service-like-tinyurl-106f30f23a82",
-            description: "Real-world scaling challenges and solutions",
-          },
-        ],
-        bestPractices: [
-          {
-            title: "Caching Strategy",
-            description: "Implement LRU caching for frequently accessed URLs",
-            example: "Using Redis with LRU eviction",
-          },
-        ],
-      },
-    },
-    {
-      problem:
-        "Users want custom short URLs, and the system is experiencing data consistency issues across distributed components",
-      requirements: [
-        "Allow custom URL aliases while preventing conflicts and maintaining consistency across the distributed system",
-      ],
-      metaRequirements: [
-        "System should generate a unique short URL for any given long URL",
-        "System should handle 1000 requests per second with latency under 100ms",
-        "Allow custom URL aliases while preventing conflicts and maintaining consistency across the distributed system",
-      ],
-      hintsPerArea: {
-        requirements: {
-          functional: [
-            "Consider custom URL validation rules",
-            "Think about URL ownership and conflicts",
-          ],
-          nonFunctional: [
-            "Ensure consistent URL mappings across all servers",
-            "Handle race conditions in custom URL creation",
-          ],
-        },
-        systemAPI: [
-          "How to handle custom URL requests?",
-          "What conflict resolution strategy to use?",
+          "How will you handle cache misses?",
+          "Should the API indicate if response is cached?"
         ],
         capacityEstimations: {
           traffic: [
-            "Estimate custom URL creation rate",
-            "Calculate conflict check overhead",
+            "What percentage of URLs are frequently accessed?",
+            "How much traffic can be served from cache?"
           ],
           storage: [
-            "Consider additional metadata for custom URLs",
-            "Estimate storage for URL ownership data",
+            "How much cache storage is needed?",
+            "What's the optimal cache size?"
           ],
           memory: [
-            "Calculate cache needs for consistency checking",
-            "Consider distributed lock overhead",
+            "Calculate memory needed for caching",
+            "Consider memory constraints"
           ],
           bandwidth: [
-            "Estimate consistency protocol overhead",
-            "Calculate replication traffic",
-          ],
+            "How does caching affect bandwidth usage?",
+            "Calculate cache update traffic"
+          ]
         },
         highLevelDesign: [
-          "Consider distributed locking mechanisms",
-          "Think about consistency protocol design",
-        ],
+          "Where should the cache be placed?",
+          "Consider distributed caching options"
+        ]
       },
       criteria: [
-        "Supports custom URL creation",
-        "Prevents URL conflicts",
-        "Maintains consistency across system",
+        "System can accept a long URL and return a shortened version",
+        "System can redirect users from short URL to original URL",
+        "Frequently accessed URLs are served faster"
       ],
       learningsInMD: `
 ## Key Learnings
-- Distributed consistency patterns
-- Race condition handling
-- Custom resource allocation
-- Conflict resolution strategies
-
-## Technical Concepts
-- Distributed locks
-- Consistency protocols
-- Database isolation levels
-- Optimistic vs pessimistic locking
+- Caching strategies and patterns
+- Cache placement in architecture
+- Memory vs disk storage trade-offs
+- Cache eviction policies
       `,
       resources: {
         documentation: [
           {
-            title: "Distributed Locking Patterns",
-            url: "https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html",
-            description: "Understanding distributed locking mechanisms",
-          },
+            title: "Caching Best Practices",
+            url: "https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/BestPractices.html",
+            description: "AWS caching best practices and patterns"
+          }
         ],
         realWorldCases: [
           {
-            name: "Bitly Custom Links",
-            url: "https://bitly.com/pages/features/custom-links",
-            description: "Real-world implementation of custom URL shortening",
-          },
+            name: "TinyURL",
+            url: "https://tinyurl.com/",
+            description: "URL shortener with caching implementation"
+          }
         ],
         bestPractices: [
           {
-            title: "Custom URL Management",
-            description:
-              "Implement optimistic locking with retry mechanism for custom URL creation",
-            example: "Using Redis SETNX for distributed locking",
-          },
-        ],
-      },
+            title: "Cache Strategy",
+            description: "Implement LRU caching for frequently accessed URLs",
+            example: "Use Redis or Memcached with LRU eviction policy"
+          }
+        ]
+      }
     },
-    // Stage 4: High Availability and Disaster Recovery
     {
-      problem:
-        "System needs to maintain 99.99% availability and handle regional failures",
+      problem: "The service is experiencing downtime during peak usage periods.",
       requirements: [
-        "Implement multi-region failover with data consistency guarantees",
+        "Ensure system availability during high traffic"
       ],
       metaRequirements: [
-        "System should generate a unique short URL for any given long URL",
-        "System should handle 1000 requests per second with latency under 100ms",
-        "Track URL access patterns and provide basic analytics while maintaining system performance",
-        "Implement multi-region failover with data consistency guarantees",
+        "Create a service that can convert long URLs into short ones",
+        "Reduce access time to shortened URLs",
+        "Ensure system availability during high traffic"
       ],
       hintsPerArea: {
         requirements: {
           functional: [
-            "Consider data replication strategies",
-            "Think about failover mechanisms",
+            "Consider how to handle traffic spikes",
+            "Think about load distribution"
           ],
           nonFunctional: [
-            "Define acceptable RPO and RTO",
-            "Consider consistency models",
-          ],
+            "Consider availability targets",
+            "Think about load balancing strategies"
+          ]
         },
         systemAPI: [
-          "How to handle region-specific endpoints?",
-          "What changes for disaster recovery?",
+          "How should the API handle overload?",
+          "What status codes for service degradation?"
+        ],
+        capacityEstimations: {
+          traffic: [
+            "Calculate peak traffic patterns",
+            "Estimate traffic distribution"
+          ],
+          storage: [
+            "How does data replication affect storage?",
+            "Calculate storage for multiple instances"
+          ],
+          memory: [
+            "Memory needs for multiple instances",
+            "Cache distribution across instances"
+          ],
+          bandwidth: [
+            "Inter-instance communication overhead",
+            "Load balancer bandwidth requirements"
+          ]
+        },
+        highLevelDesign: [
+          "Consider load balancer placement",
+          "Think about service discovery"
+        ]
+      },
+      criteria: [
+        "System can accept a long URL and return a shortened version",
+        "System can redirect users from short URL to original URL",
+        "Frequently accessed URLs are served faster",
+        "System remains available during traffic spikes"
+      ],
+      learningsInMD: `
+## Key Learnings
+- Load balancing techniques
+- High availability patterns
+- Horizontal scaling strategies
+- Service discovery principles
+      `,
+      resources: {
+        documentation: [
+          {
+            title: "High Availability Patterns",
+            url: "https://docs.microsoft.com/en-us/azure/architecture/patterns/category/availability",
+            description: "Patterns for building highly available services"
+          }
+        ],
+        realWorldCases: [
+          {
+            name: "Google URL Shortener (Historical)",
+            url: "https://goo.gl/",
+            description: "Example of highly available URL shortening service"
+          }
+        ],
+        bestPractices: [
+          {
+            title: "Load Balancing",
+            description: "Implement round-robin load balancing with health checks",
+            example: "Use nginx or HAProxy with active health monitoring"
+          }
+        ]
+      }
+    },
+    {
+      problem: "Users are reporting that some shortened URLs are not working consistently across different regions.",
+      requirements: [
+        "Ensure consistent URL access across regions"
+      ],
+      metaRequirements: [
+        "Create a service that can convert long URLs into short ones",
+        "Reduce access time to shortened URLs",
+        "Ensure system availability during high traffic",
+        "Ensure consistent URL access across regions"
+      ],
+      hintsPerArea: {
+        requirements: {
+          functional: [
+            "Consider data replication strategy",
+            "Think about consistency models"
+          ],
+          nonFunctional: [
+            "Consider replication lag",
+            "Think about regional latency"
+          ]
+        },
+        systemAPI: [
+          "How to handle write conflicts?",
+          "Consider consistency headers"
         ],
         capacityEstimations: {
           traffic: [
             "Calculate cross-region traffic",
-            "Estimate failover capacity needs",
+            "Estimate replication traffic"
           ],
           storage: [
-            "Calculate replication storage overhead",
-            "Consider backup storage needs",
+            "Storage needs per region",
+            "Replication overhead"
           ],
           memory: [
-            "Estimate cache synchronization needs",
-            "Calculate failover cache requirements",
+            "Cache requirements per region",
+            "Replication state memory needs"
           ],
           bandwidth: [
-            "Calculate replication bandwidth",
-            "Estimate recovery bandwidth needs",
-          ],
+            "Inter-region bandwidth requirements",
+            "Replication bandwidth needs"
+          ]
         },
         highLevelDesign: [
-          "Consider active-active vs active-passive setup",
-          "Think about global load balancing",
-        ],
+          "Consider multi-region architecture",
+          "Think about replication topology"
+        ]
       },
       criteria: [
-        "Achieves 99.99% availability",
-        "Handles regional failures",
-        "Maintains data consistency",
+        "System can accept a long URL and return a shortened version",
+        "System can redirect users from short URL to original URL",
+        "Frequently accessed URLs are served faster",
+        "System remains available during traffic spikes",
+        "URLs work consistently across all regions"
       ],
       learningsInMD: `
 ## Key Learnings
-- High availability design patterns
-- Disaster recovery planning
 - Multi-region architecture
-- Data consistency models
-
-## Technical Concepts
-- Global load balancing
 - Data replication strategies
-- Failover mechanisms
-- CAP theorem implications
+- Consistency models
+- Global load balancing
       `,
       resources: {
         documentation: [
           {
             title: "Multi-Region Architecture",
-            url: "https://aws.amazon.com/architecture/well-architected",
-            description: "Best practices for multi-region design",
-          },
+            url: "https://aws.amazon.com/blogs/architecture/category/database/",
+            description: "Best practices for multi-region architectures"
+          }
         ],
         realWorldCases: [
           {
-            name: "Netflix Multi-Region Design",
-            url: "https://netflixtechblog.com/active-active-for-multi-regional-resiliency-c47719f6685b",
-            description: "Real-world multi-region implementation",
-          },
+            name: "Cloudflare Workers",
+            url: "https://workers.cloudflare.com/",
+            description: "Example of global edge computing platform"
+          }
         ],
         bestPractices: [
           {
-            title: "Disaster Recovery",
-            description: "Implement automated failover with regular testing",
-            example: "Using Route 53 health checks for DNS failover",
-          },
-        ],
-      },
+            title: "Global Distribution",
+            description: "Use DNS-based global load balancing",
+            example: "Implement Route53 or Cloudflare DNS with latency-based routing"
+          }
+        ]
+      }
     },
+    {
+      problem: "Security team has identified potential abuse of the service for malicious URL spreading.",
+      requirements: [
+        "Implement security measures against URL abuse"
+      ],
+      metaRequirements: [
+        "Create a service that can convert long URLs into short ones",
+        "Reduce access time to shortened URLs",
+        "Ensure system availability during high traffic",
+        "Ensure consistent URL access across regions",
+        "Implement security measures against URL abuse"
+      ],
+      hintsPerArea: {
+        requirements: {
+          functional: [
+            "Consider URL scanning mechanism",
+            "Think about rate limiting"
+          ],
+          nonFunctional: [
+            "Consider scanning latency impact",
+            "Think about false positive rates"
+          ]
+        },
+        systemAPI: [
+          "How to handle suspicious URLs?",
+          "What rate limit headers to use?"
+        ],
+        capacityEstimations: {
+          traffic: [
+            "Calculate scanning overhead",
+            "Estimate blocked request ratio"
+          ],
+          storage: [
+            "Storage for URL metadata",
+            "Blocklist storage needs"
+          ],
+          memory: [
+            "Rate limiting data structures",
+            "Security check caching"
+          ],
+          bandwidth: [
+            "URL scanning service bandwidth",
+            "Security update propagation"
+          ]
+        },
+        highLevelDesign: [
+          "Where to place security checks",
+          "Consider rate limiter design"
+        ]
+      },
+      criteria: [
+        "System can accept a long URL and return a shortened version",
+        "System can redirect users from short URL to original URL",
+        "Frequently accessed URLs are served faster",
+        "System remains available during traffic spikes",
+        "URLs work consistently across all regions",
+        "System prevents abuse and malicious URL spreading"
+      ],
+      learningsInMD: `
+## Key Learnings
+- Security in distributed systems
+- Rate limiting strategies
+- URL scanning and validation
+- Abuse prevention techniques
+      `,
+      resources: {
+        documentation: [
+          {
+            title: "Web Application Security",
+            url: "https://owasp.org/www-project-top-ten/",
+            description: "OWASP security best practices"
+          }
+        ],
+        realWorldCases: [
+          {
+            name: "Firebase Dynamic Links",
+            url: "https://firebase.google.com/products/dynamic-links",
+            description: "Secure URL shortening with abuse prevention"
+          }
+        ],
+        bestPractices: [
+          {
+            title: "Security Measures",
+            description: "Implement rate limiting and URL scanning",
+            example: "Use token bucket algorithm and VirusTotal API for URL scanning"
+          }
+        ]
+      }
+    }
   ],
+  generalLearnings: [
+    "Basic system design principles and client-server architecture",
+    "Caching strategies and their implementation",
+    "Load balancing and high availability patterns",
+    "Multi-region architecture and data consistency",
+    "Security considerations in distributed systems",
+    "API design and REST principles",
+    "Capacity planning and estimation",
+    "Performance optimization techniques"
+  ]
 };
 
-export default URLShortenerChallenge;
+export default urlShortenerChallenge;

@@ -1,438 +1,483 @@
 import { type Challenge } from "./types";
 
-const challenge: Challenge = {
-  slug: "real-time-chat-application",
-  title: "Real-Time Chat",
-  description:
-    "Design a chat application that allows users to send and receive messages in real-time.",
-  difficulty: "Medium",
-  isFree: false,
+const chatSystemChallenge: Challenge = {
+  slug: "basic-chat-system",
+  title: "Real-time Chat System Design",
+  description: "Design a real-time chat system focusing on message delivery, scaling, and reliability. Learn fundamental distributed systems concepts through practical chat features.",
+  difficulty: "Easy",
+  isFree: true,
   stages: [
     {
-      problem: "Users want to send and receive messages in real-time.",
+      problem: "Users need to send and receive text messages to each other",
       requirements: [
-        "Build a chat application that allows users to send and receive messages in real-time.",
+        "Implement basic 1-on-1 text messaging functionality"
       ],
       metaRequirements: [
-        "The application allows users to send and receive messages in real-time.",
+        "Implement basic 1-on-1 text messaging functionality"
       ],
       hintsPerArea: {
         requirements: {
           functional: [
-            "Allow users to send messages.",
-            "Allow users to receive messages in real-time.",
+            "Think about basic message operations (send/receive)",
+            "Consider message states (sent/delivered)"
           ],
           nonFunctional: [
-            "Ensure low latency in message delivery.",
-            "Support a small number of concurrent users (e.g., 100 users).",
-          ],
+            "Consider message delivery guarantees",
+            "Think about basic response time expectations"
+          ]
         },
         systemAPI: [
-          "Design an API that supports real-time messaging.",
-          "Consider using WebSocket protocols.",
+          "What endpoints would you need for messaging?",
+          "How would you structure the message data?",
+          "Consider WebSocket vs HTTP for real-time updates"
         ],
         capacityEstimations: {
           traffic: [
-            "Estimate messages per second (e.g., 10 messages per second).",
+            "How many messages might be sent per user?",
+            "What's your expected user base?"
           ],
-          storage: ["No message storage needed at this stage."],
-          memory: ["Estimate memory required for handling active connections."],
+          storage: [
+            "How long should messages be stored?",
+            "What message metadata needs storing?"
+          ],
+          memory: [
+            "What data needs to be cached?",
+            "Consider active chat sessions"
+          ],
           bandwidth: [
-            "Calculate bandwidth per user for sending and receiving messages.",
-          ],
+            "What's the typical message size?",
+            "Consider protocol overhead"
+          ]
         },
         highLevelDesign: [
-          "Use a client-server model.",
-          "Implement real-time communication using WebSockets.",
-        ],
+          "How will you maintain user connections?",
+          "Where will messages be stored?",
+          "How will you deliver messages?"
+        ]
       },
       criteria: [
-        "Users can send messages.",
-        "Users can receive messages in real-time.",
-        "The system handles the estimated load.",
+        "Users can send and receive messages",
+        "Messages show basic delivery status",
+        "Real-time message delivery works"
       ],
-      learningsInMD: `### Key Learnings
-  
-  - Understanding client-server architecture.
-  - Implementing real-time communication using WebSockets.
-  - Basics of capacity estimation for network applications.`,
+      learningsInMD: `
+## Key Learnings
+
+### Basic Real-time Systems
+- Real-time communication protocols
+- Message delivery patterns
+- Basic connection management
+
+### Data Modeling
+- Message structure design
+- User session handling
+- Basic storage patterns
+      `,
       resources: {
         documentation: [
           {
             title: "WebSocket API",
             url: "https://developer.mozilla.org/en-US/docs/Web/API/WebSocket",
-            description: "Official MDN documentation for WebSocket API implementation"
-          },
-          {
-            title: "Socket.IO Documentation",
-            url: "https://socket.io/docs/v4/",
-            description: "Comprehensive guide for real-time bidirectional event-based communication"
+            description: "Understanding WebSocket for real-time chat"
           }
         ],
         realWorldCases: [
           {
-            name: "WhatsApp Architecture",
-            url: "https://www.youtube.com/watch?v=vvhC64hQZMk",
-            description: "Deep dive into WhatsApp's real-time messaging architecture"
+            name: "Discord Architecture",
+            url: "https://discord.com/blog/how-discord-stores-billions-of-messages",
+            description: "Basic message storage and delivery patterns"
           }
         ],
         bestPractices: [
           {
-            title: "WebSocket Connection Management",
-            description: "Implement heartbeat mechanism to detect connection drops",
-            example: "Send ping frames every 30 seconds and expect pong responses"
-          },
-          {
-            title: "Message Queue Implementation",
-            description: "Use message queues to handle high message volumes",
-            example: "Implement Redis pub/sub for message broadcasting"
+            title: "Message Structure",
+            description: "Include necessary metadata with each message",
+            example: "timestamp, sender, recipient, status flags"
           }
         ]
       }
     },
-    // Stage 2
     {
-      problem:
-        "Users want to have unique identities and only authorized users should access the system.",
+      problem: "Messages are getting lost when users have poor internet connections",
       requirements: [
-        "Implement user authentication to ensure that only registered users can send and receive messages.",
+        "Implement reliable message delivery with offline support"
       ],
       metaRequirements: [
-        "The application allows users to send and receive messages in real-time.",
-        "Users must authenticate before accessing the chat functionality.",
+        "Implement basic 1-on-1 text messaging functionality",
+        "Implement reliable message delivery with offline support"
       ],
       hintsPerArea: {
         requirements: {
           functional: [
-            "Provide user registration and login features.",
-            "Authenticate users before allowing access to messaging.",
+            "Consider message persistence",
+            "Think about message ordering"
           ],
           nonFunctional: [
-            "Securely store user credentials.",
-            "Ensure the authentication system can scale with the number of users.",
-          ],
+            "Consider network reliability",
+            "Think about message consistency"
+          ]
         },
         systemAPI: [
-          "Design APIs for user registration and authentication.",
-          "Consider token-based authentication mechanisms.",
+          "How will you handle message retries?",
+          "Consider offline message queueing",
+          "Think about sync protocols"
         ],
         capacityEstimations: {
           traffic: [
-            "Estimate the number of authentication requests per second.",
+            "How many offline messages might accumulate?",
+            "Consider retry patterns"
           ],
           storage: [
-            "Estimate storage needed for user credentials (e.g., 1,000 users).",
+            "How to store pending messages?",
+            "Consider queue size limits"
           ],
-          memory: ["Consider memory impact of maintaining user sessions."],
-          bandwidth: ["Include bandwidth for authentication data."],
+          memory: [
+            "What needs to be cached for offline users?",
+            "Think about message buffers"
+          ],
+          bandwidth: [
+            "Consider reconnection data transfer",
+            "Think about batch vs real-time sync"
+          ]
         },
         highLevelDesign: [
-          "Implement secure password storage using hashing algorithms.",
-          "Use session tokens or JWT for maintaining user sessions.",
-        ],
+          "Where will you queue offline messages?",
+          "How will you handle reconnection?",
+          "Consider message persistence strategy"
+        ]
       },
       criteria: [
-        "Users can register and log in.",
-        "Only authenticated users can send and receive messages.",
-        "User credentials are stored securely.",
+        "Messages persist across connection drops",
+        "Messages are delivered in order",
+        "Offline messages are received on reconnection"
       ],
-      learningsInMD: `### Key Learnings
-  
-  - Understanding authentication flows.
-  - Implementing secure password storage.
-  - Integrating authentication into existing systems.`,
+      learningsInMD: `
+## Key Learnings
+
+### Message Reliability
+- Offline message handling
+- Message ordering guarantees
+- Reconnection strategies
+
+### Queue Systems
+- Message persistence
+- Basic queue patterns
+- Delivery guarantees
+      `,
       resources: {
         documentation: [
           {
-            title: "JWT Authentication",
-            url: "https://jwt.io/introduction",
-            description: "Comprehensive guide to JSON Web Tokens"
-          },
-          {
-            title: "OAuth 2.0",
-            url: "https://oauth.net/2/",
-            description: "Industry-standard protocol for authorization"
+            title: "RabbitMQ Reliability Guide",
+            url: "https://www.rabbitmq.com/reliability.html",
+            description: "Understanding message queue reliability"
           }
         ],
         realWorldCases: [
           {
-            name: "Discord Authentication System",
-            url: "https://discord.com/developers/docs/topics/oauth2",
-            description: "Discord's implementation of OAuth2 for chat authentication"
+            name: "WhatsApp Message Reliability",
+            url: "https://engineering.whatsapp.com/reliability",
+            description: "How WhatsApp handles offline messages"
           }
         ],
         bestPractices: [
           {
-            title: "Password Storage",
-            description: "Use strong hashing algorithms with salt for password storage",
-            example: "bcrypt.hash(password, 10) with unique salt per user"
-          },
-          {
-            title: "Token Management",
-            description: "Implement token refresh mechanism and proper expiration",
-            example: "Use short-lived access tokens (15min) with longer refresh tokens (7days)"
+            title: "Message Persistence",
+            description: "Store messages until confirmed delivery",
+            example: "Use message queue with persistence enabled"
           }
         ]
       }
     },
-    // Stage 3
     {
-      problem:
-        "Users want to create and join chat rooms to communicate with groups.",
+      problem: "Users are experiencing slow message delivery during peak hours",
       requirements: [
-        "Implement chat rooms where multiple users can join and chat together.",
+        "Optimize system to handle increasing user load"
       ],
       metaRequirements: [
-        "The application allows users to send and receive messages in real-time.",
-        "Users must authenticate before accessing the chat functionality.",
-        "Users can create, join, and leave chat rooms.",
+        "Implement basic 1-on-1 text messaging functionality",
+        "Implement reliable message delivery with offline support",
+        "Optimize system to handle increasing user load"
       ],
       hintsPerArea: {
         requirements: {
           functional: [
-            "Allow users to create new chat rooms.",
-            "Enable users to join existing chat rooms.",
-            "Support multiple users in a single chat room.",
+            "Consider connection distribution",
+            "Think about load patterns"
           ],
           nonFunctional: [
-            "Ensure real-time message delivery within chat rooms.",
-            "Manage chat room scalability for up to 50 concurrent users per room.",
-          ],
+            "Consider response time goals",
+            "Think about system capacity"
+          ]
         },
         systemAPI: [
-          "Design APIs for creating, joining, and leaving chat rooms.",
-          "Consider how to route messages to the correct chat room.",
+          "How will you distribute connections?",
+          "Consider connection pooling",
+          "Think about load balancing"
         ],
         capacityEstimations: {
-          traffic: ["Estimate the number of chat rooms and messages per room."],
-          storage: ["Still minimal storage as messages are not persisted."],
-          memory: ["Account for memory usage per chat room."],
-          bandwidth: ["Calculate bandwidth for multiple users in chat rooms."],
-        },
-        highLevelDesign: [
-          "Use room identifiers to manage message broadcasting.",
-          "Consider data structures for managing chat rooms and user memberships.",
-        ],
-      },
-      criteria: [
-        "Users can create chat rooms.",
-        "Users can join and leave chat rooms.",
-        "Messages are delivered in real-time within chat rooms.",
-      ],
-      learningsInMD: `### Key Learnings
-  
-  - Implementing persistent storage.
-  - Managing data relationships.
-  - Designing efficient data retrieval mechanisms.`,
-      resources: {
-        documentation: [
-          {
-            title: "MongoDB Documentation",
-            url: "https://docs.mongodb.com/",
-            description: "Official MongoDB documentation for NoSQL database implementation"
-          },
-          {
-            title: "Redis Documentation",
-            url: "https://redis.io/documentation",
-            description: "Redis guide for message caching and real-time features"
-          }
-        ],
-        realWorldCases: [
-          {
-            name: "Slack's Database Architecture",
-            url: "https://slack.engineering/flannel-an-application-level-edge-cache-to-make-slack-scale/",
-            description: "How Slack handles message storage and retrieval at scale"
-          }
-        ],
-        bestPractices: [
-          {
-            title: "Message Storage Schema",
-            description: "Design efficient schema for quick message retrieval",
-            example: "Use compound indexes on (chatRoom, timestamp) for range queries"
-          },
-          {
-            title: "Caching Strategy",
-            description: "Implement multi-level caching for frequent message access",
-            example: "Cache last 100 messages per chat room in Redis"
-          }
-        ]
-      }
-    },
-    // Stage 4
-    {
-      problem:
-        "Users want their messages to be saved so they can view past conversations.",
-      requirements: [
-        "Implement message persistence so that messages are stored and can be retrieved later.",
-      ],
-      metaRequirements: [
-        "The application allows users to send and receive messages in real-time.",
-        "Users must authenticate before accessing the chat functionality.",
-        "Users can create, join, and leave chat rooms.",
-        "Messages are stored persistently and can be retrieved later.",
-      ],
-      hintsPerArea: {
-        requirements: {
-          functional: [
-            "Store messages in a database.",
-            "Retrieve and display past messages when a user joins a chat room.",
+          traffic: [
+            "What's your peak message rate?",
+            "Consider connection limits"
           ],
-          nonFunctional: [
-            "Ensure message retrieval is fast.",
-            "Handle increasing data volume efficiently.",
-          ],
-        },
-        systemAPI: [
-          "Update APIs to include message retrieval.",
-          "Consider pagination or limits on message history retrieval.",
-        ],
-        capacityEstimations: {
-          traffic: ["Estimate read and write operations per second."],
           storage: [
-            "Estimate storage needs based on message volume over time.",
+            "How will storage scale?",
+            "Think about data distribution"
           ],
-          memory: ["Consider caching recent messages in memory."],
-          bandwidth: ["Include bandwidth for message history retrieval."],
+          memory: [
+            "Consider cache scaling",
+            "Think about session distribution"
+          ],
+          bandwidth: [
+            "Calculate peak bandwidth needs",
+            "Consider network optimization"
+          ]
         },
         highLevelDesign: [
-          "Choose an appropriate database (SQL vs. NoSQL).",
-          "Design data models for storing messages.",
-        ],
+          "How will you scale horizontally?",
+          "Consider cache strategy",
+          "Think about load distribution"
+        ]
       },
       criteria: [
-        "Messages are stored in a database.",
-        "Users can retrieve past messages when joining a chat room.",
-        "Message retrieval performance meets user expectations.",
+        "System handles peak load efficiently",
+        "Message delivery remains fast",
+        "Resources scale with demand"
       ],
-      learningsInMD: `### Key Learnings
-  
-  - Understanding load balancing concepts.
-  - Implementing horizontal scaling.
-  - Managing distributed systems.`,
+      learningsInMD: `
+## Key Learnings
+
+### Basic Scaling
+- Horizontal scaling patterns
+- Load balancing
+- Resource distribution
+
+### Performance
+- Connection pooling
+- Caching strategies
+- Load distribution
+      `,
       resources: {
         documentation: [
           {
-            title: "HAProxy Documentation",
-            url: "http://www.haproxy.org/#docs",
-            description: "Load balancing and proxy server implementation guide"
-          },
-          {
-            title: "Kubernetes Documentation",
-            url: "https://kubernetes.io/docs/home/",
-            description: "Container orchestration for scaling chat applications"
+            title: "HAProxy Configuration",
+            url: "http://docs.haproxy.org/2.8/configuration.html",
+            description: "Load balancing for WebSocket connections"
           }
         ],
         realWorldCases: [
           {
-            name: "Facebook Messenger Architecture",
-            url: "https://engineering.fb.com/2018/06/26/core-data/migrating-messenger-storage-to-optimize-performance/",
-            description: "How Facebook Messenger handles billions of messages"
+            name: "Slack's Scaling Journey",
+            url: "https://slack.engineering/scaling-slack",
+            description: "How Slack handled growing pains"
           }
         ],
         bestPractices: [
           {
-            title: "WebSocket Load Balancing",
-            description: "Use sticky sessions for WebSocket connections",
-            example: "Configure HAProxy with sticky sessions based on client IP"
-          },
-          {
-            title: "Service Discovery",
-            description: "Implement service discovery for chat server instances",
-            example: "Use Consul for service registration and health checks"
+            title: "Connection Distribution",
+            description: "Use consistent hashing for connection distribution",
+            example: "Implement sticky sessions with Redis"
           }
         ]
       }
     },
-    // Stage 5
     {
-      problem:
-        "The application needs to handle increased load as the user base grows.",
+      problem: "Users report messages appearing out of order or duplicated",
       requirements: [
-        "Design the system to be scalable to support up to 10,000 concurrent users.",
+        "Ensure consistent message ordering and delivery"
       ],
       metaRequirements: [
-        "The application allows users to send and receive messages in real-time.",
-        "Users must authenticate before accessing the chat functionality.",
-        "Users can create, join, and leave chat rooms.",
-        "Messages are stored persistently and can be retrieved later.",
-        "The system supports up to 10,000 concurrent users.",
+        "Implement basic 1-on-1 text messaging functionality",
+        "Implement reliable message delivery with offline support",
+        "Optimize system to handle increasing user load",
+        "Ensure consistent message ordering and delivery"
       ],
       hintsPerArea: {
         requirements: {
           functional: [
-            "Maintain all existing functionalities under increased load.",
+            "Consider message sequence numbers",
+            "Think about deduplication"
           ],
           nonFunctional: [
-            "Ensure system scalability and high availability.",
-            "Optimize for performance under heavy traffic.",
-          ],
+            "Consider consistency requirements",
+            "Think about ordering guarantees"
+          ]
         },
         systemAPI: [
-          "APIs should handle increased traffic efficiently.",
-          "Consider rate limiting or throttling mechanisms.",
+          "How will you track message order?",
+          "Consider message identifiers",
+          "Think about acknowledgment system"
         ],
         capacityEstimations: {
-          traffic: ["Re-estimate message throughput for 10,000 users."],
-          storage: ["Plan for increased data storage needs."],
-          memory: ["Assess memory requirements for more connections."],
-          bandwidth: ["Calculate total bandwidth required for 10,000 users."],
+          traffic: [
+            "How many concurrent conversations?",
+            "Consider ordering overhead"
+          ],
+          storage: [
+            "Think about sequence storage",
+            "Consider deduplication data"
+          ],
+          memory: [
+            "What ordering data to cache?",
+            "Consider sequence buffers"
+          ],
+          bandwidth: [
+            "Consider acknowledgment overhead",
+            "Think about ordering metadata"
+          ]
         },
         highLevelDesign: [
-          "Implement load balancing across multiple servers.",
-          "Consider stateless server design or session management strategies.",
-          "Use caching to reduce database load.",
-        ],
+          "How will you maintain order?",
+          "Consider deduplication strategy",
+          "Think about consistency patterns"
+        ]
       },
       criteria: [
-        "The system can handle 10,000 concurrent users.",
-        "Performance remains acceptable under increased load.",
-        "System components scale horizontally as needed.",
+        "Messages appear in correct order",
+        "No message duplication",
+        "Consistent delivery across devices"
       ],
-      learningsInMD: `### Key Learnings
-  
-  - Managing group chat dynamics.
-  - Implementing presence detection.
-  - Handling concurrent updates.`,
+      learningsInMD: `
+## Key Learnings
+
+### Data Consistency
+- Message ordering patterns
+- Deduplication strategies
+- Consistency models
+
+### Distributed Systems
+- Sequence numbers
+- Message acknowledgments
+- Consistency guarantees
+      `,
       resources: {
         documentation: [
           {
-            title: "Firebase Realtime Database",
-            url: "https://firebase.google.com/docs/database",
-            description: "Real-time database for managing group chat state"
-          },
-          {
-            title: "Redis PubSub",
-            url: "https://redis.io/topics/pubsub",
-            description: "Redis PubSub for real-time message broadcasting"
+            title: "Apache Kafka Ordering",
+            url: "https://kafka.apache.org/documentation/#semantics",
+            description: "Understanding message ordering in distributed systems"
           }
         ],
         realWorldCases: [
           {
-            name: "Telegram Group Chat System",
-            url: "https://telegram.org/blog/shared-files",
-            description: "How Telegram implements large group chats"
+            name: "Facebook Messenger Ordering",
+            url: "https://engineering.fb.com/2014/10/09/production-engineering/messenger-ordering",
+            description: "How Facebook handles message ordering"
           }
         ],
         bestPractices: [
           {
-            title: "Group Chat Management",
-            description: "Implement efficient message fan-out for group chats",
-            example: "Use Redis pub/sub for real-time group message delivery"
-          },
-          {
-            title: "Presence System",
-            description: "Design efficient online/offline status tracking",
-            example: "Heartbeat system with Redis TTL for presence detection"
+            title: "Message Ordering",
+            description: "Use lamport timestamps for message ordering",
+            example: "Implement vector clocks for causality tracking"
           }
         ]
       }
     },
+    {
+      problem: "System becomes unstable when server components fail",
+      requirements: [
+        "Implement basic fault tolerance and recovery"
+      ],
+      metaRequirements: [
+        "Implement basic 1-on-1 text messaging functionality",
+        "Implement reliable message delivery with offline support",
+        "Optimize system to handle increasing user load",
+        "Ensure consistent message ordering and delivery",
+        "Implement basic fault tolerance and recovery"
+      ],
+      hintsPerArea: {
+        requirements: {
+          functional: [
+            "Consider failover scenarios",
+            "Think about recovery processes"
+          ],
+          nonFunctional: [
+            "Consider availability goals",
+            "Think about recovery time"
+          ]
+        },
+        systemAPI: [
+          "How will you handle failed nodes?",
+          "Consider service discovery",
+          "Think about health checks"
+        ],
+        capacityEstimations: {
+          traffic: [
+            "What's your failover capacity?",
+            "Consider recovery load"
+          ],
+          storage: [
+            "Think about backup needs",
+            "Consider replication factor"
+          ],
+          memory: [
+            "Consider failover state",
+            "Think about session recovery"
+          ],
+          bandwidth: [
+            "Consider replication traffic",
+            "Think about recovery data"
+          ]
+        },
+        highLevelDesign: [
+          "How will you detect failures?",
+          "Consider replication strategy",
+          "Think about recovery process"
+        ]
+      },
+      criteria: [
+        "System survives component failures",
+        "Messages persist through failures",
+        "Service recovers automatically"
+      ],
+      learningsInMD: `
+## Key Learnings
+
+### Fault Tolerance
+- Failure detection
+- Failover strategies
+- Recovery patterns
+
+### High Availability
+- Service redundancy
+- Data replication
+- Automated recovery
+      `,
+      resources: {
+        documentation: [
+          {
+            title: "Redis Sentinel",
+            url: "https://redis.io/topics/sentinel",
+            description: "High availability for Redis"
+          }
+        ],
+        realWorldCases: [
+          {
+            name: "LINE Messenger Reliability",
+            url: "https://engineering.linecorp.com/en/blog/messaging-reliability",
+            description: "How LINE handles system failures"
+          }
+        ],
+        bestPractices: [
+          {
+            title: "Failure Detection",
+            description: "Implement heartbeat monitoring",
+            example: "Use distributed consensus for leader election"
+          }
+        ]
+      }
+    }
   ],
   generalLearnings: [
-    "Understanding the fundamentals of designing a scalable, real-time chat application.",
-    "Applying system design principles to handle authentication, data persistence, and scalability.",
-    "Learning how to incrementally add features while considering performance and user experience.",
-  ],
+    "Real-time system design fundamentals",
+    "Message delivery patterns and guarantees",
+    "Basic scaling and performance optimization",
+    "Data consistency in distributed systems",
+    "Fault tolerance and high availability",
+    "Queue-based architecture patterns",
+    "Connection management at scale",
+    "Basic monitoring and recovery strategies"
+  ]
 };
 
-export default challenge;
+export default chatSystemChallenge;

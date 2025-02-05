@@ -1,18 +1,23 @@
 # System Design Challenge
 
 ## Overview
+
 You are a system design expert and teacher. The challenge should progressively introduce features and complexities, guiding users through designing a good enough system.
 
 ## Goal
-The goal of this challenge is to design a **Ride-Sharing Service** system.
 
-## Focus: 
+The goal of this challenge is to design a **blogging platform** system. With **Medium** difficulty. With 5 stages.
+
+## Focus
+
 Define the focus for yourself to maximize teaching system design value.
 
-### Key Features:
+### Key Features
+
 Define key features to include in the challenge so the user should implement.
 
-### Learning Outcomes:
+### Learning Outcomes
+
 Define the learning outcomes, and make sure that these learning outcomes are actually good outcomes for our learners.
 
 ---
@@ -69,7 +74,6 @@ export type Stage = {
   };
 };
 
-
 ---
 
 ## Challenge Type Structure
@@ -119,10 +123,9 @@ export type Stage = {
 
 - **requirements**: string[]
   - List of specific requirements for this stage
-  - Include both functional and non-functional requirements
-  - Be specific with numbers (e.g., "Handle 1000 requests/second")
-  - Avoid generic terms (e.g., "Implement caching layer")
-  - Take few requirements per stage (avoid having too many requirements) - We need 1 requirement maximum per stage. And if needed for learning purposes do max 2. Other than that, we can do it in next stages
+  - Include functional requirements and non-functional
+  - Avoid being specific with numbers (e.g., "Handle 1000 requests/second"), instead mention the issue to be fixed (e.g., "We're facing more traffic, and CPUs are maxed out" or "Let's reduce data access time"...)
+  - Provide few requirements per stage (avoid having too many requirements) - We need 1 requirement maximum per stage. And if needed for learning purposes do max 2. Other than that, we can do it in next stages
 
 - **metaRequirements**: string[]
   - Cumulative requirements from all stages
@@ -131,7 +134,7 @@ export type Stage = {
   - Remove requirements that are overwritten by new ones.
   - Ensure requirements are unique and not repeated.
   - Avoid using the same requirement twice in a stage.
-  - 
+  -
 
 - **hintsPerArea**: object
   - Structured hints for different aspects of system design
@@ -161,11 +164,10 @@ export type Stage = {
 
 ```typescript
 const exampleStage: Stage = {
-  problem: "Users need fast access to frequently accessed URLs",
+  problem: "Users need to have short urls for their long your urls",
   requirements: [
-    "Implement caching layer",
-    "Reduce latency to <50ms",
-    "Handle 10k requests/second"
+    "Users should be able to CRUD long urls and get back short urls",
+    "..."
   ],
   // ... other fields
 };
@@ -175,8 +177,8 @@ const exampleStage: Stage = {
 
 1. **Requirements**
    - Be specific and measurable
-   - Include numbers where possible
-   - Consider both functional and non-functional aspects
+   - Consider both functional and non-functional aspects (but avoid being specific with numbers. e.g., "Handle 1000rpm")
+   - Ask for enhancements and improvements (e.g., "Reduce data access time to the client")
 
 2. **Hints**
    - Provide guidance without solutions
@@ -193,10 +195,12 @@ const exampleStage: Stage = {
 ## Instructions for Building the Challenge
 
 ### 1. Stage Progression
+
 - **First stage**: Define the initial user need for the application.
 - **Subsequent stages**: Introduce user-facing issues that require system enhancements.
 
 ### 2. Each Stage Must Include
+
 - **Problem**: A specific issue (one or two) users face.
 - **Requirements**: Product manager’s instructions on features, constraints, or priorities.
 - **HintsPerArea**: Provide hints in the following categories:
@@ -214,9 +218,11 @@ const exampleStage: Stage = {
 ### 3. Progressive Learning Elements
 
 #### Technical Depth Progression
+
 Based on challenge difficulty:
 
 ##### Easy Challenges
+
 - Focus on core functionality and basic patterns
 - Minimal infrastructure complexity
 - Clear, straightforward solutions
@@ -224,6 +230,7 @@ Based on challenge difficulty:
 - Basic scalability considerations
 
 ##### Medium Challenges
+
 - Moderate system complexity
 - Multiple component interactions
 - Basic optimization requirements
@@ -231,6 +238,7 @@ Based on challenge difficulty:
 - Performance considerations
 
 ##### Hard Challenges
+
 - Complex distributed systems
 - Advanced optimization requirements
 - Multiple trade-off considerations
@@ -240,12 +248,13 @@ Based on challenge difficulty:
 The progression within each difficulty level should be gentle and focused on learning rather than friction.
 
 #### Evaluation Metrics
+
 - **Correctness**: How well the solution meets the functional requirements
-- **Scalability**: 
+- **Scalability**:
   - Vertical: Ability to handle increased load on single machine
   - Horizontal: Ability to distribute load across machines
   - Data: How well the system handles growing data volume
-- **Reliability**: 
+- **Reliability**:
   - Fault tolerance: System's ability to handle failures
   - Data consistency: Maintaining data integrity across components
   - Recovery mechanisms: Ability to recover from failures
@@ -261,7 +270,7 @@ The progression within each difficulty level should be gentle and focused on lea
   - Data protection: Encryption and access controls
   - Authentication/Authorization: User identity and permissions
   - Security best practices: Protection against common vulnerabilities
-- **Cost-Effectiveness**: 
+- **Cost-Effectiveness**:
   - Infrastructure costs: Hardware and cloud resources
   - Operational costs: Maintenance and monitoring
   - Development costs: Implementation and future changes
@@ -277,6 +286,7 @@ The progression within each difficulty level should be gentle and focused on lea
 ### 5. Challenge Engagement Elements
 
 #### Interactive Components
+
 Each stage should include specific decision-making exercises:
 
 - **Design Choices**:
@@ -295,6 +305,7 @@ Each stage should include specific decision-making exercises:
   - Help users understand why certain choices matter for their use case
 
 These components help users:
+
 - Practice real-world decision making
 - Learn to justify technical choices
 - Understand practical implications of design decisions
@@ -302,12 +313,14 @@ These components help users:
 ### 6. Success Metrics
 
 #### Technical Success
+
 - **Correctness**: Solution meets all functional requirements
 - **Scalability**: Handles specified load and growth
 - **Reliability**: Meets availability and durability requirements
 - **Maintainability**: Clean and well-documented design
 
 #### Learning Success
+
 - **Concept Mastery**: Understanding of key system design principles
 - **Trade-off Analysis**: Ability to evaluate different approaches
 - **Problem-Solving**: Systematic approach to breaking down problems
@@ -316,6 +329,7 @@ These components help users:
 #### Evaluation Tolerance by Difficulty
 
 ##### Easy Challenges
+
 - **Primary Focus**: Core functionality and basic requirements
 - **Must Have**:
   - Working core features
@@ -327,6 +341,7 @@ These components help users:
   - Detailed cost analysis
 
 ##### Medium Challenges
+
 - **Primary Focus**: Balance between functionality and system qualities
 - **Must Have**:
   - All core and secondary features
@@ -339,6 +354,7 @@ These components help users:
   - Complex caching strategies
 
 ##### Hard Challenges
+
 - **Primary Focus**: Comprehensive system design with optimizations
 - **Must Have**:
   - All specified features
@@ -352,6 +368,7 @@ These components help users:
   - Bleeding-edge technologies
 
 #### General Evaluation Guidelines
+
 - Evaluate based on the challenge level
 - Focus on learning over perfection
 - Reward creative solutions even if they differ from expected approach
@@ -361,15 +378,17 @@ These components help users:
 ---
 
 ## Guidelines
+
 - The challenge should be **suitable for beginners** in system design.
 - Content should be **clear and concise**.
 - The focus should be on **teaching fundamental system design principles through practical problem-solving**.
 - The challenge should be **progressive**.
-- If you specify the number of users, then mention it in the requirements and meta requirements.
+- Make sure that the requirements are actionable
 
 ---
 
 ## Implementation Notes
+
 - Each stage should build upon previous learnings
 - Include practical examples and code snippets where relevant
 - Provide clear success criteria for each learning outcome

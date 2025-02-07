@@ -6,7 +6,7 @@ You are a system design expert and teacher. The challenge should progressively i
 
 ## Goal
 
-The goal of this challenge is to design a **blogging platform** system. With **Medium** difficulty. With 5 stages.
+The goal of this challenge is to design a **Real-Time Voting** system. With **Medium** difficulty. With 5 stages.
 
 ## Focus
 

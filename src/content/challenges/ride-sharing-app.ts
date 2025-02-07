@@ -1,630 +1,494 @@
 import { type Challenge } from "./types";
 
 const rideShareChallenge: Challenge = {
-  slug: "ride-sharing-service",
-  title: "Ride-Sharing Service System Design",
-  description: "Design a scalable ride-sharing platform focusing on real-time matching, location tracking, and payment processing. Learn key concepts in distributed systems and real-time processing.",
+  slug: "ride-sharing-system",
+  title: "Ride Sharing System Design",
+  description: "Design a scalable ride-sharing platform focusing on real-time matching, geo-distribution, and reliability. Progress from basic ride matching to advanced features handling millions of concurrent users.",
   difficulty: "Hard",
-  isFree: true,
+  isFree: false,
   stages: [
     {
-      problem: "Users need to request rides and be matched with nearby drivers in real-time",
+      problem: "Users need to request rides and get matched with nearby drivers in real-time",
       requirements: [
-        "Support real-time ride matching for 10,000 concurrent users with matching time under 3 seconds"
+        "Users should be able to request rides and get matched with available drivers within their vicinity"
       ],
       metaRequirements: [
-        "Support real-time ride matching for 10,000 concurrent users with matching time under 3 seconds"
+        "Users should be able to request rides and get matched with available drivers within their vicinity"
       ],
       hintsPerArea: {
         requirements: {
           functional: [
-            "Consider geospatial indexing for location searches",
-            "Plan driver availability status management",
-            "Think about matching algorithm criteria"
+            "Consider how to store and query driver locations efficiently",
+            "Think about the matching algorithm's criteria (distance, rating, etc.)",
+            "Consider real-time location updates from drivers"
           ],
           nonFunctional: [
-            "Matching response time under 3 seconds",
-            "Support concurrent user requests",
-            "Consider location data accuracy"
+            "Response time is critical for user experience",
+            "System needs to handle location data with precision",
+            "Consider data consistency with real-time updates"
           ]
         },
         systemAPI: [
-          "Ride request endpoint structure",
-          "Driver location update API",
-          "Match confirmation endpoints"
+          "Design APIs for ride requests",
+          "Consider WebSocket connections for real-time updates",
+          "Think about location update frequency and format"
         ],
         capacityEstimations: {
           traffic: [
-            "Calculate requests per second during peak hours",
-            "Consider driver location update frequency"
+            "Calculate requests per second based on active users",
+            "Consider peak hours vs normal operation"
           ],
           storage: [
-            "User and driver profile data size",
-            "Active ride session data",
-            "Location history requirements"
+            "Estimate size of user and driver profiles",
+            "Consider location history retention requirements"
           ],
           memory: [
-            "Active driver location cache size",
-            "Matching queue requirements"
+            "Calculate active driver location cache size",
+            "Consider session data requirements"
           ],
           bandwidth: [
-            "Location update frequency and size",
-            "Matching request/response payload"
+            "Calculate size of location update packets",
+            "Consider frequency of location updates"
           ]
         },
         highLevelDesign: [
-          "Location service architecture",
-          "Matching service placement",
-          "Real-time update system"
+          "Consider using a geo-spatial database for location queries",
+          "Think about real-time messaging system for updates",
+          "Consider request/response flow for ride matching"
         ]
       },
       criteria: [
-        "Match riders with drivers in <3 seconds",
-        "Handle 10k concurrent users",
-        "Support location updates every 5 seconds",
-        "Maintain driver availability status"
+        "System can store and update driver locations",
+        "System can match riders with nearby drivers",
+        "System maintains real-time location tracking",
+        "API endpoints handle basic ride requests"
       ],
       learningsInMD: `
-## Key Learnings from Stage 1
+## Key Learnings
+- Geo-spatial data storage and querying
+- Real-time system design principles
+- Basic matching algorithms
+- Location data handling
+- WebSocket vs HTTP for real-time updates
 
-### Geospatial Systems
-- Location data management
-- Geospatial indexing
-- Proximity search algorithms
-
-### Real-time Processing
-- Event-driven architecture
-- Location update handling
-- Matching algorithm design
-
-### Data Modeling
-- User and driver profiles
-- Location data structures
-- Ride session management
-      `,
+### System Design Patterns
+- Publisher/Subscriber for real-time updates
+- Geohashing for location queries
+- Event-driven architecture basics`,
       resources: {
         documentation: [
           {
-            title: "Geospatial Indexing",
-            url: "https://docs.mongodb.com/manual/geospatial-queries/",
-            description: "Learn about implementing location-based queries"
+            title: "Geohashing",
+            url: "https://en.wikipedia.org/wiki/Geohash",
+            description: "Understanding geohashing for location-based queries"
           }
         ],
         realWorldCases: [
           {
-            name: "Uber's Matching System",
-            url: "https://eng.uber.com/engineering/",
-            description: "How Uber matches riders with drivers"
+            name: "Uber's Marketplace",
+            url: "https://eng.uber.com/marketplace-real-time-pricing/",
+            description: "How Uber handles real-time matching and pricing"
           }
         ],
         bestPractices: [
           {
-            title: "Location Data Management",
-            description: "Use specialized geospatial databases for location queries",
-            example: "MongoDB with 2dsphere index for location data"
+            title: "Location Data Storage",
+            description: "Store location data in a format optimized for range queries",
+            example: "Using geohash prefixes for quick area searches"
           }
         ]
       }
     },
     {
-      problem: "System needs to handle real-time location tracking and ETA updates",
+      problem: "System is experiencing slow response times during peak hours",
       requirements: [
-        "Provide real-time location tracking and ETA updates every 3 seconds for 50,000 concurrent rides"
+        "Reduce ride matching response time to handle increased load during rush hours"
       ],
       metaRequirements: [
-        "Support real-time ride matching for 10,000 concurrent users with matching time under 3 seconds",
-        "Provide real-time location tracking and ETA updates every 3 seconds for 50,000 concurrent rides"
+        "Users should be able to request rides and get matched with available drivers within their vicinity",
+        "Reduce ride matching response time to handle increased load during rush hours"
       ],
       hintsPerArea: {
         requirements: {
           functional: [
-            "Design real-time tracking system",
-            "Plan ETA calculation service",
-            "Consider route optimization"
+            "Consider caching frequently accessed areas",
+            "Think about batch processing vs real-time updates",
+            "Consider pre-computing some matching data"
           ],
           nonFunctional: [
-            "Location updates under 3 seconds",
-            "Maintain connection stability",
-            "Handle network fluctuations"
+            "System should handle sudden traffic spikes",
+            "Consider availability requirements",
+            "Think about data consistency requirements"
           ]
         },
         systemAPI: [
-          "WebSocket connection endpoints",
-          "Location update protocol",
-          "ETA calculation API"
+          "Consider API rate limiting strategies",
+          "Think about batch APIs for location updates",
+          "Consider API versioning for updates"
         ],
         capacityEstimations: {
           traffic: [
-            "WebSocket connections per second",
-            "Location update frequency"
+            "Calculate peak hour request patterns",
+            "Estimate traffic growth patterns"
           ],
           storage: [
-            "Trip tracking data size",
-            "Route history requirements"
+            "Calculate cache size requirements",
+            "Estimate data growth rate"
           ],
           memory: [
-            "Active connection state size",
-            "Route calculation cache"
+            "Calculate memory requirements for caching",
+            "Consider cache eviction policies"
           ],
           bandwidth: [
-            "Location update message size",
-            "Connection overhead"
+            "Estimate peak bandwidth requirements",
+            "Calculate data transfer costs"
           ]
         },
         highLevelDesign: [
-          "WebSocket server architecture",
-          "Location processing pipeline",
-          "ETA service integration"
+          "Consider implementing a caching layer",
+          "Think about load balancing strategies",
+          "Consider service discovery mechanisms"
         ]
       },
       criteria: [
-        "Location updates every 3 seconds",
-        "Handle 50k concurrent rides",
-        "ETA accuracy within 2 minutes",
-        "Reliable connection handling"
+        "System maintains performance during peak hours",
+        "Cache hit rate meets target metrics",
+        "Load balancer effectively distributes traffic",
+        "Response times meet SLA requirements"
       ],
       learningsInMD: `
-## Key Learnings from Stage 2
+## Key Learnings
+- Caching strategies for location data
+- Load balancing techniques
+- Service discovery patterns
+- Performance optimization techniques
+- Handling peak traffic scenarios
 
-### Real-time Communication
-- WebSocket implementation
-- Connection management
-- Message protocol design
-
-### Location Processing
-- GPS data handling
-- ETA calculation
-- Route optimization
-
-### Scalability
-- WebSocket server scaling
-- Connection pooling
-- Load distribution
-      `,
+### System Design Patterns
+- Cache-aside pattern
+- Load balancer algorithms
+- Service registry pattern`,
       resources: {
         documentation: [
           {
-            title: "WebSocket Best Practices",
-            url: "https://developer.mozilla.org/en-US/docs/Web/API/WebSocket",
-            description: "Learn about implementing WebSocket connections"
+            title: "Caching Strategies",
+            url: "https://docs.aws.amazon.com/whitepapers/latest/database-caching-strategies/caching-patterns.html",
+            description: "Different caching patterns and their use cases"
           }
         ],
         realWorldCases: [
           {
-            name: "Lyft's Real-time Platform",
-            url: "https://eng.lyft.com/",
-            description: "How Lyft handles real-time tracking"
+            name: "Lyft's Scaling Story",
+            url: "https://eng.lyft.com/how-lyft-scaled-their-business-intelligence-infrastructure-16d743e31897",
+            description: "How Lyft handled their scaling challenges"
           }
         ],
         bestPractices: [
           {
-            title: "Location Updates",
-            description: "Use WebSocket for real-time updates with fallback mechanisms",
-            example: "WebSocket for tracking, REST for fallback"
+            title: "Cache Design",
+            description: "Implement appropriate cache eviction policies",
+            example: "Using LRU for driver location caches"
           }
         ]
       }
     },
     {
-      problem: "Platform needs to handle secure payment processing and fare calculation",
+      problem: "Users are experiencing inconsistent pricing and availability information",
       requirements: [
-        "Process payments for 100,000 daily rides with 99.99% success rate and fare calculation accuracy"
+        "Implement consistent pricing and real-time availability across all regions"
       ],
       metaRequirements: [
-        "Support real-time ride matching for 10,000 concurrent users with matching time under 3 seconds",
-        "Provide real-time location tracking and ETA updates every 3 seconds for 50,000 concurrent rides",
-        "Process payments for 100,000 daily rides with 99.99% success rate and fare calculation accuracy"
+        "Users should be able to request rides and get matched with available drivers within their vicinity",
+        "Reduce ride matching response time to handle increased load during rush hours",
+        "Implement consistent pricing and real-time availability across all regions"
       ],
       hintsPerArea: {
         requirements: {
           functional: [
-            "Design payment processing flow",
-            "Plan fare calculation system",
-            "Consider multiple payment methods"
+            "Consider consistency models for pricing",
+            "Think about regional pricing variations",
+            "Consider surge pricing mechanisms"
           ],
           nonFunctional: [
-            "Payment processing under 5 seconds",
-            "Ensure transaction consistency",
-            "Maintain payment security"
+            "System should maintain price consistency",
+            "Consider regional data consistency",
+            "Think about failover scenarios"
           ]
         },
         systemAPI: [
-          "Payment processing endpoints",
-          "Fare calculation API",
-          "Payment status webhooks"
+          "Design APIs for price calculation",
+          "Consider versioning for pricing changes",
+          "Think about regional API routing"
         ],
         capacityEstimations: {
           traffic: [
-            "Payment transactions per second",
-            "Fare calculation requests"
+            "Calculate pricing update frequency",
+            "Estimate regional traffic distribution"
           ],
           storage: [
-            "Transaction history size",
-            "Payment method data"
+            "Calculate pricing rules storage needs",
+            "Estimate regional data storage requirements"
           ],
           memory: [
-            "Active transaction state",
-            "Fare calculation cache"
+            "Calculate cache size for pricing rules",
+            "Consider regional cache requirements"
           ],
           bandwidth: [
-            "Payment gateway communication",
-            "Transaction payload size"
+            "Estimate cross-region communication needs",
+            "Calculate pricing update broadcast size"
           ]
         },
         highLevelDesign: [
-          "Payment service architecture",
-          "Transaction processing pipeline",
-          "Payment gateway integration"
+          "Consider distributed consensus mechanisms",
+          "Think about regional data centers",
+          "Consider event sourcing for pricing history"
         ]
       },
       criteria: [
-        "99.99% payment success rate",
-        "Process payments in <5 seconds",
-        "Support multiple payment methods",
-        "Accurate fare calculation"
+        "Pricing is consistent across regions",
+        "System handles regional failures gracefully",
+        "Pricing updates propagate within SLA",
+        "System maintains availability during updates"
       ],
       learningsInMD: `
-## Key Learnings from Stage 3
+## Key Learnings
+- Distributed systems consistency
+- Regional deployment strategies
+- Event sourcing patterns
+- Pricing system design
+- Failure handling in distributed systems
 
-### Payment Processing
-- Payment gateway integration
-- Transaction consistency
-- Security best practices
-
-### Fare Calculation
-- Dynamic pricing logic
-- Distance-based calculation
-- Time factor integration
-
-### Financial Data
-- Transaction management
-- Payment reconciliation
-- Financial reporting
-      `,
+### System Design Patterns
+- Event sourcing
+- CQRS for pricing updates
+- Regional failover patterns`,
       resources: {
         documentation: [
           {
-            title: "Payment Processing Security",
-            url: "https://stripe.com/docs/security",
-            description: "Learn about secure payment processing"
+            title: "Distributed Systems",
+            url: "https://martinfowler.com/articles/distributed-systems-intro.html",
+            description: "Introduction to distributed systems concepts"
           }
         ],
         realWorldCases: [
           {
-            name: "Stripe Payment System",
-            url: "https://stripe.com/blog/engineering",
-            description: "How Stripe handles payments at scale"
+            name: "Uber's Surge Pricing",
+            url: "https://eng.uber.com/engineering-surge-pricing/",
+            description: "How Uber implements surge pricing"
+          }
+        ],
+        bestPractices: [
+          {
+            title: "Pricing Consistency",
+            description: "Implement eventual consistency with clear boundaries",
+            example: "Using event sourcing for price changes"
+          }
+        ]
+      }
+    },
+    {
+      problem: "System needs to handle multiple regions with different regulations and payment methods",
+      requirements: [
+        "Support region-specific regulations and multiple payment systems while maintaining system consistency"
+      ],
+      metaRequirements: [
+        "Users should be able to request rides and get matched with available drivers within their vicinity",
+        "Reduce ride matching response time to handle increased load during rush hours",
+        "Implement consistent pricing and real-time availability across all regions",
+        "Support region-specific regulations and multiple payment systems while maintaining system consistency"
+      ],
+      hintsPerArea: {
+        requirements: {
+          functional: [
+            "Consider different payment integrations",
+            "Think about regulatory compliance",
+            "Consider regional business rules"
+          ],
+          nonFunctional: [
+            "System should maintain payment security",
+            "Consider regulatory compliance requirements",
+            "Think about payment processing SLAs"
+          ]
+        },
+        systemAPI: [
+          "Design payment gateway interfaces",
+          "Consider regulatory reporting APIs",
+          "Think about payment method validation"
+        ],
+        capacityEstimations: {
+          traffic: [
+            "Calculate payment transaction volume",
+            "Estimate regulatory reporting frequency"
+          ],
+          storage: [
+            "Calculate payment data retention needs",
+            "Estimate compliance data storage"
+          ],
+          memory: [
+            "Calculate payment processing cache needs",
+            "Consider session token requirements"
+          ],
+          bandwidth: [
+            "Estimate payment gateway traffic",
+            "Calculate regulatory data transfer needs"
+          ]
+        },
+        highLevelDesign: [
+          "Consider payment service architecture",
+          "Think about compliance monitoring",
+          "Consider audit logging system"
+        ]
+      },
+      criteria: [
+        "System supports multiple payment methods",
+        "Regulatory compliance is maintained",
+        "Payment processing meets SLA",
+        "Audit trails are maintained"
+      ],
+      learningsInMD: `
+## Key Learnings
+- Payment system integration
+- Regulatory compliance in distributed systems
+- Multi-region deployment strategies
+- Audit logging and monitoring
+- Security in payment processing
+
+### System Design Patterns
+- Gateway pattern for payments
+- Audit logging patterns
+- Compliance monitoring patterns`,
+      resources: {
+        documentation: [
+          {
+            title: "Payment Gateway Integration",
+            url: "https://stripe.com/docs/payments/design",
+            description: "Best practices for payment system design"
+          }
+        ],
+        realWorldCases: [
+          {
+            name: "Grab's Payment Platform",
+            url: "https://engineering.grab.com/building-grab-pay",
+            description: "How Grab built their payment platform"
           }
         ],
         bestPractices: [
           {
             title: "Payment Processing",
-            description: "Implement idempotency and transaction consistency",
-            example: "Use unique transaction IDs and status tracking"
+            description: "Implement idempotency for payment transactions",
+            example: "Using unique transaction IDs for retry handling"
           }
         ]
       }
     },
     {
-      problem: "System needs to implement dynamic pricing based on demand and supply",
+      problem: "Need to implement advanced safety features and fraud detection",
       requirements: [
-        "Implement real-time surge pricing updates every minute for 200 geographic zones with 95% accuracy"
+        "Implement real-time safety monitoring and fraud detection systems"
       ],
       metaRequirements: [
-        "Support real-time ride matching for 10,000 concurrent users with matching time under 3 seconds",
-        "Provide real-time location tracking and ETA updates every 3 seconds for 50,000 concurrent rides",
-        "Process payments for 100,000 daily rides with 99.99% success rate and fare calculation accuracy",
-        "Implement real-time surge pricing updates every minute for 200 geographic zones with 95% accuracy"
+        "Users should be able to request rides and get matched with available drivers within their vicinity",
+        "Reduce ride matching response time to handle increased load during rush hours",
+        "Implement consistent pricing and real-time availability across all regions",
+        "Support region-specific regulations and multiple payment systems while maintaining system consistency",
+        "Implement real-time safety monitoring and fraud detection systems"
       ],
       hintsPerArea: {
         requirements: {
           functional: [
-            "Design surge pricing algorithm",
-            "Plan zone management system",
-            "Consider historical data analysis"
+            "Consider real-time route monitoring",
+            "Think about fraud detection rules",
+            "Consider emergency response system"
           ],
           nonFunctional: [
-            "Price updates under 1 minute",
-            "Handle concurrent zone updates",
-            "Maintain price consistency"
+            "System should process safety alerts quickly",
+            "Consider false positive rates",
+            "Think about emergency response time"
           ]
         },
         systemAPI: [
-          "Surge calculation endpoints",
-          "Zone management API",
-          "Price update propagation"
+          "Design safety monitoring APIs",
+          "Consider emergency notification system",
+          "Think about fraud alert APIs"
         ],
         capacityEstimations: {
           traffic: [
-            "Zone update frequency",
-            "Price check requests"
+            "Calculate safety check frequency",
+            "Estimate fraud detection throughput"
           ],
           storage: [
-            "Historical pricing data",
-            "Zone definition data"
+            "Calculate safety log storage needs",
+            "Estimate fraud pattern storage"
           ],
           memory: [
-            "Active zone prices cache",
-            "Calculation model size"
+            "Calculate real-time monitoring needs",
+            "Consider pattern matching requirements"
           ],
           bandwidth: [
-            "Price update broadcasts",
-            "Zone status updates"
+            "Estimate safety alert bandwidth",
+            "Calculate monitoring data volume"
           ]
         },
         highLevelDesign: [
-          "Pricing service architecture",
-          "Zone management system",
-          "Price propagation mechanism"
+          "Consider real-time monitoring architecture",
+          "Think about machine learning pipeline",
+          "Consider emergency response system"
         ]
       },
       criteria: [
-        "Update prices every minute",
-        "Handle 200 geographic zones",
-        "95% pricing accuracy",
-        "Real-time price propagation"
+        "Safety monitoring system is operational",
+        "Fraud detection meets accuracy targets",
+        "Emergency response system meets SLA",
+        "False positive rate is within limits"
       ],
       learningsInMD: `
-## Key Learnings from Stage 4
+## Key Learnings
+- Real-time monitoring systems
+- Fraud detection patterns
+- Emergency response systems
+- Machine learning pipeline design
+- Safety system architecture
 
-### Dynamic Pricing
-- Surge pricing algorithms
-- Supply-demand balancing
-- Price propagation systems
-
-### Geographic Zoning
-- Zone management
-- Data partitioning
-- Load distribution
-
-### Real-time Updates
-- Price calculation
-- Update broadcasting
-- Consistency management
-      `,
+### System Design Patterns
+- Stream processing
+- Real-time analytics
+- Emergency notification patterns`,
       resources: {
         documentation: [
           {
-            title: "Real-time Pricing Systems",
-            url: "https://aws.amazon.com/kinesis/data-analytics/",
-            description: "Learn about real-time data processing for pricing"
+            title: "Real-time Processing",
+            url: "https://docs.confluent.io/platform/current/streams/concepts.html",
+            description: "Stream processing concepts and patterns"
           }
         ],
         realWorldCases: [
           {
-            name: "Uber Surge Pricing",
-            url: "https://eng.uber.com/",
-            description: "How Uber implements dynamic pricing"
-          }
-        ],
-        bestPractices: [
-          {
-            title: "Dynamic Pricing",
-            description: "Implement gradual price changes with proper notifications",
-            example: "Use sliding window for demand calculation"
-          }
-        ]
-      }
-    },
-    {
-      problem: "Platform needs robust safety and trust features",
-      requirements: [
-        "Implement real-time safety monitoring and incident response system for 1 million daily rides with <30 second response time"
-      ],
-      metaRequirements: [
-        "Support real-time ride matching for 10,000 concurrent users with matching time under 3 seconds",
-        "Provide real-time location tracking and ETA updates every 3 seconds for 50,000 concurrent rides",
-        "Process payments for 100,000 daily rides with 99.99% success rate and fare calculation accuracy",
-        "Implement real-time surge pricing updates every minute for 200 geographic zones with 95% accuracy",
-        "Implement real-time safety monitoring and incident response system for 1 million daily rides with <30 second response time"
-      ],
-      hintsPerArea: {
-        requirements: {
-          functional: [
-            "Design safety monitoring system",
-            "Plan emergency response flow",
-            "Consider user verification system"
-          ],
-          nonFunctional: [
-            "Incident response under 30 seconds",
-            "High availability requirement",
-            "System reliability targets"
-          ]
-        },
-        systemAPI: [
-          "Emergency alert endpoints",
-          "User verification API",
-          "Incident management system"
-        ],
-        capacityEstimations: {
-          traffic: [
-            "Safety check frequency",
-            "Incident report rate"
-          ],
-          storage: [
-            "User verification data",
-            "Incident history size"
-          ],
-          memory: [
-            "Active ride monitoring",
-            "Emergency response cache"
-          ],
-          bandwidth: [
-            "Alert notification size",
-            "Monitoring data volume"
-          ]
-        },
-        highLevelDesign: [
-          "Safety service architecture",
-          "Emergency response system",
-          "Monitoring pipeline"
-        ]
-      },
-      criteria: [
-        "30-second incident response",
-        "Handle 1M daily rides",
-        "Real-time route monitoring",
-        "Emergency service integration"
-      ],
-      learningsInMD: `
-## Key Learnings from Stage 5
-
-### Safety Systems
-- Real-time monitoring
-- Incident detection
-- Emergency response
-
-### Trust & Security
-- User verification
-- Fraud detection
-- Safety protocols
-
-### System Reliability
-- High availability design
-- Incident management
-- Emergency handling
-      `,
-      resources: {
-        documentation: [
-          {
-            title: "Real-time Safety Systems",
-            url: "https://aws.amazon.com/security/",
-            description: "Learn about building secure, real-time monitoring systems"
-          }
-        ],
-        realWorldCases: [
-          {
-            name: "Lyft Safety Features",
-            url: "https://safety.lyft.com/",
-            description: "How Lyft implements safety features"
+            name: "Uber's Safety System",
+            url: "https://eng.uber.com/real-time-safety",
+            description: "How Uber implements safety features"
           }
         ],
         bestPractices: [
           {
             title: "Safety Monitoring",
-            description: "Implement multi-layer safety checks with rapid response",
-            example: "Route monitoring + Emergency detection + Alert system"
-          }
-        ]
-      }
-    },
-    {
-      problem: "Platform needs analytics and reporting for business intelligence",
-      requirements: [
-        "Build real-time analytics pipeline processing 10TB daily data with insights available within 5 minutes"
-      ],
-      metaRequirements: [
-        "Support real-time ride matching for 10,000 concurrent users with matching time under 3 seconds",
-        "Provide real-time location tracking and ETA updates every 3 seconds for 50,000 concurrent rides",
-        "Process payments for 100,000 daily rides with 99.99% success rate and fare calculation accuracy",
-        "Implement real-time surge pricing updates every minute for 200 geographic zones with 95% accuracy",
-        "Implement real-time safety monitoring and incident response system for 1 million daily rides with <30 second response time",
-        "Build real-time analytics pipeline processing 10TB daily data with insights available within 5 minutes"
-      ],
-      hintsPerArea: {
-        requirements: {
-          functional: [
-            "Design analytics pipeline",
-            "Plan reporting system",
-            "Consider data aggregation"
-          ],
-          nonFunctional: [
-            "Process data within 5 minutes",
-            "Handle 10TB daily data",
-            "Maintain data accuracy"
-          ]
-        },
-        systemAPI: [
-          "Analytics data ingestion",
-          "Report generation API",
-          "Data aggregation endpoints"
-        ],
-        capacityEstimations: {
-          traffic: [
-            "Event ingestion rate",
-            "Report generation frequency"
-          ],
-          storage: [
-            "Raw data volume",
-            "Aggregated data size"
-          ],
-          memory: [
-            "Processing pipeline memory",
-            "Aggregation cache size"
-          ],
-          bandwidth: [
-            "Data ingestion volume",
-            "Report delivery size"
-          ]
-        },
-        highLevelDesign: [
-          "Analytics pipeline architecture",
-          "Data warehouse design",
-          "Reporting system"
-        ]
-      },
-      criteria: [
-        "Process 10TB daily data",
-        "5-minute insight availability",
-        "Support multiple report types",
-        "Maintain data accuracy"
-      ],
-      learningsInMD: `
-## Key Learnings from Stage 6
-
-### Data Processing
-- Stream processing
-- Batch processing
-- Data warehousing
-
-### Analytics Pipeline
-- Data ingestion
-- Real-time processing
-- Insight generation
-
-### Business Intelligence
-- Reporting systems
-- Data visualization
-- Metric tracking
-      `,
-      resources: {
-        documentation: [
-          {
-            title: "Real-time Analytics",
-            url: "https://docs.aws.amazon.com/kinesis/",
-            description: "Learn about building real-time analytics pipelines"
-          }
-        ],
-        realWorldCases: [
-          {
-            name: "Uber Analytics",
-            url: "https://eng.uber.com/tech-stack/",
-            description: "How Uber processes analytics data"
-          }
-        ],
-        bestPractices: [
-          {
-            title: "Analytics Pipeline",
-            description: "Combine stream and batch processing for complete analytics",
-            example: "Real-time processing + Batch aggregation"
+            description: "Implement real-time alerts with fallback mechanisms",
+            example: "Using redundant notification systems"
           }
         ]
       }
     }
   ],
   generalLearnings: [
-    "Real-time system architecture",
-    "Geospatial data management",
-    "Location-based service design",
-    "Payment processing systems",
-    "Dynamic pricing implementation",
-    "Safety system design",
-    "Analytics pipeline architecture",
-    "High-availability patterns",
-    "Data consistency models",
-    "Scalability techniques",
-    "System monitoring and reliability",
-    "Business intelligence systems"
+    "Designing scalable real-time systems",
+    "Handling geo-distributed data",
+    "Implementing consistent pricing in distributed systems",
+    "Managing multi-region deployments",
+    "Building reliable payment processing systems",
+    "Implementing safety and fraud detection systems",
+    "Handling regulatory compliance in global systems",
+    "Designing for high availability and fault tolerance",
+    "Implementing caching strategies for performance",
+    "Building event-driven architectures"
   ]
 };
 

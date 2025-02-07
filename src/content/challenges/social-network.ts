@@ -1,362 +1,494 @@
 import { type Challenge } from "./types";
 
 const socialNetworkChallenge: Challenge = {
-  slug: "distributed-social-network",
-  title: "Distributed Social Network System Design",
-  description: "Design a highly scalable distributed social network focusing on feed generation, content delivery, and real-time interactions. Learn advanced concepts in distributed systems, data consistency, and large-scale data processing.",
+  slug: "social-network-system",
+  title: "Social Network System Design",
+  description: "Design a scalable social network platform focusing on news feed generation, content delivery, and real-time interactions. Progress from basic social features to advanced recommendation systems.",
   difficulty: "Hard",
   isFree: false,
   stages: [
     {
-      problem: "Users need to post content and view personalized feeds in real-time",
+      problem: "Users need to connect with friends and share posts on their timeline",
       requirements: [
-        "Build a feed system handling 100 million daily active users with feed generation latency < 500ms and 99.99% availability"
+        "Users should be able to create profiles, connect with friends, and share posts that appear on their timeline"
       ],
       metaRequirements: [
-        "Build a feed system handling 100 million daily active users with feed generation latency < 500ms and 99.99% availability"
+        "Users should be able to create profiles, connect with friends, and share posts that appear on their timeline"
       ],
       hintsPerArea: {
         requirements: {
           functional: [
-            "Design post creation and storage",
-            "Plan feed generation algorithm",
-            "Consider content ranking system"
+            "Consider how to store user relationships",
+            "Think about post storage and retrieval",
+            "Consider timeline sorting and display"
           ],
           nonFunctional: [
-            "Feed generation under 500ms",
-            "Handle massive concurrent reads",
-            "Ensure high availability"
+            "Timeline loading speed is critical",
+            "System should handle text and media content",
+            "Consider data consistency for friend connections"
           ]
         },
         systemAPI: [
-          "Post creation endpoints",
-          "Feed generation API",
-          "Content ranking endpoints"
+          "Design APIs for user relationships",
+          "Consider post creation endpoints",
+          "Think about timeline retrieval API"
         ],
         capacityEstimations: {
           traffic: [
-            "Calculate posts per second",
-            "Estimate feed request rate",
-            "Project data growth rate"
+            "Calculate posts per user ratio",
+            "Consider friend connection frequency"
           ],
           storage: [
-            "Post data volume",
-            "User graph storage",
-            "Feed cache requirements"
+            "Estimate user profile data size",
+            "Calculate post storage requirements"
           ],
           memory: [
-            "Feed cache size",
-            "User graph cache",
-            "Ranking model cache"
+            "Consider timeline caching needs",
+            "Calculate active user session data"
           ],
           bandwidth: [
-            "Post ingestion bandwidth",
-            "Feed delivery size",
-            "Cache sync traffic"
+            "Estimate post creation traffic",
+            "Calculate timeline loading size"
           ]
         },
         highLevelDesign: [
-          "Feed service architecture",
-          "Storage sharding strategy",
-          "Caching hierarchy design"
+          "Consider using a graph database for relationships",
+          "Think about content storage system",
+          "Consider feed aggregation service"
         ]
       },
       criteria: [
-        "System handles 100M daily active users",
-        "Feed generation under 500ms",
-        "Maintains 99.99% availability"
+        "System can store user profiles and relationships",
+        "Users can create and retrieve posts",
+        "Timeline displays posts chronologically",
+        "Basic friend connections work"
       ],
-      learningsInMD: "Learn about feed generation algorithms, content ranking systems, and handling massive read workloads in distributed systems.",
+      learningsInMD: `
+## Key Learnings
+- Social graph data modeling
+- Content storage systems
+- Basic feed generation
+- Friend relationship modeling
+- Timeline sorting algorithms
+
+### System Design Patterns
+- Graph database usage
+- Content delivery patterns
+- Feed aggregation basics`,
       resources: {
         documentation: [
           {
-            title: "Feed Generation",
-            url: "https://instagram-engineering.com/building-instagram-feed-performance-and-scalability-b05c762023ca",
-            description: "Understanding feed generation and optimization techniques"
+            title: "Graph Databases",
+            url: "https://neo4j.com/developer/graph-database/",
+            description: "Understanding graph databases for social networks"
           }
         ],
         realWorldCases: [
           {
-            name: "Twitter",
-            url: "https://blog.twitter.com/engineering/en_us/topics/infrastructure/2017/the-infrastructure-behind-twitter-scale",
-            description: "How Twitter handles feed generation at scale"
+            name: "Facebook's TAO",
+            url: "https://www.usenix.org/system/files/conference/atc13/atc13-bronson.pdf",
+            description: "How Facebook stores social graph data"
           }
         ],
         bestPractices: [
           {
-            title: "Feed Architecture",
-            description: "Implement hybrid push/pull model for feed generation",
-            example: "Push updates to active users, pull for inactive users to optimize resources"
+            title: "Social Graph Storage",
+            description: "Use specialized graph databases for relationship queries",
+            example: "Using Neo4j for friend-of-friend queries"
           }
         ]
       }
     },
     {
-      problem: "System needs to handle real-time interactions and notifications across global regions",
+      problem: "News feed is loading slowly and users are experiencing high latency",
       requirements: [
-        "Support 1 million concurrent real-time connections per region across 10 global regions with < 100ms notification latency"
+        "Optimize news feed generation and delivery to reduce loading times"
       ],
       metaRequirements: [
-        "Build a feed system handling 100 million daily active users with feed generation latency < 500ms and 99.99% availability",
-        "Support 1 million concurrent real-time connections per region across 10 global regions with < 100ms notification latency"
+        "Users should be able to create profiles, connect with friends, and share posts that appear on their timeline",
+        "Optimize news feed generation and delivery to reduce loading times"
       ],
       hintsPerArea: {
         requirements: {
           functional: [
-            "Design global presence system",
-            "Plan notification routing",
-            "Consider consistency model"
+            "Consider feed pre-computation",
+            "Think about pagination strategies",
+            "Consider caching frequently accessed content"
           ],
           nonFunctional: [
-            "Notification latency < 100ms",
-            "Handle regional failures",
-            "Ensure message ordering"
+            "Feed loading time should be minimal",
+            "System should handle concurrent feed requests",
+            "Consider cache invalidation strategies"
           ]
         },
         systemAPI: [
-          "Presence management API",
-          "Real-time event system",
-          "Cross-region sync API"
+          "Design feed pagination APIs",
+          "Consider cache warming endpoints",
+          "Think about delta updates"
         ],
         capacityEstimations: {
           traffic: [
-            "Concurrent connections per region",
-            "Event rate per connection",
-            "Cross-region sync volume"
+            "Calculate feed request patterns",
+            "Estimate cache hit ratios"
           ],
           storage: [
-            "Presence data size",
-            "Event buffer storage",
-            "Connection state data"
+            "Calculate cache storage needs",
+            "Estimate feed materialization size"
           ],
           memory: [
-            "Connection state cache",
-            "Event routing tables",
-            "Presence information"
+            "Calculate feed cache requirements",
+            "Consider hot user data size"
           ],
           bandwidth: [
-            "Event propagation traffic",
-            "Cross-region replication",
-            "Client connection overhead"
+            "Estimate feed delivery size",
+            "Calculate cache synchronization needs"
           ]
         },
         highLevelDesign: [
-          "Global presence architecture",
-          "Event routing system",
-          "Regional failover design"
+          "Consider implementing feed cache",
+          "Think about CDN integration",
+          "Consider fan-out service design"
         ]
       },
       criteria: [
-        "Handles 1M concurrent connections per region",
-        "Notification latency under 100ms",
-        "Correct message ordering"
+        "Feed loading meets performance targets",
+        "Cache hit rate meets requirements",
+        "System handles concurrent requests efficiently",
+        "Pagination works smoothly"
       ],
-      learningsInMD: "Learn about global distributed systems, real-time event processing, and handling cross-region consistency.",
+      learningsInMD: `
+## Key Learnings
+- Feed optimization techniques
+- Caching strategies
+- Content delivery networks
+- Fan-out processing
+- Pagination implementation
+
+### System Design Patterns
+- Read-aside cache
+- CDN integration
+- Fan-out on write vs read`,
       resources: {
         documentation: [
           {
-            title: "WebSocket at Scale",
+            title: "Feed Algorithms",
+            url: "https://instagram-engineering.com/building-instagram-feed-ranking-system-b99d40cf52e7",
+            description: "How Instagram builds their feed system"
+          }
+        ],
+        realWorldCases: [
+          {
+            name: "Twitter's Timeline",
+            url: "https://blog.twitter.com/engineering/en_us/topics/infrastructure/2017/the-infrastructure-behind-twitter-timeline",
+            description: "Twitter's timeline architecture"
+          }
+        ],
+        bestPractices: [
+          {
+            title: "Feed Caching",
+            description: "Implement smart caching with materialized views",
+            example: "Pre-computing feeds for active users"
+          }
+        ]
+      }
+    },
+    {
+      problem: "System needs to support real-time features like notifications and instant messaging",
+      requirements: [
+        "Implement real-time notifications and messaging capabilities while maintaining system performance"
+      ],
+      metaRequirements: [
+        "Users should be able to create profiles, connect with friends, and share posts that appear on their timeline",
+        "Optimize news feed generation and delivery to reduce loading times",
+        "Implement real-time notifications and messaging capabilities while maintaining system performance"
+      ],
+      hintsPerArea: {
+        requirements: {
+          functional: [
+            "Consider WebSocket connections",
+            "Think about message persistence",
+            "Consider notification delivery"
+          ],
+          nonFunctional: [
+            "Message delivery should be real-time",
+            "System should handle connection scaling",
+            "Consider message ordering"
+          ]
+        },
+        systemAPI: [
+          "Design WebSocket endpoints",
+          "Consider message delivery APIs",
+          "Think about presence system"
+        ],
+        capacityEstimations: {
+          traffic: [
+            "Calculate message throughput",
+            "Estimate concurrent connections"
+          ],
+          storage: [
+            "Calculate message history size",
+            "Estimate presence data size"
+          ],
+          memory: [
+            "Calculate active connection needs",
+            "Consider message queue size"
+          ],
+          bandwidth: [
+            "Estimate WebSocket traffic",
+            "Calculate notification size"
+          ]
+        },
+        highLevelDesign: [
+          "Consider WebSocket servers",
+          "Think about message queue system",
+          "Consider presence service"
+        ]
+      },
+      criteria: [
+        "Real-time messaging works",
+        "Notifications deliver promptly",
+        "System handles connection scaling",
+        "Message ordering is maintained"
+      ],
+      learningsInMD: `
+## Key Learnings
+- Real-time system design
+- WebSocket implementation
+- Message queue systems
+- Presence management
+- Connection handling
+
+### System Design Patterns
+- Publisher/Subscriber
+- WebSocket architecture
+- Message queue patterns`,
+      resources: {
+        documentation: [
+          {
+            title: "WebSocket Architecture",
             url: "https://www.nginx.com/blog/websocket-nginx/",
-            description: "Understanding WebSocket scaling challenges"
+            description: "Understanding WebSocket implementation"
           }
         ],
         realWorldCases: [
           {
-            name: "Discord",
-            url: "https://discord.com/blog/how-discord-handles-millions-of-concurrent-voice-users",
-            description: "Discord's approach to real-time communication"
+            name: "WhatsApp Architecture",
+            url: "https://engineering.whatsapp.com/",
+            description: "WhatsApp's messaging system"
           }
         ],
         bestPractices: [
           {
-            title: "Global Distribution",
-            description: "Implement regional presence with eventual consistency",
-            example: "Use regional event hubs with cross-region replication for global state"
+            title: "Real-time Messaging",
+            description: "Implement proper connection management",
+            example: "Using heartbeat mechanisms for connections"
           }
         ]
       }
     },
     {
-      problem: "Platform needs to handle media processing and global content delivery",
+      problem: "Content discovery is limited and users are missing relevant posts",
       requirements: [
-        "Process and deliver 500TB of new media daily with 99.999% durability and global access latency < 200ms"
+        "Implement a content recommendation system to improve post discovery and user engagement"
       ],
       metaRequirements: [
-        "Build a feed system handling 100 million daily active users with feed generation latency < 500ms and 99.99% availability",
-        "Support 1 million concurrent real-time connections per region across 10 global regions with < 100ms notification latency",
-        "Process and deliver 500TB of new media daily with 99.999% durability and global access latency < 200ms"
+        "Users should be able to create profiles, connect with friends, and share posts that appear on their timeline",
+        "Optimize news feed generation and delivery to reduce loading times",
+        "Implement real-time notifications and messaging capabilities while maintaining system performance",
+        "Implement a content recommendation system to improve post discovery and user engagement"
       ],
       hintsPerArea: {
         requirements: {
           functional: [
-            "Design media processing pipeline",
-            "Plan CDN integration",
-            "Consider transcoding system"
+            "Consider user interest tracking",
+            "Think about content categorization",
+            "Consider engagement metrics"
           ],
           nonFunctional: [
-            "Global access latency < 200ms",
-            "99.999% data durability",
-            "Optimize storage costs"
+            "Recommendations should be relevant",
+            "System should handle computation load",
+            "Consider recommendation freshness"
           ]
         },
         systemAPI: [
-          "Media upload endpoints",
-          "Processing pipeline API",
-          "CDN management system"
+          "Design recommendation APIs",
+          "Consider feedback endpoints",
+          "Think about content categorization"
         ],
         capacityEstimations: {
           traffic: [
-            "Media upload rate",
-            "Processing pipeline throughput",
-            "CDN request volume"
+            "Calculate recommendation requests",
+            "Estimate feedback volume"
           ],
           storage: [
-            "Raw media storage",
-            "Processed formats size",
-            "Metadata volume"
+            "Calculate user behavior data size",
+            "Estimate model storage needs"
           ],
           memory: [
-            "Processing pipeline buffers",
-            "CDN cache size",
-            "Metadata cache"
+            "Consider model serving requirements",
+            "Calculate feature cache size"
           ],
           bandwidth: [
-            "Upload ingestion capacity",
-            "CDN distribution traffic",
-            "Processing pipeline throughput"
+            "Estimate recommendation response size",
+            "Calculate model update size"
           ]
         },
         highLevelDesign: [
-          "Media processing architecture",
-          "Global CDN design",
-          "Storage tiering strategy"
+          "Consider recommendation service",
+          "Think about feature extraction",
+          "Consider model serving system"
         ]
       },
       criteria: [
-        "Handles 500TB daily media processing",
-        "Maintains 99.999% durability",
-        "Global access under 200ms"
+        "Recommendations are relevant",
+        "System handles computation load",
+        "Content discovery improves",
+        "User engagement increases"
       ],
-      learningsInMD: "Learn about large-scale media processing, content delivery networks, and distributed storage systems.",
+      learningsInMD: `
+## Key Learnings
+- Recommendation systems
+- Feature engineering
+- Model serving architecture
+- Content categorization
+- Engagement metrics
+
+### System Design Patterns
+- Feature extraction pipeline
+- Model serving architecture
+- A/B testing system`,
       resources: {
         documentation: [
           {
-            title: "Media Processing",
-            url: "https://aws.amazon.com/media/",
-            description: "Understanding media processing and delivery"
+            title: "Recommendation Systems",
+            url: "https://developers.google.com/machine-learning/recommendation",
+            description: "Google's guide to recommendation systems"
           }
         ],
         realWorldCases: [
           {
-            name: "Netflix",
-            url: "https://netflixtechblog.com/high-quality-video-encoding-at-scale-d159db052746",
-            description: "Netflix's media processing pipeline"
+            name: "Netflix Recommendations",
+            url: "https://netflixtechblog.com/system-architectures-for-personalization-and-recommendation-e081aa94b5d8",
+            description: "Netflix's recommendation architecture"
           }
         ],
         bestPractices: [
           {
-            title: "Media Delivery",
-            description: "Implement multi-tier storage with CDN integration",
-            example: "Use hot storage for recent content, cold storage for archives, and CDN for popular content"
+            title: "Content Recommendation",
+            description: "Implement proper feature engineering",
+            example: "Using collaborative filtering with content-based features"
           }
         ]
       }
     },
     {
-      problem: "System needs advanced analytics and recommendation engine",
+      problem: "System needs to handle user privacy and content moderation at scale",
       requirements: [
-        "Build real-time analytics and recommendation system processing 1PB daily data with recommendation latency < 50ms"
+        "Implement privacy controls and content moderation systems while maintaining performance"
       ],
       metaRequirements: [
-        "Build a feed system handling 100 million daily active users with feed generation latency < 500ms and 99.99% availability",
-        "Support 1 million concurrent real-time connections per region across 10 global regions with < 100ms notification latency",
-        "Process and deliver 500TB of new media daily with 99.999% durability and global access latency < 200ms",
-        "Build real-time analytics and recommendation system processing 1PB daily data with recommendation latency < 50ms"
+        "Users should be able to create profiles, connect with friends, and share posts that appear on their timeline",
+        "Optimize news feed generation and delivery to reduce loading times",
+        "Implement real-time notifications and messaging capabilities while maintaining system performance",
+        "Implement a content recommendation system to improve post discovery and user engagement",
+        "Implement privacy controls and content moderation systems while maintaining performance"
       ],
       hintsPerArea: {
         requirements: {
           functional: [
-            "Design analytics pipeline",
-            "Plan recommendation system",
-            "Consider ML model serving"
+            "Consider privacy settings hierarchy",
+            "Think about content filtering",
+            "Consider moderation workflow"
           ],
           nonFunctional: [
-            "Recommendation latency < 50ms",
-            "Process 1PB daily data",
-            "Real-time analytics updates"
+            "Privacy checks should be fast",
+            "System should handle reported content",
+            "Consider moderation response time"
           ]
         },
         systemAPI: [
-          "Analytics ingestion API",
-          "Recommendation endpoints",
-          "Model serving system"
+          "Design privacy control APIs",
+          "Consider moderation endpoints",
+          "Think about reporting system"
         ],
         capacityEstimations: {
           traffic: [
-            "Event ingestion rate",
-            "Recommendation request rate",
-            "Model inference load"
+            "Calculate privacy check frequency",
+            "Estimate moderation volume"
           ],
           storage: [
-            "Raw event data size",
-            "Processed features volume",
-            "Model storage requirements"
+            "Calculate privacy settings size",
+            "Estimate moderation queue size"
           ],
           memory: [
-            "Feature store cache",
-            "Model serving memory",
-            "Analytics aggregations"
+            "Consider privacy cache needs",
+            "Calculate moderation state"
           ],
           bandwidth: [
-            "Event ingestion bandwidth",
-            "Feature update traffic",
-            "Model distribution size"
+            "Estimate moderation request size",
+            "Calculate privacy check volume"
           ]
         },
         highLevelDesign: [
-          "Analytics pipeline architecture",
-          "Recommendation system design",
-          "Model serving infrastructure"
+          "Consider privacy service",
+          "Think about moderation queue",
+          "Consider content filtering system"
         ]
       },
       criteria: [
-        "Processes 1PB daily data",
-        "Recommendation latency under 50ms",
-        "Real-time analytics updates"
+        "Privacy controls work effectively",
+        "Content moderation is timely",
+        "System maintains performance",
+        "Reporting system works"
       ],
-      learningsInMD: "Learn about large-scale data processing, recommendation systems, and real-time analytics in distributed systems.",
+      learningsInMD: `
+## Key Learnings
+- Privacy system design
+- Content moderation systems
+- Queue processing
+- Access control patterns
+- Reporting systems
+
+### System Design Patterns
+- Role-based access control
+- Content filtering pipeline
+- Moderation workflow`,
       resources: {
         documentation: [
           {
-            title: "Real-time Analytics",
-            url: "https://spark.apache.org/docs/latest/structured-streaming-programming-guide.html",
-            description: "Understanding real-time data processing"
+            title: "Content Moderation",
+            url: "https://aws.amazon.com/solutions/implementations/content-moderation-api/",
+            description: "AWS content moderation architecture"
           }
         ],
         realWorldCases: [
           {
-            name: "LinkedIn",
-            url: "https://engineering.linkedin.com/blog/2020/scaling-machine-learning-productivity",
-            description: "LinkedIn's recommendation system"
+            name: "Facebook's Content Moderation",
+            url: "https://engineering.fb.com/2020/11/13/ml-applications/hate-speech-detection/",
+            description: "Facebook's moderation system"
           }
         ],
         bestPractices: [
           {
-            title: "Recommendation Architecture",
-            description: "Implement multi-stage recommendation pipeline",
-            example: "Use candidate generation followed by ranking, with feature store for real-time serving"
+            title: "Privacy Controls",
+            description: "Implement hierarchical privacy settings",
+            example: "Using permission inheritance for nested groups"
           }
         ]
       }
     }
   ],
   generalLearnings: [
-    "Designing highly scalable distributed systems",
-    "Handling global real-time communications",
-    "Managing large-scale data processing",
-    "Implementing recommendation systems",
-    "Optimizing for global content delivery",
-    "Building real-time analytics pipelines"
+    "Designing social graph databases",
+    "Implementing feed generation systems",
+    "Building real-time communication systems",
+    "Creating recommendation engines",
+    "Handling privacy and moderation",
+    "Scaling distributed systems",
+    "Implementing caching strategies",
+    "Building content delivery systems",
+    "Managing user relationships",
+    "Designing for user engagement"
   ]
 };
 

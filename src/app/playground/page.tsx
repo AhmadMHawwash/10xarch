@@ -17,7 +17,7 @@ import { usePlaygroundManager } from "@/lib/hooks/usePlaygroundManager";
 import {
   SystemDesignerProvider,
   useSystemDesigner,
-} from "@/lib/hooks/useSystemDesigner";
+} from "@/lib/hooks/_useSystemDesigner";
 import { cn } from "@/lib/utils";
 import { usePrevious } from "react-use";
 import { useEffect, useState } from "react";

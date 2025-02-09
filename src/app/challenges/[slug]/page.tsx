@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/resizable";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
-import { SystemDesignerProvider } from "@/lib/hooks/useSystemDesigner";
+import { SystemDesignerProvider } from "@/lib/hooks/_useSystemDesigner";
 import { Award, Lightbulb, TrendingUp } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";

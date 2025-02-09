@@ -5,7 +5,7 @@ const rideShareChallenge: Challenge = {
   title: "Ride Sharing System Design",
   description: "Design a scalable ride-sharing platform focusing on real-time matching, geo-distribution, and reliability. Progress from basic ride matching to advanced features handling millions of concurrent users.",
   difficulty: "Hard",
-  isFree: false,
+  isFree: true,
   stages: [
     {
       problem: "Users need to request rides and get matched with nearby drivers in real-time",

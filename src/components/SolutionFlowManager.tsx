@@ -2,7 +2,7 @@ import { useFeatureCustomisation, useFeatures } from "@/lib/hooks/useFeatures";
 import {
   defaultStartingNodes,
   useSystemDesigner,
-} from "@/lib/hooks/useSystemDesigner";
+} from "@/lib/hooks/_useSystemDesigner";
 import {
   type EvaluationResponse,
   type PlaygroundResponse,

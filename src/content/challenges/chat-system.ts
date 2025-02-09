@@ -5,7 +5,7 @@ const chatSystemChallenge: Challenge = {
   title: "Real-time Chat System Design",
   description: "Design a real-time chat system focusing on message delivery, scaling, and reliability. Learn fundamental distributed systems concepts through practical chat features.",
   difficulty: "Easy",
-  isFree: true,
+  isFree: false,
   stages: [
     {
       problem: "Users need to send and receive text messages to each other",

@@ -5,7 +5,7 @@ const fileStorageChallenge: Challenge = {
   title: "File Storage System Design",
   description: "Design a scalable file storage system that allows users to upload, download, and manage files securely with features like sharing and version control.",
   difficulty: "Medium",
-  isFree: true,
+  isFree: false,
   stages: [
     {
       problem: "Users need to upload and download personal files to the cloud securely",

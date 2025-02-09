@@ -5,7 +5,7 @@ import {
 } from "@/components/ReactflowCustomNodes/SystemComponentNode";
 import { api } from "@/trpc/react";
 import { type Edge, type Node } from "reactflow";
-import { useSystemDesigner } from "./useSystemDesigner";
+import { useSystemDesigner } from "./_useSystemDesigner";
 
 export const SYSTEM_COMPONENT_NODE = "SystemComponentNode";
 

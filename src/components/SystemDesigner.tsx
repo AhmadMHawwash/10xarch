@@ -1,5 +1,4 @@
 "use client";
-import { useSystemDesigner } from "@/lib/hooks/useSystemDesigner";
 import { useEffect, type ComponentType } from "react";
 import ReactFlow, {
   Background,
@@ -19,6 +18,7 @@ import { CustomEdge } from "./CustomEdge";
 import Gallery from "./Gallery";
 import SystemComponentNode from "./ReactflowCustomNodes/SystemComponentNode";
 import { Whiteboard } from "./SystemComponents/Whiteboard";
+import { useSystemDesigner } from "@/lib/hooks/_useSystemDesigner";
 
 const nodeTypes: Record<string, ComponentType<NodeProps>> = {
   SystemComponentNode,

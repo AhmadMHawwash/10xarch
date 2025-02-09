@@ -5,7 +5,7 @@ const bloggingPlatformChallenge: Challenge = {
   title: "Medium-Scale Blogging Platform Design",
   description: "Design a scalable blogging platform that supports content creation, distribution, and engagement while ensuring good performance and reliability.",
   difficulty: "Medium",
-  isFree: true,
+  isFree: false,
   stages: [
     {
       problem: "Writers need a platform to create, edit, and publish blog posts with rich text formatting and image support.",

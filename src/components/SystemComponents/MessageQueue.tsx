@@ -1,4 +1,4 @@
-import { useSystemDesigner } from "@/lib/hooks/useSystemDesigner";
+import { useSystemDesigner } from "@/lib/hooks/_useSystemDesigner";
 import { type ComponentNodeProps } from "../ReactflowCustomNodes/SystemComponentNode";
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";

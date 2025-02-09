@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useCredits } from "@/hooks/useCredits";
-import { useSystemDesigner } from "@/lib/hooks/useSystemDesigner";
+import { useSystemDesigner } from "@/lib/hooks/_useSystemDesigner";
 import { api } from "@/trpc/react";
 import { Coins, MessageSquare, Send } from "lucide-react";
 import { useEffect, useRef, useState, useMemo } from "react";

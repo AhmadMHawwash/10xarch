@@ -1,4 +1,4 @@
-import { useSystemDesigner } from "@/lib/hooks/useSystemDesigner";
+import { useSystemDesigner } from "@/lib/hooks/_useSystemDesigner";
 
 export type SystemComponentNodeDataProps = {
   id: string;

@@ -1,21 +1,17 @@
 import { Footer } from "@/components/Footer";
 import HeroSystemDesigner from "@/components/HeroSystemDesigner";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import {
   ArrowRight,
   BookOpen,
+  CheckCircle,
   Code,
   CreditCard,
   IterationCcw,
   Layers,
-  CheckCircle,
-  Mail,
-  MessageCircle,
-  Twitter,
-  Github,
-  ChevronDown
+  MessageSquareHeartIcon
 } from "lucide-react";
 import Link from "next/link";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 export default async function Home() {
   return (
@@ -184,7 +180,7 @@ export default async function Home() {
                   </p>
                 </div>
                 {index < 3 && (
-                  <div className="hidden md:block absolute top-1/2 -right-4 w-8 h-0.5 bg-gradient-to-r from-blue-600 to-purple-600"></div>
+                  <div className="hidden md:block absolute top-1/2 -right-8 w-8 h-0.5 bg-gradient-to-r from-blue-600 to-purple-600"></div>
                 )}
               </div>
             ))}
@@ -426,7 +422,7 @@ export default async function Home() {
 
               <div className="flex justify-center">
                 <Link
-                  href="/credits"
+                  href="/challenges/url-shortener"
                   className="group relative inline-flex items-center overflow-hidden rounded-full bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-3 text-white transition-all hover:from-blue-700 hover:to-purple-700"
                 >
                   <span className="mr-2">Get Started</span>
@@ -442,30 +438,22 @@ export default async function Home() {
       <section className="mb-20 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 py-12">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Get in Touch
+            Share Your Feedback
           </h2>
           
           <div className="max-w-2xl mx-auto">
-            <div className="grid md:grid-cols-2 gap-8">
+            <div className="flex justify-center">
               <Link
-                href="mailto:support@archround.com"
-                className="flex items-center justify-center gap-3 bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg hover:shadow-xl transition-all"
+                href="https://archround.userjot.com"
+                className="group inline-flex items-center gap-2 overflow-hidden rounded-full bg-blue-500 px-8 py-3 text-white shadow-md ring-1 ring-white/10 transition-all duration-300 hover:-translate-y-0.5 hover:bg-blue-600 hover:shadow-lg hover:shadow-blue-500/25 dark:bg-blue-600 dark:hover:bg-blue-700"
               >
-                <Mail className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-                <span className="text-gray-900 dark:text-white">Email Support</span>
-              </Link>
-              
-              <Link
-                href="https://twitter.com/archround"
-                className="flex items-center justify-center gap-3 bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg hover:shadow-xl transition-all"
-              >
-                <Twitter className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-                <span className="text-gray-900 dark:text-white">Follow Updates</span>
+                <MessageSquareHeartIcon className="h-5 w-5 transition-transform group-hover:scale-105" />
+                <span>Give Feedback</span>
               </Link>
             </div>
             
             <p className="text-center mt-8 text-gray-600 dark:text-gray-400">
-              Have questions? We&apos;re here to help you succeed in your system design journey.
+              Your feedback helps us improve and create a better learning experience for everyone.
             </p>
           </div>
         </div>

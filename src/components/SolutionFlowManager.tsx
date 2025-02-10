@@ -46,6 +46,23 @@ export const FlowManager: React.FC<FlowManagerProps> = ({
 
   useEffect(() => {
     setIsClient(true);
+
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes pulse-gentle {
+        0% { box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.4), 0 0 0 4px rgba(245, 158, 11, 0.2); }
+        50% { box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.4), 0 0 0 8px rgba(245, 158, 11, 0); }
+        100% { box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.4), 0 0 0 4px rgba(245, 158, 11, 0.2); }
+      }
+      .animate-pulse-gentle {
+        animation: pulse-gentle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      }
+    `;
+    document.head.appendChild(style);
+
+    return () => {
+      document.head.removeChild(style);
+    };
   }, []);
 
   const resetFlow = () => {
@@ -181,16 +198,3 @@ const ShouldResetFlowModal: React.FC<ShouldResetFlowModalProps> = ({
     </Dialog>
   );
 };
-
-const style = document.createElement('style');
-style.textContent = `
-  @keyframes pulse-gentle {
-    0% { box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.4), 0 0 0 4px rgba(245, 158, 11, 0.2); }
-    50% { box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.4), 0 0 0 8px rgba(245, 158, 11, 0); }
-    100% { box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.4), 0 0 0 4px rgba(245, 158, 11, 0.2); }
-  }
-  .animate-pulse-gentle {
-    animation: pulse-gentle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  }
-`;
-document.head.appendChild(style);

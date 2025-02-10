@@ -30,16 +30,16 @@ function HeroAIFeedback() {
   const [isExpanded, setIsExpanded] = useState(true);
 
   return (
-    <div className="rounded-lg bg-white/5 backdrop-blur-lg dark:bg-gray-800/50">
+    <div className="rounded-lg bg-white/5 backdrop-blur-lg dark:bg-gray-800/50 ring-2 ring-amber-400/30 dark:ring-amber-500/30 shadow-[0_0_0_2px_rgba(251,191,36,0.1)] dark:shadow-[0_0_0_2px_rgba(251,191,36,0.1)] animate-pulse-gentle">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
         className="flex w-full items-center justify-between p-4 text-left transition-colors hover:bg-white/5"
       >
-        <div className="text-sm text-gray-500 dark:text-gray-400">AI Feedback</div>
+        <div className="text-sm text-amber-500 dark:text-amber-400 font-medium">AI Feedback</div>
         {isExpanded ? (
-          <ChevronDown className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+          <ChevronDown className="h-4 w-4 text-amber-500 dark:text-amber-400" />
         ) : (
-          <ChevronUp className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+          <ChevronUp className="h-4 w-4 text-amber-500 dark:text-amber-400" />
         )}
       </button>
       {isExpanded && (
@@ -67,6 +67,19 @@ function HeroAIFeedback() {
     </div>
   );
 }
+
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes pulse-gentle {
+    0% { box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.3), 0 0 0 4px rgba(251, 191, 36, 0.1); }
+    50% { box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.3), 0 0 0 8px rgba(251, 191, 36, 0); }
+    100% { box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.3), 0 0 0 4px rgba(251, 191, 36, 0.1); }
+  }
+  .animate-pulse-gentle {
+    animation: pulse-gentle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+`;
+document.head.appendChild(style);
 
 export default function HeroSystemDesigner() {
   const {

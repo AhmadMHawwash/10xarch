@@ -10,7 +10,7 @@ import ReactFlow, {
   SelectionMode,
   type EdgeProps,
   type NodeProps,
-  type OnConnect
+  type OnConnect,
 } from "reactflow";
 import "reactflow/dist/base.css";
 import "reactflow/dist/style.css";

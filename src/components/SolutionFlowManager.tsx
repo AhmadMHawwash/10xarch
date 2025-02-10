@@ -76,12 +76,12 @@ export const FlowManager: React.FC<FlowManagerProps> = ({
               Soon
             </Badge>
           )}
-            <RunSolutionButton
-              isLoading={isLoadingAnswer}
-              onClick={checkSolution}
-              disabled={!canRunSolution}
-              label={runSolutionLabel}
-            />
+          <RunSolutionButton
+            isLoading={isLoadingAnswer}
+            onClick={checkSolution}
+            disabled={!canRunSolution}
+            label={runSolutionLabel}
+          />
         </div>
         <Suspense
           fallback={

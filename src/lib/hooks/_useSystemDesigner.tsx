@@ -44,6 +44,7 @@ interface SystemDesignerState {
   initWrapper: (wrapper: HTMLDivElement) => void;
   updateNodes: (nodes: Node[]) => void;
   updateEdges: (edges: Edge[]) => void;
+  updateEdgeLabel: (edgeId: string, label: string) => void;
   onConnect: OnConnect;
   onDragOver: DragEventHandler;
   onDrop: DragEventHandler;
@@ -78,6 +79,7 @@ const SystemDesignerContext = createContext<SystemDesignerState>({
   edges: [],
   updateEdges: noop,
   updateNodes: noop,
+  updateEdgeLabel: noop,
   initInstance: noop,
   initWrapper: noop,
   onConnect: noop,
@@ -433,6 +435,23 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
     [nodes, updateNodes],
   );
 
+  const updateEdgeLabel = useCallback((edgeId: string, label: string) => {
+    setEdges((eds) =>
+      eds.map((edge) => {
+        if (edge.id === edgeId) {
+          return {
+            ...edge,
+            data: {
+              ...edge.data,
+              label,
+            },
+          };
+        }
+        return edge;
+      }),
+    );
+  }, []);
+
   return (
     <SystemDesignerContext.Provider
       value={{
@@ -442,6 +461,7 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
         initInstance,
         updateNodes,
         updateEdges,
+        updateEdgeLabel,
         initWrapper,
         onEdgesChange,
         onNodesChange,

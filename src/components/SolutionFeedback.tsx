@@ -4,7 +4,7 @@ import {
 } from "@/server/api/routers/checkAnswer";
 import {
   Award,
-  ChevronDown,
+  Bot,
   Lightbulb,
   Loader2,
   TrendingUp,
@@ -109,7 +109,7 @@ export const SolutionFeedback: React.FC<SolutionFeedbackProps> = ({
     <Sheet open={isOpen} onOpenChange={(v) => (v ? onOpen() : onClose())}>
       <SheetTrigger asChild>
         <Button variant="outline">
-          <ChevronDown className="mr-2" size="20" />
+          <Bot className="mr-2 text-amber-500" size="20" />
           Feedback
         </Button>
       </SheetTrigger>

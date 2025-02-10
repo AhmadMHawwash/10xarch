@@ -8,18 +8,17 @@ import {
 import challenges from "@/content/challenges";
 import { useCredits } from "@/hooks/useCredits";
 import { cn } from "@/lib/utils";
+import { api } from "@/trpc/react";
 import { SignInButton, UserButton, useUser } from "@clerk/nextjs";
 import { Menu, X } from "lucide-react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import { useCallback, useState } from "react";
 import { ThemeToggle } from "./ThemeToggle";
 import { Logo } from "./icons/logo";
 import { Button } from "./ui/button";
-import { api } from "@/trpc/react";
 
 function RateLimitInfo() {
-  const { user } = useUser();
   const rateLimitQuery = api.challenges.getRateLimitInfo.useQuery(undefined, {
     refetchInterval: 1000 * 60, // Refresh every minute
   });
@@ -95,14 +94,18 @@ export default function Navbar() {
   const { user } = useUser();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { balance: credits, isLoading: isLoadingCredits } = useCredits();
+  const pathname = usePathname();
 
   const toggleMenu = useCallback(() => {
     setIsMenuOpen(!isMenuOpen);
   }, [isMenuOpen]);
 
+  // Only apply container class for home and challenges pages
+  const shouldUseContainer = pathname === "/" || pathname === "/challenges";
+
   return (
     <nav className="relative z-50 h-[7vh] border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-full items-center justify-between">
+      <div className={cn("flex h-full items-center justify-between", shouldUseContainer ? "container" : "px-6")}>
         <div className="flex items-center space-x-4">
           <Link href="/" className="flex items-center space-x-2">
             <Logo className="h-8 w-8" />

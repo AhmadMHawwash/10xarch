@@ -139,12 +139,16 @@ export const useChallengeManager = () => {
   };
 };
 
+interface EdgeData {
+  label?: string;
+}
+
 export const getChallengePrompt = ({
   nodes,
   edges,
 }: {
   nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[];
-  edges: Edge[];
+  edges: Edge<EdgeData>[];
 }): ((
   challenge: Challenge,
   currentStage: Challenge["stages"][number],
@@ -183,7 +187,10 @@ export const getChallengePrompt = ({
   const findTargets = (sourceId: string) => {
     return edges
       .filter((edge) => edge.source === sourceId)
-      .map((edge) => edge.target);
+      .map((edge) => ({
+        targetId: edge.target,
+        relationship: edge.data?.label ?? "connects to"
+      }));
   };
 
   const extractNodeConfigs = (
@@ -209,7 +216,7 @@ export const getChallengePrompt = ({
       type: node.data.name,
       id: node.id,
       configs: extractNodeConfigs(node),
-      "and it targets these nodes": findTargets(node.id),
+      "relationships": findTargets(node.id),
     }));
 
   const buildLLMPrompt = (
@@ -226,7 +233,6 @@ export const getChallengePrompt = ({
       "Current stage of the challenge": {
         problem: currentStage?.problem ?? "",
         requirements: currentStage?.metaRequirements ?? [],
-        // hintsPerArea: currentStage?.hintsPerArea ?? {},
       },
       solution: {
         components: cleanedNodes,

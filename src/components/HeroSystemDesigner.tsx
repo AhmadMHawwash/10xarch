@@ -1,7 +1,7 @@
 "use client";
 import { useHeroSystemDesigner } from "@/lib/hooks/useHeroSystemDesigner";
 import { Bot, ChevronDown, ChevronUp } from "lucide-react";
-import { useState, type ComponentType } from "react";
+import { useEffect, useState, type ComponentType } from "react";
 import ReactFlow, {
   Background,
   BackgroundVariant,
@@ -29,13 +29,34 @@ const edgeTypes: Record<string, ComponentType<EdgeProps>> = {
 function HeroAIFeedback() {
   const [isExpanded, setIsExpanded] = useState(true);
 
+  useEffect(() => {
+    const style = document.createElement("style");
+    style.textContent = `
+      @keyframes pulse-gentle {
+        0% { box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.3), 0 0 0 4px rgba(251, 191, 36, 0.1); }
+        50% { box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.3), 0 0 0 8px rgba(251, 191, 36, 0); }
+        100% { box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.3), 0 0 0 4px rgba(251, 191, 36, 0.1); }
+      }
+      .animate-pulse-gentle {
+        animation: pulse-gentle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      }
+    `;
+    document.head.appendChild(style);
+
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
+
   return (
-    <div className="rounded-lg bg-white/5 backdrop-blur-lg dark:bg-gray-800/50 ring-2 ring-amber-400/30 dark:ring-amber-500/30 shadow-[0_0_0_2px_rgba(251,191,36,0.1)] dark:shadow-[0_0_0_2px_rgba(251,191,36,0.1)] animate-pulse-gentle">
+    <div className="animate-pulse-gentle rounded-lg bg-white/5 shadow-[0_0_0_2px_rgba(251,191,36,0.1)] ring-2 ring-amber-400/30 backdrop-blur-lg dark:bg-gray-800/50 dark:shadow-[0_0_0_2px_rgba(251,191,36,0.1)] dark:ring-amber-500/30">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
         className="flex w-full items-center justify-between p-4 text-left transition-colors hover:bg-white/5"
       >
-        <div className="text-sm text-amber-500 dark:text-amber-400 font-medium">AI Feedback</div>
+        <div className="text-sm font-medium text-amber-500 dark:text-amber-400">
+          AI Feedback
+        </div>
         {isExpanded ? (
           <ChevronDown className="h-4 w-4 text-amber-500 dark:text-amber-400" />
         ) : (
@@ -43,23 +64,32 @@ function HeroAIFeedback() {
         )}
       </button>
       {isExpanded && (
-        <div className="p-4 pt-0 space-y-3">
+        <div className="space-y-3 p-4 pt-0">
           <div>
-            <div className="mb-1 text-xs font-medium text-emerald-500 dark:text-emerald-400">✓ Strengths</div>
+            <div className="mb-1 text-xs font-medium text-emerald-500 dark:text-emerald-400">
+              ✓ Strengths
+            </div>
             <div className="text-sm text-gray-700 dark:text-gray-300">
-              Lightning-fast URL lookups with Redis cache, high availability through load balancing, and reliable data storage with PostgreSQL.
+              Lightning-fast URL lookups with Redis cache, high availability
+              through load balancing, and reliable data storage with PostgreSQL.
             </div>
           </div>
           <div>
-            <div className="mb-1 text-xs font-medium text-amber-500 dark:text-amber-400">↑ Improvable</div>
+            <div className="mb-1 text-xs font-medium text-amber-500 dark:text-amber-400">
+              ↑ Improvable
+            </div>
             <div className="text-sm text-gray-700 dark:text-gray-300">
-              Consider adding rate limiting and analytics tracking for production readiness.
+              Consider adding rate limiting and analytics tracking for
+              production readiness.
             </div>
           </div>
           <div className="mt-2 border-t border-gray-200 pt-2 dark:border-gray-700">
-            <div className="text-xs text-blue-500 dark:text-blue-400">💡 Pro Tip</div>
+            <div className="text-xs text-blue-500 dark:text-blue-400">
+              💡 Pro Tip
+            </div>
             <div className="text-sm text-gray-700 dark:text-gray-300">
-              Get detailed explanations and explore alternative designs by chatting with our AI system design expert.
+              Get detailed explanations and explore alternative designs by
+              chatting with our AI system design expert.
             </div>
           </div>
         </div>
@@ -68,28 +98,9 @@ function HeroAIFeedback() {
   );
 }
 
-const style = document.createElement('style');
-style.textContent = `
-  @keyframes pulse-gentle {
-    0% { box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.3), 0 0 0 4px rgba(251, 191, 36, 0.1); }
-    50% { box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.3), 0 0 0 8px rgba(251, 191, 36, 0); }
-    100% { box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.3), 0 0 0 4px rgba(251, 191, 36, 0.1); }
-  }
-  .animate-pulse-gentle {
-    animation: pulse-gentle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  }
-`;
-document.head.appendChild(style);
-
 export default function HeroSystemDesigner() {
-  const {
-    nodes,
-    edges,
-    onNodesChange,
-    onEdgesChange,
-    onConnect,
-    onInit,
-  } = useHeroSystemDesigner();
+  const { nodes, edges, onNodesChange, onEdgesChange, onConnect, onInit } =
+    useHeroSystemDesigner();
 
   return (
     <div className="relative flex h-full flex-grow flex-col bg-white dark:bg-gray-900">
@@ -134,11 +145,17 @@ export default function HeroSystemDesigner() {
         <Panel position="top-center" className="left-0 right-0 top-0 w-full">
           <div className="w-full bg-white/5 px-4 py-3 backdrop-blur-lg dark:bg-gray-800/50">
             <div className="mx-auto flex max-w-screen-xl items-center gap-2 text-sm">
-              <span className="font-medium text-gray-700 dark:text-gray-200">Challenges</span>
+              <span className="font-medium text-gray-700 dark:text-gray-200">
+                Challenges
+              </span>
               <span className="text-gray-400">/</span>
-              <span className="font-medium text-gray-700 dark:text-gray-200">URL Shortener</span>
+              <span className="font-medium text-gray-700 dark:text-gray-200">
+                URL Shortener
+              </span>
               <span className="text-gray-400">/</span>
-              <span className="text-blue-600 dark:text-blue-400">High-Level Design</span>
+              <span className="text-blue-600 dark:text-blue-400">
+                High-Level Design
+              </span>
             </div>
           </div>
         </Panel>
@@ -148,7 +165,7 @@ export default function HeroSystemDesigner() {
         <Panel position="bottom-right" className="p-4">
           <button className="group relative flex h-12 w-12 items-center justify-center rounded-full bg-blue-500 text-white shadow-lg transition-all hover:bg-blue-600">
             <Bot className="h-6 w-6" />
-            <div className="absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-gray-900/75 px-3 py-1.5 text-sm text-white opacity-0 transition-opacity group-hover:opacity-100 backdrop-blur-sm">
+            <div className="absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-gray-900/75 px-3 py-1.5 text-sm text-white opacity-0 backdrop-blur-sm transition-opacity group-hover:opacity-100">
               Chat with AI
             </div>
           </button>
@@ -157,4 +174,4 @@ export default function HeroSystemDesigner() {
       </ReactFlow>
     </div>
   );
-} 
+}

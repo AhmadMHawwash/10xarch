@@ -24,7 +24,7 @@ interface ResourcesProps {
 
 export function Resources({ documentation, realWorldCases, bestPractices }: ResourcesProps) {
   return (
-    <Card className="w-full">
+    <Card className="w-full h-fit">
       <CardHeader>
         <CardTitle className="text-lg">Resources</CardTitle>
         <CardDescription>Documentation, real-world examples, and best practices</CardDescription>
@@ -37,7 +37,7 @@ export function Resources({ documentation, realWorldCases, bestPractices }: Reso
             <TabsTrigger value="practices" className="text-[11px] sm:text-sm">Practices</TabsTrigger>
           </TabsList>
           
-          <ScrollArea className="h-[300px] w-full pr-4">
+          <ScrollArea className="h-fit w-full pr-4">
             <TabsContent value="documentation" className="mt-4 space-y-4">
               {documentation.map((doc, index) => (
                 <Card key={index} className="border-none shadow-none">

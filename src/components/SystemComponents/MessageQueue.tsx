@@ -4,12 +4,20 @@ import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
 import { Small } from "../ui/typography";
 import { WithSettings } from "./Wrappers/WithSettings";
+import { Input } from "../ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import { HelpCircle } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
+import { cn } from "@/lib/utils";
+import { Checkbox } from "../ui/checkbox";
 
 export const MessageQueue = ({ name, Icon }: ComponentNodeProps) => {
   return (
-    <div className="relative flex flex-col items-center text-gray-800 dark:text-gray-200">
-      {Icon && <Icon size={20} className="text-gray-700 dark:text-gray-300" />}
-      <Small>{name}</Small>
+    <div className="relative flex flex-col items-center text-gray-800 dark:text-gray-200 group">
+      <div className="relative flex items-center gap-1">
+        {Icon && <Icon size={20} className="text-gray-700 dark:text-gray-300" />}
+        <Small>{name}</Small>
+      </div>
       <MessageQueueSettings name={name} />
     </div>
   );
@@ -18,28 +26,287 @@ export const MessageQueue = ({ name, Icon }: ComponentNodeProps) => {
 const MessageQueueSettings = ({ name: id }: { name: string }) => {
   const { useSystemComponentConfigSlice } = useSystemDesigner();
 
-  const [configs, setConfigs] = useSystemComponentConfigSlice<string>(
+  const [queueType, setQueueType] = useSystemComponentConfigSlice<string>(
+    id,
+    "queue_type",
+    "standard"
+  );
+
+  const [deliveryType, setDeliveryType] = useSystemComponentConfigSlice<string>(
+    id,
+    "delivery_type",
+    "at-least-once"
+  );
+
+  const [capacity, setCapacity] = useSystemComponentConfigSlice<{
+    messageSize: number;
+    throughput: number;
+    retention: number;
+  }>(id, "capacity", {
+    messageSize: 256,
+    throughput: 1000,
+    retention: 7
+  });
+
+  const [features, setFeatures] = useSystemComponentConfigSlice<string[]>(
+    id,
+    "features",
+    []
+  );
+
+  const [details, setDetails] = useSystemComponentConfigSlice<string>(
     id,
     "details",
+    ""
   );
+
+  const availableFeatures = [
+    "Dead Letter Queue",
+    "Message Filtering",
+    "Message Priority",
+    "Message Batching",
+    "Message Deduplication",
+    "Delayed Delivery",
+    "Message TTL",
+    "Pub/Sub Support"
+  ];
 
   return (
     <WithSettings name={id}>
-      <div className="grid w-full grid-flow-row grid-cols-1 gap-2 text-gray-800 dark:text-gray-200">
-        <div className="flex flex-col gap-4">
-          <Label
-            htmlFor="Message queue-details"
-            className="text-gray-700 dark:text-gray-300"
-          >
-            Message queue details
-          </Label>
+      <div className="grid w-full grid-flow-row grid-cols-1 gap-4 text-gray-800 dark:text-gray-200">
+        <div className="grid grid-cols-2 gap-4">
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <Label htmlFor="queue-type" className="text-gray-700 dark:text-gray-300">
+                Queue Type
+              </Label>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <HelpCircle className="h-4 w-4 text-gray-500" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>The type of message queue to use</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+            <Select value={queueType} onValueChange={setQueueType}>
+              <SelectTrigger className={cn(
+                "w-full bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
+                "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
+              )}>
+                <SelectValue placeholder="Select queue type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="standard">Standard Queue</SelectItem>
+                <SelectItem value="fifo">FIFO Queue</SelectItem>
+                <SelectItem value="priority">Priority Queue</SelectItem>
+                <SelectItem value="topic">Topic</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <Label htmlFor="delivery-type" className="text-gray-700 dark:text-gray-300">
+                Delivery Guarantee
+              </Label>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <HelpCircle className="h-4 w-4 text-gray-500" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Message delivery guarantee type</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+            <Select value={deliveryType} onValueChange={setDeliveryType}>
+              <SelectTrigger className={cn(
+                "w-full bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
+                "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
+              )}>
+                <SelectValue placeholder="Select delivery type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="at-least-once">At Least Once</SelectItem>
+                <SelectItem value="exactly-once">Exactly Once</SelectItem>
+                <SelectItem value="at-most-once">At Most Once</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-3 gap-4">
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <Label htmlFor="message-size" className="text-gray-700 dark:text-gray-300">
+                Max Message Size (KB)
+              </Label>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <HelpCircle className="h-4 w-4 text-gray-500" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Maximum size of a single message in kilobytes</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+            <Input
+              type="number"
+              id="message-size"
+              value={capacity.messageSize}
+              onChange={(e) => setCapacity({ ...capacity, messageSize: Number(e.target.value) })}
+              className={cn(
+                "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
+                "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
+              )}
+              min={1}
+              step={64}
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <Label htmlFor="throughput" className="text-gray-700 dark:text-gray-300">
+                Throughput (msg/s)
+              </Label>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <HelpCircle className="h-4 w-4 text-gray-500" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Messages processed per second</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+            <Input
+              type="number"
+              id="throughput"
+              value={capacity.throughput}
+              onChange={(e) => setCapacity({ ...capacity, throughput: Number(e.target.value) })}
+              className={cn(
+                "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
+                "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
+              )}
+              min={100}
+              step={100}
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <Label htmlFor="retention" className="text-gray-700 dark:text-gray-300">
+                Retention (days)
+              </Label>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <HelpCircle className="h-4 w-4 text-gray-500" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Message retention period in days</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+            <Input
+              type="number"
+              id="retention"
+              value={capacity.retention}
+              onChange={(e) => setCapacity({ ...capacity, retention: Number(e.target.value) })}
+              className={cn(
+                "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
+                "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
+              )}
+              min={1}
+              max={14}
+            />
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center gap-2">
+            <Label className="text-gray-700 dark:text-gray-300">
+              Features
+            </Label>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <HelpCircle className="h-4 w-4 text-gray-500" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Message queue capabilities and features</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            {availableFeatures.map((feature) => (
+              <div key={feature} className="flex items-center gap-2">
+                <Checkbox
+                  id={feature}
+                  checked={features.includes(feature)}
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      setFeatures([...features, feature]);
+                    } else {
+                      setFeatures(features.filter((f) => f !== feature));
+                    }
+                  }}
+                  className="border-gray-400 dark:border-gray-600"
+                />
+                <Label
+                  htmlFor={feature}
+                  className="text-sm text-gray-700 dark:text-gray-300"
+                >
+                  {feature}
+                </Label>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center gap-2">
+            <Label htmlFor="queue-details" className="text-gray-700 dark:text-gray-300">
+              Additional Configuration
+            </Label>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <HelpCircle className="h-4 w-4 text-gray-500" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Additional queue configuration, policies, or requirements</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
           <Textarea
-            name="Message queue-details"
-            id="Message queue-details"
-            rows={10}
-            className="text-md border-gray-300 bg-gray-100 text-gray-900 focus:border-gray-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-gray-600"
-            value={configs}
-            onChange={(e) => setConfigs(e.target.value)}
+            name="queue-details"
+            id="queue-details"
+            rows={6}
+            placeholder="Example:
+- Consumer group configuration
+- Dead letter queue settings
+- Message routing rules
+- Retry policies
+- Monitoring requirements
+- Security settings"
+            className={cn(
+              "text-md bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
+              "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600",
+              "placeholder:text-gray-500 dark:placeholder:text-gray-400"
+            )}
+            value={details}
+            onChange={(e) => setDetails(e.target.value)}
           />
         </div>
       </div>

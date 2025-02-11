@@ -93,14 +93,6 @@ export const LevelContent = () => {
           </div>
         </div>
       </div>
-      <div className="mt-4">
-        <StageProgress
-          currentStage={currentStageIndex}
-          totalStages={challenge.stages.length}
-          onPrevious={toPreviousStage}
-          onNext={toNextStage}
-        />
-      </div>
     </div>
   );
 };

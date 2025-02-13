@@ -95,8 +95,9 @@ export const LevelContent = () => {
           </div>
         </div>
       </div>
+      
       <div>
-        <div className="border-t border-gray-200 bg-gray-50 px-4 py-4 dark:border-gray-800 dark:bg-gray-800/50">
+        <div className="border-t border-gray-200 bg-white px-4 py-3 dark:border-gray-800 dark:bg-gray-900">
           <StageProgress
             currentStage={currentStageIndex}
             totalStages={challenge.stages.length}
@@ -104,7 +105,7 @@ export const LevelContent = () => {
             onNext={toNextStage}
           />
         </div>
-        <div className="border-t border-gray-200 px-4 py-2 dark:border-gray-800">
+        <div className="border-t border-gray-200 bg-white px-4 py-2 dark:border-gray-800 dark:bg-gray-900">
           <div className="flex items-center justify-between">
             <a
               href="https://archround.userjot.com/"
@@ -119,6 +120,7 @@ export const LevelContent = () => {
           </div>
         </div>
       </div>
+
       <div className="fixed bottom-4 right-4 z-50">
         <PanelChat />
       </div>
@@ -157,47 +159,43 @@ const StageProgress: React.FC<StageProgressProps> = ({
   onPrevious,
   onNext,
 }) => (
-  <div>
-    <div className="flex items-center justify-between gap-4">
-      <Button
-        disabled={currentStage === 0}
-        size="sm"
-        variant="ghost"
-        onClick={onPrevious}
-        className="h-9 px-4 text-gray-600 hover:bg-gray-200/70 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-gray-700/50 dark:hover:text-gray-200"
-      >
-        <ArrowLeft className="mr-2 h-4 w-4" /> Previous
-      </Button>
-      <div className="relative flex-grow">
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger className="w-full">
-              <Progress
-                value={((currentStage + 1) / totalStages) * 100}
-                className="h-2.5 w-full bg-gray-200 dark:bg-gray-700"
-              />
-            </TooltipTrigger>
-            <TooltipContent
-              side="top"
-              className="bg-white text-sm text-gray-800 dark:bg-gray-800 dark:text-gray-200"
-            >
-              <p>
-                Stage {currentStage + 1} of {totalStages}
-              </p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      </div>
-      <Button
-        disabled={currentStage === totalStages - 1}
-        size="sm"
-        variant="ghost"
-        onClick={onNext}
-        className="h-9 px-4 text-gray-600 hover:bg-gray-200/70 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-gray-700/50 dark:hover:text-gray-200"
-      >
-        Next <ArrowRight className="ml-2 h-4 w-4" />
-      </Button>
+  <div className="flex items-center justify-between gap-4">
+    <Button
+      disabled={currentStage === 0}
+      size="sm"
+      variant="ghost"
+      onClick={onPrevious}
+      className="text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200"
+    >
+      <ArrowLeft className="mr-2 h-4 w-4" /> Previous
+    </Button>
+    <div className="relative flex-grow">
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger className="w-full">
+            <Progress
+              value={((currentStage + 1) / totalStages) * 100}
+              className="h-2 w-full bg-gray-200 dark:bg-gray-700"
+            />
+          </TooltipTrigger>
+          <TooltipContent
+            side="top"
+            className="bg-white text-sm text-gray-800 dark:bg-gray-800 dark:text-gray-200"
+          >
+            <p>Stage {currentStage + 1} of {totalStages}</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     </div>
+    <Button
+      disabled={currentStage === totalStages - 1}
+      size="sm"
+      variant="ghost"
+      onClick={onNext}
+      className="text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200"
+    >
+      Next <ArrowRight className="ml-2 h-4 w-4" />
+    </Button>
   </div>
 );
 

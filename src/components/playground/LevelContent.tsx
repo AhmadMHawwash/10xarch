@@ -116,16 +116,25 @@ export const LevelContent = () => {
         </div>
         <div className="border-t border-gray-200 bg-white px-4 py-2 dark:border-gray-800 dark:bg-gray-900">
           <div className="flex items-center justify-between">
-            <a
-              href="https://archround.userjot.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 rounded-md p-0.5 text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-              aria-label="Give Feedback"
-            >
-              <MessageSquareHeart className="h-6 w-6" />
-              <span className="sr-only">Give Feedback</span>
-            </a>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <a
+                    href="https://archround.userjot.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 rounded-md p-0.5 text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                    aria-label="Give Feedback"
+                  >
+                    <MessageSquareHeart className="h-6 w-6" />
+                    <span className="sr-only">Give Feedback</span>
+                  </a>
+                </TooltipTrigger>
+                <TooltipContent side="top" className="bg-gray-900/75 text-white backdrop-blur-sm border-0">
+                  Give Feedback
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         </div>
       </div>

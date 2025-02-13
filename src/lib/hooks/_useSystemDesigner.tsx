@@ -102,28 +102,13 @@ const componentTargets: Record<
   SystemComponent["name"],
   SystemComponent["name"][]
 > = {
-  Client: ["Server", "Server Cluster", "Load Balancer", "CDN"],
-  CDN: ["Load Balancer", "Server", "Server Cluster"],
-  "Load Balancer": ["Server", "Server Cluster"],
-  Server: [
-    "Cache",
-    "Database",
-    "Cache Cluster",
-    "Database Cluster",
-    "Message Queue",
-  ],
-  "Server Cluster": [
-    "Cache",
-    "Database",
-    "Cache Cluster",
-    "Database Cluster",
-    "Message Queue",
-  ],
-  Cache: ["Database", "Database Cluster"],
+  Client: ["Server", "Load Balancer", "CDN"],
+  CDN: ["Load Balancer", "Server"],
+  "Load Balancer": ["Server"],
+  Server: ["Cache", "Database", "Message Queue"],
+  Cache: ["Database"],
   Database: [],
-  "Message Queue": ["Server", "Server Cluster"],
-  "Cache Cluster": ["Database Cluster", "Database"],
-  "Database Cluster": [],
+  "Message Queue": ["Server"],
 };
 
 const deserializeNodes = (nodes: string | null) => {

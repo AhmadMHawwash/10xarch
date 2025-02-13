@@ -1,13 +1,10 @@
 import { cache } from "@/content/cache";
-import { cacheCluster } from "@/content/cache-cluster";
 import { cdn } from "@/content/cdn";
 import { client } from "@/content/client";
 import { database } from "@/content/database";
-import { databaseCluster } from "@/content/database-cluster";
 import { loadBalancer } from "@/content/load-balancer";
 import { messageQueue } from "@/content/message-queue";
 import { server } from "@/content/server";
-import { serverCluster } from "@/content/server-cluster";
 import { type SystemComponent, type SystemComponentType } from "@/lib/levels/type";
 import {
   Database,
@@ -70,51 +67,6 @@ const components: Record<SystemComponentType, SystemComponent> = {
     icon: HardDriveDownload,
     content: messageQueue,
   },
-  "Database Cluster": {
-    name: "Database Cluster",
-    description:
-      "A database cluster is a group of databases that work together to store and serve data.",
-    icon: () => (
-      <div className="relative h-[16px] w-[16px] mr-1">
-        <Database className="absolute -left-0.5 -top-0.5" size={16} />
-        <Database
-          className="absolute left-0.5 top-0.5 bg-gray-100 dark:bg-gray-900 bg-opacity-60 p-0"
-          size={16}
-        />
-      </div>
-    ),
-    content: databaseCluster,
-  },
-  "Cache Cluster": {
-    name: "Cache Cluster",
-    description:
-      "A cache cluster is a group of caches that work together to store and serve data.",
-    icon: () => (
-      <div className="relative h-[16px] w-[16px] mr-1">
-        <DatabaseZap className="absolute -left-0.5 -top-0.5" size={16} />
-        <DatabaseZap
-          className="absolute left-0.5 top-0.5 bg- dark:bg-gray-900 bg-opacity-60 p-0"
-          size={16}
-        />
-      </div>
-    ),
-    content: cacheCluster,
-  },
-  "Server Cluster": {
-    name: "Server Cluster",
-    description:
-      "A server cluster is a group of servers that work together to serve data.",
-    icon: () => (
-      <div className="relative h-[16px] w-[16px] mr-1">
-        <Server className="absolute -left-0.5 -top-0.5" size={16} />
-        <Server
-          className="absolute left-0.5 top-0.5 bg- dark:bg-gray-900 bg-opacity-60 p-0"
-          size={16}
-        />
-      </div>
-    ),
-    content: serverCluster,
-  },
 //   Whiteboard: {
 //     description:
 //       "Whiteboard is your area to write your notes and thoughts about the system.",
@@ -136,7 +88,6 @@ const components: Record<SystemComponentType, SystemComponent> = {
 const componentCategories = {
   "Basic Components": ["Client", "Server", "Database"],
   "Advanced Components": ["Load Balancer", "Cache", "CDN", "Message Queue"],
-  "Clustered Components": ["Database Cluster", "Cache Cluster", "Server Cluster"],
 };
 
 const Gallery = () => {

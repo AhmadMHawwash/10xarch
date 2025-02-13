@@ -8,9 +8,6 @@ import { InfoIcon, type PiIcon } from "lucide-react";
 import { Handle, Position, type NodeProps } from "reactflow";
 import { getSystemComponent } from "../Gallery";
 import { Cache } from "../SystemComponents/Cache";
-import { CacheCluster } from "../SystemComponents/Clusters/Cache";
-import { DatabaseCluster } from "../SystemComponents/Clusters/Database";
-import { ServerCluster } from "../SystemComponents/Clusters/Server";
 import { Database } from "../SystemComponents/Database";
 import { WithMarkdownDetails } from "../SystemComponents/Wrappers/WithMarkdownDetails";
 import { Small } from "../ui/typography";
@@ -119,9 +116,6 @@ const components: Partial<
   CDN,
   "Message Queue": MessageQueue,
   "Load Balancer": LoadBalancer,
-  "Database Cluster": DatabaseCluster,
-  "Cache Cluster": CacheCluster,
-  "Server Cluster": ServerCluster,
 };
 
 const DefaultComponent = ({ name, Icon }: ComponentNodeProps) => (
@@ -140,5 +134,4 @@ const DefaultComponent = ({ name, Icon }: ComponentNodeProps) => (
 const withoutTargetHandle: SystemComponentType[] = ["Client"];
 const withoutSourceHandle: SystemComponentType[] = [
   "Database",
-  "Database Cluster",
 ];

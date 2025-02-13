@@ -13,9 +13,6 @@ const componentsListSchema = z.enum([
   "CDN",
   "Database",
   "Message Queue",
-  "Database Cluster",
-  "Cache Cluster",
-  "Server Cluster",
 ]);
 
 const DatabaseConfigs = z.object({
@@ -61,25 +58,9 @@ const CacheComponentSchema = z.object({
   configs: CacheConfigs,
 });
 
-const DatabaseClusterComponentSchema = z.object({
-  id: z.string(),
-  type: z.literal(componentsListSchema.Values["Database Cluster"]),
-  targets: z.array(z.string()),
-  configs: DatabaseConfigs,
-});
-
-const CacheClusterComponentSchema = z.object({
-  id: z.string(),
-  type: z.literal(componentsListSchema.Values["Cache Cluster"]),
-  targets: z.array(z.string()),
-  configs: CacheConfigs,
-});
-
 const componentSchema = z.union([
   DatabaseComponentSchema,
   CacheComponentSchema,
-  DatabaseClusterComponentSchema,
-  CacheClusterComponentSchema,
   z.object({
     id: z.string(),
     type: componentsListSchema,

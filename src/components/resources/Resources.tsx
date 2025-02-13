@@ -87,7 +87,7 @@ export function Resources({ documentation, realWorldCases, bestPractices }: Reso
                   <CardContent className="p-0 pt-2">
                     <p className="text-sm text-muted-foreground">{practice.description}</p>
                     {practice.example && (
-                      <pre className="mt-2 rounded-md bg-muted p-2 text-xs">
+                      <pre className="mt-2 rounded-md bg-muted p-2 text-xs overflow-x-auto whitespace-pre-wrap">
                         <code>{practice.example}</code>
                       </pre>
                     )}

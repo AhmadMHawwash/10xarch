@@ -10,7 +10,6 @@ import { dark } from "@clerk/themes";
 import { ClerkProvider } from "@clerk/nextjs";
 import { GeistSans } from "geist/font/sans";
 import { Analytics } from "@vercel/analytics/react";
-import { FeedbackButton } from "@/components/floating-button";
 
 export const metadata = {
   title: "Archround",
@@ -58,7 +57,6 @@ export default async function RootLayout({
                 <Toaster />
                 <Navbar />
                 <main className="h-[93vh]">{children}</main>
-                <FeedbackButton />
               </TooltipProvider>
             </ThemeProvider>
           </TRPCReactProvider>

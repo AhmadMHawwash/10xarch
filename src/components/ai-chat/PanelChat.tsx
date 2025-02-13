@@ -23,7 +23,7 @@ export function PanelChat() {
             animate={{ opacity: 1, height: 400 }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
-            className="mb-4 w-full overflow-hidden rounded-lg border bg-background shadow-sm"
+            className="absolute bottom-16 right-0 mb-2 w-[400px] overflow-hidden rounded-lg border bg-background shadow-lg"
           >
             <div className="flex items-center justify-between border-b bg-muted/50 p-2">
               <span className="flex items-center gap-2 text-sm font-medium">
@@ -45,18 +45,15 @@ export function PanelChat() {
         )}
       </AnimatePresence>
 
-      <div className="mb-4 flex items-center gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setIsOpen(!isOpen)}
-          className="flex w-full items-center gap-2"
-        >
-          <Bot className="h-4 w-4" />
-          {isOpen ? "Hide AI Assistant" : "Show AI Assistant"}
-        </Button>
-      </div>
-      <Separator className="mb-4" />
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-2 rounded-full bg-background px-4 py-2 shadow-lg"
+      >
+        <Bot className="h-4 w-4" />
+        {isOpen ? "Hide AI Assistant" : "Show AI Assistant"}
+      </Button>
     </div>
   );
 }

@@ -14,9 +14,10 @@ import {
 } from "@/components/ui/tooltip";
 import { H5, List, Muted, P } from "@/components/ui/typography";
 import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
-import { ArrowLeft, ArrowRight, InfoIcon } from "lucide-react";
+import { ArrowLeft, ArrowRight, InfoIcon, MessageSquareHeart } from "lucide-react";
 import { type ReactNode } from "react";
 import { PanelChat } from "@/components/ai-chat/PanelChat";
+import { buttonVariants } from "@/components/ui/button";
 
 export const LevelContent = () => {
   const {
@@ -32,23 +33,24 @@ export const LevelContent = () => {
     .reduce<string[]>((acc, stage) => acc.concat(stage.requirements), []);
 
   return (
-    <div className="flex h-full max-h-[100vh] flex-col justify-between bg-white p-4 text-gray-800 dark:bg-gray-900 dark:text-gray-200">
-      <div className="overflow-y-auto pb-8">
+    <div className="flex h-full max-h-[100vh] flex-col justify-between bg-white text-gray-800 dark:bg-gray-900 dark:text-gray-200">
+      <div className="overflow-y-auto p-4 pb-8 pt-0">
         <div className="min-w-[17vw]">
-          <div className="sticky top-0 z-10 w-full bg-white dark:bg-gray-900">
-            <H5 className="flex items-center justify-between text-gray-900 dark:text-gray-100">
-              <span>{challenge.title}</span>
+          <div className="sticky pt-[17px] z-10 w-full bg-white dark:bg-gray-900">
+            <div className="flex items-center justify-between">
+              <H5 className="text-gray-900 dark:text-gray-100">
+                {challenge.title}
+              </H5>
               <Badge
                 variant="outline"
                 className="border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400"
               >
                 Stage {currentStageIndex + 1} of {challenge.stages.length}
               </Badge>
-            </H5>
-            <Separator className="mb-5 mt-1 bg-gray-300 dark:bg-gray-700" />
+            </div>
+            <Separator className="mb-5 mt-4 bg-gray-300 dark:bg-gray-700" />
           </div>
           <div className="flex flex-col gap-4">
-            <PanelChat />
             <Section title="Emerging Complexity" content={stage?.problem} />
             <Section
               title="CTO/CPO Requirements"
@@ -93,6 +95,33 @@ export const LevelContent = () => {
           </div>
         </div>
       </div>
+      <div>
+        <div className="border-t border-gray-200 bg-gray-50 px-4 py-4 dark:border-gray-800 dark:bg-gray-800/50">
+          <StageProgress
+            currentStage={currentStageIndex}
+            totalStages={challenge.stages.length}
+            onPrevious={toPreviousStage}
+            onNext={toNextStage}
+          />
+        </div>
+        <div className="border-t border-gray-200 px-4 py-2 dark:border-gray-800">
+          <div className="flex items-center justify-between">
+            <a
+              href="https://archround.userjot.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 rounded-md p-0.5 text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+              aria-label="Give Feedback"
+            >
+              <MessageSquareHeart className="h-6 w-6" />
+              <span className="sr-only">Give Feedback</span>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div className="fixed bottom-4 right-4 z-50">
+        <PanelChat />
+      </div>
     </div>
   );
 };
@@ -128,29 +157,29 @@ const StageProgress: React.FC<StageProgressProps> = ({
   onPrevious,
   onNext,
 }) => (
-  <div className="flex flex-col justify-center">
-    <div className="flex items-center justify-between">
+  <div>
+    <div className="flex items-center justify-between gap-4">
       <Button
         disabled={currentStage === 0}
         size="sm"
-        variant="outline"
+        variant="ghost"
         onClick={onPrevious}
-        className="border-gray-400 text-gray-800 hover:bg-gray-200 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700"
+        className="h-9 px-4 text-gray-600 hover:bg-gray-200/70 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-gray-700/50 dark:hover:text-gray-200"
       >
-        <ArrowLeft className="mr-1" /> Previous
+        <ArrowLeft className="mr-2 h-4 w-4" /> Previous
       </Button>
-      <div className="relative mx-4 flex-grow">
+      <div className="relative flex-grow">
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger className="w-full">
               <Progress
                 value={((currentStage + 1) / totalStages) * 100}
-                className="h-2 w-full"
+                className="h-2.5 w-full bg-gray-200 dark:bg-gray-700"
               />
             </TooltipTrigger>
             <TooltipContent
               side="top"
-              className="bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200"
+              className="bg-white text-sm text-gray-800 dark:bg-gray-800 dark:text-gray-200"
             >
               <p>
                 Stage {currentStage + 1} of {totalStages}
@@ -162,11 +191,11 @@ const StageProgress: React.FC<StageProgressProps> = ({
       <Button
         disabled={currentStage === totalStages - 1}
         size="sm"
-        variant="outline"
+        variant="ghost"
         onClick={onNext}
-        className="border-gray-400 text-gray-800 hover:bg-gray-200 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700"
+        className="h-9 px-4 text-gray-600 hover:bg-gray-200/70 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-gray-700/50 dark:hover:text-gray-200"
       >
-        Next <ArrowRight className="ml-1" />
+        Next <ArrowRight className="ml-2 h-4 w-4" />
       </Button>
     </div>
   </div>

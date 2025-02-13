@@ -55,14 +55,14 @@ const CDNSettings = ({ name: id }: { name: string }) => {
   );
 
   const availableFeatures = [
-    "HTTPS/SSL",
-    "DDoS Protection",
-    "WAF",
-    "Image Optimization",
-    "Video Streaming",
-    "Geo-blocking",
-    "Custom Domain",
-    "Real-time Analytics"
+    "Edge Caching",
+    "Origin Shield",
+    "Dynamic Compression",
+    "HTTP/3 Support",
+    "Smart Purging",
+    "Geo-routing",
+    "Media Optimization",
+    "Access Control"
   ];
 
   return (

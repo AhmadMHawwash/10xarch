@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { HelpCircle } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import { cn } from "@/lib/utils";
+import { Checkbox } from "../ui/checkbox";
 
 export const Client = ({ name, Icon }: ComponentNodeProps) => {
   return (
@@ -49,6 +50,60 @@ const ClientSettings = ({ name: id }: { name: string }) => {
     ""
   );
 
+  const [features, setFeatures] = useSystemComponentConfigSlice<string[]>(
+    id,
+    "features",
+    []
+  );
+
+  const getAvailableFeatures = (type: string): string[] => {
+    const commonFeatures = [
+      "Error Handling",
+      "Request Retries",
+      "Request Timeout",
+      "Response Caching"
+    ];
+
+    switch (type) {
+      case "web":
+        return [
+          ...commonFeatures,
+          "Service Workers",
+          "Progressive Loading",
+          "Offline Support",
+          "State Management"
+        ];
+      case "mobile":
+        return [
+          ...commonFeatures,
+          "Background Sync",
+          "Push Notifications",
+          "Data Persistence",
+          "Network Detection"
+        ];
+      case "iot":
+        return [
+          ...commonFeatures,
+          "Device Management",
+          "Data Buffering",
+          "Power Management",
+          "Secure Boot"
+        ];
+      case "desktop":
+        return [
+          ...commonFeatures,
+          "Auto Updates",
+          "Native Integration",
+          "Cross Platform",
+          "Resource Management"
+        ];
+      default:
+        return commonFeatures;
+    }
+  };
+
+  const availableFeatures = getAvailableFeatures(clientType);
+
   return (
     <WithSettings name={id}>
       <div className="grid w-full grid-flow-row grid-cols-1 gap-4 text-gray-800 dark:text-gray-200">
@@ -77,18 +132,18 @@ const ClientSettings = ({ name: id }: { name: string }) => {
                 <SelectValue placeholder="Select client type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="web">Web Browser</SelectItem>
-                <SelectItem value="mobile">Mobile App</SelectItem>
-                <SelectItem value="desktop">Desktop App</SelectItem>
-                <SelectItem value="api">API Client</SelectItem>
+                <SelectItem value="web">Web Client</SelectItem>
+                <SelectItem value="mobile">Mobile Client</SelectItem>
+                <SelectItem value="iot">IoT Device</SelectItem>
+                <SelectItem value="desktop">Desktop Application</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
-              <Label htmlFor="concurrent-users" className="text-gray-700 dark:text-gray-300">
-                Concurrent Users
+              <Label htmlFor="location" className="text-gray-700 dark:text-gray-300">
+                Client Location
               </Label>
               <TooltipProvider>
                 <Tooltip>
@@ -96,29 +151,31 @@ const ClientSettings = ({ name: id }: { name: string }) => {
                     <HelpCircle className="h-4 w-4 text-gray-500" />
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Expected number of concurrent users</p>
+                    <p>Geographic distribution of clients</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
             </div>
-            <Input
-              type="number"
-              id="concurrent-users"
-              value={concurrentUsers}
-              onChange={(e) => setConcurrentUsers(Number(e.target.value))}
-              className={cn(
-                "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
+            <Select value={location} onValueChange={setLocation}>
+              <SelectTrigger className={cn(
+                "w-full bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
                 "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
-              )}
-              min={1}
-            />
+              )}>
+                <SelectValue placeholder="Select location" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="global">Global</SelectItem>
+                <SelectItem value="regional">Regional</SelectItem>
+                <SelectItem value="local">Local</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-2">
-            <Label htmlFor="location" className="text-gray-700 dark:text-gray-300">
-              Geographic Distribution
+            <Label htmlFor="concurrent-users" className="text-gray-700 dark:text-gray-300">
+              Concurrent Users
             </Label>
             <TooltipProvider>
               <Tooltip>
@@ -126,30 +183,70 @@ const ClientSettings = ({ name: id }: { name: string }) => {
                   <HelpCircle className="h-4 w-4 text-gray-500" />
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Geographic distribution of clients</p>
+                  <p>Expected number of simultaneous users</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
           </div>
-          <Select value={location} onValueChange={setLocation}>
-            <SelectTrigger className={cn(
-              "w-full bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
+          <Input
+            type="number"
+            id="concurrent-users"
+            value={concurrentUsers}
+            onChange={(e) => setConcurrentUsers(Number(e.target.value))}
+            className={cn(
+              "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
               "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
-            )}>
-              <SelectValue placeholder="Select location distribution" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="global">Global</SelectItem>
-              <SelectItem value="regional">Regional</SelectItem>
-              <SelectItem value="single">Single Location</SelectItem>
-            </SelectContent>
-          </Select>
+            )}
+            min={1}
+          />
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center gap-2">
+            <Label className="text-gray-700 dark:text-gray-300">
+              Features
+            </Label>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <HelpCircle className="h-4 w-4 text-gray-500" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Client capabilities and features</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            {availableFeatures.map((feature) => (
+              <div key={feature} className="flex items-center gap-2">
+                <Checkbox
+                  id={feature}
+                  checked={features.includes(feature)}
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      setFeatures([...features, feature]);
+                    } else {
+                      setFeatures(features.filter((f) => f !== feature));
+                    }
+                  }}
+                  className="border-gray-400 dark:border-gray-600"
+                />
+                <Label
+                  htmlFor={feature}
+                  className="text-sm text-gray-700 dark:text-gray-300"
+                >
+                  {feature}
+                </Label>
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-2">
             <Label htmlFor="client-details" className="text-gray-700 dark:text-gray-300">
-              Additional Requirements
+              Additional Configuration
             </Label>
             <TooltipProvider>
               <Tooltip>
@@ -157,7 +254,7 @@ const ClientSettings = ({ name: id }: { name: string }) => {
                   <HelpCircle className="h-4 w-4 text-gray-500" />
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Specify any additional client requirements, constraints, or behaviors</p>
+                  <p>Additional client configuration, requirements, or constraints</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -166,11 +263,11 @@ const ClientSettings = ({ name: id }: { name: string }) => {
             name="client-details"
             id="client-details"
             rows={6}
-            placeholder="Example: 
-- Client needs offline support
-- Requires real-time updates
-- Has specific security requirements
-- Network constraints"
+            placeholder="Example:
+- Client-side requirements
+- Network constraints
+- Security requirements
+- Performance targets"
             className={cn(
               "text-md bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
               "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600",

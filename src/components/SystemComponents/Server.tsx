@@ -15,8 +15,8 @@ export const Server = ({ name, Icon }: ComponentNodeProps) => {
   return (
     <div className="relative flex flex-col items-center text-gray-800 dark:text-gray-200 group">
       <div className="relative flex items-center gap-1">
-        {Icon && <Icon size={20} className="text-gray-700 dark:text-gray-300" />}
-        <Small>{name}</Small>
+      {Icon && <Icon size={20} className="text-gray-700 dark:text-gray-300" />}
+      <Small>{name}</Small>
       </div>
       <ServerSettings name={name} />
     </div>
@@ -76,16 +76,61 @@ const ServerSettings = ({ name: id }: { name: string }) => {
     scalingThreshold: 70
   });
 
-  const availableFeatures = [
-    "Load balancing",
-    "Health monitoring",
-    "Fault tolerance",
-    "Request rate limiting",
-    "Connection pooling",
-    "SSL/TLS termination",
-    "Logging & Monitoring",
-    "Backup & Restore"
-  ];
+  const getAvailableFeatures = (type: string): string[] => {
+    const commonFeatures = [
+      "Health monitoring",
+      "Fault tolerance",
+      "Logging & Monitoring",
+      "Backup & Restore"
+    ];
+
+    switch (type) {
+      case "application":
+        return [
+          ...commonFeatures,
+          "Request rate limiting",
+          "Database connection pooling",
+          "Session management",
+          "Application caching"
+        ];
+      case "api":
+        return [
+          ...commonFeatures,
+          "API Gateway",
+          "Request validation",
+          "Rate limiting",
+          "API versioning"
+        ];
+      case "web":
+        return [
+          ...commonFeatures,
+          "Static file serving",
+          "Compression",
+          "URL rewriting",
+          "Virtual hosting"
+        ];
+      case "processing":
+        return [
+          ...commonFeatures,
+          "Job scheduling",
+          "Queue processing",
+          "Resource isolation",
+          "Batch processing"
+        ];
+      case "caching":
+        return [
+          ...commonFeatures,
+          "Cache coherence",
+          "Cache partitioning",
+          "Eviction policies",
+          "Cache statistics"
+        ];
+      default:
+        return commonFeatures;
+    }
+  };
+
+  const availableFeatures = getAvailableFeatures(serverType);
 
   return (
     <WithSettings name={id}>
@@ -472,7 +517,7 @@ const ServerSettings = ({ name: id }: { name: string }) => {
                   }}
                   className="border-gray-400 dark:border-gray-600"
                 />
-                <Label
+          <Label
                   htmlFor={feature}
                   className="text-sm text-gray-700 dark:text-gray-300"
                 >
@@ -487,7 +532,7 @@ const ServerSettings = ({ name: id }: { name: string }) => {
           <div className="flex items-center gap-2">
             <Label htmlFor="server-details" className="text-gray-700 dark:text-gray-300">
               Additional Configuration
-            </Label>
+          </Label>
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>

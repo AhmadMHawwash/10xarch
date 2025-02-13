@@ -93,16 +93,61 @@ const DatabaseSettings = ({ name: id }: { name: string }) => {
     replicationStrategy: "async"
   });
 
-  const availableFeatures = [
-    "Backup/Recovery",
-    "Encryption at rest",
-    "Connection pooling",
-    "Query caching",
-    "Audit logging",
-    "Point-in-time recovery",
-    "Row-level security",
-    "Full-text search"
-  ];
+  const getAvailableFeatures = (dbType: DbType): string[] => {
+    const commonFeatures = [
+      "Backup/Recovery",
+      "Point-in-time recovery",
+      "Encryption at rest",
+      "Audit logging"
+    ];
+
+    switch (dbType) {
+      case "relational":
+        return [
+          ...commonFeatures,
+          "Row-level security",
+          "Column-level encryption",
+          "Materialized views",
+          "Triggers & Stored Procedures"
+        ];
+      case "document":
+        return [
+          ...commonFeatures,
+          "Schema validation",
+          "Field-level encryption",
+          "Change streams",
+          "Text search"
+        ];
+      case "keyvalue":
+        return [
+          ...commonFeatures,
+          "TTL support",
+          "Atomic operations",
+          "Data structures",
+          "Pub/Sub"
+        ];
+      case "graph":
+        return [
+          ...commonFeatures,
+          "Graph traversal",
+          "Path finding",
+          "Graph analytics",
+          "Visualization"
+        ];
+      case "search":
+        return [
+          ...commonFeatures,
+          "Full-text search",
+          "Fuzzy matching",
+          "Relevance scoring",
+          "Aggregations"
+        ];
+      default:
+        return commonFeatures;
+    }
+  };
+
+  const availableFeatures = getAvailableFeatures(dbConfig.type);
 
   const engineOptions: EngineOptions = {
     relational: [

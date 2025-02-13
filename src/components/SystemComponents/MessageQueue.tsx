@@ -61,14 +61,14 @@ const MessageQueueSettings = ({ name: id }: { name: string }) => {
   );
 
   const availableFeatures = [
-    "Dead Letter Queue",
-    "Message Filtering",
-    "Message Priority",
-    "Message Batching",
-    "Message Deduplication",
-    "Delayed Delivery",
-    "Message TTL",
-    "Pub/Sub Support"
+    "Message Persistence",
+    "Message Ordering",
+    "Message Routing",
+    "Message Replay",
+    "Message Tracing",
+    "Message Compression",
+    "Message Encryption",
+    "Message Acknowledgment"
   ];
 
   return (

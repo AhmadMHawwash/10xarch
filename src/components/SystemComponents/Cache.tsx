@@ -15,8 +15,8 @@ export const Cache = ({ name, Icon }: ComponentNodeProps) => {
   return (
     <div className="relative flex flex-col items-center text-gray-800 dark:text-gray-200 group">
       <div className="relative flex items-center gap-1">
-        {Icon && <Icon size={20} className="text-gray-700 dark:text-gray-300" />}
-        <Small>{name}</Small>
+      {Icon && <Icon size={20} className="text-gray-700 dark:text-gray-300" />}
+      <Small>{name}</Small>
       </div>
       <CacheSettings name={name} />
     </div>
@@ -74,16 +74,53 @@ const CacheSettings = ({ name: id }: { name: string }) => {
     consistencyLevel: "quorum"
   });
 
-  const availableFeatures = [
-    "Persistence",
-    "Data Compression",
-    "Encryption at rest",
-    "TTL Support",
-    "Cache Invalidation",
-    "Cache Preloading",
-    "Event Notifications",
-    "Access Control"
-  ];
+  const getAvailableFeatures = (type: string): string[] => {
+    const commonFeatures = [
+      "Data Compression",
+      "Encryption at rest",
+      "TTL Support",
+      "Monitoring & Alerts"
+    ];
+
+    switch (type) {
+      case "in-memory":
+        return [
+          ...commonFeatures,
+          "Write-Through",
+          "Write-Behind",
+          "Cache Invalidation",
+          "Cache Preloading"
+        ];
+      case "distributed":
+        return [
+          ...commonFeatures,
+          "Write-Through",
+          "Write-Behind",
+          "Cross-DC Replication",
+          "Partition Tolerance"
+        ];
+      case "cdn":
+        return [
+          ...commonFeatures,
+          "Edge Caching",
+          "Dynamic Compression",
+          "Origin Shield",
+          "Smart Purging"
+        ];
+      case "browser":
+        return [
+          ...commonFeatures,
+          "Service Workers",
+          "Offline Mode",
+          "Cache-Control",
+          "Conditional Requests"
+        ];
+      default:
+        return commonFeatures;
+    }
+  };
+
+  const availableFeatures = getAvailableFeatures(cacheType);
 
   return (
     <WithSettings name={id}>

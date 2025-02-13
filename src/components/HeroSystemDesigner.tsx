@@ -29,25 +29,6 @@ const edgeTypes: Record<string, ComponentType<EdgeProps>> = {
 function HeroAIFeedback() {
   const [isExpanded, setIsExpanded] = useState(true);
 
-  useEffect(() => {
-    const style = document.createElement("style");
-    style.textContent = `
-      @keyframes pulse-gentle {
-        0% { box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.3), 0 0 0 4px rgba(251, 191, 36, 0.1); }
-        50% { box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.3), 0 0 0 8px rgba(251, 191, 36, 0); }
-        100% { box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.3), 0 0 0 4px rgba(251, 191, 36, 0.1); }
-      }
-      .animate-pulse-gentle {
-        animation: pulse-gentle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-      }
-    `;
-    document.head.appendChild(style);
-
-    return () => {
-      document.head.removeChild(style);
-    };
-  }, []);
-
   return (
     <div className="animate-pulse-gentle rounded-lg bg-white/5 shadow-[0_0_0_2px_rgba(251,191,36,0.1)] ring-2 ring-amber-400/30 backdrop-blur-lg dark:bg-gray-800/50 dark:shadow-[0_0_0_2px_rgba(251,191,36,0.1)] dark:ring-amber-500/30">
       <button

@@ -67,10 +67,22 @@ const config = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        "pulse-ring": {
+          "0%": { transform: "scale(0.95)", boxShadow: "0 0 0 0 rgba(245, 158, 11, 0.7)" },
+          "70%": { transform: "scale(1)", boxShadow: "0 0 0 2px rgba(245, 158, 11, 0)" },
+          "100%": { transform: "scale(0.95)", boxShadow: "0 0 0 0 rgba(245, 158, 11, 0)" },
+        },
+        "pulse-gentle": {
+          "0%": { boxShadow: "0 0 0 2px rgba(245, 158, 11, 0.4), 0 0 0 4px rgba(245, 158, 11, 0.2)" },
+          "50%": { boxShadow: "0 0 0 2px rgba(245, 158, 11, 0.4), 0 0 0 8px rgba(245, 158, 11, 0)" },
+          "100%": { boxShadow: "0 0 0 2px rgba(245, 158, 11, 0.4), 0 0 0 4px rgba(245, 158, 11, 0.2)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "pulse-ring": "pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+        "pulse-gentle": "pulse-gentle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
       },
     },
   },

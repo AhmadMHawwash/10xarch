@@ -51,28 +51,37 @@ export const LevelContent = () => {
             <Separator className="mb-5 mt-4 bg-gray-300 dark:bg-gray-700" />
           </div>
           <div className="flex flex-col gap-4">
-            <Section title="Emerging Complexity" content={stage?.problem} />
             <Section
-              title="CTO/CPO Requirements"
+              title="Challenge Context"
               content={
-                <List className="!ml-2">
-                  {oldRequirements.map((requirement, index) => (
-                    <P
-                      key={index}
-                      className="!mt-0 ml-4 list-item list-decimal text-gray-600 line-through opacity-50 dark:text-gray-400"
-                    >
-                      {requirement}
-                    </P>
-                  ))}
-                  {stage?.requirements.map((requirement, index) => (
-                    <P
-                      key={index}
-                      className="!mt-0 ml-4 list-item list-decimal text-gray-700 dark:text-gray-300"
-                    >
-                      {requirement}
-                    </P>
-                  ))}
-                </List>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <P className="!mt-0">{stage?.problem}</P>
+                    <div className="pl-4 border-l-2 border-blue-500 dark:border-blue-400">
+                      <P className="!mt-0 text-sm italic text-gray-600 dark:text-gray-400">
+                        As the Technical Lead, you&apos;ve been tasked with addressing this challenge. The CTO and CPO have outlined the following requirements:
+                      </P>
+                      <List className="!ml-2">
+                        {oldRequirements.map((requirement, index) => (
+                          <P
+                            key={index}
+                            className="!mt-0 ml-4 list-item list-decimal text-gray-600 line-through opacity-50 dark:text-gray-400"
+                          >
+                            {requirement}
+                          </P>
+                        ))}
+                        {stage?.requirements.map((requirement, index) => (
+                          <P
+                            key={index}
+                            className="!mt-0 ml-4 list-item list-decimal text-gray-700 dark:text-gray-300"
+                          >
+                            {requirement}
+                          </P>
+                        ))}
+                      </List>
+                    </div>
+                  </div>
+                </div>
               }
             />
             {stage?.resources && (

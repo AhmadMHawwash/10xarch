@@ -49,10 +49,11 @@ export function PanelChat() {
         variant="outline"
         size="sm"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 rounded-full bg-background px-4 py-2 shadow-lg"
+        className={`flex items-center gap-2 rounded-full bg-background px-4 py-2 shadow-lg relative ${
+          !isOpen ? "animate-pulse-ring" : ""
+        }`}
       >
-        <Bot className="h-4 w-4" />
-        {isOpen ? "Hide AI Assistant" : "Show AI Assistant"}
+        <Bot className={`h-7 w-7`} />
       </Button>
     </div>
   );

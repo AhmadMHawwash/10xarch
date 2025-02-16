@@ -168,7 +168,9 @@ const ServerSettings = ({ name: id }: { name: string }) => {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
-                  <HelpCircle className="h-4 w-4 text-gray-500" />
+                  <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+                    <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+                  </div>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>Toggle between detailed configuration and free-form text input</p>
@@ -197,7 +199,9 @@ const ServerSettings = ({ name: id }: { name: string }) => {
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger>
-                        <HelpCircle className="h-4 w-4 text-gray-500" />
+                        <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+                          <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+                        </div>
                       </TooltipTrigger>
                       <TooltipContent>
                         <p>The primary purpose of this server in the system</p>
@@ -239,7 +243,9 @@ const ServerSettings = ({ name: id }: { name: string }) => {
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger>
-                        <HelpCircle className="h-4 w-4 text-gray-500" />
+                        <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+                          <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+                        </div>
                       </TooltipTrigger>
                       <TooltipContent>
                         <p>
@@ -277,7 +283,9 @@ const ServerSettings = ({ name: id }: { name: string }) => {
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger>
-                      <HelpCircle className="h-4 w-4 text-gray-500" />
+                      <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+                        <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+                      </div>
                     </TooltipTrigger>
                     <TooltipContent>
                       <p>Server scaling and high availability settings</p>
@@ -316,7 +324,9 @@ const ServerSettings = ({ name: id }: { name: string }) => {
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger>
-                            <HelpCircle className="h-4 w-4 text-gray-500" />
+                            <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+                              <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+                            </div>
                           </TooltipTrigger>
                           <TooltipContent>
                             <p>Minimum number of server instances</p>
@@ -353,7 +363,9 @@ const ServerSettings = ({ name: id }: { name: string }) => {
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger>
-                            <HelpCircle className="h-4 w-4 text-gray-500" />
+                            <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+                              <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+                            </div>
                           </TooltipTrigger>
                           <TooltipContent>
                             <p>Maximum number of server instances</p>
@@ -401,7 +413,9 @@ const ServerSettings = ({ name: id }: { name: string }) => {
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger>
-                            <HelpCircle className="h-4 w-4 text-gray-500" />
+                            <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+                              <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+                            </div>
                           </TooltipTrigger>
                           <TooltipContent>
                             <p>
@@ -426,7 +440,9 @@ const ServerSettings = ({ name: id }: { name: string }) => {
                           <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger>
-                                <HelpCircle className="h-4 w-4 text-gray-500" />
+                                <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+                                  <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+                                </div>
                               </TooltipTrigger>
                               <TooltipContent>
                                 <p>Metric used for auto-scaling decisions</p>
@@ -472,7 +488,9 @@ const ServerSettings = ({ name: id }: { name: string }) => {
                           <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger>
-                                <HelpCircle className="h-4 w-4 text-gray-500" />
+                                <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+                                  <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+                                </div>
                               </TooltipTrigger>
                               <TooltipContent>
                                 <p>Threshold that triggers auto-scaling</p>
@@ -516,7 +534,9 @@ const ServerSettings = ({ name: id }: { name: string }) => {
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger>
-                        <HelpCircle className="h-4 w-4 text-gray-500" />
+                        <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+                          <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+                        </div>
                       </TooltipTrigger>
                       <TooltipContent>
                         <p>Number of CPU cores</p>
@@ -550,7 +570,9 @@ const ServerSettings = ({ name: id }: { name: string }) => {
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger>
-                        <HelpCircle className="h-4 w-4 text-gray-500" />
+                        <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+                          <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+                        </div>
                       </TooltipTrigger>
                       <TooltipContent>
                         <p>RAM in gigabytes</p>
@@ -584,7 +606,9 @@ const ServerSettings = ({ name: id }: { name: string }) => {
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger>
-                        <HelpCircle className="h-4 w-4 text-gray-500" />
+                        <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+                          <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+                        </div>
                       </TooltipTrigger>
                       <TooltipContent>
                         <p>Storage capacity in gigabytes</p>
@@ -619,7 +643,9 @@ const ServerSettings = ({ name: id }: { name: string }) => {
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger>
-                      <HelpCircle className="h-4 w-4 text-gray-500" />
+                      <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+                        <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+                      </div>
                     </TooltipTrigger>
                     <TooltipContent>
                       <p>Server capabilities and features</p>
@@ -664,7 +690,9 @@ const ServerSettings = ({ name: id }: { name: string }) => {
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger>
-                      <HelpCircle className="h-4 w-4 text-gray-500" />
+                      <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+                        <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+                      </div>
                     </TooltipTrigger>
                     <TooltipContent>
                       <p>

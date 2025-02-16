@@ -142,7 +142,9 @@ const CacheSettings = ({ name: id }: { name: string }) => {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
-                  <HelpCircle className="h-4 w-4 text-gray-500" />
+                  <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+                    <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+                  </div>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>Toggle between detailed configuration and free-form text input</p>
@@ -168,7 +170,9 @@ const CacheSettings = ({ name: id }: { name: string }) => {
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger>
-                        <HelpCircle className="h-4 w-4 text-gray-500" />
+                        <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+                          <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+                        </div>
                       </TooltipTrigger>
                       <TooltipContent>
                         <p>The type of caching system to use</p>
@@ -200,7 +204,9 @@ const CacheSettings = ({ name: id }: { name: string }) => {
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger>
-                        <HelpCircle className="h-4 w-4 text-gray-500" />
+                        <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+                          <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+                        </div>
                       </TooltipTrigger>
                       <TooltipContent>
                         <p>Policy for removing items when cache is full</p>
@@ -233,7 +239,9 @@ const CacheSettings = ({ name: id }: { name: string }) => {
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger>
-                      <HelpCircle className="h-4 w-4 text-gray-500" />
+                      <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+                        <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+                      </div>
                     </TooltipTrigger>
                     <TooltipContent>
                       <p>Cache distribution and replication settings</p>
@@ -269,7 +277,9 @@ const CacheSettings = ({ name: id }: { name: string }) => {
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger>
-                            <HelpCircle className="h-4 w-4 text-gray-500" />
+                            <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+                              <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+                            </div>
                           </TooltipTrigger>
                           <TooltipContent>
                             <p>Total number of cache nodes in the cluster</p>
@@ -298,7 +308,9 @@ const CacheSettings = ({ name: id }: { name: string }) => {
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger>
-                            <HelpCircle className="h-4 w-4 text-gray-500" />
+                            <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+                              <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+                            </div>
                           </TooltipTrigger>
                           <TooltipContent>
                             <p>Number of copies for each data item</p>
@@ -328,7 +340,9 @@ const CacheSettings = ({ name: id }: { name: string }) => {
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger>
-                            <HelpCircle className="h-4 w-4 text-gray-500" />
+                            <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+                              <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+                            </div>
                           </TooltipTrigger>
                           <TooltipContent>
                             <p>Method used to distribute data across nodes</p>
@@ -362,7 +376,9 @@ const CacheSettings = ({ name: id }: { name: string }) => {
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger>
-                            <HelpCircle className="h-4 w-4 text-gray-500" />
+                            <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+                              <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+                            </div>
                           </TooltipTrigger>
                           <TooltipContent>
                             <p>Required consistency level for read/write operations</p>
@@ -400,7 +416,9 @@ const CacheSettings = ({ name: id }: { name: string }) => {
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger>
-                        <HelpCircle className="h-4 w-4 text-gray-500" />
+                        <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+                          <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+                        </div>
                       </TooltipTrigger>
                       <TooltipContent>
                         <p>Maximum memory allocation in gigabytes</p>
@@ -429,7 +447,9 @@ const CacheSettings = ({ name: id }: { name: string }) => {
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger>
-                        <HelpCircle className="h-4 w-4 text-gray-500" />
+                        <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+                          <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+                        </div>
                       </TooltipTrigger>
                       <TooltipContent>
                         <p>Maximum number of items in cache</p>
@@ -459,7 +479,9 @@ const CacheSettings = ({ name: id }: { name: string }) => {
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger>
-                        <HelpCircle className="h-4 w-4 text-gray-500" />
+                        <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+                          <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+                        </div>
                       </TooltipTrigger>
                       <TooltipContent>
                         <p>Maximum size per item in megabytes</p>
@@ -489,7 +511,9 @@ const CacheSettings = ({ name: id }: { name: string }) => {
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger>
-                      <HelpCircle className="h-4 w-4 text-gray-500" />
+                      <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+                        <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+                      </div>
                     </TooltipTrigger>
                     <TooltipContent>
                       <p>Cache capabilities and features</p>
@@ -531,7 +555,9 @@ const CacheSettings = ({ name: id }: { name: string }) => {
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger>
-                      <HelpCircle className="h-4 w-4 text-gray-500" />
+                      <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+                        <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+                      </div>
                     </TooltipTrigger>
                     <TooltipContent>
                       <p>Additional cache configuration, policies, or requirements</p>

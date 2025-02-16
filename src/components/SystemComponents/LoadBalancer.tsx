@@ -81,7 +81,9 @@ const LoadBalancerSettings = ({ name: id }: { name: string }) => {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
-                  <HelpCircle className="h-4 w-4 text-gray-500" />
+                  <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+                    <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+                  </div>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>Toggle between detailed configuration and free-form text input</p>
@@ -106,7 +108,9 @@ const LoadBalancerSettings = ({ name: id }: { name: string }) => {
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger>
-                      <HelpCircle className="h-4 w-4 text-gray-500" />
+                      <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+                        <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+                      </div>
                     </TooltipTrigger>
                     <TooltipContent>
                       <p>The algorithm used to distribute traffic across servers</p>
@@ -140,7 +144,9 @@ const LoadBalancerSettings = ({ name: id }: { name: string }) => {
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger>
-                        <HelpCircle className="h-4 w-4 text-gray-500" />
+                        <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+                          <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+                        </div>
                       </TooltipTrigger>
                       <TooltipContent>
                         <p>Maximum number of concurrent connections</p>
@@ -170,7 +176,9 @@ const LoadBalancerSettings = ({ name: id }: { name: string }) => {
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger>
-                        <HelpCircle className="h-4 w-4 text-gray-500" />
+                        <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+                          <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+                        </div>
                       </TooltipTrigger>
                       <TooltipContent>
                         <p>Requests per second the load balancer can handle</p>
@@ -201,7 +209,9 @@ const LoadBalancerSettings = ({ name: id }: { name: string }) => {
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger>
-                      <HelpCircle className="h-4 w-4 text-gray-500" />
+                      <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+                        <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+                      </div>
                     </TooltipTrigger>
                     <TooltipContent>
                       <p>Load balancer capabilities and features</p>
@@ -243,7 +253,9 @@ const LoadBalancerSettings = ({ name: id }: { name: string }) => {
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger>
-                      <HelpCircle className="h-4 w-4 text-gray-500" />
+                      <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+                        <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+                      </div>
                     </TooltipTrigger>
                     <TooltipContent>
                       <p>Additional load balancer configuration, policies, or requirements</p>

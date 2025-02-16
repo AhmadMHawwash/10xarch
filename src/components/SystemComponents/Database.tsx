@@ -214,7 +214,9 @@ const DatabaseSettings = ({ name: id }: { name: string }) => {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
-                  <HelpCircle className="h-4 w-4 text-gray-500" />
+                  <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+                    <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+                  </div>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>Toggle between detailed configuration and free-form text input</p>
@@ -247,7 +249,9 @@ const DatabaseSettings = ({ name: id }: { name: string }) => {
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger>
-                            <HelpCircle className="h-4 w-4 text-gray-500" />
+                            <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+                              <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+                            </div>
                           </TooltipTrigger>
                           <TooltipContent>
                             <p>The type of database system</p>
@@ -255,21 +259,6 @@ const DatabaseSettings = ({ name: id }: { name: string }) => {
                         </Tooltip>
                       </TooltipProvider>
                     </div>
-                    <Select value={dbConfig.type} onValueChange={handleDbTypeChange}>
-                      <SelectTrigger className={cn(
-                        "w-full bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
-                        "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
-                      )}>
-                        <SelectValue placeholder="Select database type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="relational">Relational</SelectItem>
-                        <SelectItem value="document">Document</SelectItem>
-                        <SelectItem value="keyvalue">Key-Value</SelectItem>
-                        <SelectItem value="graph">Graph</SelectItem>
-                        <SelectItem value="search">Search</SelectItem>
-                      </SelectContent>
-                    </Select>
                   </div>
 
                   <div className="flex flex-col gap-2">
@@ -280,7 +269,9 @@ const DatabaseSettings = ({ name: id }: { name: string }) => {
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger>
-                            <HelpCircle className="h-4 w-4 text-gray-500" />
+                            <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+                              <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+                            </div>
                           </TooltipTrigger>
                           <TooltipContent>
                             <p>Specific database engine/implementation</p>
@@ -314,7 +305,9 @@ const DatabaseSettings = ({ name: id }: { name: string }) => {
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger>
-                          <HelpCircle className="h-4 w-4 text-gray-500" />
+                          <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+                            <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+                          </div>
                         </TooltipTrigger>
                         <TooltipContent>
                           <p>Database clustering and replication settings</p>
@@ -350,7 +343,9 @@ const DatabaseSettings = ({ name: id }: { name: string }) => {
                           <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger>
-                                <HelpCircle className="h-4 w-4 text-gray-500" />
+                                <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+                                  <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+                                </div>
                               </TooltipTrigger>
                               <TooltipContent>
                                 <p>How data is replicated across nodes</p>
@@ -378,14 +373,16 @@ const DatabaseSettings = ({ name: id }: { name: string }) => {
 
                       <div className="flex flex-col gap-2">
                         <div className="flex items-center gap-2">
-                          <Checkbox
-                            id="sharding-enabled"
-                            checked={clustering.shardingEnabled}
-                            onCheckedChange={(checked) => {
-                              setClustering({ ...clustering, shardingEnabled: !!checked });
-                            }}
-                            className="border-gray-400 dark:border-gray-600"
-                          />
+                          <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+                            <Checkbox
+                              id="sharding-enabled"
+                              checked={clustering.shardingEnabled}
+                              onCheckedChange={(checked) => {
+                                setClustering({ ...clustering, shardingEnabled: !!checked });
+                              }}
+                              className="border-gray-400 dark:border-gray-600"
+                            />
+                          </div>
                           <Label
                             htmlFor="sharding-enabled"
                             className="text-sm text-gray-700 dark:text-gray-300"
@@ -395,7 +392,9 @@ const DatabaseSettings = ({ name: id }: { name: string }) => {
                           <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger>
-                                <HelpCircle className="h-4 w-4 text-gray-500" />
+                                <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+                                  <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+                                </div>
                               </TooltipTrigger>
                               <TooltipContent>
                                 <p>Distribute data across multiple shards</p>
@@ -413,7 +412,9 @@ const DatabaseSettings = ({ name: id }: { name: string }) => {
                           <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger>
-                                <HelpCircle className="h-4 w-4 text-gray-500" />
+                                <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+                                  <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+                                </div>
                               </TooltipTrigger>
                               <TooltipContent>
                                 <p>Number of primary/read-write nodes</p>
@@ -442,7 +443,9 @@ const DatabaseSettings = ({ name: id }: { name: string }) => {
                           <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger>
-                                <HelpCircle className="h-4 w-4 text-gray-500" />
+                                <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+                                  <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+                                </div>
                               </TooltipTrigger>
                               <TooltipContent>
                                 <p>Number of replica/read-only nodes</p>
@@ -475,7 +478,9 @@ const DatabaseSettings = ({ name: id }: { name: string }) => {
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger>
-                            <HelpCircle className="h-4 w-4 text-gray-500" />
+                            <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+                              <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+                            </div>
                           </TooltipTrigger>
                           <TooltipContent>
                             <p>Storage capacity in gigabytes</p>
@@ -504,7 +509,9 @@ const DatabaseSettings = ({ name: id }: { name: string }) => {
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger>
-                            <HelpCircle className="h-4 w-4 text-gray-500" />
+                            <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+                              <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+                            </div>
                           </TooltipTrigger>
                           <TooltipContent>
                             <p>Input/Output Operations per Second</p>
@@ -534,7 +541,9 @@ const DatabaseSettings = ({ name: id }: { name: string }) => {
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger>
-                            <HelpCircle className="h-4 w-4 text-gray-500" />
+                            <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+                              <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+                            </div>
                           </TooltipTrigger>
                           <TooltipContent>
                             <p>Maximum number of concurrent connections</p>
@@ -564,7 +573,9 @@ const DatabaseSettings = ({ name: id }: { name: string }) => {
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger>
-                          <HelpCircle className="h-4 w-4 text-gray-500" />
+                          <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+                            <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+                          </div>
                         </TooltipTrigger>
                         <TooltipContent>
                           <p>Database capabilities and features</p>
@@ -606,7 +617,9 @@ const DatabaseSettings = ({ name: id }: { name: string }) => {
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger>
-                          <HelpCircle className="h-4 w-4 text-gray-500" />
+                          <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+                            <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+                          </div>
                         </TooltipTrigger>
                         <TooltipContent>
                           <p>Additional database configuration, requirements, or constraints</p>
@@ -645,7 +658,9 @@ const DatabaseSettings = ({ name: id }: { name: string }) => {
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger>
-                          <HelpCircle className="h-4 w-4 text-gray-500" />
+                          <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+                            <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+                          </div>
                         </TooltipTrigger>
                         <TooltipContent className="max-w-sm">
                           <p>Define your database schema, models, or collections. For relational databases, define tables and their columns. For document databases, define collections and their structure.</p>

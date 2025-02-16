@@ -4,12 +4,14 @@ import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
 import { Small } from "../ui/typography";
 import { WithSettings } from "./Wrappers/WithSettings";
+import { useState } from "react";
 import { Input } from "../ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { HelpCircle } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import { cn } from "@/lib/utils";
 import { Checkbox } from "../ui/checkbox";
+import { Switch } from "../ui/switch";
 
 export const Cache = ({ name, Icon }: ComponentNodeProps) => {
   return (
@@ -25,6 +27,7 @@ export const Cache = ({ name, Icon }: ComponentNodeProps) => {
 
 const CacheSettings = ({ name: id }: { name: string }) => {
   const { useSystemComponentConfigSlice } = useSystemDesigner();
+  const [isDetailedMode, setIsDetailedMode] = useState<boolean>(false);
 
   const [cacheType, setCacheType] = useSystemComponentConfigSlice<string>(
     id,
@@ -73,6 +76,12 @@ const CacheSettings = ({ name: id }: { name: string }) => {
     partitioningStrategy: "consistent-hashing",
     consistencyLevel: "quorum"
   });
+
+  const [freeFormText, setFreeFormText] = useSystemComponentConfigSlice<string>(
+    id,
+    "free_form_text",
+    ""
+  );
 
   const getAvailableFeatures = (type: string): string[] => {
     const commonFeatures = [
@@ -124,77 +133,11 @@ const CacheSettings = ({ name: id }: { name: string }) => {
 
   return (
     <WithSettings name={id}>
-      <div className="grid w-full grid-flow-row grid-cols-1 gap-4 text-gray-800 dark:text-gray-200">
-        <div className="grid grid-cols-2 gap-4">
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-2">
-              <Label htmlFor="cache-type" className="text-gray-700 dark:text-gray-300">
-                Cache Type
-              </Label>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger>
-                    <HelpCircle className="h-4 w-4 text-gray-500" />
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>The type of caching system to use</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
-            <Select value={cacheType} onValueChange={setCacheType}>
-              <SelectTrigger className={cn(
-                "w-full bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
-                "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
-              )}>
-                <SelectValue placeholder="Select cache type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="in-memory">In-Memory Cache</SelectItem>
-                <SelectItem value="distributed">Distributed Cache</SelectItem>
-                <SelectItem value="cdn">CDN Cache</SelectItem>
-                <SelectItem value="browser">Browser Cache</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-2">
-              <Label htmlFor="eviction-policy" className="text-gray-700 dark:text-gray-300">
-                Eviction Policy
-              </Label>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger>
-                    <HelpCircle className="h-4 w-4 text-gray-500" />
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Policy for removing items when cache is full</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
-            <Select value={policy} onValueChange={setPolicy}>
-              <SelectTrigger className={cn(
-                "w-full bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
-                "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
-              )}>
-                <SelectValue placeholder="Select eviction policy" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="lru">LRU (Least Recently Used)</SelectItem>
-                <SelectItem value="lfu">LFU (Least Frequently Used)</SelectItem>
-                <SelectItem value="fifo">FIFO (First In First Out)</SelectItem>
-                <SelectItem value="random">Random Replacement</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-4 w-full">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Label className="text-gray-700 dark:text-gray-300">
-              Distribution Configuration
+            <Label htmlFor="detailed-mode" className="text-gray-700 dark:text-gray-300">
+              Detailed Configuration
             </Label>
             <TooltipProvider>
               <Tooltip>
@@ -202,35 +145,25 @@ const CacheSettings = ({ name: id }: { name: string }) => {
                   <HelpCircle className="h-4 w-4 text-gray-500" />
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Cache distribution and replication settings</p>
+                  <p>Toggle between detailed configuration and free-form text input</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
           </div>
+          <Switch
+            id="detailed-mode"
+            checked={isDetailedMode}
+            onCheckedChange={setIsDetailedMode}
+          />
+        </div>
 
-          <div className="flex items-center gap-2 mb-2">
-            <Checkbox
-              id="distribution-enabled"
-              checked={distribution.enabled}
-              onCheckedChange={(checked) => {
-                setDistribution({ ...distribution, enabled: !!checked });
-              }}
-              className="border-gray-400 dark:border-gray-600"
-            />
-            <Label
-              htmlFor="distribution-enabled"
-              className="text-sm text-gray-700 dark:text-gray-300"
-            >
-              Enable Distributed Cache
-            </Label>
-          </div>
-
-          {distribution.enabled && (
+        {isDetailedMode ? (
+          <div className="grid w-full grid-flow-row grid-cols-1 gap-4 text-gray-800 dark:text-gray-200">
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2">
-                  <Label htmlFor="nodes" className="text-gray-700 dark:text-gray-300">
-                    Number of Nodes
+                  <Label htmlFor="cache-type" className="text-gray-700 dark:text-gray-300">
+                    Cache Type
                   </Label>
                   <TooltipProvider>
                     <Tooltip>
@@ -238,92 +171,31 @@ const CacheSettings = ({ name: id }: { name: string }) => {
                         <HelpCircle className="h-4 w-4 text-gray-500" />
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>Total number of cache nodes in the cluster</p>
+                        <p>The type of caching system to use</p>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
                 </div>
-                <Input
-                  type="number"
-                  id="nodes"
-                  value={distribution.nodes}
-                  onChange={(e) => setDistribution({ ...distribution, nodes: Number(e.target.value) })}
-                  className={cn(
-                    "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
-                    "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
-                  )}
-                  min={1}
-                />
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2">
-                  <Label htmlFor="replication-factor" className="text-gray-700 dark:text-gray-300">
-                    Replication Factor
-                  </Label>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <HelpCircle className="h-4 w-4 text-gray-500" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Number of copies for each data item</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </div>
-                <Input
-                  type="number"
-                  id="replication-factor"
-                  value={distribution.replicationFactor}
-                  onChange={(e) => setDistribution({ ...distribution, replicationFactor: Number(e.target.value) })}
-                  className={cn(
-                    "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
-                    "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
-                  )}
-                  min={1}
-                  max={distribution.nodes}
-                />
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2">
-                  <Label htmlFor="partitioning-strategy" className="text-gray-700 dark:text-gray-300">
-                    Partitioning Strategy
-                  </Label>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <HelpCircle className="h-4 w-4 text-gray-500" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Method used to distribute data across nodes</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </div>
-                <Select 
-                  value={distribution.partitioningStrategy} 
-                  onValueChange={(value) => setDistribution({ ...distribution, partitioningStrategy: value })}
-                >
+                <Select value={cacheType} onValueChange={setCacheType}>
                   <SelectTrigger className={cn(
                     "w-full bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
                     "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
                   )}>
-                    <SelectValue placeholder="Select partitioning strategy" />
+                    <SelectValue placeholder="Select cache type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="consistent-hashing">Consistent Hashing</SelectItem>
-                    <SelectItem value="range">Range Based</SelectItem>
-                    <SelectItem value="modulo">Modulo Based</SelectItem>
+                    <SelectItem value="in-memory">In-Memory Cache</SelectItem>
+                    <SelectItem value="distributed">Distributed Cache</SelectItem>
+                    <SelectItem value="cdn">CDN Cache</SelectItem>
+                    <SelectItem value="browser">Browser Cache</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2">
-                  <Label htmlFor="consistency-level" className="text-gray-700 dark:text-gray-300">
-                    Consistency Level
+                  <Label htmlFor="eviction-policy" className="text-gray-700 dark:text-gray-300">
+                    Eviction Policy
                   </Label>
                   <TooltipProvider>
                     <Tooltip>
@@ -331,199 +203,405 @@ const CacheSettings = ({ name: id }: { name: string }) => {
                         <HelpCircle className="h-4 w-4 text-gray-500" />
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>Required consistency level for read/write operations</p>
+                        <p>Policy for removing items when cache is full</p>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
                 </div>
-                <Select 
-                  value={distribution.consistencyLevel} 
-                  onValueChange={(value) => setDistribution({ ...distribution, consistencyLevel: value })}
-                >
+                <Select value={policy} onValueChange={setPolicy}>
                   <SelectTrigger className={cn(
                     "w-full bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
                     "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
                   )}>
-                    <SelectValue placeholder="Select consistency level" />
+                    <SelectValue placeholder="Select eviction policy" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="one">ONE</SelectItem>
-                    <SelectItem value="quorum">QUORUM</SelectItem>
-                    <SelectItem value="all">ALL</SelectItem>
+                    <SelectItem value="lru">LRU (Least Recently Used)</SelectItem>
+                    <SelectItem value="lfu">LFU (Least Frequently Used)</SelectItem>
+                    <SelectItem value="fifo">FIFO (First In First Out)</SelectItem>
+                    <SelectItem value="random">Random Replacement</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
-          )}
-        </div>
 
-        <div className="grid grid-cols-3 gap-4">
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-2">
-              <Label htmlFor="memory" className="text-gray-700 dark:text-gray-300">
-                Memory (GB)
-              </Label>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger>
-                    <HelpCircle className="h-4 w-4 text-gray-500" />
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Maximum memory allocation in gigabytes</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
-            <Input
-              type="number"
-              id="memory"
-              value={capacity.memory}
-              onChange={(e) => setCapacity({ ...capacity, memory: Number(e.target.value) })}
-              className={cn(
-                "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
-                "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
-              )}
-              min={1}
-            />
-          </div>
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <Label className="text-gray-700 dark:text-gray-300">
+                  Distribution Configuration
+                </Label>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <HelpCircle className="h-4 w-4 text-gray-500" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Cache distribution and replication settings</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
 
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-2">
-              <Label htmlFor="max-items" className="text-gray-700 dark:text-gray-300">
-                Max Items
-              </Label>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger>
-                    <HelpCircle className="h-4 w-4 text-gray-500" />
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Maximum number of items in cache</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
-            <Input
-              type="number"
-              id="max-items"
-              value={capacity.maxItems}
-              onChange={(e) => setCapacity({ ...capacity, maxItems: Number(e.target.value) })}
-              className={cn(
-                "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
-                "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
-              )}
-              min={1000}
-              step={1000}
-            />
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-2">
-              <Label htmlFor="max-item-size" className="text-gray-700 dark:text-gray-300">
-                Max Item Size (MB)
-              </Label>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger>
-                    <HelpCircle className="h-4 w-4 text-gray-500" />
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Maximum size per item in megabytes</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
-            <Input
-              type="number"
-              id="max-item-size"
-              value={capacity.maxItemSize}
-              onChange={(e) => setCapacity({ ...capacity, maxItemSize: Number(e.target.value) })}
-              className={cn(
-                "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
-                "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
-              )}
-              min={1}
-            />
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center gap-2">
-            <Label className="text-gray-700 dark:text-gray-300">
-              Features
-            </Label>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <HelpCircle className="h-4 w-4 text-gray-500" />
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Cache capabilities and features</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            {availableFeatures.map((feature) => (
-              <div key={feature} className="flex items-center gap-2">
+              <div className="flex items-center gap-2 mb-2">
                 <Checkbox
-                  id={feature}
-                  checked={features.includes(feature)}
+                  id="distribution-enabled"
+                  checked={distribution.enabled}
                   onCheckedChange={(checked) => {
-                    if (checked) {
-                      setFeatures([...features, feature]);
-                    } else {
-                      setFeatures(features.filter((f) => f !== feature));
-                    }
+                    setDistribution({ ...distribution, enabled: !!checked });
                   }}
                   className="border-gray-400 dark:border-gray-600"
                 />
                 <Label
-                  htmlFor={feature}
+                  htmlFor="distribution-enabled"
                   className="text-sm text-gray-700 dark:text-gray-300"
                 >
-                  {feature}
+                  Enable Distributed Cache
                 </Label>
               </div>
-            ))}
-          </div>
-        </div>
 
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center gap-2">
-            <Label htmlFor="cache-details" className="text-gray-700 dark:text-gray-300">
-              Additional Configuration
-            </Label>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <HelpCircle className="h-4 w-4 text-gray-500" />
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Additional cache configuration, policies, or requirements</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
-          <Textarea
-            name="cache-details"
-            id="cache-details"
-            rows={6}
-            placeholder="Example:
+              {distribution.enabled && (
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                      <Label htmlFor="nodes" className="text-gray-700 dark:text-gray-300">
+                        Number of Nodes
+                      </Label>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <HelpCircle className="h-4 w-4 text-gray-500" />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Total number of cache nodes in the cluster</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
+                    <Input
+                      type="number"
+                      id="nodes"
+                      value={distribution.nodes}
+                      onChange={(e) => setDistribution({ ...distribution, nodes: Number(e.target.value) })}
+                      className={cn(
+                        "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
+                        "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
+                      )}
+                      min={1}
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                      <Label htmlFor="replication-factor" className="text-gray-700 dark:text-gray-300">
+                        Replication Factor
+                      </Label>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <HelpCircle className="h-4 w-4 text-gray-500" />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Number of copies for each data item</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
+                    <Input
+                      type="number"
+                      id="replication-factor"
+                      value={distribution.replicationFactor}
+                      onChange={(e) => setDistribution({ ...distribution, replicationFactor: Number(e.target.value) })}
+                      className={cn(
+                        "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
+                        "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
+                      )}
+                      min={1}
+                      max={distribution.nodes}
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                      <Label htmlFor="partitioning-strategy" className="text-gray-700 dark:text-gray-300">
+                        Partitioning Strategy
+                      </Label>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <HelpCircle className="h-4 w-4 text-gray-500" />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Method used to distribute data across nodes</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
+                    <Select 
+                      value={distribution.partitioningStrategy} 
+                      onValueChange={(value) => setDistribution({ ...distribution, partitioningStrategy: value })}
+                    >
+                      <SelectTrigger className={cn(
+                        "w-full bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
+                        "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
+                      )}>
+                        <SelectValue placeholder="Select partitioning strategy" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="consistent-hashing">Consistent Hashing</SelectItem>
+                        <SelectItem value="range">Range Based</SelectItem>
+                        <SelectItem value="modulo">Modulo Based</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                      <Label htmlFor="consistency-level" className="text-gray-700 dark:text-gray-300">
+                        Consistency Level
+                      </Label>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <HelpCircle className="h-4 w-4 text-gray-500" />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Required consistency level for read/write operations</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
+                    <Select 
+                      value={distribution.consistencyLevel} 
+                      onValueChange={(value) => setDistribution({ ...distribution, consistencyLevel: value })}
+                    >
+                      <SelectTrigger className={cn(
+                        "w-full bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
+                        "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
+                      )}>
+                        <SelectValue placeholder="Select consistency level" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="one">ONE</SelectItem>
+                        <SelectItem value="quorum">QUORUM</SelectItem>
+                        <SelectItem value="all">ALL</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="grid grid-cols-3 gap-4">
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="memory" className="text-gray-700 dark:text-gray-300">
+                    Memory (GB)
+                  </Label>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <HelpCircle className="h-4 w-4 text-gray-500" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Maximum memory allocation in gigabytes</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
+                <Input
+                  type="number"
+                  id="memory"
+                  value={capacity.memory}
+                  onChange={(e) => setCapacity({ ...capacity, memory: Number(e.target.value) })}
+                  className={cn(
+                    "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
+                    "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
+                  )}
+                  min={1}
+                />
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="max-items" className="text-gray-700 dark:text-gray-300">
+                    Max Items
+                  </Label>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <HelpCircle className="h-4 w-4 text-gray-500" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Maximum number of items in cache</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
+                <Input
+                  type="number"
+                  id="max-items"
+                  value={capacity.maxItems}
+                  onChange={(e) => setCapacity({ ...capacity, maxItems: Number(e.target.value) })}
+                  className={cn(
+                    "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
+                    "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
+                  )}
+                  min={1000}
+                  step={1000}
+                />
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="max-item-size" className="text-gray-700 dark:text-gray-300">
+                    Max Item Size (MB)
+                  </Label>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <HelpCircle className="h-4 w-4 text-gray-500" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Maximum size per item in megabytes</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
+                <Input
+                  type="number"
+                  id="max-item-size"
+                  value={capacity.maxItemSize}
+                  onChange={(e) => setCapacity({ ...capacity, maxItemSize: Number(e.target.value) })}
+                  className={cn(
+                    "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
+                    "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
+                  )}
+                  min={1}
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <Label className="text-gray-700 dark:text-gray-300">
+                  Features
+                </Label>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <HelpCircle className="h-4 w-4 text-gray-500" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Cache capabilities and features</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                {availableFeatures.map((feature) => (
+                  <div key={feature} className="flex items-center gap-2">
+                    <Checkbox
+                      id={feature}
+                      checked={features.includes(feature)}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          setFeatures([...features, feature]);
+                        } else {
+                          setFeatures(features.filter((f) => f !== feature));
+                        }
+                      }}
+                      className="border-gray-400 dark:border-gray-600"
+                    />
+                    <Label
+                      htmlFor={feature}
+                      className="text-sm text-gray-700 dark:text-gray-300"
+                    >
+                      {feature}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <Label htmlFor="cache-details" className="text-gray-700 dark:text-gray-300">
+                  Additional Configuration
+                </Label>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <HelpCircle className="h-4 w-4 text-gray-500" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Additional cache configuration, policies, or requirements</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+              <Textarea
+                name="cache-details"
+                id="cache-details"
+                rows={6}
+                placeholder="Example:
 - Cache invalidation strategy
 - TTL configuration
 - Replication settings
 - Backup policies
 - Monitoring requirements"
-            className={cn(
-              "text-md bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
-              "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600",
-              "placeholder:text-gray-500 dark:placeholder:text-gray-400"
-            )}
-            value={details}
-            onChange={(e) => setDetails(e.target.value)}
-          />
-        </div>
+                className={cn(
+                  "text-md bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
+                  "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600",
+                  "placeholder:text-gray-500 dark:placeholder:text-gray-400"
+                )}
+                value={details}
+                onChange={(e) => setDetails(e.target.value)}
+              />
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="free-form" className="text-gray-700 dark:text-gray-300">
+              Cache Configuration
+            </Label>
+            <Textarea
+              id="free-form"
+              rows={20}
+              placeholder="Describe your cache configuration here. Example:
+
+Cache Type: In-Memory Cache
+Capacity:
+- Memory: 4GB
+- Max Items: 1,000,000
+- Max Item Size: 1MB
+
+Features:
+- Data Compression
+- TTL Support
+- Write-Through
+- Cache Invalidation
+
+Distribution:
+- 3 cache nodes
+- Consistent hashing
+- Replication factor: 2
+- Quorum consistency
+
+Additional Requirements:
+- Monitoring and alerts
+- Eviction policy: LRU
+- Backup strategy
+- Security configurations"
+              className={cn(
+                "text-md bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
+                "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600",
+                "placeholder:text-gray-500 dark:placeholder:text-gray-400"
+              )}
+              value={freeFormText}
+              onChange={(e) => setFreeFormText(e.target.value)}
+            />
+          </div>
+        )}
       </div>
     </WithSettings>
   );

@@ -51,5 +51,6 @@ Format your responses using markdown for better readability:
 - Use bullet points and numbered lists for structured information
 - Use > for important notes or quotes
 - Use ### for section headers when needed
-- Use tables when comparing multiple options
+- You only have 400 tokens to work with, so make sure to be concise and to the point
+- You can use markdown tables when comparing multiple options (make sure to build it for the chat width of 780px) (maybe only 3 columns max)
 `

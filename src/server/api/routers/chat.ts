@@ -152,7 +152,7 @@ Keep these requirements in mind when providing assistance. Guide the user withou
           model: 'gpt-4o-mini',
           messages: messages.map(({ role, content }) => ({ role, content })),
           temperature: 0.1,
-          max_tokens: 200,
+          max_tokens: 400,
         })
 
         const response = completion.choices[0]?.message?.content ?? 'No response generated.'
@@ -201,7 +201,7 @@ Keep these requirements in mind when providing assistance. Guide the user withou
         model: 'gpt-4o-mini',
         messages: messages.map(({ role, content }) => ({ role, content })),
         temperature: 0.1,
-        max_tokens: 100,
+        max_tokens: 400,
       })
 
       const response = completion.choices[0]?.message?.content ?? 'No response generated.'

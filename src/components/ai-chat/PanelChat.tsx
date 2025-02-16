@@ -35,7 +35,7 @@ export function PanelChat() {
             animate={{ opacity: 1, height: 400 }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
-            className="absolute bottom-16 right-0 mb-2 w-[400px] overflow-hidden rounded-lg border border-border/40 bg-background/95 shadow-2xl backdrop-blur supports-[backdrop-filter]:bg-background/60"
+            className="absolute bottom-16 right-0 mb-2 flex w-[400px] flex-col overflow-hidden rounded-lg border border-border/40 bg-background/95 shadow-2xl backdrop-blur supports-[backdrop-filter]:bg-background/60"
           >
             <div className="flex h-8 items-center justify-between border-b border-border/40 bg-muted/50 px-3">
               <div className="flex items-center gap-2">
@@ -61,10 +61,8 @@ export function PanelChat() {
                 </Button>
               </div>
             </div>
-            <div className="h-[calc(100%-32px)]">
-              <div className="h-full">
-                <AIChatAssistant />
-              </div>
+            <div className="flex-1">
+              <AIChatAssistant />
             </div>
           </motion.div>
         )}
@@ -72,13 +70,13 @@ export function PanelChat() {
 
       {/* Full Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-[80vw] w-[1020px] h-[80vh] p-0 gap-0 border border-border/40 bg-background/95 shadow-2xl backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <div className="flex h-8 items-center justify-between border-b border-border/40 bg-muted/50 px-3">
+        <DialogContent className="max-w-[80vw] w-[780px] h-[80vh] p-0 gap-0 flex flex-col border border-border/40 bg-background/95 shadow-2xl backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <div className="flex h-12 items-center justify-between border-b border-border/40 bg-muted/50 px-3">
             <div className="flex items-center gap-2">
               <Bot className="h-4 w-4" />
               <span className="text-xs font-medium">AI Assistant</span>
             </div>
-            <div className="flex items-center gap-0.5">
+            <div className="flex items-center gap-0.5 mr-6">
               <Button
                 variant="ghost"
                 size="icon"
@@ -87,20 +85,10 @@ export function PanelChat() {
               >
                 <Minimize2 className="h-3.5 w-3.5" />
               </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6 hover:bg-muted/50"
-                onClick={() => setIsDialogOpen(false)}
-              >
-                <X className="h-3.5 w-3.5" />
-              </Button>
             </div>
           </div>
-          <div className="h-[calc(100%-32px)]">
-            <div className="h-full">
-              <AIChatAssistant />
-            </div>
+          <div className="flex-1">
+            <AIChatAssistant />
           </div>
         </DialogContent>
       </Dialog>

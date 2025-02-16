@@ -618,11 +618,11 @@ const DatabaseSettings = ({ name: id }: { name: string }) => {
                     name="database-details"
                     id="database-details"
                     rows={6}
-                    placeholder="Example:
+                    placeholder={`Example:
 - Specific configuration parameters
 - Security requirements
 - Backup strategy
-- Performance requirements"
+- Performance requirements`}
                     className={cn(
                       "text-md bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
                       "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600",
@@ -719,7 +719,7 @@ Properties:
             <Textarea
               id="free-form"
               rows={20}
-              placeholder="Describe your database configuration here. Example:
+              placeholder={`Describe your database configuration here. Example:
 
 Database Type: PostgreSQL
 Capacity: 100GB storage, 1000 IOPS
@@ -739,7 +739,7 @@ Additional Requirements:
 - Daily backup retention: 7 days
 - Monthly backup retention: 1 year
 - Monitoring requirements
-- Security configurations"
+- Security configurations`}
               className={cn(
                 "text-md bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
                 "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600",

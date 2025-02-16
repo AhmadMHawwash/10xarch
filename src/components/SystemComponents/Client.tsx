@@ -297,11 +297,11 @@ const ClientSettings = ({ name: id }: { name: string }) => {
                 name="client-details"
                 id="client-details"
                 rows={6}
-                placeholder="Example:
+                placeholder={`Example:
 - Client-side requirements
 - Network constraints
 - Security requirements
-- Performance targets"
+- Performance targets`}
                 className={cn(
                   "text-md bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
                   "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600",
@@ -320,7 +320,7 @@ const ClientSettings = ({ name: id }: { name: string }) => {
             <Textarea
               id="free-form"
               rows={20}
-              placeholder="Describe your client configuration here. Example:
+              placeholder={`Describe your client configuration here. Example:
 
 Client Type: Web Client
 Location: Global
@@ -340,7 +340,7 @@ Additional Requirements:
 - Client-side requirements
 - Network constraints
 - Security requirements
-- Performance targets"
+- Performance targets`}
               className={cn(
                 "text-md bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
                 "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600",

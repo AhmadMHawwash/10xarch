@@ -287,13 +287,13 @@ const CDNSettings = ({ name: id }: { name: string }) => {
                 name="cdn-details"
                 id="cdn-details"
                 rows={6}
-                placeholder="Example:
+                placeholder={`Example:
 - Cache control policies
 - Origin server settings
 - Security configurations
 - Custom routing rules
 - Content optimization settings
-- Geographic restrictions"
+- Geographic restrictions`}
                 className={cn(
                   "text-md bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
                   "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600",
@@ -312,7 +312,7 @@ const CDNSettings = ({ name: id }: { name: string }) => {
             <Textarea
               id="free-form"
               rows={20}
-              placeholder="Describe your CDN configuration here. Example:
+              placeholder={`Describe your CDN configuration here. Example:
 
 CDN Type: Public CDN
 
@@ -337,7 +337,7 @@ Additional Requirements:
 - Security configurations
 - Custom routing rules
 - Content optimization settings
-- Geographic restrictions"
+- Geographic restrictions`}
               className={cn(
                 "text-md bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
                 "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600",

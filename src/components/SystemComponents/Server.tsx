@@ -6,19 +6,32 @@ import { Small } from "../ui/typography";
 import { WithSettings } from "./Wrappers/WithSettings";
 import { useState } from "react";
 import { Input } from "../ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 import { HelpCircle } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../ui/tooltip";
 import { cn } from "@/lib/utils";
 import { Checkbox } from "../ui/checkbox";
 import { Switch } from "../ui/switch";
 
 export const Server = ({ name, Icon }: ComponentNodeProps) => {
   return (
-    <div className="relative flex flex-col items-center text-gray-800 dark:text-gray-200 group">
+    <div className="group relative flex flex-col items-center text-gray-800 dark:text-gray-200">
       <div className="relative flex items-center gap-1">
-      {Icon && <Icon size={20} className="text-gray-700 dark:text-gray-300" />}
-      <Small>{name}</Small>
+        {Icon && (
+          <Icon size={20} className="text-gray-700 dark:text-gray-300" />
+        )}
+        <Small>{name}</Small>
       </div>
       <ServerSettings name={name} />
     </div>
@@ -32,13 +45,13 @@ const ServerSettings = ({ name: id }: { name: string }) => {
   const [serverType, setServerType] = useSystemComponentConfigSlice<string>(
     id,
     "server_type",
-    "application"
+    "application",
   );
 
   const [computeType, setComputeType] = useSystemComponentConfigSlice<string>(
     id,
     "compute_type",
-    "general"
+    "general",
   );
 
   const [capacity, setCapacity] = useSystemComponentConfigSlice<{
@@ -48,19 +61,19 @@ const ServerSettings = ({ name: id }: { name: string }) => {
   }>(id, "capacity", {
     cpu: 2,
     memory: 4,
-    storage: 100
+    storage: 100,
   });
 
   const [features, setFeatures] = useSystemComponentConfigSlice<string[]>(
     id,
     "features",
-    []
+    [],
   );
 
   const [details, setDetails] = useSystemComponentConfigSlice<string>(
     id,
     "details",
-    ""
+    "",
   );
 
   const [scaling, setScaling] = useSystemComponentConfigSlice<{
@@ -76,13 +89,13 @@ const ServerSettings = ({ name: id }: { name: string }) => {
     maxInstances: 5,
     autoScalingEnabled: true,
     scalingMetric: "cpu",
-    scalingThreshold: 70
+    scalingThreshold: 70,
   });
 
   const [freeFormText, setFreeFormText] = useSystemComponentConfigSlice<string>(
     id,
     "free_form_text",
-    ""
+    "",
   );
 
   const getAvailableFeatures = (type: string): string[] => {
@@ -90,7 +103,7 @@ const ServerSettings = ({ name: id }: { name: string }) => {
       "Health monitoring",
       "Fault tolerance",
       "Logging & Monitoring",
-      "Backup & Restore"
+      "Backup & Restore",
     ];
 
     switch (type) {
@@ -100,7 +113,7 @@ const ServerSettings = ({ name: id }: { name: string }) => {
           "Request rate limiting",
           "Database connection pooling",
           "Session management",
-          "Application caching"
+          "Application caching",
         ];
       case "api":
         return [
@@ -108,7 +121,7 @@ const ServerSettings = ({ name: id }: { name: string }) => {
           "API Gateway",
           "Request validation",
           "Rate limiting",
-          "API versioning"
+          "API versioning",
         ];
       case "web":
         return [
@@ -116,7 +129,7 @@ const ServerSettings = ({ name: id }: { name: string }) => {
           "Static file serving",
           "Compression",
           "URL rewriting",
-          "Virtual hosting"
+          "Virtual hosting",
         ];
       case "processing":
         return [
@@ -124,7 +137,7 @@ const ServerSettings = ({ name: id }: { name: string }) => {
           "Job scheduling",
           "Queue processing",
           "Resource isolation",
-          "Batch processing"
+          "Batch processing",
         ];
       case "caching":
         return [
@@ -132,7 +145,7 @@ const ServerSettings = ({ name: id }: { name: string }) => {
           "Cache coherence",
           "Cache partitioning",
           "Eviction policies",
-          "Cache statistics"
+          "Cache statistics",
         ];
       default:
         return commonFeatures;
@@ -143,10 +156,13 @@ const ServerSettings = ({ name: id }: { name: string }) => {
 
   return (
     <WithSettings name={id}>
-      <div className="flex flex-col gap-4 w-full">
+      <div className="flex w-full flex-col gap-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Label htmlFor="detailed-mode" className="text-gray-700 dark:text-gray-300">
+            <Label
+              htmlFor="detailed-mode"
+              className="text-gray-700 dark:text-gray-300"
+            >
               Detailed Configuration
             </Label>
             <TooltipProvider>
@@ -155,7 +171,10 @@ const ServerSettings = ({ name: id }: { name: string }) => {
                   <HelpCircle className="h-4 w-4 text-gray-500" />
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Toggle between detailed configuration and free-form text input</p>
+                  <p>
+                    Toggle between detailed configuration and free-form text
+                    input
+                  </p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -172,7 +191,10 @@ const ServerSettings = ({ name: id }: { name: string }) => {
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2">
-                  <Label htmlFor="server-type" className="text-gray-700 dark:text-gray-300">
+                  <Label
+                    htmlFor="server-type"
+                    className="text-gray-700 dark:text-gray-300"
+                  >
                     Server Type
                   </Label>
                   <TooltipProvider>
@@ -187,17 +209,23 @@ const ServerSettings = ({ name: id }: { name: string }) => {
                   </TooltipProvider>
                 </div>
                 <Select value={serverType} onValueChange={setServerType}>
-                  <SelectTrigger className={cn(
-                    "w-full bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
-                    "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
-                  )}>
+                  <SelectTrigger
+                    className={cn(
+                      "w-full border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                      "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+                    )}
+                  >
                     <SelectValue placeholder="Select server type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="application">Application Server</SelectItem>
+                    <SelectItem value="application">
+                      Application Server
+                    </SelectItem>
                     <SelectItem value="api">API Server</SelectItem>
                     <SelectItem value="web">Web Server</SelectItem>
-                    <SelectItem value="processing">Processing Server</SelectItem>
+                    <SelectItem value="processing">
+                      Processing Server
+                    </SelectItem>
                     <SelectItem value="caching">Caching Server</SelectItem>
                   </SelectContent>
                 </Select>
@@ -205,7 +233,10 @@ const ServerSettings = ({ name: id }: { name: string }) => {
 
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2">
-                  <Label htmlFor="compute-type" className="text-gray-700 dark:text-gray-300">
+                  <Label
+                    htmlFor="compute-type"
+                    className="text-gray-700 dark:text-gray-300"
+                  >
                     Compute Type
                   </Label>
                   <TooltipProvider>
@@ -214,16 +245,21 @@ const ServerSettings = ({ name: id }: { name: string }) => {
                         <HelpCircle className="h-4 w-4 text-gray-500" />
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>The type of compute resources optimized for this server</p>
+                        <p>
+                          The type of compute resources optimized for this
+                          server
+                        </p>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
                 </div>
                 <Select value={computeType} onValueChange={setComputeType}>
-                  <SelectTrigger className={cn(
-                    "w-full bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
-                    "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
-                  )}>
+                  <SelectTrigger
+                    className={cn(
+                      "w-full border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                      "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+                    )}
+                  >
                     <SelectValue placeholder="Select compute type" />
                   </SelectTrigger>
                   <SelectContent>
@@ -253,7 +289,7 @@ const ServerSettings = ({ name: id }: { name: string }) => {
                 </TooltipProvider>
               </div>
 
-              <div className="flex items-center gap-2 mb-2">
+              <div className="mb-2 flex items-center gap-2">
                 <Checkbox
                   id="scaling-enabled"
                   checked={scaling.enabled}
@@ -274,7 +310,10 @@ const ServerSettings = ({ name: id }: { name: string }) => {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex flex-col gap-2">
                     <div className="flex items-center gap-2">
-                      <Label htmlFor="min-instances" className="text-gray-700 dark:text-gray-300">
+                      <Label
+                        htmlFor="min-instances"
+                        className="text-gray-700 dark:text-gray-300"
+                      >
                         Min Instances
                       </Label>
                       <TooltipProvider>
@@ -292,10 +331,15 @@ const ServerSettings = ({ name: id }: { name: string }) => {
                       type="number"
                       id="min-instances"
                       value={scaling.minInstances}
-                      onChange={(e) => setScaling({ ...scaling, minInstances: Number(e.target.value) })}
+                      onChange={(e) =>
+                        setScaling({
+                          ...scaling,
+                          minInstances: Number(e.target.value),
+                        })
+                      }
                       className={cn(
-                        "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
-                        "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
+                        "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                        "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
                       )}
                       min={1}
                     />
@@ -303,7 +347,10 @@ const ServerSettings = ({ name: id }: { name: string }) => {
 
                   <div className="flex flex-col gap-2">
                     <div className="flex items-center gap-2">
-                      <Label htmlFor="max-instances" className="text-gray-700 dark:text-gray-300">
+                      <Label
+                        htmlFor="max-instances"
+                        className="text-gray-700 dark:text-gray-300"
+                      >
                         Max Instances
                       </Label>
                       <TooltipProvider>
@@ -321,10 +368,15 @@ const ServerSettings = ({ name: id }: { name: string }) => {
                       type="number"
                       id="max-instances"
                       value={scaling.maxInstances}
-                      onChange={(e) => setScaling({ ...scaling, maxInstances: Number(e.target.value) })}
+                      onChange={(e) =>
+                        setScaling({
+                          ...scaling,
+                          maxInstances: Number(e.target.value),
+                        })
+                      }
                       className={cn(
-                        "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
-                        "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
+                        "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                        "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
                       )}
                       min={scaling.minInstances}
                     />
@@ -336,7 +388,10 @@ const ServerSettings = ({ name: id }: { name: string }) => {
                         id="auto-scaling"
                         checked={scaling.autoScalingEnabled}
                         onCheckedChange={(checked) => {
-                          setScaling({ ...scaling, autoScalingEnabled: !!checked });
+                          setScaling({
+                            ...scaling,
+                            autoScalingEnabled: !!checked,
+                          });
                         }}
                         className="border-gray-400 dark:border-gray-600"
                       />
@@ -352,7 +407,9 @@ const ServerSettings = ({ name: id }: { name: string }) => {
                             <HelpCircle className="h-4 w-4 text-gray-500" />
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p>Automatically adjust instance count based on load</p>
+                            <p>
+                              Automatically adjust instance count based on load
+                            </p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
@@ -363,7 +420,10 @@ const ServerSettings = ({ name: id }: { name: string }) => {
                     <>
                       <div className="flex flex-col gap-2">
                         <div className="flex items-center gap-2">
-                          <Label htmlFor="scaling-metric" className="text-gray-700 dark:text-gray-300">
+                          <Label
+                            htmlFor="scaling-metric"
+                            className="text-gray-700 dark:text-gray-300"
+                          >
                             Scaling Metric
                           </Label>
                           <TooltipProvider>
@@ -377,28 +437,39 @@ const ServerSettings = ({ name: id }: { name: string }) => {
                             </Tooltip>
                           </TooltipProvider>
                         </div>
-                        <Select 
-                          value={scaling.scalingMetric} 
-                          onValueChange={(value) => setScaling({ ...scaling, scalingMetric: value })}
+                        <Select
+                          value={scaling.scalingMetric}
+                          onValueChange={(value) =>
+                            setScaling({ ...scaling, scalingMetric: value })
+                          }
                         >
-                          <SelectTrigger className={cn(
-                            "w-full bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
-                            "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
-                          )}>
+                          <SelectTrigger
+                            className={cn(
+                              "w-full border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                              "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+                            )}
+                          >
                             <SelectValue placeholder="Select scaling metric" />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="cpu">CPU Utilization</SelectItem>
                             <SelectItem value="memory">Memory Usage</SelectItem>
-                            <SelectItem value="requests">Request Count</SelectItem>
-                            <SelectItem value="latency">Response Latency</SelectItem>
+                            <SelectItem value="requests">
+                              Request Count
+                            </SelectItem>
+                            <SelectItem value="latency">
+                              Response Latency
+                            </SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
 
                       <div className="flex flex-col gap-2">
                         <div className="flex items-center gap-2">
-                          <Label htmlFor="scaling-threshold" className="text-gray-700 dark:text-gray-300">
+                          <Label
+                            htmlFor="scaling-threshold"
+                            className="text-gray-700 dark:text-gray-300"
+                          >
                             Scaling Threshold (%)
                           </Label>
                           <TooltipProvider>
@@ -416,10 +487,15 @@ const ServerSettings = ({ name: id }: { name: string }) => {
                           type="number"
                           id="scaling-threshold"
                           value={scaling.scalingThreshold}
-                          onChange={(e) => setScaling({ ...scaling, scalingThreshold: Number(e.target.value) })}
+                          onChange={(e) =>
+                            setScaling({
+                              ...scaling,
+                              scalingThreshold: Number(e.target.value),
+                            })
+                          }
                           className={cn(
-                            "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
-                            "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
+                            "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                            "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
                           )}
                           min={1}
                           max={100}
@@ -434,7 +510,10 @@ const ServerSettings = ({ name: id }: { name: string }) => {
             <div className="grid grid-cols-3 gap-4">
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2">
-                  <Label htmlFor="cpu" className="text-gray-700 dark:text-gray-300">
+                  <Label
+                    htmlFor="cpu"
+                    className="text-gray-700 dark:text-gray-300"
+                  >
                     CPU (cores)
                   </Label>
                   <TooltipProvider>
@@ -452,10 +531,12 @@ const ServerSettings = ({ name: id }: { name: string }) => {
                   type="number"
                   id="cpu"
                   value={capacity.cpu}
-                  onChange={(e) => setCapacity({ ...capacity, cpu: Number(e.target.value) })}
+                  onChange={(e) =>
+                    setCapacity({ ...capacity, cpu: Number(e.target.value) })
+                  }
                   className={cn(
-                    "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
-                    "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
+                    "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                    "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
                   )}
                   min={1}
                 />
@@ -463,7 +544,10 @@ const ServerSettings = ({ name: id }: { name: string }) => {
 
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2">
-                  <Label htmlFor="memory" className="text-gray-700 dark:text-gray-300">
+                  <Label
+                    htmlFor="memory"
+                    className="text-gray-700 dark:text-gray-300"
+                  >
                     Memory (GB)
                   </Label>
                   <TooltipProvider>
@@ -481,10 +565,12 @@ const ServerSettings = ({ name: id }: { name: string }) => {
                   type="number"
                   id="memory"
                   value={capacity.memory}
-                  onChange={(e) => setCapacity({ ...capacity, memory: Number(e.target.value) })}
+                  onChange={(e) =>
+                    setCapacity({ ...capacity, memory: Number(e.target.value) })
+                  }
                   className={cn(
-                    "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
-                    "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
+                    "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                    "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
                   )}
                   min={1}
                 />
@@ -492,7 +578,10 @@ const ServerSettings = ({ name: id }: { name: string }) => {
 
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2">
-                  <Label htmlFor="storage" className="text-gray-700 dark:text-gray-300">
+                  <Label
+                    htmlFor="storage"
+                    className="text-gray-700 dark:text-gray-300"
+                  >
                     Storage (GB)
                   </Label>
                   <TooltipProvider>
@@ -510,10 +599,15 @@ const ServerSettings = ({ name: id }: { name: string }) => {
                   type="number"
                   id="storage"
                   value={capacity.storage}
-                  onChange={(e) => setCapacity({ ...capacity, storage: Number(e.target.value) })}
+                  onChange={(e) =>
+                    setCapacity({
+                      ...capacity,
+                      storage: Number(e.target.value),
+                    })
+                  }
                   className={cn(
-                    "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
-                    "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
+                    "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                    "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
                   )}
                   min={1}
                 />
@@ -564,7 +658,10 @@ const ServerSettings = ({ name: id }: { name: string }) => {
 
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
-                <Label htmlFor="server-details" className="text-gray-700 dark:text-gray-300">
+                <Label
+                  htmlFor="server-details"
+                  className="text-gray-700 dark:text-gray-300"
+                >
                   Additional Configuration
                 </Label>
                 <TooltipProvider>
@@ -573,7 +670,10 @@ const ServerSettings = ({ name: id }: { name: string }) => {
                       <HelpCircle className="h-4 w-4 text-gray-500" />
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>Additional server configuration details, requirements, or constraints</p>
+                      <p>
+                        Additional server configuration details, requirements,
+                        or constraints
+                      </p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
@@ -582,15 +682,15 @@ const ServerSettings = ({ name: id }: { name: string }) => {
                 name="server-details"
                 id="server-details"
                 rows={6}
-                placeholder="Example:
+                placeholder={`Example:
 - Specific middleware requirements
 - Security configurations
 - Performance requirements
-- Deployment constraints"
+- Deployment constraints`}
                 className={cn(
-                  "text-md bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
-                  "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600",
-                  "placeholder:text-gray-500 dark:placeholder:text-gray-400"
+                  "text-md border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                  "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+                  "placeholder:text-gray-500 dark:placeholder:text-gray-400",
                 )}
                 value={details}
                 onChange={(e) => setDetails(e.target.value)}
@@ -599,13 +699,16 @@ const ServerSettings = ({ name: id }: { name: string }) => {
           </div>
         ) : (
           <div className="flex flex-col gap-2">
-            <Label htmlFor="free-form" className="text-gray-700 dark:text-gray-300">
+            <Label
+              htmlFor="free-form"
+              className="text-gray-700 dark:text-gray-300"
+            >
               Server Configuration
             </Label>
             <Textarea
               id="free-form"
               rows={20}
-              placeholder="Describe your server configuration here. Example:
+              placeholder={`Describe your server configuration here. Example:
 
 Server Type: Application Server
 Compute Type: General Purpose
@@ -631,11 +734,11 @@ Additional Requirements:
 - Load balancing configuration
 - Security settings
 - Monitoring requirements
-- Deployment constraints"
+- Deployment constraints`}
               className={cn(
-                "text-md bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
-                "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600",
-                "placeholder:text-gray-500 dark:placeholder:text-gray-400"
+                "text-md border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+                "placeholder:text-gray-500 dark:placeholder:text-gray-400",
               )}
               value={freeFormText}
               onChange={(e) => setFreeFormText(e.target.value)}

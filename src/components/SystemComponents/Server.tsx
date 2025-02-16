@@ -40,7 +40,7 @@ export const Server = ({ name, Icon }: ComponentNodeProps) => {
 
 const ServerSettings = ({ name: id }: { name: string }) => {
   const { useSystemComponentConfigSlice } = useSystemDesigner();
-  const [isDetailedMode, setIsDetailedMode] = useState<boolean>(false);
+  const [isFreeText, setIsFreeText] = useState<boolean>(true);
 
   const [serverType, setServerType] = useSystemComponentConfigSlice<string>(
     id,
@@ -160,10 +160,10 @@ const ServerSettings = ({ name: id }: { name: string }) => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Label
-              htmlFor="detailed-mode"
+              htmlFor="free-text-mode"
               className="text-gray-700 dark:text-gray-300"
             >
-              Detailed Configuration
+              Free-form Text
             </Label>
             <TooltipProvider>
               <Tooltip>
@@ -171,22 +171,19 @@ const ServerSettings = ({ name: id }: { name: string }) => {
                   <HelpCircle className="h-4 w-4 text-gray-500" />
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>
-                    Toggle between detailed configuration and free-form text
-                    input
-                  </p>
+                  <p>Toggle between detailed configuration and free-form text input</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
           </div>
           <Switch
-            id="detailed-mode"
-            checked={isDetailedMode}
-            onCheckedChange={setIsDetailedMode}
+            id="free-text-mode"
+            checked={isFreeText}
+            onCheckedChange={setIsFreeText}
           />
         </div>
 
-        {isDetailedMode ? (
+        {!isFreeText ? (
           <div className="grid w-full grid-flow-row grid-cols-1 gap-4 text-gray-800 dark:text-gray-200">
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-2">

@@ -42,7 +42,7 @@ type DbConfig = {
 
 const DatabaseSettings = ({ name: id }: { name: string }) => {
   const { useSystemComponentConfigSlice } = useSystemDesigner();
-  const [isDetailedMode, setIsDetailedMode] = useState(true);
+  const [isFreeText, setIsFreeText] = useState<boolean>(false);
 
   const [dbConfig, setDbConfig] = useSystemComponentConfigSlice<DbConfig>(
     id,
@@ -208,8 +208,8 @@ const DatabaseSettings = ({ name: id }: { name: string }) => {
       <div className="flex flex-col gap-4 w-full">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Label htmlFor="detailed-mode" className="text-gray-700 dark:text-gray-300">
-              Detailed Configuration
+            <Label htmlFor="free-text-mode" className="text-gray-700 dark:text-gray-300">
+              Free-form Text
             </Label>
             <TooltipProvider>
               <Tooltip>
@@ -223,13 +223,13 @@ const DatabaseSettings = ({ name: id }: { name: string }) => {
             </TooltipProvider>
           </div>
           <Switch
-            id="detailed-mode"
-            checked={isDetailedMode}
-            onCheckedChange={setIsDetailedMode}
+            id="free-text-mode"
+            checked={isFreeText}
+            onCheckedChange={setIsFreeText}
           />
         </div>
 
-        {isDetailedMode ? (
+        {!isFreeText ? (
           <Tabs defaultValue="config" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="config">Configuration</TabsTrigger>

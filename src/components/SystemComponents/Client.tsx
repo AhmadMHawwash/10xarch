@@ -280,6 +280,14 @@ const ClientSettings = ({ name: id }: { name: string }) => {
 
         {!isFreeText ? (
           <div className="grid w-full grid-flow-row grid-cols-1 gap-4 text-gray-800 dark:text-gray-200">
+            <div className="rounded-md border border-yellow-200 bg-yellow-50 p-3 dark:border-yellow-900/50 dark:bg-yellow-900/20">
+              <div className="flex items-center gap-2 text-sm text-yellow-800 dark:text-yellow-200">
+                <Small>
+                  Note: Detailed configuration options are still a work in
+                  progress. Options might get added or deleted.
+                </Small>
+              </div>
+            </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2">

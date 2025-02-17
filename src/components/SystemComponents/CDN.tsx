@@ -6,9 +6,20 @@ import { Small } from "../ui/typography";
 import { WithSettings } from "./Wrappers/WithSettings";
 import { useState } from "react";
 import { Input } from "../ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 import { HelpCircle, ExternalLink } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../ui/tooltip";
 import { cn } from "@/lib/utils";
 import { Checkbox } from "../ui/checkbox";
 import { Switch } from "../ui/switch";
@@ -30,89 +41,101 @@ interface FeatureInfo {
 const featureInfoMap: Record<string, FeatureInfo> = {
   "Edge Caching": {
     name: "Edge Caching",
-    description: "Cache content at edge locations closest to users for faster delivery.",
-    learnMoreUrl: "https://docs.example.com/cdn/edge-caching"
+    description:
+      "Cache content at edge locations closest to users for faster delivery.",
+    learnMoreUrl: "https://docs.example.com/cdn/edge-caching",
   },
   "Dynamic Content": {
     name: "Dynamic Content",
-    description: "Cache and serve dynamic content with configurable TTL and invalidation rules.",
-    learnMoreUrl: "https://docs.example.com/cdn/dynamic-content"
+    description:
+      "Cache and serve dynamic content with configurable TTL and invalidation rules.",
+    learnMoreUrl: "https://docs.example.com/cdn/dynamic-content",
   },
   "HTTP/3 Support": {
     name: "HTTP/3 Support",
-    description: "Support for the latest HTTP protocol version for improved performance.",
-    learnMoreUrl: "https://docs.example.com/cdn/http3"
+    description:
+      "Support for the latest HTTP protocol version for improved performance.",
+    learnMoreUrl: "https://docs.example.com/cdn/http3",
   },
   "SSL/TLS": {
     name: "SSL/TLS",
     description: "Secure content delivery with modern SSL/TLS encryption.",
-    learnMoreUrl: "https://docs.example.com/cdn/ssl-tls"
+    learnMoreUrl: "https://docs.example.com/cdn/ssl-tls",
   },
   "DDoS Protection": {
     name: "DDoS Protection",
-    description: "Built-in protection against distributed denial of service attacks.",
-    learnMoreUrl: "https://docs.example.com/cdn/ddos-protection"
+    description:
+      "Built-in protection against distributed denial of service attacks.",
+    learnMoreUrl: "https://docs.example.com/cdn/ddos-protection",
   },
   "Origin Shield": {
     name: "Origin Shield",
     description: "Additional caching layer to reduce load on origin servers.",
-    learnMoreUrl: "https://docs.example.com/cdn/origin-shield"
+    learnMoreUrl: "https://docs.example.com/cdn/origin-shield",
   },
   "Smart Purging": {
     name: "Smart Purging",
-    description: "Selectively invalidate cached content based on tags or patterns.",
-    learnMoreUrl: "https://docs.example.com/cdn/smart-purging"
+    description:
+      "Selectively invalidate cached content based on tags or patterns.",
+    learnMoreUrl: "https://docs.example.com/cdn/smart-purging",
   },
   "Real-time Analytics": {
     name: "Real-time Analytics",
     description: "Monitor CDN performance and usage in real-time.",
-    learnMoreUrl: "https://docs.example.com/cdn/analytics"
+    learnMoreUrl: "https://docs.example.com/cdn/analytics",
   },
   "Image Optimization": {
     name: "Image Optimization",
-    description: "Automatically optimize and transform images for different devices.",
-    learnMoreUrl: "https://docs.example.com/cdn/image-optimization"
+    description:
+      "Automatically optimize and transform images for different devices.",
+    learnMoreUrl: "https://docs.example.com/cdn/image-optimization",
   },
   "Video Streaming": {
     name: "Video Streaming",
-    description: "Optimized delivery of streaming video content with adaptive bitrate.",
-    learnMoreUrl: "https://docs.example.com/cdn/video-streaming"
-  }
+    description:
+      "Optimized delivery of streaming video content with adaptive bitrate.",
+    learnMoreUrl: "https://docs.example.com/cdn/video-streaming",
+  },
 };
 
 const configInfoMap: Record<string, FeatureInfo> = {
   "Free-form Text Mode": {
     name: "Free-form Text Mode",
-    description: "Toggle between detailed configuration and free-form text input. Free-form text allows you to describe your CDN configuration in a more natural way.",
-    learnMoreUrl: "https://docs.example.com/cdn-configuration"
+    description:
+      "Toggle between detailed configuration and free-form text input. Free-form text allows you to describe your CDN configuration in a more natural way.",
+    learnMoreUrl: "https://docs.example.com/cdn-configuration",
   },
   "CDN Type": {
     name: "CDN Type",
-    description: "The type of CDN service to use. Different types are optimized for different content delivery needs.",
-    learnMoreUrl: "https://docs.example.com/cdn-types"
+    description:
+      "The type of CDN service to use. Different types are optimized for different content delivery needs.",
+    learnMoreUrl: "https://docs.example.com/cdn-types",
   },
-  "Storage": {
+  Storage: {
     name: "Storage",
-    description: "Total storage capacity for cached content across all edge locations.",
-    learnMoreUrl: "https://docs.example.com/cdn-storage"
+    description:
+      "Total storage capacity for cached content across all edge locations.",
+    learnMoreUrl: "https://docs.example.com/cdn-storage",
   },
-  "Bandwidth": {
+  Bandwidth: {
     name: "Bandwidth",
-    description: "Total bandwidth capacity for content delivery across the CDN network.",
-    learnMoreUrl: "https://docs.example.com/cdn-bandwidth"
+    description:
+      "Total bandwidth capacity for content delivery across the CDN network.",
+    learnMoreUrl: "https://docs.example.com/cdn-bandwidth",
   },
   "Edge Locations": {
     name: "Edge Locations",
-    description: "Number of geographic locations where content is cached for faster delivery.",
-    learnMoreUrl: "https://docs.example.com/cdn-edge-locations"
-  }
+    description:
+      "Number of geographic locations where content is cached for faster delivery.",
+    learnMoreUrl: "https://docs.example.com/cdn-edge-locations",
+  },
 };
 
 const InfoPopup = ({ feature }: { feature: FeatureInfo }) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+        <div className="cursor-help rounded-full p-1 transition-colors duration-200 hover:bg-gray-200 dark:hover:bg-gray-700">
           <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
         </div>
       </DialogTrigger>
@@ -140,9 +163,11 @@ const InfoPopup = ({ feature }: { feature: FeatureInfo }) => {
 
 export const CDN = ({ name, Icon }: ComponentNodeProps) => {
   return (
-    <div className="relative flex flex-col items-center text-gray-800 dark:text-gray-200 group">
+    <div className="group relative flex flex-col items-center text-gray-800 dark:text-gray-200">
       <div className="relative flex items-center gap-1">
-        {Icon && <Icon size={20} className="text-gray-700 dark:text-gray-300" />}
+        {Icon && (
+          <Icon size={20} className="text-gray-700 dark:text-gray-300" />
+        )}
         <Small>{name}</Small>
       </div>
       <CDNSettings name={name} />
@@ -157,7 +182,7 @@ const CDNSettings = ({ name: id }: { name: string }) => {
   const [cdnType, setCdnType] = useSystemComponentConfigSlice<string>(
     id,
     "cdn_type",
-    "public"
+    "public",
   );
 
   const [capacity, setCapacity] = useSystemComponentConfigSlice<{
@@ -167,25 +192,25 @@ const CDNSettings = ({ name: id }: { name: string }) => {
   }>(id, "capacity", {
     storage: 1000,
     bandwidth: 1000,
-    edgeLocations: 10
+    edgeLocations: 10,
   });
 
   const [features, setFeatures] = useSystemComponentConfigSlice<string[]>(
     id,
     "features",
-    []
+    [],
   );
 
   const [details, setDetails] = useSystemComponentConfigSlice<string>(
     id,
     "details",
-    ""
+    "",
   );
 
   const [freeFormText, setFreeFormText] = useSystemComponentConfigSlice<string>(
     id,
     "free_form_text",
-    ""
+    "",
   );
 
   const availableFeatures = [
@@ -198,15 +223,18 @@ const CDNSettings = ({ name: id }: { name: string }) => {
     "Smart Purging",
     "Real-time Analytics",
     "Image Optimization",
-    "Video Streaming"
+    "Video Streaming",
   ];
 
   return (
     <WithSettings name={id}>
-      <div className="flex flex-col gap-4 w-full">
+      <div className="flex w-full flex-col gap-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Label htmlFor="free-text-mode" className="text-gray-700 dark:text-gray-300">
+            <Label
+              htmlFor="free-text-mode"
+              className="text-gray-700 dark:text-gray-300"
+            >
               Free-form Text
             </Label>
             {configInfoMap["Free-form Text Mode"] && (
@@ -222,9 +250,20 @@ const CDNSettings = ({ name: id }: { name: string }) => {
 
         {!isFreeText ? (
           <div className="grid w-full grid-flow-row grid-cols-1 gap-4 text-gray-800 dark:text-gray-200">
+            <div className="rounded-md border border-yellow-200 bg-yellow-50 p-3 dark:border-yellow-900/50 dark:bg-yellow-900/20">
+              <div className="flex items-center gap-2 text-sm text-yellow-800 dark:text-yellow-200">
+                <Small>
+                  Note: Detailed configuration options are still a work in
+                  progress. Options might get added or deleted.
+                </Small>
+              </div>
+            </div>
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
-                <Label htmlFor="cdn-type" className="text-gray-700 dark:text-gray-300">
+                <Label
+                  htmlFor="cdn-type"
+                  className="text-gray-700 dark:text-gray-300"
+                >
                   CDN Type
                 </Label>
                 {configInfoMap["CDN Type"] && (
@@ -232,10 +271,12 @@ const CDNSettings = ({ name: id }: { name: string }) => {
                 )}
               </div>
               <Select value={cdnType} onValueChange={setCdnType}>
-                <SelectTrigger className={cn(
-                  "w-full bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
-                  "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
-                )}>
+                <SelectTrigger
+                  className={cn(
+                    "w-full border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                    "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+                  )}
+                >
                   <SelectValue placeholder="Select CDN type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -250,7 +291,10 @@ const CDNSettings = ({ name: id }: { name: string }) => {
             <div className="grid grid-cols-3 gap-4">
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2">
-                  <Label htmlFor="storage" className="text-gray-700 dark:text-gray-300">
+                  <Label
+                    htmlFor="storage"
+                    className="text-gray-700 dark:text-gray-300"
+                  >
                     Storage (TB)
                   </Label>
                   {configInfoMap.Storage && (
@@ -261,10 +305,15 @@ const CDNSettings = ({ name: id }: { name: string }) => {
                   type="number"
                   id="storage"
                   value={capacity.storage}
-                  onChange={(e) => setCapacity({ ...capacity, storage: Number(e.target.value) })}
+                  onChange={(e) =>
+                    setCapacity({
+                      ...capacity,
+                      storage: Number(e.target.value),
+                    })
+                  }
                   className={cn(
-                    "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
-                    "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
+                    "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                    "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
                   )}
                   min={100}
                   step={100}
@@ -273,7 +322,10 @@ const CDNSettings = ({ name: id }: { name: string }) => {
 
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2">
-                  <Label htmlFor="bandwidth" className="text-gray-700 dark:text-gray-300">
+                  <Label
+                    htmlFor="bandwidth"
+                    className="text-gray-700 dark:text-gray-300"
+                  >
                     Bandwidth (Gbps)
                   </Label>
                   {configInfoMap.Bandwidth && (
@@ -284,10 +336,15 @@ const CDNSettings = ({ name: id }: { name: string }) => {
                   type="number"
                   id="bandwidth"
                   value={capacity.bandwidth}
-                  onChange={(e) => setCapacity({ ...capacity, bandwidth: Number(e.target.value) })}
+                  onChange={(e) =>
+                    setCapacity({
+                      ...capacity,
+                      bandwidth: Number(e.target.value),
+                    })
+                  }
                   className={cn(
-                    "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
-                    "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
+                    "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                    "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
                   )}
                   min={100}
                   step={100}
@@ -296,7 +353,10 @@ const CDNSettings = ({ name: id }: { name: string }) => {
 
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2">
-                  <Label htmlFor="edge-locations" className="text-gray-700 dark:text-gray-300">
+                  <Label
+                    htmlFor="edge-locations"
+                    className="text-gray-700 dark:text-gray-300"
+                  >
                     Edge Locations
                   </Label>
                   {configInfoMap["Edge Locations"] && (
@@ -307,17 +367,22 @@ const CDNSettings = ({ name: id }: { name: string }) => {
                   type="number"
                   id="edge-locations"
                   value={capacity.edgeLocations}
-                  onChange={(e) => setCapacity({ ...capacity, edgeLocations: Number(e.target.value) })}
+                  onChange={(e) =>
+                    setCapacity({
+                      ...capacity,
+                      edgeLocations: Number(e.target.value),
+                    })
+                  }
                   className={cn(
-                    "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
-                    "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
+                    "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                    "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
                   )}
                   min={1}
                 />
               </div>
             </div>
 
-              {/* 
+            {/* 
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
                 <Label className="text-gray-700 dark:text-gray-300">
@@ -359,11 +424,16 @@ const CDNSettings = ({ name: id }: { name: string }) => {
 
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
-                <Label htmlFor="cdn-details" className="text-gray-700 dark:text-gray-300">
+                <Label
+                  htmlFor="cdn-details"
+                  className="text-gray-700 dark:text-gray-300"
+                >
                   Additional Configuration
                 </Label>
                 {configInfoMap["Additional Configuration"] && (
-                  <InfoPopup feature={configInfoMap["Additional Configuration"]} />
+                  <InfoPopup
+                    feature={configInfoMap["Additional Configuration"]}
+                  />
                 )}
               </div>
               <Textarea
@@ -378,9 +448,9 @@ const CDNSettings = ({ name: id }: { name: string }) => {
 - Content optimization settings
 - Geographic restrictions`}
                 className={cn(
-                  "text-md bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
-                  "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600",
-                  "placeholder:text-gray-500 dark:placeholder:text-gray-400"
+                  "text-md border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                  "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+                  "placeholder:text-gray-500 dark:placeholder:text-gray-400",
                 )}
                 value={details}
                 onChange={(e) => setDetails(e.target.value)}
@@ -389,7 +459,10 @@ const CDNSettings = ({ name: id }: { name: string }) => {
           </div>
         ) : (
           <div className="flex flex-col gap-2">
-            <Label htmlFor="free-form" className="text-gray-700 dark:text-gray-300">
+            <Label
+              htmlFor="free-form"
+              className="text-gray-700 dark:text-gray-300"
+            >
               CDN Configuration
             </Label>
             <Textarea
@@ -422,9 +495,9 @@ Additional Requirements:
 - Content optimization settings
 - Geographic restrictions`}
               className={cn(
-                "text-md bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
-                "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600",
-                "placeholder:text-gray-500 dark:placeholder:text-gray-400"
+                "text-md border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+                "placeholder:text-gray-500 dark:placeholder:text-gray-400",
               )}
               value={freeFormText}
               onChange={(e) => setFreeFormText(e.target.value)}

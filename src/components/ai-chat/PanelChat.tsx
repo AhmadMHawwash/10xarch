@@ -97,11 +97,11 @@ export function PanelChat() {
         variant="outline"
         size="sm"
         onClick={() => setIsPanelOpen(true)}
-        className={`flex items-center gap-2 rounded-full bg-background/95 px-4 py-2 shadow-lg relative backdrop-blur supports-[backdrop-filter]:bg-background/60 ${
+        className={`flex items-center gap-2 rounded-full bg-background/95 px-6 py-6 shadow-lg relative backdrop-blur supports-[backdrop-filter]:bg-background/60 ${
           !isPanelOpen && !isDialogOpen ? "animate-pulse-ring" : ""
         }`}
       >
-        <Bot className={`h-7 w-7`} />
+        <Bot className={`h-8 w-8`} />
       </Button>
     </div>
   );

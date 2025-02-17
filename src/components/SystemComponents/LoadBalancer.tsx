@@ -7,11 +7,131 @@ import { WithSettings } from "./Wrappers/WithSettings";
 import { useState } from "react";
 import { Input } from "../ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import { HelpCircle } from "lucide-react";
+import { HelpCircle, ExternalLink } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import { cn } from "@/lib/utils";
 import { Checkbox } from "../ui/checkbox";
 import { Switch } from "../ui/switch";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../ui/dialog";
+
+interface FeatureInfo {
+  name: string;
+  description: string;
+  learnMoreUrl?: string;
+}
+
+const featureInfoMap: Record<string, FeatureInfo> = {
+  "SSL Termination": {
+    name: "SSL Termination",
+    description: "Handle SSL/TLS encryption and decryption at the load balancer level.",
+    learnMoreUrl: "https://docs.example.com/load-balancer/ssl-termination"
+  },
+  "Session Persistence": {
+    name: "Session Persistence",
+    description: "Ensure requests from the same client are routed to the same server.",
+    learnMoreUrl: "https://docs.example.com/load-balancer/session-persistence"
+  },
+  "Health Checks": {
+    name: "Health Checks",
+    description: "Monitor backend server health and automatically remove unhealthy servers.",
+    learnMoreUrl: "https://docs.example.com/load-balancer/health-checks"
+  },
+  "Rate Limiting": {
+    name: "Rate Limiting",
+    description: "Control the rate of incoming requests to prevent overload.",
+    learnMoreUrl: "https://docs.example.com/load-balancer/rate-limiting"
+  },
+  "Request Routing": {
+    name: "Request Routing",
+    description: "Route requests based on URL, headers, or other criteria.",
+    learnMoreUrl: "https://docs.example.com/load-balancer/request-routing"
+  },
+  "Connection Draining": {
+    name: "Connection Draining",
+    description: "Gracefully remove servers from the pool during maintenance.",
+    learnMoreUrl: "https://docs.example.com/load-balancer/connection-draining"
+  },
+  "DDoS Protection": {
+    name: "DDoS Protection",
+    description: "Protect against distributed denial of service attacks.",
+    learnMoreUrl: "https://docs.example.com/load-balancer/ddos-protection"
+  },
+  "WAF Integration": {
+    name: "WAF Integration",
+    description: "Integrate with Web Application Firewall for enhanced security.",
+    learnMoreUrl: "https://docs.example.com/load-balancer/waf-integration"
+  }
+};
+
+const configInfoMap: Record<string, FeatureInfo> = {
+  "Free-form Text Mode": {
+    name: "Free-form Text Mode",
+    description: "Toggle between detailed configuration and free-form text input. Free-form text allows you to describe your load balancer configuration in a more natural way.",
+    learnMoreUrl: "https://docs.example.com/lb-configuration"
+  },
+  "Load Balancing Algorithm": {
+    name: "Load Balancing Algorithm",
+    description: "The method used to distribute traffic across backend servers. Different algorithms are suited for different workload patterns.",
+    learnMoreUrl: "https://docs.example.com/lb-algorithms"
+  },
+  "Max Connections": {
+    name: "Max Connections",
+    description: "Maximum number of concurrent connections the load balancer can handle.",
+    learnMoreUrl: "https://docs.example.com/lb-connections"
+  },
+  "Throughput": {
+    name: "Throughput",
+    description: "Maximum number of requests per second the load balancer can process.",
+    learnMoreUrl: "https://docs.example.com/lb-throughput"
+  },
+  "Features": {
+    name: "Features",
+    description: "Additional capabilities and features that can be enabled for this load balancer. These may include SSL termination, session persistence, health checks, and more.",
+    learnMoreUrl: "https://docs.example.com/load-balancer/features"
+  },
+  "Additional Configuration": {
+    name: "Additional Configuration",
+    description: "Additional load balancer configuration, requirements, or constraints specific to your use case.",
+    learnMoreUrl: "https://docs.example.com/load-balancer/additional-config"
+  }
+};
+
+const InfoPopup = ({ feature }: { feature: FeatureInfo }) => {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+          <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+        </div>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>{feature.name}</DialogTitle>
+          <DialogDescription className="space-y-4">
+            <p>{feature.description}</p>
+            {feature.learnMoreUrl && (
+              <a
+                href={feature.learnMoreUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300"
+              >
+                Learn more <ExternalLink className="h-4 w-4" />
+              </a>
+            )}
+          </DialogDescription>
+        </DialogHeader>
+      </DialogContent>
+    </Dialog>
+  );
+};
 
 export const LoadBalancer = ({ name, Icon }: ComponentNodeProps) => {
   return (
@@ -78,18 +198,9 @@ const LoadBalancerSettings = ({ name: id }: { name: string }) => {
             <Label htmlFor="free-text-mode" className="text-gray-700 dark:text-gray-300">
               Free-form Text
             </Label>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                    <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Toggle between detailed configuration and free-form text input</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            {configInfoMap["Free-form Text Mode"] && (
+              <InfoPopup feature={configInfoMap["Free-form Text Mode"]} />
+            )}
           </div>
           <Switch
             id="free-text-mode"
@@ -100,23 +211,20 @@ const LoadBalancerSettings = ({ name: id }: { name: string }) => {
 
         {!isFreeText ? (
           <div className="grid w-full grid-flow-row grid-cols-1 gap-4 text-gray-800 dark:text-gray-200">
+            <div className="rounded-md border border-yellow-200 bg-yellow-50 p-3 dark:border-yellow-900/50 dark:bg-yellow-900/20">
+              <div className="flex items-center gap-2 text-sm text-yellow-800 dark:text-yellow-200">
+                <Small>Note: Detailed configuration options are still a work in progress. More options and features will be added soon.</Small>
+              </div>
+            </div>
+
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
                 <Label htmlFor="algorithm" className="text-gray-700 dark:text-gray-300">
                   Load Balancing Algorithm
                 </Label>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                        <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>The algorithm used to distribute traffic across servers</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                {configInfoMap["Load Balancing Algorithm"] && (
+                  <InfoPopup feature={configInfoMap["Load Balancing Algorithm"]} />
+                )}
               </div>
               <Select value={algorithm} onValueChange={setAlgorithm}>
                 <SelectTrigger className={cn(
@@ -141,18 +249,9 @@ const LoadBalancerSettings = ({ name: id }: { name: string }) => {
                   <Label htmlFor="max-connections" className="text-gray-700 dark:text-gray-300">
                     Max Connections
                   </Label>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                          <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Maximum number of concurrent connections</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                  {configInfoMap["Max Connections"] && (
+                    <InfoPopup feature={configInfoMap["Max Connections"]} />
+                  )}
                 </div>
                 <Input
                   type="number"
@@ -173,18 +272,9 @@ const LoadBalancerSettings = ({ name: id }: { name: string }) => {
                   <Label htmlFor="throughput" className="text-gray-700 dark:text-gray-300">
                     Throughput (req/s)
                   </Label>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                          <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Requests per second the load balancer can handle</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                  {configInfoMap.Throughput && (
+                    <InfoPopup feature={configInfoMap.Throughput} />
+                  )}
                 </div>
                 <Input
                   type="number"
@@ -201,23 +291,15 @@ const LoadBalancerSettings = ({ name: id }: { name: string }) => {
               </div>
             </div>
 
+              {/*
             <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-2">
+               <div className="flex items-center gap-2">
                 <Label className="text-gray-700 dark:text-gray-300">
                   Features
                 </Label>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                        <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Load balancer capabilities and features</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                {configInfoMap.Features && (
+                  <InfoPopup feature={configInfoMap.Features} />
+                )}
               </div>
               <div className="grid grid-cols-2 gap-2">
                 {availableFeatures.map((feature) => (
@@ -240,28 +322,23 @@ const LoadBalancerSettings = ({ name: id }: { name: string }) => {
                     >
                       {feature}
                     </Label>
+                    {featureInfoMap[feature] && (
+                      <InfoPopup feature={featureInfoMap[feature]} />
+                    )}
                   </div>
                 ))}
               </div>
             </div>
+               */}
 
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
                 <Label htmlFor="loadbalancer-details" className="text-gray-700 dark:text-gray-300">
                   Additional Configuration
                 </Label>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                        <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Additional load balancer configuration, policies, or requirements</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                {configInfoMap["Additional Configuration"] && (
+                  <InfoPopup feature={configInfoMap["Additional Configuration"]} />
+                )}
               </div>
               <Textarea
                 name="loadbalancer-details"

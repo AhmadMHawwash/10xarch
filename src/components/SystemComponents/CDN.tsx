@@ -7,11 +7,136 @@ import { WithSettings } from "./Wrappers/WithSettings";
 import { useState } from "react";
 import { Input } from "../ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import { HelpCircle } from "lucide-react";
+import { HelpCircle, ExternalLink } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import { cn } from "@/lib/utils";
 import { Checkbox } from "../ui/checkbox";
 import { Switch } from "../ui/switch";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../ui/dialog";
+
+interface FeatureInfo {
+  name: string;
+  description: string;
+  learnMoreUrl?: string;
+}
+
+const featureInfoMap: Record<string, FeatureInfo> = {
+  "Edge Caching": {
+    name: "Edge Caching",
+    description: "Cache content at edge locations closest to users for faster delivery.",
+    learnMoreUrl: "https://docs.example.com/cdn/edge-caching"
+  },
+  "Dynamic Content": {
+    name: "Dynamic Content",
+    description: "Cache and serve dynamic content with configurable TTL and invalidation rules.",
+    learnMoreUrl: "https://docs.example.com/cdn/dynamic-content"
+  },
+  "HTTP/3 Support": {
+    name: "HTTP/3 Support",
+    description: "Support for the latest HTTP protocol version for improved performance.",
+    learnMoreUrl: "https://docs.example.com/cdn/http3"
+  },
+  "SSL/TLS": {
+    name: "SSL/TLS",
+    description: "Secure content delivery with modern SSL/TLS encryption.",
+    learnMoreUrl: "https://docs.example.com/cdn/ssl-tls"
+  },
+  "DDoS Protection": {
+    name: "DDoS Protection",
+    description: "Built-in protection against distributed denial of service attacks.",
+    learnMoreUrl: "https://docs.example.com/cdn/ddos-protection"
+  },
+  "Origin Shield": {
+    name: "Origin Shield",
+    description: "Additional caching layer to reduce load on origin servers.",
+    learnMoreUrl: "https://docs.example.com/cdn/origin-shield"
+  },
+  "Smart Purging": {
+    name: "Smart Purging",
+    description: "Selectively invalidate cached content based on tags or patterns.",
+    learnMoreUrl: "https://docs.example.com/cdn/smart-purging"
+  },
+  "Real-time Analytics": {
+    name: "Real-time Analytics",
+    description: "Monitor CDN performance and usage in real-time.",
+    learnMoreUrl: "https://docs.example.com/cdn/analytics"
+  },
+  "Image Optimization": {
+    name: "Image Optimization",
+    description: "Automatically optimize and transform images for different devices.",
+    learnMoreUrl: "https://docs.example.com/cdn/image-optimization"
+  },
+  "Video Streaming": {
+    name: "Video Streaming",
+    description: "Optimized delivery of streaming video content with adaptive bitrate.",
+    learnMoreUrl: "https://docs.example.com/cdn/video-streaming"
+  }
+};
+
+const configInfoMap: Record<string, FeatureInfo> = {
+  "Free-form Text Mode": {
+    name: "Free-form Text Mode",
+    description: "Toggle between detailed configuration and free-form text input. Free-form text allows you to describe your CDN configuration in a more natural way.",
+    learnMoreUrl: "https://docs.example.com/cdn-configuration"
+  },
+  "CDN Type": {
+    name: "CDN Type",
+    description: "The type of CDN service to use. Different types are optimized for different content delivery needs.",
+    learnMoreUrl: "https://docs.example.com/cdn-types"
+  },
+  "Storage": {
+    name: "Storage",
+    description: "Total storage capacity for cached content across all edge locations.",
+    learnMoreUrl: "https://docs.example.com/cdn-storage"
+  },
+  "Bandwidth": {
+    name: "Bandwidth",
+    description: "Total bandwidth capacity for content delivery across the CDN network.",
+    learnMoreUrl: "https://docs.example.com/cdn-bandwidth"
+  },
+  "Edge Locations": {
+    name: "Edge Locations",
+    description: "Number of geographic locations where content is cached for faster delivery.",
+    learnMoreUrl: "https://docs.example.com/cdn-edge-locations"
+  }
+};
+
+const InfoPopup = ({ feature }: { feature: FeatureInfo }) => {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+          <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+        </div>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>{feature.name}</DialogTitle>
+          <DialogDescription className="space-y-4">
+            <p>{feature.description}</p>
+            {feature.learnMoreUrl && (
+              <a
+                href={feature.learnMoreUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300"
+              >
+                Learn more <ExternalLink className="h-4 w-4" />
+              </a>
+            )}
+          </DialogDescription>
+        </DialogHeader>
+      </DialogContent>
+    </Dialog>
+  );
+};
 
 export const CDN = ({ name, Icon }: ComponentNodeProps) => {
   return (
@@ -65,13 +190,15 @@ const CDNSettings = ({ name: id }: { name: string }) => {
 
   const availableFeatures = [
     "Edge Caching",
-    "Origin Shield",
-    "Dynamic Compression",
+    "Dynamic Content",
     "HTTP/3 Support",
+    "SSL/TLS",
+    "DDoS Protection",
+    "Origin Shield",
     "Smart Purging",
-    "Geo-routing",
-    "Media Optimization",
-    "Access Control"
+    "Real-time Analytics",
+    "Image Optimization",
+    "Video Streaming"
   ];
 
   return (
@@ -82,18 +209,9 @@ const CDNSettings = ({ name: id }: { name: string }) => {
             <Label htmlFor="free-text-mode" className="text-gray-700 dark:text-gray-300">
               Free-form Text
             </Label>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                    <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Toggle between detailed configuration and free-form text input</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            {configInfoMap["Free-form Text Mode"] && (
+              <InfoPopup feature={configInfoMap["Free-form Text Mode"]} />
+            )}
           </div>
           <Switch
             id="free-text-mode"
@@ -109,18 +227,9 @@ const CDNSettings = ({ name: id }: { name: string }) => {
                 <Label htmlFor="cdn-type" className="text-gray-700 dark:text-gray-300">
                   CDN Type
                 </Label>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                        <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>The type of CDN service to use</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                {configInfoMap["CDN Type"] && (
+                  <InfoPopup feature={configInfoMap["CDN Type"]} />
+                )}
               </div>
               <Select value={cdnType} onValueChange={setCdnType}>
                 <SelectTrigger className={cn(
@@ -144,18 +253,9 @@ const CDNSettings = ({ name: id }: { name: string }) => {
                   <Label htmlFor="storage" className="text-gray-700 dark:text-gray-300">
                     Storage (TB)
                   </Label>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                          <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Total storage capacity in terabytes</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                  {configInfoMap.Storage && (
+                    <InfoPopup feature={configInfoMap.Storage} />
+                  )}
                 </div>
                 <Input
                   type="number"
@@ -176,18 +276,9 @@ const CDNSettings = ({ name: id }: { name: string }) => {
                   <Label htmlFor="bandwidth" className="text-gray-700 dark:text-gray-300">
                     Bandwidth (Gbps)
                   </Label>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                          <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Total bandwidth capacity in gigabits per second</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                  {configInfoMap.Bandwidth && (
+                    <InfoPopup feature={configInfoMap.Bandwidth} />
+                  )}
                 </div>
                 <Input
                   type="number"
@@ -208,18 +299,9 @@ const CDNSettings = ({ name: id }: { name: string }) => {
                   <Label htmlFor="edge-locations" className="text-gray-700 dark:text-gray-300">
                     Edge Locations
                   </Label>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                          <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Number of edge locations/Points of Presence (PoP)</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                  {configInfoMap["Edge Locations"] && (
+                    <InfoPopup feature={configInfoMap["Edge Locations"]} />
+                  )}
                 </div>
                 <Input
                   type="number"
@@ -235,23 +317,15 @@ const CDNSettings = ({ name: id }: { name: string }) => {
               </div>
             </div>
 
+              {/* 
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
                 <Label className="text-gray-700 dark:text-gray-300">
                   Features
                 </Label>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                        <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>CDN capabilities and features</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                {configInfoMap.Features && (
+                  <InfoPopup feature={configInfoMap.Features} />
+                )}
               </div>
               <div className="grid grid-cols-2 gap-2">
                 {availableFeatures.map((feature) => (
@@ -274,28 +348,23 @@ const CDNSettings = ({ name: id }: { name: string }) => {
                     >
                       {feature}
                     </Label>
+                    {featureInfoMap[feature] && (
+                      <InfoPopup feature={featureInfoMap[feature]} />
+                    )}
                   </div>
                 ))}
               </div>
             </div>
+               */}
 
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
                 <Label htmlFor="cdn-details" className="text-gray-700 dark:text-gray-300">
                   Additional Configuration
                 </Label>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                        <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Additional CDN configuration, policies, or requirements</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                {configInfoMap["Additional Configuration"] && (
+                  <InfoPopup feature={configInfoMap["Additional Configuration"]} />
+                )}
               </div>
               <Textarea
                 name="cdn-details"

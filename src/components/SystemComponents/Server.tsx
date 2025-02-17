@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { HelpCircle } from "lucide-react";
+import { HelpCircle, ExternalLink } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -23,6 +23,131 @@ import {
 import { cn } from "@/lib/utils";
 import { Checkbox } from "../ui/checkbox";
 import { Switch } from "../ui/switch";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../ui/dialog";
+
+interface FeatureInfo {
+  name: string;
+  description: string;
+  learnMoreUrl?: string;
+}
+
+const featureInfoMap: Record<string, FeatureInfo> = {
+  "Health monitoring": {
+    name: "Health Monitoring",
+    description: "Monitor server health metrics, uptime, and performance indicators to ensure optimal operation.",
+    learnMoreUrl: "https://docs.example.com/server-features/health-monitoring"
+  },
+  "Fault tolerance": {
+    name: "Fault Tolerance",
+    description: "Implement mechanisms to handle and recover from various types of failures without service interruption.",
+    learnMoreUrl: "https://docs.example.com/server-features/fault-tolerance"
+  },
+  "Logging & Monitoring": {
+    name: "Logging & Monitoring",
+    description: "Comprehensive logging and monitoring capabilities for debugging, auditing, and performance analysis.",
+    learnMoreUrl: "https://docs.example.com/server-features/logging-monitoring"
+  },
+  "Backup & Restore": {
+    name: "Backup & Restore",
+    description: "Regular backup of server data and configuration with quick restore capabilities.",
+    learnMoreUrl: "https://docs.example.com/server-features/backup-restore"
+  },
+  "Request rate limiting": {
+    name: "Request Rate Limiting",
+    description: "Control the rate of incoming requests to prevent server overload and ensure fair resource allocation.",
+    learnMoreUrl: "https://docs.example.com/server-features/rate-limiting"
+  },
+  "Database connection pooling": {
+    name: "Database Connection Pooling",
+    description: "Efficiently manage database connections to improve performance and resource utilization.",
+    learnMoreUrl: "https://docs.example.com/server-features/connection-pooling"
+  },
+  "Session management": {
+    name: "Session Management",
+    description: "Handle user sessions securely and efficiently across multiple server instances.",
+    learnMoreUrl: "https://docs.example.com/server-features/session-management"
+  },
+  "Application caching": {
+    name: "Application Caching",
+    description: "Cache frequently accessed data to reduce database load and improve response times.",
+    learnMoreUrl: "https://docs.example.com/server-features/application-caching"
+  }
+};
+
+const configInfoMap: Record<string, FeatureInfo> = {
+  "Free-form Text Mode": {
+    name: "Free-form Text Mode",
+    description: "Toggle between detailed configuration and free-form text input. Free-form text allows you to describe your server configuration in a more natural way, while detailed configuration provides structured input fields.",
+    learnMoreUrl: "https://docs.example.com/server-configuration"
+  },
+  "Server Type": {
+    name: "Server Type",
+    description: "The primary purpose and role of this server in your system architecture. Different server types are optimized for different workloads and use cases.",
+    learnMoreUrl: "https://docs.example.com/server-types"
+  },
+  "Compute Type": {
+    name: "Compute Type",
+    description: "The type of compute resources optimized for this server. Choose based on your workload requirements: general purpose for balanced performance, compute optimized for CPU-intensive tasks, memory optimized for large datasets, or storage optimized for I/O operations.",
+    learnMoreUrl: "https://docs.example.com/compute-types"
+  },
+  "Scaling Configuration": {
+    name: "Scaling Configuration",
+    description: "Configure how your server scales to handle varying workloads. Set up high availability with multiple instances and define auto-scaling rules based on metrics like CPU utilization or request count.",
+    learnMoreUrl: "https://docs.example.com/server-scaling"
+  },
+  "CPU": {
+    name: "CPU",
+    description: "The number of CPU cores available for this server. More cores generally mean better performance for multi-threaded applications.",
+    learnMoreUrl: "https://docs.example.com/server-configuration#cpu"
+  },
+  "Memory": {
+    name: "Memory",
+    description: "The amount of RAM available for this server. More memory generally means better performance for applications that require a lot of random access memory (RAM).",
+    learnMoreUrl: "https://docs.example.com/server-configuration#memory"
+  },
+  "Storage": {
+    name: "Storage",
+    description: "The total amount of storage available for this server. Storage is used for data, logs, and other server files. More storage generally means you can store more data and files.",
+    learnMoreUrl: "https://docs.example.com/server-configuration#storage"
+  }
+};
+
+const InfoPopup = ({ feature }: { feature: FeatureInfo }) => {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+          <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+        </div>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>{feature.name}</DialogTitle>
+          <DialogDescription className="space-y-4">
+            <p>{feature.description}</p>
+            {feature.learnMoreUrl && (
+              <a
+                href={feature.learnMoreUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300"
+              >
+                Learn more <ExternalLink className="h-4 w-4" />
+              </a>
+            )}
+          </DialogDescription>
+        </DialogHeader>
+      </DialogContent>
+    </Dialog>
+  );
+};
 
 export const Server = ({ name, Icon }: ComponentNodeProps) => {
   return (
@@ -165,18 +290,9 @@ const ServerSettings = ({ name: id }: { name: string }) => {
             >
               Free-form Text
             </Label>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                    <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Toggle between detailed configuration and free-form text input</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            {configInfoMap["Free-form Text Mode"] && (
+              <InfoPopup feature={configInfoMap["Free-form Text Mode"]} />
+            )}
           </div>
           <Switch
             id="free-text-mode"
@@ -187,6 +303,12 @@ const ServerSettings = ({ name: id }: { name: string }) => {
 
         {!isFreeText ? (
           <div className="grid w-full grid-flow-row grid-cols-1 gap-4 text-gray-800 dark:text-gray-200">
+            <div className="rounded-md border border-yellow-200 bg-yellow-50 p-3 dark:border-yellow-900/50 dark:bg-yellow-900/20">
+              <div className="flex items-center gap-2 text-sm text-yellow-800 dark:text-yellow-200">
+                <Small>Note: Detailed configuration options are still a work in progress. More options and features will be added soon.</Small>
+              </div>
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2">
@@ -196,18 +318,9 @@ const ServerSettings = ({ name: id }: { name: string }) => {
                   >
                     Server Type
                   </Label>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                          <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>The primary purpose of this server in the system</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                  {configInfoMap["Server Type"] && (
+                    <InfoPopup feature={configInfoMap["Server Type"]} />
+                  )}
                 </div>
                 <Select value={serverType} onValueChange={setServerType}>
                   <SelectTrigger
@@ -240,21 +353,9 @@ const ServerSettings = ({ name: id }: { name: string }) => {
                   >
                     Compute Type
                   </Label>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                          <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>
-                          The type of compute resources optimized for this
-                          server
-                        </p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                  {configInfoMap["Compute Type"] && (
+                    <InfoPopup feature={configInfoMap["Compute Type"]} />
+                  )}
                 </div>
                 <Select value={computeType} onValueChange={setComputeType}>
                   <SelectTrigger
@@ -280,18 +381,9 @@ const ServerSettings = ({ name: id }: { name: string }) => {
                 <Label className="text-gray-700 dark:text-gray-300">
                   Scaling Configuration
                 </Label>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                        <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Server scaling and high availability settings</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                {configInfoMap["Scaling Configuration"] && (
+                  <InfoPopup feature={configInfoMap["Scaling Configuration"]} />
+                )}
               </div>
 
               <div className="mb-2 flex items-center gap-2">
@@ -321,18 +413,13 @@ const ServerSettings = ({ name: id }: { name: string }) => {
                       >
                         Min Instances
                       </Label>
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger>
-                            <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                              <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
-                            </div>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Minimum number of server instances</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
+                      <InfoPopup
+                        feature={{
+                          name: "Minimum Instances",
+                          description: "The minimum number of server instances that should be running at all times. This ensures baseline availability and performance even during low traffic periods.",
+                          learnMoreUrl: "https://docs.example.com/server-scaling#min-instances"
+                        }}
+                      />
                     </div>
                     <Input
                       type="number"
@@ -360,18 +447,13 @@ const ServerSettings = ({ name: id }: { name: string }) => {
                       >
                         Max Instances
                       </Label>
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger>
-                            <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                              <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
-                            </div>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Maximum number of server instances</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
+                      <InfoPopup
+                        feature={{
+                          name: "Maximum Instances",
+                          description: "The maximum number of server instances that can be running at any time. This helps control costs while ensuring your system can handle peak loads.",
+                          learnMoreUrl: "https://docs.example.com/server-scaling#max-instances"
+                        }}
+                      />
                     </div>
                     <Input
                       type="number"
@@ -410,20 +492,13 @@ const ServerSettings = ({ name: id }: { name: string }) => {
                       >
                         Enable Auto-scaling
                       </Label>
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger>
-                            <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                              <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
-                            </div>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>
-                              Automatically adjust instance count based on load
-                            </p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
+                      <InfoPopup
+                        feature={{
+                          name: "Auto-scaling",
+                          description: "Automatically adjust the number of server instances based on defined metrics and thresholds. This ensures optimal resource utilization and cost efficiency.",
+                          learnMoreUrl: "https://docs.example.com/server-scaling#auto-scaling"
+                        }}
+                      />
                     </div>
                   </div>
 
@@ -437,18 +512,13 @@ const ServerSettings = ({ name: id }: { name: string }) => {
                           >
                             Scaling Metric
                           </Label>
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger>
-                                <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                                  <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
-                                </div>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>Metric used for auto-scaling decisions</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
+                          <InfoPopup
+                            feature={{
+                              name: "Scaling Metric",
+                              description: "The metric used to determine when to scale your server instances. Common metrics include CPU utilization, memory usage, request count, and response latency.",
+                              learnMoreUrl: "https://docs.example.com/server-scaling#metrics"
+                            }}
+                          />
                         </div>
                         <Select
                           value={scaling.scalingMetric}
@@ -485,18 +555,13 @@ const ServerSettings = ({ name: id }: { name: string }) => {
                           >
                             Scaling Threshold (%)
                           </Label>
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger>
-                                <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                                  <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
-                                </div>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>Threshold that triggers auto-scaling</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
+                          <InfoPopup
+                            feature={{
+                              name: "Scaling Threshold",
+                              description: "The threshold value that triggers auto-scaling actions. When the chosen metric exceeds this threshold, the system will automatically scale up the number of instances.",
+                              learnMoreUrl: "https://docs.example.com/server-scaling#thresholds"
+                            }}
+                          />
                         </div>
                         <Input
                           type="number"
@@ -531,18 +596,9 @@ const ServerSettings = ({ name: id }: { name: string }) => {
                   >
                     CPU (cores)
                   </Label>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                          <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Number of CPU cores</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                  {configInfoMap.CPU && (
+                    <InfoPopup feature={configInfoMap.CPU} />
+                  )}
                 </div>
                 <Input
                   type="number"
@@ -567,18 +623,9 @@ const ServerSettings = ({ name: id }: { name: string }) => {
                   >
                     Memory (GB)
                   </Label>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                          <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>RAM in gigabytes</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                  {configInfoMap.Memory && (
+                    <InfoPopup feature={configInfoMap.Memory} />
+                  )}
                 </div>
                 <Input
                   type="number"
@@ -603,18 +650,9 @@ const ServerSettings = ({ name: id }: { name: string }) => {
                   >
                     Storage (GB)
                   </Label>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                          <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Storage capacity in gigabytes</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                  {configInfoMap.Storage && (
+                    <InfoPopup feature={configInfoMap.Storage} />
+                  )}
                 </div>
                 <Input
                   type="number"
@@ -635,23 +673,18 @@ const ServerSettings = ({ name: id }: { name: string }) => {
               </div>
             </div>
 
-            <div className="flex flex-col gap-2">
+            {/* <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
                 <Label className="text-gray-700 dark:text-gray-300">
                   Features
                 </Label>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                        <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Server capabilities and features</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                <InfoPopup
+                  feature={{
+                    name: "Server Features",
+                    description: "Additional capabilities and features that can be enabled for this server. These may include monitoring, security features, performance optimizations, and more.",
+                    learnMoreUrl: "https://docs.example.com/server-features"
+                  }}
+                />
               </div>
               <div className="grid grid-cols-2 gap-2">
                 {availableFeatures.map((feature) => (
@@ -674,10 +707,13 @@ const ServerSettings = ({ name: id }: { name: string }) => {
                     >
                       {feature}
                     </Label>
+                    {featureInfoMap[feature] && (
+                      <InfoPopup feature={featureInfoMap[feature]} />
+                    )}
                   </div>
                 ))}
               </div>
-            </div>
+            </div> */}
 
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
@@ -687,21 +723,13 @@ const ServerSettings = ({ name: id }: { name: string }) => {
                 >
                   Additional Configuration
                 </Label>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                        <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>
-                        Additional server configuration details, requirements,
-                        or constraints
-                      </p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                <InfoPopup
+                  feature={{
+                    name: "Additional Configuration",
+                    description: "Specify any additional server configuration details, requirements, or constraints. This can include specific middleware requirements, security configurations, performance requirements, or deployment constraints.",
+                    learnMoreUrl: "https://docs.example.com/server-configuration#additional"
+                  }}
+                />
               </div>
               <Textarea
                 name="server-details"

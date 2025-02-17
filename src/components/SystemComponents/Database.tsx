@@ -6,7 +6,7 @@ import { H6, Small } from "../ui/typography";
 import { WithSettings } from "./Wrappers/WithSettings";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { HelpCircle, PlusIcon, X } from "lucide-react";
+import { HelpCircle, PlusIcon, X, ExternalLink } from "lucide-react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
@@ -14,6 +14,14 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/
 import { Checkbox } from "../ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Switch } from "../ui/switch";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../ui/dialog";
 
 export const Database = ({ name, Icon }: ComponentNodeProps) => {
   return (
@@ -38,6 +46,64 @@ const isValidDbType = (value: string): value is DbType => {
 type DbConfig = {
   type: DbType;
   engine: string;
+};
+
+const configInfoMap: Record<string, FeatureInfo> = {
+  "Free-form Text Mode": {
+    name: "Free-form Text Mode",
+    description: "Toggle between detailed configuration and free-form text input. Free-form text allows you to describe your database configuration in a more natural way.",
+    learnMoreUrl: "https://docs.example.com/db-configuration"
+  },
+  "Database Type": {
+    name: "Database Type",
+    description: "The type of database system to use. Different types have different capabilities and use cases.",
+    learnMoreUrl: "https://docs.example.com/db-types"
+  },
+  "Database Engine": {
+    name: "Database Engine",
+    description: "Specific database engine/implementation to use based on your requirements.",
+    learnMoreUrl: "https://docs.example.com/db-engines"
+  },
+  "Clustering": {
+    name: "Clustering",
+    description: "Database clustering and replication settings for high availability and scalability.",
+    learnMoreUrl: "https://docs.example.com/db-clustering"
+  },
+  "Replication Strategy": {
+    name: "Replication Strategy",
+    description: "How data is replicated across nodes in the database cluster.",
+    learnMoreUrl: "https://docs.example.com/db-replication"
+  },
+  "Primary Nodes": {
+    name: "Primary Nodes",
+    description: "Number of primary/read-write nodes in the database cluster.",
+    learnMoreUrl: "https://docs.example.com/db-nodes#primary"
+  },
+  "Replica Nodes": {
+    name: "Replica Nodes",
+    description: "Number of replica/read-only nodes in the database cluster.",
+    learnMoreUrl: "https://docs.example.com/db-nodes#replica"
+  },
+  "IOPS": {
+    name: "IOPS",
+    description: "Input/Output Operations per Second - a measure of database performance.",
+    learnMoreUrl: "https://docs.example.com/db-performance#iops"
+  },
+  "Features": {
+    name: "Features",
+    description: "Database capabilities and features that enhance functionality and performance.",
+    learnMoreUrl: "https://docs.example.com/db-features"
+  },
+  "Additional Configuration": {
+    name: "Additional Configuration",
+    description: "Additional database configuration, requirements, or constraints specific to your use case.",
+    learnMoreUrl: "https://docs.example.com/db-config"
+  },
+  "Schema Design": {
+    name: "Schema Design",
+    description: "Define your database schema, models, or collections. For relational databases, define tables and their columns. For document databases, define collections and their structure.",
+    learnMoreUrl: "https://docs.example.com/db-schema"
+  }
 };
 
 const DatabaseSettings = ({ name: id }: { name: string }) => {
@@ -206,227 +272,223 @@ const DatabaseSettings = ({ name: id }: { name: string }) => {
   return (
     <WithSettings name={id}>
       <div className="flex flex-col gap-4 w-full">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Label htmlFor="free-text-mode" className="text-gray-700 dark:text-gray-300">
-              Free-form Text
-            </Label>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                    <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Toggle between detailed configuration and free-form text input</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
-          <Switch
-            id="free-text-mode"
-            checked={isFreeText}
-            onCheckedChange={setIsFreeText}
-          />
-        </div>
+        <Tabs defaultValue="config" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="config">Configuration</TabsTrigger>
+            <TabsTrigger value="schema">Schema Design</TabsTrigger>
+          </TabsList>
 
-        {!isFreeText ? (
-          <Tabs defaultValue="config" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="config">Configuration</TabsTrigger>
-              <TabsTrigger value="schema">Schema Design</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="config" className="mt-4">
-              <div className="grid w-full grid-flow-row grid-cols-1 gap-4 text-gray-800 dark:text-gray-200">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="flex flex-col gap-2">
-                    <div className="flex items-center gap-2">
-                      <Label htmlFor="db-type" className="text-gray-700 dark:text-gray-300">
-                        Database Type
-                      </Label>
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger>
-                            <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                              <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
-                            </div>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>The type of database system</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col gap-2">
-                    <div className="flex items-center gap-2">
-                      <Label htmlFor="engine" className="text-gray-700 dark:text-gray-300">
-                        Database Engine
-                      </Label>
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger>
-                            <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                              <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
-                            </div>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Specific database engine/implementation</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </div>
-                    <Select value={dbConfig.engine} onValueChange={handleEngineChange}>
-                      <SelectTrigger className={cn(
-                        "w-full bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
-                        "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
-                      )}>
-                        <SelectValue placeholder="Select database engine" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {currentEngineOptions.map(option => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+          <TabsContent value="config" className="mt-4">
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="free-text-mode" className="text-gray-700 dark:text-gray-300">
+                    {configInfoMap["Free-form Text Mode"] && (
+                      <InfoPopup feature={configInfoMap["Free-form Text Mode"]} />
+                    )}
+                  </Label>
+                  <Switch
+                    id="free-text-mode"
+                    checked={isFreeText}
+                    onCheckedChange={setIsFreeText}
+                  />
                 </div>
+              </div>
 
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center gap-2">
-                    <Label className="text-gray-700 dark:text-gray-300">
-                      Clustering
-                    </Label>
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                            <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
-                          </div>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Database clustering and replication settings</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
+              {!isFreeText ? (
+                <div className="grid w-full grid-flow-row grid-cols-1 gap-4 text-gray-800 dark:text-gray-200">
+                  <div className="rounded-md border border-yellow-200 bg-yellow-50 p-3 dark:border-yellow-900/50 dark:bg-yellow-900/20">
+                    <div className="flex items-center gap-2 text-sm text-yellow-800 dark:text-yellow-200">
+                      <Small>Note: Detailed configuration options are still a work in progress. More options and features will be added soon.</Small>
+                    </div>
                   </div>
 
-                  <div className="flex items-center gap-2 mb-2">
-                    <Checkbox
-                      id="clustering-enabled"
-                      checked={clustering.enabled}
-                      onCheckedChange={(checked) => {
-                        setClustering({ ...clustering, enabled: !!checked });
-                      }}
-                      className="border-gray-400 dark:border-gray-600"
-                    />
-                    <Label
-                      htmlFor="clustering-enabled"
-                      className="text-sm text-gray-700 dark:text-gray-300"
-                    >
-                      Enable High Availability Cluster
-                    </Label>
-                  </div>
-
-                  {clustering.enabled && (
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="flex flex-col gap-2">
-                        <div className="flex items-center gap-2">
-                          <Label htmlFor="replication-strategy" className="text-gray-700 dark:text-gray-300">
-                            Replication Strategy
-                          </Label>
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger>
-                                <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                                  <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
-                                </div>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>How data is replicated across nodes</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                        </div>
-                        <Select 
-                          value={clustering.replicationStrategy} 
-                          onValueChange={(value) => setClustering({ ...clustering, replicationStrategy: value })}
-                        >
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center gap-2">
+                        <Label htmlFor="db-type" className="text-gray-700 dark:text-gray-300">
+                          {configInfoMap["Database Type"] && (
+                            <InfoPopup feature={configInfoMap["Database Type"]} />
+                          )}
+                        </Label>
+                        <Select value={dbConfig.type} onValueChange={handleDbTypeChange}>
                           <SelectTrigger className={cn(
                             "w-full bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
                             "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
                           )}>
-                            <SelectValue placeholder="Select replication strategy" />
+                            <SelectValue placeholder="Select database type" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="async">Asynchronous</SelectItem>
-                            <SelectItem value="sync">Synchronous</SelectItem>
-                            <SelectItem value="semi-sync">Semi-Synchronous</SelectItem>
+                            <SelectItem value="relational">Relational</SelectItem>
+                            <SelectItem value="document">Document</SelectItem>
+                            <SelectItem value="keyvalue">Key-Value</SelectItem>
+                            <SelectItem value="graph">Graph</SelectItem>
+                            <SelectItem value="search">Search</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
+                    </div>
 
-                      <div className="flex flex-col gap-2">
-                        <div className="flex items-center gap-2">
-                          <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                            <Checkbox
-                              id="sharding-enabled"
-                              checked={clustering.shardingEnabled}
-                              onCheckedChange={(checked) => {
-                                setClustering({ ...clustering, shardingEnabled: !!checked });
-                              }}
-                              className="border-gray-400 dark:border-gray-600"
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center gap-2">
+                        <Label htmlFor="engine" className="text-gray-700 dark:text-gray-300">
+                          {configInfoMap["Database Engine"] && (
+                            <InfoPopup feature={configInfoMap["Database Engine"]} />
+                          )}
+                        </Label>
+                        <Select value={dbConfig.engine} onValueChange={handleEngineChange}>
+                          <SelectTrigger className={cn(
+                            "w-full bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
+                            "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
+                          )}>
+                            <SelectValue placeholder="Select database engine" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {currentEngineOptions.map(option => (
+                              <SelectItem key={option.value} value={option.value}>
+                                {option.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                      <Label className="text-gray-700 dark:text-gray-300">
+                        Clustering
+                      </Label>
+                      {configInfoMap.Clustering && (
+                        <InfoPopup feature={configInfoMap.Clustering} />
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-2 mb-2">
+                      <Checkbox
+                        id="clustering-enabled"
+                        checked={clustering.enabled}
+                        onCheckedChange={(checked) => {
+                          setClustering({ ...clustering, enabled: !!checked });
+                        }}
+                        className="border-gray-400 dark:border-gray-600"
+                      />
+                      <Label
+                        htmlFor="clustering-enabled"
+                        className="text-sm text-gray-700 dark:text-gray-300"
+                      >
+                        Enable High Availability Cluster
+                      </Label>
+                    </div>
+
+                    {clustering.enabled && (
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="flex flex-col gap-2">
+                          <div className="flex items-center gap-2">
+                            <Label htmlFor="replication-strategy" className="text-gray-700 dark:text-gray-300">
+                              {configInfoMap["Replication Strategy"] && (
+                                <InfoPopup feature={configInfoMap["Replication Strategy"]} />
+                              )}
+                            </Label>
+                            <Select 
+                              value={clustering.replicationStrategy} 
+                              onValueChange={(value) => setClustering({ ...clustering, replicationStrategy: value })}
+                            >
+                              <SelectTrigger className={cn(
+                                "w-full bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
+                                "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
+                              )}>
+                                <SelectValue placeholder="Select replication strategy" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="async">Asynchronous</SelectItem>
+                                <SelectItem value="sync">Synchronous</SelectItem>
+                                <SelectItem value="semi-sync">Semi-Synchronous</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col gap-2">
+                          <div className="flex items-center gap-2">
+                            <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+                              <Checkbox
+                                id="sharding-enabled"
+                                checked={clustering.shardingEnabled}
+                                onCheckedChange={(checked) => {
+                                  setClustering({ ...clustering, shardingEnabled: !!checked });
+                                }}
+                                className="border-gray-400 dark:border-gray-600"
+                              />
+                            </div>
+                            <Label
+                              htmlFor="sharding-enabled"
+                              className="text-sm text-gray-700 dark:text-gray-300"
+                            >
+                              Enable Sharding
+                            </Label>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col gap-2">
+                          <div className="flex items-center gap-2">
+                            <Label htmlFor="primary-nodes" className="text-gray-700 dark:text-gray-300">
+                              {configInfoMap["Primary Nodes"] && (
+                                <InfoPopup feature={configInfoMap["Primary Nodes"]} />
+                              )}
+                            </Label>
+                            <Input
+                              type="number"
+                              id="primary-nodes"
+                              value={clustering.primaryNodes}
+                              onChange={(e) => setClustering({ ...clustering, primaryNodes: Number(e.target.value) })}
+                              className={cn(
+                                "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
+                                "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
+                              )}
+                              min={1}
                             />
                           </div>
-                          <Label
-                            htmlFor="sharding-enabled"
-                            className="text-sm text-gray-700 dark:text-gray-300"
-                          >
-                            Enable Sharding
-                          </Label>
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger>
-                                <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                                  <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
-                                </div>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>Distribute data across multiple shards</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
+                        </div>
+
+                        <div className="flex flex-col gap-2">
+                          <div className="flex items-center gap-2">
+                            <Label htmlFor="replica-nodes" className="text-gray-700 dark:text-gray-300">
+                              {configInfoMap["Replica Nodes"] && (
+                                <InfoPopup feature={configInfoMap["Replica Nodes"]} />
+                              )}
+                            </Label>
+                            <Input
+                              type="number"
+                              id="replica-nodes"
+                              value={clustering.replicaNodes}
+                              onChange={(e) => setClustering({ ...clustering, replicaNodes: Number(e.target.value) })}
+                              className={cn(
+                                "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
+                                "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
+                              )}
+                              min={0}
+                            />
+                          </div>
                         </div>
                       </div>
+                    )}
+                  </div>
 
-                      <div className="flex flex-col gap-2">
-                        <div className="flex items-center gap-2">
-                          <Label htmlFor="primary-nodes" className="text-gray-700 dark:text-gray-300">
-                            Primary Nodes
-                          </Label>
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger>
-                                <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                                  <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
-                                </div>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>Number of primary/read-write nodes</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                        </div>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center gap-2">
+                        <Label htmlFor="storage" className="text-gray-700 dark:text-gray-300">
+                          {configInfoMap["Storage (GB)"] && (
+                            <InfoPopup feature={configInfoMap["Storage (GB)"]} />
+                          )}
+                        </Label>
                         <Input
                           type="number"
-                          id="primary-nodes"
-                          value={clustering.primaryNodes}
-                          onChange={(e) => setClustering({ ...clustering, primaryNodes: Number(e.target.value) })}
+                          id="storage"
+                          value={capacity.storage}
+                          onChange={(e) => setCapacity({ ...capacity, storage: Number(e.target.value) })}
                           className={cn(
                             "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
                             "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
@@ -434,255 +496,178 @@ const DatabaseSettings = ({ name: id }: { name: string }) => {
                           min={1}
                         />
                       </div>
+                    </div>
 
-                      <div className="flex flex-col gap-2">
-                        <div className="flex items-center gap-2">
-                          <Label htmlFor="replica-nodes" className="text-gray-700 dark:text-gray-300">
-                            Replica Nodes
-                          </Label>
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger>
-                                <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                                  <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
-                                </div>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>Number of replica/read-only nodes</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                        </div>
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center gap-2">
+                        <Label htmlFor="iops" className="text-gray-700 dark:text-gray-300">
+                          IOPS
+                        </Label>
+                        {configInfoMap.IOPS && (
+                          <InfoPopup feature={configInfoMap.IOPS} />
+                        )}
                         <Input
                           type="number"
-                          id="replica-nodes"
-                          value={clustering.replicaNodes}
-                          onChange={(e) => setClustering({ ...clustering, replicaNodes: Number(e.target.value) })}
+                          id="iops"
+                          value={capacity.iops}
+                          onChange={(e) => setCapacity({ ...capacity, iops: Number(e.target.value) })}
                           className={cn(
                             "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
                             "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
                           )}
-                          min={0}
+                          min={100}
+                          step={100}
                         />
                       </div>
                     </div>
-                  )}
-                </div>
 
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="flex flex-col gap-2">
-                    <div className="flex items-center gap-2">
-                      <Label htmlFor="storage" className="text-gray-700 dark:text-gray-300">
-                        Storage (GB)
-                      </Label>
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger>
-                            <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                              <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
-                            </div>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Storage capacity in gigabytes</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </div>
-                    <Input
-                      type="number"
-                      id="storage"
-                      value={capacity.storage}
-                      onChange={(e) => setCapacity({ ...capacity, storage: Number(e.target.value) })}
-                      className={cn(
-                        "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
-                        "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
-                      )}
-                      min={1}
-                    />
-                  </div>
-
-                  <div className="flex flex-col gap-2">
-                    <div className="flex items-center gap-2">
-                      <Label htmlFor="iops" className="text-gray-700 dark:text-gray-300">
-                        IOPS
-                      </Label>
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger>
-                            <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                              <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
-                            </div>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Input/Output Operations per Second</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </div>
-                    <Input
-                      type="number"
-                      id="iops"
-                      value={capacity.iops}
-                      onChange={(e) => setCapacity({ ...capacity, iops: Number(e.target.value) })}
-                      className={cn(
-                        "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
-                        "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
-                      )}
-                      min={100}
-                      step={100}
-                    />
-                  </div>
-
-                  <div className="flex flex-col gap-2">
-                    <div className="flex items-center gap-2">
-                      <Label htmlFor="connections" className="text-gray-700 dark:text-gray-300">
-                        Max Connections
-                      </Label>
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger>
-                            <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                              <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
-                            </div>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Maximum number of concurrent connections</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </div>
-                    <Input
-                      type="number"
-                      id="connections"
-                      value={capacity.connections}
-                      onChange={(e) => setCapacity({ ...capacity, connections: Number(e.target.value) })}
-                      className={cn(
-                        "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
-                        "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
-                      )}
-                      min={1}
-                    />
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center gap-2">
-                    <Label className="text-gray-700 dark:text-gray-300">
-                      Features
-                    </Label>
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                            <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
-                          </div>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Database capabilities and features</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    {availableFeatures.map((feature) => (
-                      <div key={feature} className="flex items-center gap-2">
-                        <Checkbox
-                          id={feature}
-                          checked={features.includes(feature)}
-                          onCheckedChange={(checked) => {
-                            if (checked) {
-                              setFeatures([...features, feature]);
-                            } else {
-                              setFeatures(features.filter((f) => f !== feature));
-                            }
-                          }}
-                          className="border-gray-400 dark:border-gray-600"
-                        />
-                        <Label
-                          htmlFor={feature}
-                          className="text-sm text-gray-700 dark:text-gray-300"
-                        >
-                          {feature}
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center gap-2">
+                        <Label htmlFor="connections" className="text-gray-700 dark:text-gray-300">
+                          {configInfoMap["Max Connections"] && (
+                            <InfoPopup feature={configInfoMap["Max Connections"]} />
+                          )}
                         </Label>
+                        <Input
+                          type="number"
+                          id="connections"
+                          value={capacity.connections}
+                          onChange={(e) => setCapacity({ ...capacity, connections: Number(e.target.value) })}
+                          className={cn(
+                            "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
+                            "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
+                          )}
+                          min={1}
+                        />
                       </div>
-                    ))}
+                    </div>
                   </div>
-                </div>
 
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center gap-2">
-                    <Label htmlFor="database-details" className="text-gray-700 dark:text-gray-300">
-                      Additional Configuration
-                    </Label>
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                            <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
-                          </div>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Additional database configuration, requirements, or constraints</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  </div>
-                  <Textarea
-                    name="database-details"
-                    id="database-details"
-                    rows={6}
-                    placeholder={`Example:
+                    {/* 
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                      <Label className="text-gray-700 dark:text-gray-300">
+                        Features
+                      </Label>
+                      {configInfoMap.Features && (
+                        <InfoPopup feature={configInfoMap.Features} />
+                      )}
+                    </div> 
+                    <div className="grid grid-cols-2 gap-2">
+                      {availableFeatures.map((feature) => (
+                        <div key={feature} className="flex items-center gap-2">
+                          <Checkbox
+                            id={feature}
+                            checked={features.includes(feature)}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                setFeatures([...features, feature]);
+                              } else {
+                                setFeatures(features.filter((f) => f !== feature));
+                              }
+                            }}
+                            className="border-gray-400 dark:border-gray-600"
+                          />
+                          <Label
+                            htmlFor={feature}
+                            className="text-sm text-gray-700 dark:text-gray-300"
+                          >
+                            {feature}
+                          </Label>
+                        </div>
+                      ))}
+                    </div>
+                  </div> 
+                    */}
+
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                      <Label htmlFor="database-details" className="text-gray-700 dark:text-gray-300">
+                        {configInfoMap["Additional Configuration"] && (
+                          <InfoPopup feature={configInfoMap["Additional Configuration"]} />
+                        )}
+                      </Label>
+                    </div>
+                    <Textarea
+                      name="database-details"
+                      id="database-details"
+                      rows={6}
+                      placeholder={`Example:
 - Specific configuration parameters
 - Security requirements
 - Backup strategy
 - Performance requirements`}
+                      className={cn(
+                        "text-md bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
+                        "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600",
+                        "placeholder:text-gray-500 dark:placeholder:text-gray-400"
+                      )}
+                      value={details}
+                      onChange={(e) => setDetails(e.target.value)}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="free-form" className="text-gray-700 dark:text-gray-300">
+                    Database Configuration
+                  </Label>
+                  <Textarea
+                    id="free-form"
+                    rows={20}
+                    placeholder={`Describe your database configuration here. Example:
+
+Database Type: PostgreSQL
+Capacity: 100GB storage, 1000 IOPS
+Features:
+- High Availability with 3 nodes
+- Automatic backups
+- Point-in-time recovery
+- Row-level security
+
+Additional Requirements:
+- Daily backup retention: 7 days
+- Monthly backup retention: 1 year
+- Monitoring requirements
+- Security configurations`}
                     className={cn(
                       "text-md bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
                       "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600",
                       "placeholder:text-gray-500 dark:placeholder:text-gray-400"
                     )}
-                    value={details}
-                    onChange={(e) => setDetails(e.target.value)}
+                    value={freeFormText}
+                    onChange={(e) => setFreeFormText(e.target.value)}
                   />
                 </div>
-              </div>
-            </TabsContent>
+              )}
+            </div>
+          </TabsContent>
 
-            <TabsContent value="schema" className="mt-4">
-              <div className="flex flex-col gap-4 w-full">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Label htmlFor="database-design" className="text-lg font-semibold text-gray-700 dark:text-gray-300">
-                      Schema Design
-                    </Label>
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                            <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
-                          </div>
-                        </TooltipTrigger>
-                        <TooltipContent className="max-w-sm">
-                          <p>Define your database schema, models, or collections. For relational databases, define tables and their columns. For document databases, define collections and their structure.</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  </div>
-                  <Small className="text-gray-500 dark:text-gray-400">
-                    {dbConfig.type === "relational" ? "Tables" : dbConfig.type === "document" ? "Collections" : "Models"}
-                  </Small>
+          <TabsContent value="schema" className="mt-4">
+            <div className="flex flex-col gap-4 w-full">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="database-design" className="text-lg font-semibold text-gray-700 dark:text-gray-300">
+                    {configInfoMap["Schema Design"] && (
+                      <InfoPopup feature={configInfoMap["Schema Design"]} />
+                    )}
+                  </Label>
                 </div>
-                <div className="rounded-md border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800/50">
-                  <ListAndDetails
-                    textareaRowsCount={25}
-                    items={models}
-                    onChange={setModels}
-                    onDelete={(index: number) => {
-                      const newModels = models.filter((_, i) => i !== index);
-                      setModels(newModels);
-                    }}
-                    onAdd={() => setModels([...models, ["new model", ""]])}
-                    textareaPlaceholder={dbConfig.type === "relational" ? 
+                <Small className="text-gray-500 dark:text-gray-400">
+                  {dbConfig.type === "relational" ? "Tables" : dbConfig.type === "document" ? "Collections" : "Models"}
+                </Small>
+              </div>
+              <div className="rounded-md border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800/50">
+                <ListAndDetails
+                  textareaRowsCount={25}
+                  items={models}
+                  onChange={setModels}
+                  onDelete={(index: number) => {
+                    const newModels = models.filter((_, i) => i !== index);
+                    setModels(newModels);
+                  }}
+                  onAdd={() => setModels([...models, ["new model", ""]])}
+                  textareaPlaceholder={dbConfig.type === "relational" ? 
 `Example: Users Table
 - id (Primary Key, UUID)
 - username (Unique, VARCHAR(50))
@@ -695,7 +680,7 @@ Constraints:
 - username: NOT NULL
 - email: NOT NULL
 - password_hash: NOT NULL` 
-                    : dbConfig.type === "document" ? 
+                  : dbConfig.type === "document" ? 
 `Example: Users Collection
 {
   _id: ObjectId,
@@ -713,7 +698,7 @@ Constraints:
   createdAt: Date,
   lastLogin: Date
 }`
-                    : `Example: Model Structure
+                  : `Example: Model Structure
 Name: User
 Type: Entity
 Properties:
@@ -721,50 +706,11 @@ Properties:
 - name: string
 - attributes: key-value pairs
 - metadata: object`}
-                  />
-                </div>
+                />
               </div>
-            </TabsContent>
-          </Tabs>
-        ) : (
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="free-form" className="text-gray-700 dark:text-gray-300">
-              Database Configuration
-            </Label>
-            <Textarea
-              id="free-form"
-              rows={20}
-              placeholder={`Describe your database configuration here. Example:
-
-Database Type: PostgreSQL
-Capacity: 100GB storage, 1000 IOPS
-Features:
-- High Availability with 3 nodes
-- Automatic backups
-- Point-in-time recovery
-- Row-level security
-
-Schema:
-Users Table:
-- id (UUID, Primary Key)
-- email (VARCHAR, Unique)
-- created_at (TIMESTAMP)
-
-Additional Requirements:
-- Daily backup retention: 7 days
-- Monthly backup retention: 1 year
-- Monitoring requirements
-- Security configurations`}
-              className={cn(
-                "text-md bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
-                "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600",
-                "placeholder:text-gray-500 dark:placeholder:text-gray-400"
-              )}
-              value={freeFormText}
-              onChange={(e) => setFreeFormText(e.target.value)}
-            />
-          </div>
-        )}
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </WithSettings>
   );
@@ -879,5 +825,41 @@ export const ListAndDetails = ({
         </H6>
       )}
     </div>
+  );
+};
+
+interface FeatureInfo {
+  name: string;
+  description: string;
+  learnMoreUrl?: string;
+}
+
+const InfoPopup = ({ feature }: { feature: FeatureInfo }) => {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+          <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+        </div>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>{feature.name}</DialogTitle>
+          <DialogDescription className="space-y-4">
+            <p>{feature.description}</p>
+            {feature.learnMoreUrl && (
+              <a
+                href={feature.learnMoreUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300"
+              >
+                Learn more <ExternalLink className="h-4 w-4" />
+              </a>
+            )}
+          </DialogDescription>
+        </DialogHeader>
+      </DialogContent>
+    </Dialog>
   );
 };

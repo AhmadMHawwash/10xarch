@@ -7,11 +7,151 @@ import { WithSettings } from "./Wrappers/WithSettings";
 import { useState } from "react";
 import { Input } from "../ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import { HelpCircle } from "lucide-react";
+import { HelpCircle, ExternalLink } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import { cn } from "@/lib/utils";
 import { Checkbox } from "../ui/checkbox";
 import { Switch } from "../ui/switch";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../ui/dialog";
+
+interface FeatureInfo {
+  name: string;
+  description: string;
+  learnMoreUrl?: string;
+}
+
+const featureInfoMap: Record<string, FeatureInfo> = {
+  "Message Persistence": {
+    name: "Message Persistence",
+    description: "Store messages on disk to prevent data loss in case of system failures.",
+    learnMoreUrl: "https://docs.example.com/message-queue/persistence"
+  },
+  "Dead Letter Queue": {
+    name: "Dead Letter Queue",
+    description: "A queue for messages that cannot be processed successfully, enabling error handling and debugging.",
+    learnMoreUrl: "https://docs.example.com/message-queue/dlq"
+  },
+  "Message Filtering": {
+    name: "Message Filtering",
+    description: "Filter messages based on content or metadata before processing.",
+    learnMoreUrl: "https://docs.example.com/message-queue/filtering"
+  },
+  "Message Routing": {
+    name: "Message Routing",
+    description: "Route messages to different queues based on content or metadata.",
+    learnMoreUrl: "https://docs.example.com/message-queue/routing"
+  },
+  "Message Batching": {
+    name: "Message Batching",
+    description: "Group multiple messages together for more efficient processing.",
+    learnMoreUrl: "https://docs.example.com/message-queue/batching"
+  },
+  "Message Compression": {
+    name: "Message Compression",
+    description: "Compress messages to reduce storage and bandwidth usage.",
+    learnMoreUrl: "https://docs.example.com/message-queue/compression"
+  },
+  "Message Encryption": {
+    name: "Message Encryption",
+    description: "Encrypt messages for secure transmission and storage.",
+    learnMoreUrl: "https://docs.example.com/message-queue/encryption"
+  },
+  "Message Deduplication": {
+    name: "Message Deduplication",
+    description: "Prevent duplicate message processing by identifying and removing duplicates.",
+    learnMoreUrl: "https://docs.example.com/message-queue/deduplication"
+  },
+  "Message Prioritization": {
+    name: "Message Prioritization",
+    description: "Process messages based on priority levels for optimized handling of critical messages.",
+    learnMoreUrl: "https://docs.example.com/message-queue/prioritization"
+  },
+  "Message Replay": {
+    name: "Message Replay",
+    description: "Ability to replay messages from a specific point in time for recovery or debugging.",
+    learnMoreUrl: "https://docs.example.com/message-queue/replay"
+  }
+};
+
+const configInfoMap: Record<string, FeatureInfo> = {
+  "Free-form Text Mode": {
+    name: "Free-form Text Mode",
+    description: "Toggle between detailed configuration and free-form text input. Free-form text allows you to describe your message queue configuration in a more natural way.",
+    learnMoreUrl: "https://docs.example.com/mq-configuration"
+  },
+  "Queue Type": {
+    name: "Queue Type",
+    description: "The type of message queue to use. Different types provide different delivery guarantees and features.",
+    learnMoreUrl: "https://docs.example.com/mq-types"
+  },
+  "Delivery Guarantee": {
+    name: "Delivery Guarantee",
+    description: "The level of guarantee for message delivery. Choose based on your reliability requirements.",
+    learnMoreUrl: "https://docs.example.com/mq-delivery"
+  },
+  "Max Message Size": {
+    name: "Max Message Size",
+    description: "Maximum size allowed for individual messages in the queue.",
+    learnMoreUrl: "https://docs.example.com/mq-limits#size"
+  },
+  "Throughput": {
+    name: "Throughput",
+    description: "Number of messages that can be processed per second.",
+    learnMoreUrl: "https://docs.example.com/mq-throughput"
+  },
+  "Retention": {
+    name: "Retention",
+    description: "How long messages are kept in the queue before being automatically deleted.",
+    learnMoreUrl: "https://docs.example.com/mq-retention"
+  },
+  "Features": {
+    name: "Features",
+    description: "Additional capabilities and features that can be enabled for this message queue. These may include persistence, routing, filtering, and more.",
+    learnMoreUrl: "https://docs.example.com/message-queue/features"
+  },
+  "Additional Configuration": {
+    name: "Additional Configuration",
+    description: "Additional message queue configuration, requirements, or constraints specific to your use case.",
+    learnMoreUrl: "https://docs.example.com/message-queue/additional-config"
+  }
+};
+
+const InfoPopup = ({ feature }: { feature: FeatureInfo }) => {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+          <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+        </div>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>{feature.name}</DialogTitle>
+          <DialogDescription className="space-y-4">
+            <p>{feature.description}</p>
+            {feature.learnMoreUrl && (
+              <a
+                href={feature.learnMoreUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300"
+              >
+                Learn more <ExternalLink className="h-4 w-4" />
+              </a>
+            )}
+          </DialogDescription>
+        </DialogHeader>
+      </DialogContent>
+    </Dialog>
+  );
+};
 
 export const MessageQueue = ({ name, Icon }: ComponentNodeProps) => {
   return (
@@ -71,13 +211,15 @@ const MessageQueueSettings = ({ name: id }: { name: string }) => {
 
   const availableFeatures = [
     "Message Persistence",
-    "Message Ordering",
+    "Dead Letter Queue",
+    "Message Filtering",
     "Message Routing",
-    "Message Replay",
-    "Message Tracing",
+    "Message Batching",
     "Message Compression",
     "Message Encryption",
-    "Message Acknowledgment"
+    "Message Deduplication",
+    "Message Prioritization",
+    "Message Replay"
   ];
 
   return (
@@ -88,18 +230,9 @@ const MessageQueueSettings = ({ name: id }: { name: string }) => {
             <Label htmlFor="free-text-mode" className="text-gray-700 dark:text-gray-300">
               Free-form Text
             </Label>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                    <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Toggle between detailed configuration and free-form text input</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            {configInfoMap["Free-form Text Mode"] && (
+              <InfoPopup feature={configInfoMap["Free-form Text Mode"]} />
+            )}
           </div>
           <Switch
             id="free-text-mode"
@@ -110,24 +243,21 @@ const MessageQueueSettings = ({ name: id }: { name: string }) => {
 
         {!isFreeText ? (
           <div className="grid w-full grid-flow-row grid-cols-1 gap-4 text-gray-800 dark:text-gray-200">
+            <div className="rounded-md border border-yellow-200 bg-yellow-50 p-3 dark:border-yellow-900/50 dark:bg-yellow-900/20">
+              <div className="flex items-center gap-2 text-sm text-yellow-800 dark:text-yellow-200">
+                <Small>Note: Detailed configuration options are still a work in progress. More options and features will be added soon.</Small>
+              </div>
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2">
                   <Label htmlFor="queue-type" className="text-gray-700 dark:text-gray-300">
                     Queue Type
                   </Label>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                          <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>The type of message queue to use</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                  {configInfoMap["Queue Type"] && (
+                    <InfoPopup feature={configInfoMap["Queue Type"]} />
+                  )}
                 </div>
                 <Select value={queueType} onValueChange={setQueueType}>
                   <SelectTrigger className={cn(
@@ -150,18 +280,9 @@ const MessageQueueSettings = ({ name: id }: { name: string }) => {
                   <Label htmlFor="delivery-type" className="text-gray-700 dark:text-gray-300">
                     Delivery Guarantee
                   </Label>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                          <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Message delivery guarantee type</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                  {configInfoMap["Delivery Guarantee"] && (
+                    <InfoPopup feature={configInfoMap["Delivery Guarantee"]} />
+                  )}
                 </div>
                 <Select value={deliveryType} onValueChange={setDeliveryType}>
                   <SelectTrigger className={cn(
@@ -185,18 +306,9 @@ const MessageQueueSettings = ({ name: id }: { name: string }) => {
                   <Label htmlFor="message-size" className="text-gray-700 dark:text-gray-300">
                     Max Message Size (KB)
                   </Label>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                          <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Maximum size of a single message in kilobytes</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                  {configInfoMap["Max Message Size"] && (
+                    <InfoPopup feature={configInfoMap["Max Message Size"]} />
+                  )}
                 </div>
                 <Input
                   type="number"
@@ -217,18 +329,9 @@ const MessageQueueSettings = ({ name: id }: { name: string }) => {
                   <Label htmlFor="throughput" className="text-gray-700 dark:text-gray-300">
                     Throughput (msg/s)
                   </Label>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                          <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Messages processed per second</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                  {configInfoMap.Throughput && (
+                    <InfoPopup feature={configInfoMap.Throughput} />
+                  )}
                 </div>
                 <Input
                   type="number"
@@ -249,18 +352,9 @@ const MessageQueueSettings = ({ name: id }: { name: string }) => {
                   <Label htmlFor="retention" className="text-gray-700 dark:text-gray-300">
                     Retention (days)
                   </Label>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                          <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Message retention period in days</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                  {configInfoMap.Retention && (
+                    <InfoPopup feature={configInfoMap.Retention} />
+                  )}
                 </div>
                 <Input
                   type="number"
@@ -277,23 +371,15 @@ const MessageQueueSettings = ({ name: id }: { name: string }) => {
               </div>
             </div>
 
+              {/* 
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
                 <Label className="text-gray-700 dark:text-gray-300">
                   Features
                 </Label>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                        <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Message queue capabilities and features</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                {configInfoMap.Features && (
+                  <InfoPopup feature={configInfoMap.Features} />
+                )}
               </div>
               <div className="grid grid-cols-2 gap-2">
                 {availableFeatures.map((feature) => (
@@ -316,28 +402,23 @@ const MessageQueueSettings = ({ name: id }: { name: string }) => {
                     >
                       {feature}
                     </Label>
+                    {featureInfoMap[feature] && (
+                      <InfoPopup feature={featureInfoMap[feature]} />
+                    )}
                   </div>
                 ))}
               </div>
-            </div>
+            </div> 
+              */}
 
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
                 <Label htmlFor="queue-details" className="text-gray-700 dark:text-gray-300">
                   Additional Configuration
                 </Label>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
-                        <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Additional queue configuration, policies, or requirements</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                {configInfoMap["Additional Configuration"] && (
+                  <InfoPopup feature={configInfoMap["Additional Configuration"]} />
+                )}
               </div>
               <Textarea
                 name="queue-details"
@@ -380,10 +461,10 @@ Capacity:
 
 Features:
 - Message Persistence
-- Message Ordering
+- Dead Letter Queue
+- Message Filtering
 - Message Routing
-- Message Replay
-- Message Tracing
+- Message Batching
 - Message Compression
 
 Additional Requirements:

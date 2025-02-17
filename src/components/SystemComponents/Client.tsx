@@ -6,9 +6,20 @@ import { Small } from "../ui/typography";
 import { WithSettings } from "./Wrappers/WithSettings";
 import { useState } from "react";
 import { Input } from "../ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 import { HelpCircle, ExternalLink } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../ui/tooltip";
 import { cn } from "@/lib/utils";
 import { Checkbox } from "../ui/checkbox";
 import { Switch } from "../ui/switch";
@@ -30,69 +41,97 @@ interface FeatureInfo {
 const featureInfoMap: Record<string, FeatureInfo> = {
   "Error Handling": {
     name: "Error Handling",
-    description: "Implement robust error handling mechanisms to gracefully handle and recover from various types of errors, including network failures, API errors, and client-side exceptions.",
-    learnMoreUrl: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Control_flow_and_error_handling"
+    description:
+      "Implement robust error handling mechanisms to gracefully handle and recover from various types of errors, including network failures, API errors, and client-side exceptions.",
+    learnMoreUrl:
+      "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Control_flow_and_error_handling",
   },
   "Request Retries": {
     name: "Request Retries",
-    description: "Automatically retry failed network requests with configurable backoff strategies to improve reliability and handle temporary network issues.",
-    learnMoreUrl: "https://developers.google.com/analytics/devguides/reporting/core/v4/errors#exponential_backoff"
+    description:
+      "Automatically retry failed network requests with configurable backoff strategies to improve reliability and handle temporary network issues.",
+    learnMoreUrl:
+      "https://developers.google.com/analytics/devguides/reporting/core/v4/errors#exponential_backoff",
   },
   "Request Timeout": {
     name: "Request Timeout",
-    description: "Set appropriate timeout limits for network requests to prevent hanging operations and provide better user feedback.",
-    learnMoreUrl: "https://developer.mozilla.org/en-US/docs/Web/API/AbortController"
+    description:
+      "Set appropriate timeout limits for network requests to prevent hanging operations and provide better user feedback.",
+    learnMoreUrl:
+      "https://developer.mozilla.org/en-US/docs/Web/API/AbortController",
   },
   "Response Caching": {
     name: "Response Caching",
-    description: "Cache API responses locally to improve performance and enable offline functionality.",
-    learnMoreUrl: "https://web.dev/cache-api-quick-guide/"
+    description:
+      "Cache API responses locally to improve performance and enable offline functionality.",
+    learnMoreUrl: "https://web.dev/cache-api-quick-guide/",
   },
   "Service Workers": {
     name: "Service Workers",
-    description: "Use Service Workers to enable offline functionality, background sync, and push notifications in web applications.",
-    learnMoreUrl: "https://developers.google.com/web/fundamentals/primers/service-workers"
+    description:
+      "Use Service Workers to enable offline functionality, background sync, and push notifications in web applications.",
+    learnMoreUrl:
+      "https://developers.google.com/web/fundamentals/primers/service-workers",
   },
   "Progressive Loading": {
     name: "Progressive Loading",
-    description: "Implement progressive loading techniques to improve perceived performance and user experience.",
-    learnMoreUrl: "https://web.dev/progressive-loading/"
+    description:
+      "Implement progressive loading techniques to improve perceived performance and user experience.",
+    learnMoreUrl: "https://web.dev/progressive-loading/",
   },
   "Offline Support": {
     name: "Offline Support",
-    description: "Enable the application to function without an internet connection using service workers and local storage.",
-    learnMoreUrl: "https://web.dev/offline-cookbook/"
+    description:
+      "Enable the application to function without an internet connection using service workers and local storage.",
+    learnMoreUrl: "https://web.dev/offline-cookbook/",
   },
   "State Management": {
     name: "State Management",
-    description: "Implement robust state management to handle complex application state and data flow.",
-    learnMoreUrl: "https://redux.js.org/introduction/getting-started"
-  }
+    description:
+      "Implement robust state management to handle complex application state and data flow.",
+    learnMoreUrl: "https://redux.js.org/introduction/getting-started",
+  },
 };
 
 const configInfoMap: Record<string, FeatureInfo> = {
   "Client Type": {
     name: "Client Type",
-    description: "The type of client application that will interact with your system. Different client types have different capabilities, requirements, and considerations for implementation.",
-    learnMoreUrl: "https://www.patterns.dev/posts/client-side-architecture"
+    description:
+      "The type of client application that will interact with your system. Different client types have different capabilities, requirements, and considerations for implementation.",
+    learnMoreUrl: "https://www.patterns.dev/posts/client-side-architecture",
   },
   "Client Location": {
     name: "Client Location",
-    description: "Geographic distribution of your clients. This affects latency, data residency requirements, and CDN strategy. Global distribution requires more edge locations and careful consideration of regional requirements.",
-    learnMoreUrl: "https://aws.amazon.com/blogs/architecture/what-to-consider-when-selecting-a-region-for-your-workloads/"
+    description:
+      "Geographic distribution of your clients. This affects latency, data residency requirements, and CDN strategy. Global distribution requires more edge locations and careful consideration of regional requirements.",
+    learnMoreUrl:
+      "https://aws.amazon.com/blogs/architecture/what-to-consider-when-selecting-a-region-for-your-workloads/",
   },
   "Concurrent Users": {
     name: "Concurrent Users",
-    description: "The number of users simultaneously accessing your application. This metric is crucial for capacity planning, scaling decisions, and performance requirements.",
-    learnMoreUrl: "https://www.nginx.com/blog/capacity-planning/"
-  }
+    description:
+      "The number of users simultaneously accessing your application. This metric is crucial for capacity planning, scaling decisions, and performance requirements.",
+    learnMoreUrl: "https://www.nginx.com/blog/capacity-planning/",
+  },
+  "Free-form Text Mode": {
+    name: "Free-form Text Mode",
+    description:
+      "Toggle between detailed configuration and free-form text input",
+    learnMoreUrl: "",
+  },
+  "Additional Configuration": {
+    name: "Additional Configuration",
+    description:
+      "Additional client configuration, requirements, or constraints",
+    learnMoreUrl: "",
+  },
 };
 
 const InfoPopup = ({ feature }: { feature: FeatureInfo }) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+        <div className="cursor-help rounded-full p-1 transition-colors duration-200 hover:bg-gray-200 dark:hover:bg-gray-700">
           <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
         </div>
       </DialogTrigger>
@@ -120,9 +159,11 @@ const InfoPopup = ({ feature }: { feature: FeatureInfo }) => {
 
 export const Client = ({ name, Icon }: ComponentNodeProps) => {
   return (
-    <div className="relative flex flex-col items-center text-gray-800 dark:text-gray-200 group">
+    <div className="group relative flex flex-col items-center text-gray-800 dark:text-gray-200">
       <div className="relative flex items-center gap-1">
-        {Icon && <Icon size={20} className="text-gray-700 dark:text-gray-300" />}
+        {Icon && (
+          <Icon size={20} className="text-gray-700 dark:text-gray-300" />
+        )}
         <Small>{name}</Small>
       </div>
       <ClientSettings name={name} />
@@ -137,37 +178,34 @@ const ClientSettings = ({ name: id }: { name: string }) => {
   const [clientType, setClientType] = useSystemComponentConfigSlice<string>(
     id,
     "client_type",
-    "web"
+    "web",
   );
 
-  const [concurrentUsers, setConcurrentUsers] = useSystemComponentConfigSlice<number>(
-    id,
-    "concurrent_users",
-    1000
-  );
+  const [concurrentUsers, setConcurrentUsers] =
+    useSystemComponentConfigSlice<number>(id, "concurrent_users", 1000);
 
   const [location, setLocation] = useSystemComponentConfigSlice<string>(
     id,
     "location",
-    "global"
+    "global",
   );
 
   const [details, setDetails] = useSystemComponentConfigSlice<string>(
     id,
     "details",
-    ""
+    "",
   );
 
   const [features, setFeatures] = useSystemComponentConfigSlice<string[]>(
     id,
     "features",
-    []
+    [],
   );
 
   const [freeFormText, setFreeFormText] = useSystemComponentConfigSlice<string>(
     id,
     "free_form_text",
-    ""
+    "",
   );
 
   const getAvailableFeatures = (type: string): string[] => {
@@ -175,7 +213,7 @@ const ClientSettings = ({ name: id }: { name: string }) => {
       "Error Handling",
       "Request Retries",
       "Request Timeout",
-      "Response Caching"
+      "Response Caching",
     ];
 
     switch (type) {
@@ -185,7 +223,7 @@ const ClientSettings = ({ name: id }: { name: string }) => {
           "Service Workers",
           "Progressive Loading",
           "Offline Support",
-          "State Management"
+          "State Management",
         ];
       case "mobile":
         return [
@@ -193,7 +231,7 @@ const ClientSettings = ({ name: id }: { name: string }) => {
           "Background Sync",
           "Push Notifications",
           "Data Persistence",
-          "Network Detection"
+          "Network Detection",
         ];
       case "iot":
         return [
@@ -201,7 +239,7 @@ const ClientSettings = ({ name: id }: { name: string }) => {
           "Device Management",
           "Data Buffering",
           "Power Management",
-          "Secure Boot"
+          "Secure Boot",
         ];
       case "desktop":
         return [
@@ -209,7 +247,7 @@ const ClientSettings = ({ name: id }: { name: string }) => {
           "Auto Updates",
           "Native Integration",
           "Cross Platform",
-          "Resource Management"
+          "Resource Management",
         ];
       default:
         return commonFeatures;
@@ -220,22 +258,18 @@ const ClientSettings = ({ name: id }: { name: string }) => {
 
   return (
     <WithSettings name={id}>
-      <div className="flex flex-col gap-4 w-full">
+      <div className="flex w-full flex-col gap-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Label htmlFor="free-text-mode" className="text-gray-700 dark:text-gray-300">
+            <Label
+              htmlFor="free-text-mode"
+              className="text-gray-700 dark:text-gray-300"
+            >
               Free-form Text
             </Label>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <HelpCircle className="h-4 w-4 text-gray-500" />
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Toggle between detailed configuration and free-form text input</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            {configInfoMap["Free-form Text Mode"] && (
+              <InfoPopup feature={configInfoMap["Free-form Text Mode"]} />
+            )}
           </div>
           <Switch
             id="free-text-mode"
@@ -249,7 +283,10 @@ const ClientSettings = ({ name: id }: { name: string }) => {
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2">
-                  <Label htmlFor="client-type" className="text-gray-700 dark:text-gray-300">
+                  <Label
+                    htmlFor="client-type"
+                    className="text-gray-700 dark:text-gray-300"
+                  >
                     Client Type
                   </Label>
                   {configInfoMap["Client Type"] && (
@@ -257,10 +294,12 @@ const ClientSettings = ({ name: id }: { name: string }) => {
                   )}
                 </div>
                 <Select value={clientType} onValueChange={setClientType}>
-                  <SelectTrigger className={cn(
-                    "w-full bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
-                    "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
-                  )}>
+                  <SelectTrigger
+                    className={cn(
+                      "w-full border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                      "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+                    )}
+                  >
                     <SelectValue placeholder="Select client type" />
                   </SelectTrigger>
                   <SelectContent>
@@ -274,7 +313,10 @@ const ClientSettings = ({ name: id }: { name: string }) => {
 
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2">
-                  <Label htmlFor="location" className="text-gray-700 dark:text-gray-300">
+                  <Label
+                    htmlFor="location"
+                    className="text-gray-700 dark:text-gray-300"
+                  >
                     Client Location
                   </Label>
                   {configInfoMap["Client Location"] && (
@@ -282,10 +324,12 @@ const ClientSettings = ({ name: id }: { name: string }) => {
                   )}
                 </div>
                 <Select value={location} onValueChange={setLocation}>
-                  <SelectTrigger className={cn(
-                    "w-full bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
-                    "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
-                  )}>
+                  <SelectTrigger
+                    className={cn(
+                      "w-full border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                      "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+                    )}
+                  >
                     <SelectValue placeholder="Select location" />
                   </SelectTrigger>
                   <SelectContent>
@@ -299,7 +343,10 @@ const ClientSettings = ({ name: id }: { name: string }) => {
 
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
-                <Label htmlFor="concurrent-users" className="text-gray-700 dark:text-gray-300">
+                <Label
+                  htmlFor="concurrent-users"
+                  className="text-gray-700 dark:text-gray-300"
+                >
                   Concurrent Users
                 </Label>
                 {configInfoMap["Concurrent Users"] && (
@@ -312,28 +359,22 @@ const ClientSettings = ({ name: id }: { name: string }) => {
                 value={concurrentUsers}
                 onChange={(e) => setConcurrentUsers(Number(e.target.value))}
                 className={cn(
-                  "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
-                  "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
+                  "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                  "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
                 )}
                 min={1}
               />
             </div>
 
+            {/* 
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
                 <Label className="text-gray-700 dark:text-gray-300">
                   Features
                 </Label>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <HelpCircle className="h-4 w-4 text-gray-500" />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Client capabilities and features</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                {configInfoMap.Features && (
+                  <InfoPopup feature={configInfoMap.Features} />
+                )}
               </div>
               <div className="grid grid-cols-2 gap-2">
                 {availableFeatures.map((feature) => (
@@ -361,24 +402,23 @@ const ClientSettings = ({ name: id }: { name: string }) => {
                     )}
                   </div>
                 ))}
-              </div>
+              </div> 
             </div>
+              */}
 
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
-                <Label htmlFor="client-details" className="text-gray-700 dark:text-gray-300">
+                <Label
+                  htmlFor="client-details"
+                  className="text-gray-700 dark:text-gray-300"
+                >
                   Additional Configuration
                 </Label>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <HelpCircle className="h-4 w-4 text-gray-500" />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Additional client configuration, requirements, or constraints</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                {configInfoMap["Additional Configuration"] && (
+                  <InfoPopup
+                    feature={configInfoMap["Additional Configuration"]}
+                  />
+                )}
               </div>
               <Textarea
                 name="client-details"
@@ -390,9 +430,9 @@ const ClientSettings = ({ name: id }: { name: string }) => {
 - Security requirements
 - Performance targets`}
                 className={cn(
-                  "text-md bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
-                  "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600",
-                  "placeholder:text-gray-500 dark:placeholder:text-gray-400"
+                  "text-md border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                  "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+                  "placeholder:text-gray-500 dark:placeholder:text-gray-400",
                 )}
                 value={details}
                 onChange={(e) => setDetails(e.target.value)}
@@ -401,7 +441,10 @@ const ClientSettings = ({ name: id }: { name: string }) => {
           </div>
         ) : (
           <div className="flex flex-col gap-2">
-            <Label htmlFor="free-form" className="text-gray-700 dark:text-gray-300">
+            <Label
+              htmlFor="free-form"
+              className="text-gray-700 dark:text-gray-300"
+            >
               Client Configuration
             </Label>
             <Textarea
@@ -429,9 +472,9 @@ Additional Requirements:
 - Security requirements
 - Performance targets`}
               className={cn(
-                "text-md bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
-                "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600",
-                "placeholder:text-gray-500 dark:placeholder:text-gray-400"
+                "text-md border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+                "placeholder:text-gray-500 dark:placeholder:text-gray-400",
               )}
               value={freeFormText}
               onChange={(e) => setFreeFormText(e.target.value)}

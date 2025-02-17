@@ -13,6 +13,7 @@ import {
   useContext,
   useRef,
   useState,
+  useEffect,
   type DragEventHandler,
   type PropsWithChildren,
 } from "react";
@@ -68,10 +69,8 @@ interface SystemDesignerState {
     configKey: string,
     defaultValue?: T,
   ) => [T, (configValue: T) => void];
-  // toggleApiRequestFlowMode: () => void;
-  // isApiRequestFlowMode: boolean;
-  // selectedApiFlow?: string;
-  // setSelectedApiFlow: (selectedApiFlow: string) => void;
+  handleCopy: () => void;
+  handlePaste: () => void;
 }
 
 const SystemDesignerContext = createContext<SystemDesignerState>({
@@ -96,6 +95,8 @@ const SystemDesignerContext = createContext<SystemDesignerState>({
   selectedNode: null,
   onSelectNode: noop,
   useSystemComponentConfigSlice: noop,
+  handleCopy: noop,
+  handlePaste: noop,
 });
 
 const componentTargets: Record<
@@ -176,6 +177,10 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
     SystemComponentNodeDataProps | OtherNodeDataProps
   > | null>(null);
   const { toast } = useToast();
+  const [clipboardData, setClipboardData] = useState<{
+    nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[];
+    edges: Edge[];
+  } | null>(null);
 
   const onConnect: OnConnect = useCallback(
     (params) => {
@@ -437,6 +442,85 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
     );
   }, []);
 
+  const handleCopy = useCallback(() => {
+    if (!reactFlowInstance) return;
+
+    const selectedNodes = nodes.filter(
+      (node) => reactFlowInstance.getNodes().find((n) => n.selected && n.id === node.id),
+    );
+    
+    if (selectedNodes.length === 0) return;
+
+    const selectedEdges = edges.filter((edge) => {
+      const sourceNode = selectedNodes.find((node) => node.id === edge.source);
+      const targetNode = selectedNodes.find((node) => node.id === edge.target);
+      return sourceNode && targetNode;
+    });
+
+    setClipboardData({
+      nodes: selectedNodes,
+      edges: selectedEdges,
+    });
+  }, [nodes, edges, reactFlowInstance]);
+
+  const handlePaste = useCallback(() => {
+    if (!clipboardData || !reactFlowInstance) return;
+
+    const { nodes: clipboardNodes, edges: clipboardEdges } = clipboardData;
+
+    // Create a mapping of old IDs to new IDs
+    const idMapping: Record<string, string> = {};
+
+    // Create new nodes with offset positions
+    const newNodes = clipboardNodes.map((node) => {
+      const componentName = node.data.name as SystemComponent["name"];
+      const newId = componentsNumberingStore.getState().getNextId(componentName);
+      idMapping[node.id] = newId;
+
+      return {
+        ...node,
+        id: newId,
+        position: {
+          x: node.position.x + 100,
+          y: node.position.y + 100,
+        },
+        data: {
+          ...node.data,
+          id: newId,
+        },
+        selected: false,
+      };
+    });
+
+    // Create new edges with updated source/target IDs
+    const newEdges = clipboardEdges.map((edge) => ({
+      ...edge,
+      id: `${idMapping[edge.source]} -> ${idMapping[edge.target]}`,
+      source: idMapping[edge.source] ?? '',
+      target: idMapping[edge.target] ?? '',
+      selected: false,
+    })) as Edge[];
+
+    setNodes((nds) => [...nds, ...newNodes]);
+    setEdges((eds) => [...eds, ...newEdges]);
+  }, [clipboardData, reactFlowInstance, setNodes, setEdges]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && event.key === 'c') {
+        handleCopy();
+      }
+      if ((event.ctrlKey || event.metaKey) && event.key === 'v') {
+        handlePaste();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [handleCopy, handlePaste]);
+
   return (
     <SystemDesignerContext.Provider
       value={{
@@ -462,10 +546,8 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
         selectedNode,
         onSelectNode: setSelectedNode,
         useSystemComponentConfigSlice,
-        // toggleApiRequestFlowMode,
-        // isApiRequestFlowMode,
-        // selectedApiFlow,
-        // setSelectedApiFlow: (v: string) => setSelectedApiFlow(v),
+        handleCopy,
+        handlePaste,
       }}
     >
       {children}

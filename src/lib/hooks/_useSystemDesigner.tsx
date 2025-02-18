@@ -70,7 +70,7 @@ interface SystemDesignerState {
     defaultValue?: T,
   ) => [T, (configValue: T) => void];
   handleCopy: () => void;
-  handlePaste: () => void;
+  handlePaste: (event: KeyboardEvent) => void;
 }
 
 const SystemDesignerContext = createContext<SystemDesignerState>({
@@ -471,7 +471,7 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
     // Create a mapping of old IDs to new IDs
     const idMapping: Record<string, string> = {};
 
-    // Create new nodes with offset positions
+    // Create new nodes with a fixed offset from original positions
     const newNodes = clipboardNodes.map((node) => {
       const componentName = node.data.name as SystemComponent["name"];
       const newId = componentsNumberingStore.getState().getNextId(componentName);
@@ -488,7 +488,7 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
           ...node.data,
           id: newId,
         },
-        selected: false,
+        selected: true,
       };
     });
 
@@ -498,11 +498,18 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
       id: `${idMapping[edge.source]} -> ${idMapping[edge.target]}`,
       source: idMapping[edge.source] ?? '',
       target: idMapping[edge.target] ?? '',
-      selected: false,
+      selected: true,
     })) as Edge[];
 
-    setNodes((nds) => [...nds, ...newNodes]);
-    setEdges((eds) => [...eds, ...newEdges]);
+    // Deselect all existing nodes and edges, then add new ones
+    setNodes((nds) => [
+      ...nds.map(node => ({ ...node, selected: false })),
+      ...newNodes
+    ]);
+    setEdges((eds) => [
+      ...eds.map(edge => ({ ...edge, selected: false })),
+      ...newEdges
+    ]);
   }, [clipboardData, reactFlowInstance, setNodes, setEdges]);
 
   useEffect(() => {

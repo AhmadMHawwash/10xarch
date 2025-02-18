@@ -1,9 +1,11 @@
 "use client";
+import { getSystemComponent } from "@/components/Gallery";
 import Notes, { type Note } from "@/components/playground/Notes";
 import SystemContext from "@/components/playground/SystemContext";
 import TodoList, { type TodoItem } from "@/components/playground/TodoList";
 import { FlowManager } from "@/components/SolutionFlowManager";
 import SystemBuilder from "@/components/SystemDesigner";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -12,18 +14,15 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { H3 } from "@/components/ui/typography";
-import { usePlaygroundManager } from "@/lib/hooks/usePlaygroundManager";
 import {
   SystemDesignerProvider,
   useSystemDesigner,
 } from "@/lib/hooks/_useSystemDesigner";
-import { cn } from "@/lib/utils";
-import { usePrevious } from "react-use";
-import { useEffect, useState } from "react";
-import { ReactFlowProvider } from "reactflow";
-import { getSystemComponent } from "@/components/Gallery";
+import { usePlaygroundManager } from "@/lib/hooks/usePlaygroundManager";
 import { type SystemComponentType } from "@/lib/levels/type";
+import { useEffect, useState } from "react";
+import { usePrevious } from "react-use";
+import { ReactFlowProvider } from "reactflow";
 
 export default function Page() {
   return (
@@ -83,45 +82,58 @@ function PageContent() {
   return (
     <ResizablePanelGroup direction="horizontal">
       <ResizablePanel defaultSize={25} minSize={3}>
-        <div className="flex w-[95%] min-w-[300px] flex-col items-center ml-2">
-          <div className="flex items-center justify-start w-full">
-            <Icon />
-            <H3 className="self-start p-2 pl-3">
-              {selectedNode?.data.id && selectedNode.type !== "Whiteboard"
-                ? selectedNode?.data.name
-                : "System"}
-            </H3>
-          </div>
-          <Label htmlFor="name" className="mt-2 ml-3 self-start">
-            Name
-          </Label>
-          <Input
-            id="name"
-            className={cn("m-2 ml-0 w-[95%]", selectedNode ? "" : "hidden")}
-            placeholder="Name"
-            value={displayName}
-            onChange={(e) => {
-              if (!selectedNode?.id) return;
-
-              setDisplayName(e.target.value);
-            }}
-          />
-          <Tabs defaultValue="context" className="mx-auto mt-1 w-[95%]">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="context">Context</TabsTrigger>
-              <TabsTrigger value="todo">Todo</TabsTrigger>
-              <TabsTrigger value="notes">Notes</TabsTrigger>
-            </TabsList>
-            <TabsContent value="todo" className="h-[calc(100%-40px)]">
-              <TodoList todos={todos} setTodos={setTodos} />
-            </TabsContent>
-            <TabsContent value="notes" className="h-[calc(100%-40px)]">
-              <Notes notes={notes} setNotes={setNotes} />
-            </TabsContent>
-            <TabsContent value="context" className="h-[calc(100%-40px)]">
-              <SystemContext context={context} setContext={setContext} />
-            </TabsContent>
-          </Tabs>
+        <div className="h-full bg-gray-50/50 dark:bg-gray-900/50 p-4">
+          <Card className="h-full border-gray-200 dark:border-gray-800">
+            <div className="flex items-center border-b border-gray-200 dark:border-gray-800 p-4">
+              <div className="flex items-center gap-2">
+                <Icon className="w-4 h-4 text-gray-700 dark:text-gray-300" />
+                <span className="text-base font-medium">
+                  {selectedNode?.data.id && selectedNode.type !== "Whiteboard"
+                    ? selectedNode?.data.name
+                    : "System"}
+                </span>
+              </div>
+            </div>
+            
+            <div className="p-4 space-y-4">
+              {selectedNode && (
+                <div className="space-y-2">
+                  <Label htmlFor="name" className="text-sm font-medium">
+                    Name
+                  </Label>
+                  <Input
+                    id="name"
+                    className="w-full"
+                    placeholder="Component name"
+                    value={displayName}
+                    onChange={(e) => {
+                      if (!selectedNode?.id) return;
+                      setDisplayName(e.target.value);
+                    }}
+                  />
+                </div>
+              )}
+              
+              <Tabs defaultValue="context" className="w-full">
+                <TabsList className="w-full grid grid-cols-3 gap-1">
+                  <TabsTrigger value="context" className="text-sm">Context</TabsTrigger>
+                  <TabsTrigger value="todo" className="text-sm">Todo</TabsTrigger>
+                  <TabsTrigger value="notes" className="text-sm">Notes</TabsTrigger>
+                </TabsList>
+                <div className="mt-4 h-[calc(100vh-280px)]">
+                  <TabsContent value="todo" className="h-full m-0">
+                    <TodoList todos={todos} setTodos={setTodos} />
+                  </TabsContent>
+                  <TabsContent value="notes" className="h-full m-0">
+                    <Notes notes={notes} setNotes={setNotes} />
+                  </TabsContent>
+                  <TabsContent value="context" className="h-full m-0">
+                    <SystemContext context={context} setContext={setContext} />
+                  </TabsContent>
+                </div>
+              </Tabs>
+            </div>
+          </Card>
         </div>
       </ResizablePanel>
       <ResizableHandle className="w-1 bg-gray-300 transition-colors hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600" />

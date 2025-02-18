@@ -7,7 +7,7 @@ import { useCredits } from "@/hooks/useCredits";
 import { useSystemDesigner } from "@/lib/hooks/_useSystemDesigner";
 import { api } from "@/trpc/react";
 import { Coins, MessageSquare, Send } from "lucide-react";
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import ReactMarkdown from "react-markdown";
 import { cn } from "@/lib/utils";
 import { useChatMessages } from "@/lib/hooks/useChatMessages_";
@@ -15,6 +15,7 @@ import { useChatMessages } from "@/lib/hooks/useChatMessages_";
 interface Message {
   role: "user" | "assistant" | "system";
   content: string;
+  isSystemDesignRelated: boolean;
 }
 
 interface ChatUIProps {
@@ -176,7 +177,7 @@ export function ChatUI({ challengeId, stageIndex = 0 }: ChatUIProps) {
     });
   }
 
-  const renderMessage = (message: Message) => {
+  const renderMessage = useCallback((message: Message) => {
     const isUser = message.role === "user";
     const isSystem = message.role === "system";
 
@@ -222,32 +223,38 @@ export function ChatUI({ challengeId, stageIndex = 0 }: ChatUIProps) {
         </div>
       </div>
     );
-  };
+  }, []);
+
+  const MessageList = useMemo(() => {
+    return (
+      <div className="space-y-4 p-4">
+        {messages.length === 0 && (
+          <div className="p-4 text-center text-muted-foreground">
+            Hi! I am your AI assistant. How can I help you with this
+            challenge?
+          </div>
+        )}
+        {messages.map((message, i) => (
+          <div key={i}>
+            {renderMessage(message)}
+          </div>
+        ))}
+        {isLoading && (
+          <div className="flex justify-start">
+            <div className="max-w-[80%] rounded-lg bg-muted px-4 py-2">
+              Thinking...
+            </div>
+          </div>
+        )}
+        <div ref={messagesEndRef} />
+      </div>
+    );
+  }, [messages, isLoading, renderMessage]);
 
   return (
     <div className="flex h-full w-full flex-col">
-      <ScrollArea ref={scrollAreaRef} className="flex-1">
-        <div className="space-y-4 p-4">
-          {messages.length === 0 && (
-            <div className="p-4 text-center text-muted-foreground">
-              Hi! I am your AI assistant. How can I help you with this
-              challenge?
-            </div>
-          )}
-          {messages.map((message, i) => (
-            <div key={i}>
-              {renderMessage(message)}
-            </div>
-          ))}
-          {isLoading && (
-            <div className="flex justify-start">
-              <div className="max-w-[80%] rounded-lg bg-muted px-4 py-2">
-                Thinking...
-              </div>
-            </div>
-          )}
-          <div ref={messagesEndRef} />
-        </div>
+      <ScrollArea ref={scrollAreaRef} className="flex-1 min-h-0">
+        {MessageList}
       </ScrollArea>
       <div className="border-t border-border/40 bg-background/95">
         <div className="flex items-center justify-between px-4 py-2 text-xs text-muted-foreground">

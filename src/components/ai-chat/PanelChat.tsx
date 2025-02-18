@@ -61,7 +61,7 @@ export function PanelChat() {
                 </Button>
               </div>
             </div>
-            <div className="flex-1">
+            <div className="flex-1 overflow-hidden">
               <AIChatAssistant />
             </div>
           </motion.div>
@@ -87,7 +87,7 @@ export function PanelChat() {
               </Button>
             </div>
           </div>
-          <div className="flex-1">
+          <div className="flex-1 overflow-hidden">
             <AIChatAssistant />
           </div>
         </DialogContent>

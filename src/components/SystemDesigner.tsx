@@ -8,6 +8,7 @@ import ReactFlow, {
   MarkerType,
   Panel,
   SelectionMode,
+  PanOnScrollMode,
   type EdgeProps,
   type NodeProps,
   type OnConnect,
@@ -95,6 +96,10 @@ const SystemDesigner = ({
         connectionMode={ConnectionMode.Loose}
         selectionMode={SelectionMode.Partial}
         fitView={false}
+        panOnDrag={false}
+        panOnScroll={true}
+        panOnScrollMode={PanOnScrollMode.Free}
+        selectionOnDrag={true}
         className="light-theme dark:dark-theme"
       >
         <Background

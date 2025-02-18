@@ -11,6 +11,7 @@ import {
 interface Message {
   role: "user" | "assistant" | "system";
   content: string;
+  isSystemDesignRelated: boolean;
 }
 
 interface ChatMessagesContextType {

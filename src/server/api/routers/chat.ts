@@ -156,10 +156,11 @@ Keep these requirements in mind when providing assistance. Guide the user withou
         })
 
         const response = completion.choices[0]?.message?.content ?? 'No response generated.'
-        
-        // Calculate actual cost based on usage
         const outputTokens = calculateTextTokens(response)
         const actualCost = costToCredits(calculateGPTCost(inputTokens, outputTokens));
+
+        // Check if response is system design related by looking for the disclaimer
+        const isSystemDesignRelated = !response.includes("Sorry, I can't help with that. I specialise in system design.");
 
         // Use credits
         const [updatedCredits] = await ctx.db
@@ -180,6 +181,7 @@ Keep these requirements in mind when providing assistance. Guide the user withou
 
         return {
           message: response,
+          isSystemDesignRelated,
           remainingMessages: remaining,
           credits: updatedCredits.balance,
           tokensUsed: {
@@ -205,6 +207,10 @@ Keep these requirements in mind when providing assistance. Guide the user withou
       })
 
       const response = completion.choices[0]?.message?.content ?? 'No response generated.'
+      const outputTokens = calculateTextTokens(response)
+
+      // Check if response is system design related by looking for the disclaimer
+      const isSystemDesignRelated = !response.includes("Sorry, I can't help with that. I specialise in system design.");
 
       // Get updated credits if user is signed in
       let creditsBalance = 0;
@@ -215,9 +221,9 @@ Keep these requirements in mind when providing assistance. Guide the user withou
         creditsBalance = userCredits?.balance ?? 0;
       }
 
-      const outputTokens = calculateTextTokens(response)
       return {
         message: response,
+        isSystemDesignRelated,
         remainingMessages: remaining,
         credits: creditsBalance,
         tokensUsed: {

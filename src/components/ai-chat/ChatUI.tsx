@@ -43,7 +43,7 @@ export function ChatUI({ challengeId, stageIndex = 0 }: ChatUIProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [remainingMessages, setRemainingMessages] = useState(10);
   const { balance: credits, refetch: refetchCredits } = useCredits();
-  const { getMessages, addMessage } = useChatMessages();
+  const { getMessages, addMessage, clearSession } = useChatMessages();
   const [mounted, setMounted] = useState(false);
   
   // Create a stable chat session ID that persists across component mounts
@@ -94,7 +94,24 @@ export function ChatUI({ challengeId, stageIndex = 0 }: ChatUIProps) {
       const assistantMessage: Message = {
         role: "assistant",
         content: data.message,
+        isSystemDesignRelated: data.isSystemDesignRelated ?? false
       };
+
+      // If the assistant's response contains the disclaimer, update the last user message
+      if (!data.isSystemDesignRelated) {
+        const currentMessages = getMessages(chatSessionId);
+        const updatedMessages = currentMessages.map((msg, index) => {
+          if (index === currentMessages.length - 1 && msg.role === "user") {
+            return { ...msg, isSystemDesignRelated: false };
+          }
+          return msg;
+        });
+        
+        // Clear and re-add all messages to maintain the updated state
+        clearSession(chatSessionId);
+        updatedMessages.forEach(msg => addMessage(chatSessionId, msg));
+      }
+
       addMessage(chatSessionId, assistantMessage);
       setRemainingMessages(data.remainingMessages);
       // Refetch credits to update the navbar
@@ -108,6 +125,7 @@ export function ChatUI({ challengeId, stageIndex = 0 }: ChatUIProps) {
       const errorMessage: Message = {
         role: "system",
         content: error.message,
+        isSystemDesignRelated: false
       };
       addMessage(chatSessionId, errorMessage);
     },
@@ -144,7 +162,7 @@ export function ChatUI({ challengeId, stageIndex = 0 }: ChatUIProps) {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
 
-    const userMessage: Message = { role: "user", content: input };
+    const userMessage: Message = { role: "user", content: input, isSystemDesignRelated: true };
     addMessage(chatSessionId, userMessage);
     setInput("");
     setIsLoading(true);
@@ -153,7 +171,7 @@ export function ChatUI({ challengeId, stageIndex = 0 }: ChatUIProps) {
       message: input,
       challengeId,
       stageIndex: stageIndex ?? 0,
-      history: messages,
+      history: messages.filter((msg) => msg.isSystemDesignRelated),
       solution: extractSolutionData(),
     });
   }

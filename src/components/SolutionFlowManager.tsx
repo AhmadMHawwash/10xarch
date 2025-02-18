@@ -161,22 +161,22 @@ const ShouldResetFlowModal: React.FC<ShouldResetFlowModalProps> = ({
         </DialogHeader>
         <DialogDescription>
           This will reset the flow to the initial state.
-          <div className="mt-4 flex justify-end gap-2">
-            <Button variant="outline" size="sm" onClick={() => setOpen(false)}>
-              Cancel
-            </Button>
-            <Button
-              size="sm"
-              onClick={() => {
-                onReset();
-                setOpen(false);
-              }}
-              variant="destructive"
-            >
-              Reset
-            </Button>
-          </div>
         </DialogDescription>
+        <div className="mt-4 flex justify-end gap-2">
+          <Button variant="outline" size="sm" onClick={() => setOpen(false)}>
+            Cancel
+          </Button>
+          <Button
+            size="sm"
+            onClick={() => {
+              onReset();
+              setOpen(false);
+            }}
+            variant="destructive"
+          >
+            Reset
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   );

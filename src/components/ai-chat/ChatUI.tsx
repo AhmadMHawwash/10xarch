@@ -203,16 +203,13 @@ export function ChatUI({ challengeId, stageIndex = 0 }: ChatUIProps) {
           ) : (
             <ReactMarkdown
               className={cn(
-                "prose prose-sm max-w-none",
+                "prose prose-sm max-w-none dark:prose-invert",
                 isSystem
                   ? "prose-invert"
-                  : "prose-neutral dark:prose-invert",
+                  : "prose-neutral",
                 "break-words [&_p:last-child]:mb-0",
-                "[&_p]:my-1 [&_ul]:my-1 [&_ol]:my-1 [&_li]:my-0.5",
-                "[&_pre]:my-1 [&_code]:my-1",
                 "[&_pre]:bg-secondary/50 [&_pre]:p-2 [&_pre]:rounded",
                 "[&_code]:bg-secondary/50 [&_code]:px-1 [&_code]:py-0.5 [&_code]:rounded",
-                "[&_a]:text-primary [&_a:hover]:underline",
                 "[&_table]:border-collapse [&_td]:border [&_th]:border [&_td]:px-2 [&_th]:px-2",
                 "[&_blockquote]:border-l-4 [&_blockquote]:border-primary/20 [&_blockquote]:pl-4 [&_blockquote]:italic"
               )}

@@ -18,6 +18,52 @@ const config = {
       },
     },
     extend: {
+      typography: {
+        DEFAULT: {
+          css: {
+            maxWidth: 'none',
+            color: 'hsl(var(--foreground))',
+            h3: {
+              color: 'hsl(var(--foreground))',
+              marginTop: '1.5em',
+              marginBottom: '0.5em'
+            },
+            h4: {
+              color: 'hsl(var(--foreground))',
+              marginTop: '1.5em',
+              marginBottom: '0.5em'
+            },
+            h5: {
+              color: 'hsl(var(--foreground))',
+              marginTop: '1.5em',
+              marginBottom: '0.5em'
+            },
+            p: {
+              marginTop: '0.75em',
+              marginBottom: '0.75em'
+            },
+            a: {
+              color: 'hsl(var(--primary))',
+              '&:hover': {
+                color: 'hsl(var(--primary))',
+              },
+            },
+            code: {
+              color: 'hsl(var(--foreground))',
+              backgroundColor: 'hsl(var(--secondary))',
+              borderRadius: '0.25rem',
+              padding: '0.125rem 0.25rem',
+            },
+            pre: {
+              backgroundColor: 'hsl(var(--secondary))',
+              code: {
+                backgroundColor: 'transparent',
+                padding: 0,
+              },
+            },
+          },
+        },
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -86,7 +132,10 @@ const config = {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+    require("tailwindcss-animate"),
+    require("@tailwindcss/typography"),
+  ],
 } satisfies Config
 
 export default config

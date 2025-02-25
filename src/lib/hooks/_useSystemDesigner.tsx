@@ -451,54 +451,72 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
     if (edgeDeletions.length > 0) {
       // Update nodes to mark affected handles as not connected
       setNodes((currentNodes) => {
-        const edgeId = edgeDeletions[0]?.id;
-        if (!edgeId) return currentNodes;
-
-        // Edge ID format is "sourceId:sourceHandleId -> targetId:targetHandleId"
-        const [sourceWithHandle, targetWithHandle] = edgeId.split(" -> ");
-        if (!sourceWithHandle || !targetWithHandle) return currentNodes;
-
-        const [sourceId, sourceHandleId] = sourceWithHandle.split(":");
-        const [targetId, targetHandleId] = targetWithHandle.split(":");
-        if (!sourceId || !sourceHandleId || !targetId || !targetHandleId) return currentNodes;
-
-        const sourceNode = currentNodes.find((node) => node.id === sourceId);
-        const targetNode = currentNodes.find((node) => node.id === targetId);
+        // Track all nodes that need their internals updated
+        const nodesToUpdate = new Set<string>();
         
-        if (!sourceNode || !targetNode) return currentNodes;
+        // Process all edge deletions instead of just the first one
+        const updatedNodes = [...currentNodes];
+        
+        for (const deletion of edgeDeletions) {
+          const edgeId = deletion.id;
+          if (!edgeId) continue;
 
-        nodesToUpdateUI = [sourceNode, targetNode];
+          // Edge ID format is "sourceId:sourceHandleId -> targetId:targetHandleId"
+          const [sourceWithHandle, targetWithHandle] = edgeId.split(" -> ");
+          if (!sourceWithHandle || !targetWithHandle) continue;
 
-        // Remove the connected handles from both nodes
-        const updatedSourceHandles = sourceNode.data.sourceHandles?.filter(
-          (handle) => handle.id !== sourceHandleId,
-        );
+          const [sourceId, sourceHandleId] = sourceWithHandle.split(":");
+          const [targetId, targetHandleId] = targetWithHandle.split(":");
+          if (!sourceId || !sourceHandleId || !targetId || !targetHandleId) continue;
 
-        const updatedTargetHandles = targetNode.data.targetHandles?.filter(
-          (handle) => handle.id !== targetHandleId,
-        );
-
-        const updatedNodes = currentNodes.map((node) => {
-          if (node.id === sourceId) {
-            return {
-              ...node,
-              data: {
-                ...node.data,
-                sourceHandles: updatedSourceHandles,
-              },
-            };
-          }
-          if (node.id === targetId) {
-            return {
-              ...node,
-              data: {
-                ...node.data,
-                targetHandles: updatedTargetHandles,
-              },
-            };
-          }
-          return node;
-        });
+          // Add nodes to update set
+          nodesToUpdate.add(sourceId);
+          nodesToUpdate.add(targetId);
+          
+          // Find the source and target nodes
+          const sourceNodeIndex = updatedNodes.findIndex((node) => node.id === sourceId);
+          const targetNodeIndex = updatedNodes.findIndex((node) => node.id === targetId);
+          
+          if (sourceNodeIndex === -1 || targetNodeIndex === -1) continue;
+          
+          // Update source node's source handles
+          const sourceNode = updatedNodes[sourceNodeIndex];
+          if (!sourceNode) continue;
+          
+          const updatedSourceHandles = sourceNode.data.sourceHandles?.filter(
+            (handle) => handle.id !== sourceHandleId
+          ) ?? [];
+          
+          updatedNodes[sourceNodeIndex] = {
+            ...sourceNode,
+            data: {
+              ...sourceNode.data,
+              sourceHandles: updatedSourceHandles,
+            },
+          };
+          
+          // Update target node's target handles
+          const targetNode = updatedNodes[targetNodeIndex];
+          if (!targetNode) continue;
+          
+          const updatedTargetHandles = targetNode.data.targetHandles?.filter(
+            (handle) => handle.id !== targetHandleId
+          ) ?? [];
+          
+          updatedNodes[targetNodeIndex] = {
+            ...targetNode,
+            data: {
+              ...targetNode.data,
+              targetHandles: updatedTargetHandles,
+            },
+          };
+        }
+        
+        // Update the nodesToUpdateUI array for later use
+        nodesToUpdateUI = Array.from(nodesToUpdate)
+          .map(id => updatedNodes.find(node => node.id === id))
+          .filter((node): node is Node<SystemComponentNodeDataProps | OtherNodeDataProps> => node !== undefined);
+        
         return updatedNodes;
       });
     }

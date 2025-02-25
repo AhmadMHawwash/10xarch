@@ -63,16 +63,53 @@ export const CustomEdge: FC<EdgeProps<EdgeData>> = ({
     updateEdgeLabel(id, data?.label ?? '', newData);
   };
 
+  const handleEdgeMouseEnter = () => {
+    setIsHovered(true);
+  };
+
+  const handleEdgeMouseLeave = () => {
+    setIsHovered(false);
+  };
+
+  const handleEdgeDoubleClick = () => {
+    setIsEditing(true);
+  };
+
   return (
     <>
+      {/* Invisible wider path for easier interaction - 12px width */}
+      <path
+        id={`${id}-hitbox`}
+        d={edgePath}
+        className="react-flow__edge-interaction"
+        onMouseEnter={handleEdgeMouseEnter}
+        onMouseLeave={handleEdgeMouseLeave}
+        onDoubleClick={handleEdgeDoubleClick}
+        style={{
+          strokeWidth: "12px",
+          stroke: "transparent",
+          fill: "none",
+          cursor: "pointer",
+        }}
+      />
+      
+      {/* Actual visible path */}
       <path
         id={id}
         style={{
-          strokeWidth: "3px",
+          strokeWidth: isHovered ? "4px" : "3px",
+          transition: "stroke-width 0.2s",
+          cursor: "pointer",
         }}
-        className={cn("react-flow__edge-path")}
+        className={cn(
+          "react-flow__edge-path",
+          isHovered && "stroke-blue-500 dark:stroke-blue-400"
+        )}
         d={edgePath}
         markerEnd={markerEnd}
+        onMouseEnter={handleEdgeMouseEnter}
+        onMouseLeave={handleEdgeMouseLeave}
+        onDoubleClick={handleEdgeDoubleClick}
       />
       <EdgeLabelRenderer>
         <div
@@ -82,8 +119,8 @@ export const CustomEdge: FC<EdgeProps<EdgeData>> = ({
             pointerEvents: 'all',
           }}
           className="nodrag nopan relative group"
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
+          onMouseEnter={handleEdgeMouseEnter}
+          onMouseLeave={handleEdgeMouseLeave}
         >
           {isEditing ? (
             <input

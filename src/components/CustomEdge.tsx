@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { useState, type FC } from "react";
+import { useState, useEffect, useRef, type FC } from "react";
 import { getBezierPath, EdgeLabelRenderer, type EdgeProps } from "reactflow";
 import { useSystemDesigner } from "@/lib/hooks/_useSystemDesigner";
 import {
@@ -41,6 +41,23 @@ export const CustomEdge: FC<EdgeProps<EdgeData>> = ({
     targetY,
     targetPosition,
   });
+  
+  const definitionRef = useRef<HTMLTextAreaElement>(null);
+  const flowRef = useRef<HTMLTextAreaElement>(null);
+  
+  // Local state to track if we're currently editing the textareas
+  const [isEditingDefinition, setIsEditingDefinition] = useState(false);
+  const [isEditingFlow, setIsEditingFlow] = useState(false);
+  
+  // Set textarea values when the dialog opens and we're not already editing
+  useEffect(() => {
+    if (definitionRef.current && !isEditingDefinition) {
+      definitionRef.current.value = data?.definition ?? '';
+    }
+    if (flowRef.current && !isEditingFlow) {
+      flowRef.current.value = data?.flow ?? '';
+    }
+  }, [data?.definition, data?.flow, isEditingDefinition, isEditingFlow]);
 
   const handleDoubleClick = () => {
     setIsEditing(true);
@@ -55,6 +72,21 @@ export const CustomEdge: FC<EdgeProps<EdgeData>> = ({
     if (e.key === 'Enter') {
       setIsEditing(false);
       updateEdgeLabel(id, e.currentTarget.value);
+    }
+  };
+
+  // Only update parent state when the textarea loses focus
+  const handleDefinitionBlur = () => {
+    setIsEditingDefinition(false);
+    if (definitionRef.current) {
+      handleApiChange('definition', definitionRef.current.value);
+    }
+  };
+  
+  const handleFlowBlur = () => {
+    setIsEditingFlow(false);
+    if (flowRef.current) {
+      handleApiChange('flow', flowRef.current.value);
     }
   };
 
@@ -177,8 +209,10 @@ export const CustomEdge: FC<EdgeProps<EdgeData>> = ({
                 </TabsList>
                 <TabsContent value="definition">
                   <Textarea
-                    value={data?.definition ?? ''}
-                    onChange={(e) => handleApiChange('definition', e.target.value)}
+                    ref={definitionRef}
+                    defaultValue={data?.definition ?? ''}
+                    onFocus={() => setIsEditingDefinition(true)}
+                    onBlur={handleDefinitionBlur}
                     placeholder={`Example: URL Shortening Service API
 
 Endpoint: POST /shorten
@@ -201,8 +235,10 @@ Example Response:
                 </TabsContent>
                 <TabsContent value="flow">
                   <Textarea
-                    value={data?.flow ?? ""}
-                    onChange={(e) => handleApiChange("flow", e.target.value)}
+                    ref={flowRef}
+                    defaultValue={data?.flow ?? ''}
+                    onFocus={() => setIsEditingFlow(true)}
+                    onBlur={handleFlowBlur}
                     placeholder={`Describe how the API request flows through the system...
 
 Example:

@@ -22,6 +22,7 @@ import {
   applyEdgeChanges,
   applyNodeChanges,
   useReactFlow,
+  useUpdateNodeInternals,
   type Edge,
   type Node,
   type NodeChange,
@@ -117,28 +118,49 @@ const deserializeNodes = (nodes: string | null) => {
   const parsedNodes = JSON.parse(nodes) as Node<
     SystemComponentNodeDataProps | OtherNodeDataProps
   >[];
-  componentsNumberingStore.getState().resetCounting();
-  return parsedNodes.map((node) => {
-    const id =
-      node.data.name === "Whiteboard"
-        ? "Whiteboard-1"
-        : componentsNumberingStore
-            .getState()
-            .getNextId(node.data.name as SystemComponent["name"]);
 
-    return {
-      ...node,
-      id,
-      data: {
-        ...node.data,
-        id,
-        displayName: node.data.id,
-        name: node.data.name as SystemComponent["name"],
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        icon: getSystemComponent(node.data.name as SystemComponentType)?.icon,
-      },
-    };
+  // Instead of resetting, update the component numbering store to the highest number for each component
+  const componentCounts: Record<SystemComponent["name"], number> = {
+    Client: 1,
+    Server: 1,
+    Database: 1,
+    "Load Balancer": 1,
+    Cache: 1,
+    CDN: 1,
+    "Message Queue": 1,
+  };
+
+  // Calculate the highest number for each component type
+  parsedNodes.forEach((node) => {
+    if (node.data.name === "Whiteboard") return;
+    
+    const match = node.id.match(/^(.+)-(\d+)$/);
+    if (match?.[1] && match[2]) {
+      const componentName = match[1];
+      const number = parseInt(match[2], 10);
+      if (componentName in componentCounts && !isNaN(number)) {
+        componentCounts[componentName as SystemComponent["name"]] = 
+          Math.max(componentCounts[componentName as SystemComponent["name"]], number + 1);
+      }
+    }
   });
+
+  // Update the component numbering store with the highest numbers
+  componentsNumberingStore.setState({
+    componentsToCount: componentCounts,
+  });
+
+  return parsedNodes.map((node) => ({
+    ...node,
+    data: {
+      ...node.data,
+      name: node.data.name as SystemComponent["name"],
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      icon: getSystemComponent(node.data.name as SystemComponentType)?.icon,
+      targetHandles: node.data.targetHandles ?? [],
+      sourceHandles: node.data.sourceHandles ?? [],
+    },
+  }));
 };
 
 export const defaultStartingNodes: Node<
@@ -151,6 +173,7 @@ export const defaultStartingNodes: Node<
       name: "Whiteboard",
       id: "Whiteboard-1",
       configs: {},
+      targetHandles: [],
     },
     position: {
       x: 100,
@@ -181,10 +204,11 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
     nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[];
     edges: Edge[];
   } | null>(null);
+  const updateNodeInternals = useUpdateNodeInternals();
 
   const onConnect: OnConnect = useCallback(
     (params) => {
-      const { source, target } = params;
+      const { source, target, targetHandle, sourceHandle } = params;
       const sourceNode = nodes.find((node) => node.id === source);
       const targetNode = nodes.find((node) => node.id === target);
 
@@ -197,26 +221,82 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
 
       const targets = componentTargets[typedSourceNode?.data.name];
       if (!targets.includes(typedTargetNode?.data.name)) {
-        // toast(
-        //   warning({
-        //     title: `You cannot connect ${sourceNode?.data.name} to ${targetNode?.data.name}`,
-        //     position: "bottom",
-        //   }),
-        // );
         return;
       }
 
-      return setEdges((eds: Edge[]) =>
-        addEdge(
-          {
-            ...params,
-            id: `${sourceNode.id} -> ${targetNode.id}`,
-            type: "CustomEdge",
-            // animated: isApiRequestFlowMode,
-          },
-          eds,
-        ),
-      );
+      // Update both nodes' handles
+      const updatedNodes = nodes.map((node) => {
+        if (node.id === target) {
+          // Update target node's targetHandles
+          const updatedTargetHandles =
+            node.data.targetHandles?.map((handle) => ({
+              ...handle,
+              isConnected: handle.isConnected || handle.id === targetHandle,
+            })) ?? [];
+
+          // Generate a unique handle ID
+          const timestamp = Date.now();
+          const newTargetHandle = {
+            id: `${target}-target-handle-${timestamp}`,
+            isConnected: false,
+          };
+
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              targetHandles: [...updatedTargetHandles, newTargetHandle],
+            },
+          };
+        }
+        
+        if (node.id === source) {
+          // Update source node's sourceHandles
+          const updatedSourceHandles =
+            node.data.sourceHandles?.map((handle) => ({
+              ...handle,
+              isConnected: handle.isConnected || handle.id === sourceHandle,
+            })) ?? [];
+
+          // Generate a unique handle ID
+          const timestamp = Date.now();
+          const newSourceHandle = {
+            id: `${source}-source-handle-${timestamp}`,
+            isConnected: false,
+          };
+
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              sourceHandles: [...updatedSourceHandles, newSourceHandle],
+            },
+          };
+        }
+        
+        return node;
+      });
+
+      queueMicrotask(() => {
+        setEdges((eds: Edge[]) =>
+          addEdge(
+            {
+              ...params,
+              id: `${source}:${sourceHandle} -> ${target}:${targetHandle}`,
+              type: "CustomEdge",
+              data: { sourceHandle, targetHandle },
+            },
+            eds,
+          ),
+        );
+        setNodes(updatedNodes);
+      });
+      
+      // Update both nodes' internals
+      setTimeout(() => {
+        updateNodeInternals(targetNode.id);
+        updateNodeInternals(sourceNode.id);
+      }, 200);
     },
     [nodes],
   );
@@ -299,6 +379,9 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
       if (!component) return;
 
       const id = componentsNumberingStore.getState().getNextId(componentName);
+      
+      // Generate unique handle IDs using timestamp
+      const timestamp = Date.now();
       const data: SystemComponentNodeDataProps = {
         name: componentName,
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -307,6 +390,8 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
         withSourceHandle: true,
         id,
         configs: {},
+        targetHandles: [{ id: `${id}-target-handle-${timestamp}`, isConnected: false }],
+        sourceHandles: [{ id: `${id}-source-handle-${timestamp + 1}`, isConnected: false }],
       };
 
       const newNode: Node<SystemComponentNodeDataProps> = {
@@ -360,9 +445,74 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
   };
 
   const onEdgesChange: OnEdgesChange = (changes) => {
-    const newEdges = applyEdgeChanges(changes, edges);
+    let nodesToUpdateUI: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[] = [];
+    const edgeDeletions = changes.filter((change) => change.type === "remove");
+    
+    if (edgeDeletions.length > 0) {
+      // Update nodes to mark affected handles as not connected
+      setNodes((currentNodes) => {
+        const edgeId = edgeDeletions[0]?.id;
+        if (!edgeId) return currentNodes;
 
+        // Edge ID format is "sourceId:sourceHandleId -> targetId:targetHandleId"
+        const [sourceWithHandle, targetWithHandle] = edgeId.split(" -> ");
+        if (!sourceWithHandle || !targetWithHandle) return currentNodes;
+
+        const [sourceId, sourceHandleId] = sourceWithHandle.split(":");
+        const [targetId, targetHandleId] = targetWithHandle.split(":");
+        if (!sourceId || !sourceHandleId || !targetId || !targetHandleId) return currentNodes;
+
+        const sourceNode = currentNodes.find((node) => node.id === sourceId);
+        const targetNode = currentNodes.find((node) => node.id === targetId);
+        
+        if (!sourceNode || !targetNode) return currentNodes;
+
+        nodesToUpdateUI = [sourceNode, targetNode];
+
+        // Remove the connected handles from both nodes
+        const updatedSourceHandles = sourceNode.data.sourceHandles?.filter(
+          (handle) => handle.id !== sourceHandleId,
+        );
+
+        const updatedTargetHandles = targetNode.data.targetHandles?.filter(
+          (handle) => handle.id !== targetHandleId,
+        );
+
+        const updatedNodes = currentNodes.map((node) => {
+          if (node.id === sourceId) {
+            return {
+              ...node,
+              data: {
+                ...node.data,
+                sourceHandles: updatedSourceHandles,
+              },
+            };
+          }
+          if (node.id === targetId) {
+            return {
+              ...node,
+              data: {
+                ...node.data,
+                targetHandles: updatedTargetHandles,
+              },
+            };
+          }
+          return node;
+        });
+        return updatedNodes;
+      });
+    }
+
+    const newEdges = applyEdgeChanges(changes, edges);
     setEdges(newEdges);
+
+    if (nodesToUpdateUI.length > 0) {
+      setTimeout(() => {
+        nodesToUpdateUI.forEach((node) => {
+          updateNodeInternals(node.id);
+        });
+      }, 200);
+    }
   };
 
   const onSave = useCallback(() => {
@@ -377,6 +527,9 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
   const onRestore = useCallback(() => {
     const restoreFlow = async () => {
       if (typeof window === "undefined") return;
+
+      // Reset the component numbering store
+      componentsNumberingStore.getState().resetCounting();
 
       const flow: ReactFlowJsonObject = JSON.parse(
         localStorage.getItem("reactflow") ?? "{}",
@@ -445,10 +598,10 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
   const handleCopy = useCallback(() => {
     if (!reactFlowInstance) return;
 
-    const selectedNodes = nodes.filter(
-      (node) => reactFlowInstance.getNodes().find((n) => n.selected && n.id === node.id),
+    const selectedNodes = nodes.filter((node) =>
+      reactFlowInstance.getNodes().find((n) => n.selected && n.id === node.id),
     );
-    
+
     if (selectedNodes.length === 0) return;
 
     const selectedEdges = edges.filter((edge) => {
@@ -474,7 +627,9 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
     // Create new nodes with a fixed offset from original positions
     const newNodes = clipboardNodes.map((node) => {
       const componentName = node.data.name as SystemComponent["name"];
-      const newId = componentsNumberingStore.getState().getNextId(componentName);
+      const newId = componentsNumberingStore
+        .getState()
+        .getNextId(componentName);
       idMapping[node.id] = newId;
 
       return {
@@ -496,35 +651,35 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
     const newEdges = clipboardEdges.map((edge) => ({
       ...edge,
       id: `${idMapping[edge.source]} -> ${idMapping[edge.target]}`,
-      source: idMapping[edge.source] ?? '',
-      target: idMapping[edge.target] ?? '',
+      source: idMapping[edge.source] ?? "",
+      target: idMapping[edge.target] ?? "",
       selected: true,
     })) as Edge[];
 
     // Deselect all existing nodes and edges, then add new ones
     setNodes((nds) => [
-      ...nds.map(node => ({ ...node, selected: false })),
-      ...newNodes
+      ...nds.map((node) => ({ ...node, selected: false })),
+      ...newNodes,
     ]);
     setEdges((eds) => [
-      ...eds.map(edge => ({ ...edge, selected: false })),
-      ...newEdges
+      ...eds.map((edge) => ({ ...edge, selected: false })),
+      ...newEdges,
     ]);
   }, [clipboardData, reactFlowInstance, setNodes, setEdges]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if ((event.ctrlKey || event.metaKey) && event.key === 'c') {
+      if ((event.ctrlKey || event.metaKey) && event.key === "c") {
         handleCopy();
       }
-      if ((event.ctrlKey || event.metaKey) && event.key === 'v') {
+      if ((event.ctrlKey || event.metaKey) && event.key === "v") {
         handlePaste();
       }
     };
 
-    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener("keydown", handleKeyDown);
     return () => {
-      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener("keydown", handleKeyDown);
     };
   }, [handleCopy, handlePaste]);
 

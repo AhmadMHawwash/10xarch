@@ -8,14 +8,14 @@ import { InfoIcon, type PiIcon } from "lucide-react";
 import { Handle, Position, type NodeProps } from "reactflow";
 import { getSystemComponent } from "../Gallery";
 import { Cache } from "../SystemComponents/Cache";
+import { CDN } from "../SystemComponents/CDN";
+import { Client } from "../SystemComponents/Client";
 import { Database } from "../SystemComponents/Database";
+import { LoadBalancer } from "../SystemComponents/LoadBalancer";
+import { MessageQueue } from "../SystemComponents/MessageQueue";
+import { Server } from "../SystemComponents/Server";
 import { WithMarkdownDetails } from "../SystemComponents/Wrappers/WithMarkdownDetails";
 import { Small } from "../ui/typography";
-import { Client } from "../SystemComponents/Client";
-import { Server } from "../SystemComponents/Server";
-import { LoadBalancer } from "../SystemComponents/LoadBalancer";
-import { CDN } from "../SystemComponents/CDN";
-import { MessageQueue } from "../SystemComponents/MessageQueue";
 
 export type SystemComponentNodeDataProps = {
   icon?: typeof PiIcon;
@@ -25,6 +25,8 @@ export type SystemComponentNodeDataProps = {
   withSourceHandle?: boolean;
   configs: Record<string, unknown>;
   displayName?: string;
+  targetHandles?: Array<{ id: string; isConnected: boolean }>;
+  sourceHandles?: Array<{ id: string; isConnected: boolean }>;
 };
 
 export type OtherNodeDataProps = {
@@ -35,6 +37,8 @@ export type OtherNodeDataProps = {
   withSourceHandle?: boolean;
   configs: Record<string, unknown>;
   displayName?: string;
+  targetHandles?: Array<{ id: string; isConnected: boolean }>;
+  sourceHandles?: Array<{ id: string; isConnected: boolean }>;
 };
 
 export default function SystemComponentNode({
@@ -47,19 +51,43 @@ export default function SystemComponentNode({
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const { icon: ComponentIcon, content } = getSystemComponent(data.name);
   const displayName = data.configs["display name"] as string;
+
+  // Calculate positions for target handles
+  const targetHandles = data.targetHandles ?? [];
+  const sourceHandles = data.sourceHandles ?? [];
+  const handleSpacing = 30; // pixels between handles
+  const targetTotalHeight = (targetHandles.length - 1) * handleSpacing;
+  const sourceTotalHeight = (sourceHandles.length - 1) * handleSpacing;
+
   return (
     <>
-      {!withoutTargetHandle.includes(data.name) && (
-        <Handle
-          type="target"
-          position={Position.Left}
-          style={{ background: "#aaa", width: "10px", height: "10px" }}
-          className="transition-all"
-        />
-      )}
+      {!withoutTargetHandle.includes(data.name) &&
+        targetHandles.map((handle, index) => {
+          const yOffset = -targetTotalHeight / 2 + index * handleSpacing;
+          return (
+            <Handle
+              key={handle.id}
+              type="target"
+              position={Position.Left}
+              id={handle.id}
+              isConnectable={!handle.isConnected}
+              style={{
+                background: handle.isConnected ? "#4CAF50" : "#aaa",
+                width: "10px",
+                height: "10px",
+                top: `calc(50% + ${yOffset}px)`,
+                cursor: handle.isConnected ? 'not-allowed' : 'pointer'
+              }}
+              className={cn(
+                "transition-all",
+                handle.isConnected && "opacity-50"
+              )}
+            />
+          );
+        })}
       <div
         className={cn(
-          "group flex max-w-[200px] flex-col items-center justify-center rounded-sm border border-gray-300 p-2 dark:border-gray-600",
+          "group flex max-w-[200px] flex-col items-center justify-center rounded-sm border border-gray-300 p-4 dark:border-gray-600",
           selected
             ? "bg-gray-200 dark:bg-gray-700"
             : "bg-gray-100 dark:bg-gray-800",
@@ -68,8 +96,11 @@ export default function SystemComponentNode({
             !(data.withTargetHandle || data.withSourceHandle) &&
             "opacity-50",
         )}
+        style={{
+          height: `${Math.max(targetTotalHeight, sourceTotalHeight) + 20}px`,
+        }}
       >
-        <Component name={displayName || data.id} Icon={data.icon} />
+        <Component name={displayName ?? data.id} Icon={data.icon} />
         {content && (
           <WithMarkdownDetails
             className="absolute left-0 top-[-17px] rounded-full bg-gray-200 opacity-0 transition-all group-hover:opacity-100 dark:bg-gray-700"
@@ -86,14 +117,30 @@ export default function SystemComponentNode({
         )}
       </div>
 
-      {!withoutSourceHandle.includes(data.name) && (
-        <Handle
-          type="source"
-          position={Position.Right}
-          style={{ background: "#aaa", width: "10px", height: "10px" }}
-          className="transition-all"
-        />
-      )}
+      {!withoutSourceHandle.includes(data.name) &&
+        sourceHandles.map((handle, index) => {
+          const yOffset = -sourceTotalHeight / 2 + index * handleSpacing;
+          return (
+            <Handle
+              key={handle.id}
+              type="source"
+              position={Position.Right}
+              id={handle.id}
+              isConnectable={!handle.isConnected}
+              style={{
+                background: handle.isConnected ? "#4CAF50" : "#aaa",
+                width: "10px",
+                height: "10px",
+                top: `calc(50% + ${yOffset}px)`,
+                cursor: handle.isConnected ? 'not-allowed' : 'pointer'
+              }}
+              className={cn(
+                "transition-all",
+                handle.isConnected && "opacity-50"
+              )}
+            />
+          );
+        })}
     </>
   );
 }
@@ -132,6 +179,4 @@ const DefaultComponent = ({ name, Icon }: ComponentNodeProps) => (
 );
 
 const withoutTargetHandle: SystemComponentType[] = ["Client"];
-const withoutSourceHandle: SystemComponentType[] = [
-  "Database",
-];
+const withoutSourceHandle: SystemComponentType[] = ["Database"];

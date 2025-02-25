@@ -3,6 +3,7 @@ import {
   defaultStartingNodes,
   useSystemDesigner,
 } from "@/lib/hooks/_useSystemDesigner";
+import { componentsNumberingStore } from "@/lib/levels/utils";
 import {
   type EvaluationResponse,
   type PlaygroundResponse,
@@ -49,6 +50,7 @@ export const FlowManager: React.FC<FlowManagerProps> = ({
   }, []);
 
   const resetFlow = () => {
+    componentsNumberingStore.getState().resetCounting();
     setNodes(defaultStartingNodes);
     setEdges([]);
     setResetDone(true);

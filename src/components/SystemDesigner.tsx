@@ -88,7 +88,7 @@ const SystemDesigner = ({
         onPaneClick={() => onSelectNode(whiteboardNode)}
         defaultEdgeOptions={{
           markerEnd: { type: MarkerType.ArrowClosed },
-          animated: true,
+          animated: false,
         }}
         proOptions={{
           hideAttribution: true,

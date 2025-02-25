@@ -63,7 +63,7 @@ export const useChallengeManager = () => {
   const pathname = usePathname();
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  
+
   const challenge = challenges.find(
     (challenge) => challenge.slug === params?.slug,
   );
@@ -78,7 +78,7 @@ export const useChallengeManager = () => {
       : [],
   );
   const { nodes, edges } = useSystemDesigner();
-  
+
   const { mutate, data, isPending } = api.challenges.submit.useMutation({
     async onSuccess() {
       await queryClient.refetchQueries({
@@ -87,7 +87,10 @@ export const useChallengeManager = () => {
     },
     onError: (error) => {
       toast({
-        title: error.data?.code === "TOO_MANY_REQUESTS" ? "Rate Limit Exceeded" : "Error",
+        title:
+          error.data?.code === "TOO_MANY_REQUESTS"
+            ? "Rate Limit Exceeded"
+            : "Error",
         description: error.message,
         variant: "destructive",
       });
@@ -141,6 +144,8 @@ export const useChallengeManager = () => {
 
 interface EdgeData {
   label?: string;
+  definition?: string;
+  flow?: string;
 }
 
 export const getChallengePrompt = ({
@@ -166,17 +171,6 @@ export const getChallengePrompt = ({
       nonFunctionalRequirements: configs[
         "non-functional requirements"
       ] as string,
-      apiDefinitions: (
-        configs["API definitions and flows"] as Array<{
-          name: string;
-          definition: string;
-          flow: string;
-        }>
-      )?.map((api) => ({
-        name: api.name,
-        definition: api.definition,
-        flow: api.flow,
-      })),
       capacityEstimations: configs["Capacity estimations"] as Record<
         string,
         string
@@ -184,12 +178,30 @@ export const getChallengePrompt = ({
     };
   };
 
+  const extractAPIDefinitions = (edges: Edge<EdgeData>[]) => {
+    return edges
+      .filter(
+        (edge) =>
+          // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+          edge.data?.label && (edge.data?.definition || edge.data?.flow),
+      )
+      .map((edge) => ({
+        name: edge.data?.label ?? "",
+        definition: edge.data?.definition ?? "",
+        flow: edge.data?.flow ?? "",
+        source: edge.source,
+        target: edge.target,
+      }));
+  };
+
   const findTargets = (sourceId: string) => {
     return edges
       .filter((edge) => edge.source === sourceId)
       .map((edge) => ({
         targetId: edge.target,
-        relationship: edge.data?.label ?? "connects to"
+        title: edge.data?.label ?? "connects to",
+        ...(edge.data?.definition && { apiDefinition: edge.data?.definition }),
+        ...(edge.data?.flow && { apiFlow: edge.data?.flow }),
       }));
   };
 
@@ -216,7 +228,7 @@ export const getChallengePrompt = ({
       type: node.data.name,
       id: node.id,
       configs: extractNodeConfigs(node),
-      "relationships": findTargets(node.id),
+      relationships: findTargets(node.id),
     }));
 
   const buildLLMPrompt = (
@@ -224,6 +236,7 @@ export const getChallengePrompt = ({
     currentStage: Challenge["stages"][number],
   ) => {
     const whiteboardData = extractRequirements(nodes);
+    const apiDefinitions = extractAPIDefinitions(edges);
 
     const prompt = {
       challenge: {
@@ -236,7 +249,7 @@ export const getChallengePrompt = ({
       },
       solution: {
         components: cleanedNodes,
-        "API definitions": whiteboardData?.apiDefinitions ?? [],
+        "API definitions": apiDefinitions,
         "Traffic capacity estimation ":
           whiteboardData?.capacityEstimations?.Traffic ?? "",
         "Storage capacity estimation":

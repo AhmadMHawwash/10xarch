@@ -76,7 +76,8 @@ export default function SystemComponentNode({
                 width: "10px",
                 height: "10px",
                 top: `calc(50% + ${yOffset}px)`,
-                cursor: handle.isConnected ? 'not-allowed' : 'pointer'
+                cursor: handle.isConnected ? 'not-allowed' : 'pointer',
+                zIndex: 5,
               }}
               className={cn(
                 "transition-all",
@@ -87,7 +88,7 @@ export default function SystemComponentNode({
         })}
       <div
         className={cn(
-          "group flex max-w-[200px] flex-col items-center justify-center rounded-sm border border-gray-300 p-4 dark:border-gray-600",
+          "group relative flex max-w-[200px] flex-col items-center justify-center rounded-sm border border-gray-300 p-4 dark:border-gray-600",
           selected
             ? "bg-gray-200 dark:bg-gray-700"
             : "bg-gray-100 dark:bg-gray-800",

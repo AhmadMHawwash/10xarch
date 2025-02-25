@@ -25,8 +25,8 @@ import {
 
 export const Database = ({ name, Icon }: ComponentNodeProps) => {
   return (
-    <div className="relative flex flex-col items-center text-gray-800 dark:text-gray-200 group">
-      <div className="relative flex items-center gap-1">
+    <div className="flex flex-col items-center text-gray-800 dark:text-gray-200 group">
+      <div className="flex items-center gap-1">
         {Icon && <Icon size={20} className="text-gray-700 dark:text-gray-300" />}
         <Small className="text-gray-700 dark:text-gray-300">{name}</Small>
       </div>

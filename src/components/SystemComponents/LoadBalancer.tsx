@@ -1,17 +1,8 @@
 import { useSystemDesigner } from "@/lib/hooks/_useSystemDesigner";
-import { type ComponentNodeProps } from "../ReactflowCustomNodes/SystemComponentNode";
-import { Label } from "../ui/label";
-import { Textarea } from "../ui/textarea";
-import { Small } from "../ui/typography";
-import { WithSettings } from "./Wrappers/WithSettings";
-import { useState } from "react";
-import { Input } from "../ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import { HelpCircle, ExternalLink } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import { cn } from "@/lib/utils";
-import { Checkbox } from "../ui/checkbox";
-import { Switch } from "../ui/switch";
+import { ExternalLink, HelpCircle } from "lucide-react";
+import { useState } from "react";
+import { type ComponentNodeProps } from "../ReactflowCustomNodes/SystemComponentNode";
 import {
   Dialog,
   DialogContent,
@@ -20,55 +11,19 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import { Switch } from "../ui/switch";
+import { Textarea } from "../ui/textarea";
+import { Small } from "../ui/typography";
+import { WithSettings } from "./Wrappers/WithSettings";
 
 interface FeatureInfo {
   name: string;
   description: string;
   learnMoreUrl?: string;
 }
-
-const featureInfoMap: Record<string, FeatureInfo> = {
-  "SSL Termination": {
-    name: "SSL Termination",
-    description: "Handle SSL/TLS encryption and decryption at the load balancer level.",
-    learnMoreUrl: "https://docs.example.com/load-balancer/ssl-termination"
-  },
-  "Session Persistence": {
-    name: "Session Persistence",
-    description: "Ensure requests from the same client are routed to the same server.",
-    learnMoreUrl: "https://docs.example.com/load-balancer/session-persistence"
-  },
-  "Health Checks": {
-    name: "Health Checks",
-    description: "Monitor backend server health and automatically remove unhealthy servers.",
-    learnMoreUrl: "https://docs.example.com/load-balancer/health-checks"
-  },
-  "Rate Limiting": {
-    name: "Rate Limiting",
-    description: "Control the rate of incoming requests to prevent overload.",
-    learnMoreUrl: "https://docs.example.com/load-balancer/rate-limiting"
-  },
-  "Request Routing": {
-    name: "Request Routing",
-    description: "Route requests based on URL, headers, or other criteria.",
-    learnMoreUrl: "https://docs.example.com/load-balancer/request-routing"
-  },
-  "Connection Draining": {
-    name: "Connection Draining",
-    description: "Gracefully remove servers from the pool during maintenance.",
-    learnMoreUrl: "https://docs.example.com/load-balancer/connection-draining"
-  },
-  "DDoS Protection": {
-    name: "DDoS Protection",
-    description: "Protect against distributed denial of service attacks.",
-    learnMoreUrl: "https://docs.example.com/load-balancer/ddos-protection"
-  },
-  "WAF Integration": {
-    name: "WAF Integration",
-    description: "Integrate with Web Application Firewall for enhanced security.",
-    learnMoreUrl: "https://docs.example.com/load-balancer/waf-integration"
-  }
-};
 
 const configInfoMap: Record<string, FeatureInfo> = {
   "Free-form Text Mode": {
@@ -135,8 +90,8 @@ const InfoPopup = ({ feature }: { feature: FeatureInfo }) => {
 
 export const LoadBalancer = ({ name, Icon }: ComponentNodeProps) => {
   return (
-    <div className="relative flex flex-col items-center text-gray-800 dark:text-gray-200 group">
-      <div className="relative flex items-center gap-1">
+    <div className="flex flex-col items-center text-gray-800 dark:text-gray-200 group">
+      <div className="flex items-center gap-1">
         {Icon && <Icon size={20} className="text-gray-700 dark:text-gray-300" />}
         <Small>{name}</Small>
       </div>

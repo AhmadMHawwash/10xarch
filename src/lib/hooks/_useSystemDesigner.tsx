@@ -46,7 +46,7 @@ interface SystemDesignerState {
   initWrapper: (wrapper: HTMLDivElement) => void;
   updateNodes: (nodes: Node[]) => void;
   updateEdges: (edges: Edge[]) => void;
-  updateEdgeLabel: (edgeId: string, label: string) => void;
+  updateEdgeLabel: (edgeId: string, label: string, data?: Record<string, unknown>) => void;
   onConnect: OnConnect;
   onDragOver: DragEventHandler;
   onDrop: DragEventHandler;
@@ -578,7 +578,7 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
     [nodes, updateNodes],
   );
 
-  const updateEdgeLabel = useCallback((edgeId: string, label: string) => {
+  const updateEdgeLabel = useCallback((edgeId: string, label: string, data?: Record<string, unknown>) => {
     setEdges((eds) =>
       eds.map((edge) => {
         if (edge.id === edgeId) {
@@ -586,6 +586,7 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
             ...edge,
             data: {
               ...edge.data,
+              ...data,
               label,
             },
           };

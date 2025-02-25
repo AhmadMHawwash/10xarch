@@ -17,7 +17,7 @@ export const Whiteboard = ({ selected }: NodeProps) => {
     >
       <Small className="mb-2">System definitions</Small>
       <RequirementsDefinition />
-      <APIDefinition />
+      {/* <APIDefinition /> */}
       <CapacityEstimationDefinition />
       <WithMarkdownDetails
         className="absolute left-0 top-[-17px] rounded-full bg-gray-200 dark:bg-gray-700 opacity-0 transition-all group-hover:opacity-100"

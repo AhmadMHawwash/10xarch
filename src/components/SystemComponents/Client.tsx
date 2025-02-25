@@ -159,8 +159,8 @@ const InfoPopup = ({ feature }: { feature: FeatureInfo }) => {
 
 export const Client = ({ name, Icon }: ComponentNodeProps) => {
   return (
-    <div className="group relative flex flex-col items-center text-gray-800 dark:text-gray-200">
-      <div className="relative flex items-center gap-1">
+    <div className="group flex flex-col items-center text-gray-800 dark:text-gray-200">
+      <div className="flex items-center gap-1">
         {Icon && (
           <Icon size={20} className="text-gray-700 dark:text-gray-300" />
         )}
@@ -253,8 +253,6 @@ const ClientSettings = ({ name: id }: { name: string }) => {
         return commonFeatures;
     }
   };
-
-  const availableFeatures = getAvailableFeatures(clientType);
 
   return (
     <WithSettings name={id}>

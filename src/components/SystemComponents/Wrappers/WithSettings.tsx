@@ -18,8 +18,8 @@ export const WithSettings = ({
 }) => {
   return (
     <Dialog>
-      <DialogTrigger>
-        <span className="absolute right-[-14px] top-[-14px] rounded-full bg-gray-200 dark:bg-gray-700">
+      <DialogTrigger className="absolute -right-1 -top-1 rounded-full bg-gray-200 dark:bg-gray-700">
+        <span>
           <Settings size={16} className="stroke-gray-700 dark:stroke-gray-300" />
         </span>
       </DialogTrigger>

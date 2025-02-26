@@ -616,9 +616,33 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
 
   const handleCopy = useCallback(() => {
     if (!reactFlowInstance) return;
+    
+    // Don't copy if focus is in a form input element
+    const activeElement = document.activeElement;
+    if (
+      activeElement instanceof HTMLInputElement ||
+      activeElement instanceof HTMLTextAreaElement ||
+      (activeElement instanceof HTMLElement && activeElement.isContentEditable)
+    ) {
+      return;
+    }
 
+    // Check if user is trying to copy a Whiteboard node
+    const hasWhiteboardSelected = reactFlowInstance.getNodes().some(
+      (n) => n.selected && n.id.includes("Whiteboard")
+    );
+
+    if (hasWhiteboardSelected) {
+      toast({
+        title: "Cannot copy System definitions",
+        description: "The System definitions cannot be copied or duplicated."
+      });
+    }
+
+    // Filter out Whiteboard nodes from selection
     const selectedNodes = nodes.filter((node) =>
-      reactFlowInstance.getNodes().find((n) => n.selected && n.id === node.id),
+      reactFlowInstance.getNodes().find((n) => n.selected && n.id === node.id) && 
+      !node.id.includes("Whiteboard")
     );
 
     if (selectedNodes.length === 0) return;
@@ -633,10 +657,20 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
       nodes: selectedNodes,
       edges: selectedEdges,
     });
-  }, [nodes, edges, reactFlowInstance]);
+  }, [nodes, edges, reactFlowInstance, toast]);
 
   const handlePaste = useCallback(() => {
     if (!clipboardData || !reactFlowInstance) return;
+    
+    // Don't paste if focus is in a form input element
+    const activeElement = document.activeElement;
+    if (
+      activeElement instanceof HTMLInputElement ||
+      activeElement instanceof HTMLTextAreaElement ||
+      (activeElement instanceof HTMLElement && activeElement.isContentEditable)
+    ) {
+      return;
+    }
 
     const { nodes: clipboardNodes, edges: clipboardEdges } = clipboardData;
 

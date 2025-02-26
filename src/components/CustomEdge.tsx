@@ -45,19 +45,37 @@ export const CustomEdge: FC<EdgeProps<EdgeData>> = ({
   const definitionRef = useRef<HTMLTextAreaElement>(null);
   const flowRef = useRef<HTMLTextAreaElement>(null);
   
+  // Local state to preserve textarea values when switching tabs
+  const [localDefinition, setLocalDefinition] = useState(data?.definition ?? '');
+  const [localFlow, setLocalFlow] = useState(data?.flow ?? '');
+
+  // Keep local state in sync with props when not editing
+  useEffect(() => {
+    setLocalDefinition(data?.definition ?? '');
+  }, [data?.definition]);
+
+  useEffect(() => {
+    setLocalFlow(data?.flow ?? '');
+  }, [data?.flow]);
+  
   // Local state to track if we're currently editing the textareas
   const [isEditingDefinition, setIsEditingDefinition] = useState(false);
   const [isEditingFlow, setIsEditingFlow] = useState(false);
   
-  // Set textarea values when the dialog opens and we're not already editing
-  useEffect(() => {
-    if (definitionRef.current && !isEditingDefinition) {
-      definitionRef.current.value = data?.definition ?? '';
+  // Current active tab
+  const [activeTab, setActiveTab] = useState<string>("definition");
+  
+  // Handle tab switching - save current tab's content before switching
+  const handleTabChange = (newTab: string) => {
+    // Save current tab's content
+    if (activeTab === "definition" && definitionRef.current) {
+      setLocalDefinition(definitionRef.current.value);
+    } else if (activeTab === "flow" && flowRef.current) {
+      setLocalFlow(flowRef.current.value);
     }
-    if (flowRef.current && !isEditingFlow) {
-      flowRef.current.value = data?.flow ?? '';
-    }
-  }, [data?.definition, data?.flow, isEditingDefinition, isEditingFlow]);
+    
+    setActiveTab(newTab);
+  };
 
   const handleDoubleClick = () => {
     setIsEditing(true);
@@ -75,18 +93,40 @@ export const CustomEdge: FC<EdgeProps<EdgeData>> = ({
     }
   };
 
-  // Only update parent state when the textarea loses focus
+  // Save local state and update parent when textarea loses focus
   const handleDefinitionBlur = () => {
     setIsEditingDefinition(false);
     if (definitionRef.current) {
-      handleApiChange('definition', definitionRef.current.value);
+      const newValue = definitionRef.current.value;
+      setLocalDefinition(newValue);
+      handleApiChange('definition', newValue);
     }
   };
   
+  // Save local state and update parent when textarea loses focus
   const handleFlowBlur = () => {
     setIsEditingFlow(false);
     if (flowRef.current) {
-      handleApiChange('flow', flowRef.current.value);
+      const newValue = flowRef.current.value;
+      setLocalFlow(newValue);
+      handleApiChange('flow', newValue);
+    }
+  };
+
+  // Track manual changes in textareas
+  const handleDefinitionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    // We don't set state on every keystroke to avoid cursor jumping
+    // Just manually tracking when the dialog is about to close or tabs switch
+    if (!isEditingDefinition) {
+      setLocalDefinition(e.target.value);
+    }
+  };
+
+  const handleFlowChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    // We don't set state on every keystroke to avoid cursor jumping
+    // Just manually tracking when the dialog is about to close or tabs switch
+    if (!isEditingFlow) {
+      setLocalFlow(e.target.value);
     }
   };
 
@@ -198,7 +238,7 @@ export const CustomEdge: FC<EdgeProps<EdgeData>> = ({
               <DialogHeader>
                 <DialogTitle>API Definition</DialogTitle>
               </DialogHeader>
-              <Tabs defaultValue="definition" className="w-full">
+              <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
                 <TabsList className="w-full bg-gray-200 dark:bg-gray-700">
                   <TabsTrigger value="definition" className="w-full">
                     Definition
@@ -210,9 +250,10 @@ export const CustomEdge: FC<EdgeProps<EdgeData>> = ({
                 <TabsContent value="definition">
                   <Textarea
                     ref={definitionRef}
-                    defaultValue={data?.definition ?? ''}
+                    defaultValue={localDefinition}
                     onFocus={() => setIsEditingDefinition(true)}
                     onBlur={handleDefinitionBlur}
+                    onChange={handleDefinitionChange}
                     placeholder={`Example: URL Shortening Service API
 
 Endpoint: POST /shorten
@@ -236,9 +277,10 @@ Example Response:
                 <TabsContent value="flow">
                   <Textarea
                     ref={flowRef}
-                    defaultValue={data?.flow ?? ''}
+                    defaultValue={localFlow}
                     onFocus={() => setIsEditingFlow(true)}
                     onBlur={handleFlowBlur}
+                    onChange={handleFlowChange}
                     placeholder={`Describe how the API request flows through the system...
 
 Example:

@@ -29,6 +29,7 @@ interface FlowManagerProps {
   isFeedbackExpanded: boolean;
   onOpen: () => void;
   onClose: () => void;
+  onNextStage?: () => void;
 }
 
 export const FlowManager: React.FC<FlowManagerProps> = ({
@@ -38,6 +39,7 @@ export const FlowManager: React.FC<FlowManagerProps> = ({
   isFeedbackExpanded,
   onOpen,
   onClose,
+  onNextStage,
 }) => {
   const { runSolutionLabel } = useFeatureCustomisation();
   const { canRunSolution } = useFeatures();
@@ -96,6 +98,7 @@ export const FlowManager: React.FC<FlowManagerProps> = ({
             isOpen={isFeedbackExpanded}
             onClose={onClose}
             onOpen={onOpen}
+            onNextStage={onNextStage}
           />
         </Suspense>
       </div>

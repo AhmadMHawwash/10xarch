@@ -45,6 +45,7 @@ function Level() {
     isLoadingAnswer,
     challenge,
     currentStageIndex,
+    toNextStage,
   } = useChallengeManager();
   const [isFeedbackExpanded, setIsFeedbackExpanded] = useState(false);
   const [isOpenClosure, setIsOpenClosure] = useState(false);
@@ -60,6 +61,15 @@ function Level() {
   if (!challenge) return notFound();
 
   const isLastStage = currentStageIndex + 1 === challenge.stages.length;
+
+  // Function to handle moving to the next stage when score is 80% or higher
+  const handleNextStage = () => {
+    if (feedback && 'score' in feedback && feedback.score >= 80 && !isLastStage) {
+      toNextStage();
+      setIsFeedbackExpanded(false);
+    }
+  };
+
   return (
     <>
       <ChallengeOverviewDialog />
@@ -89,6 +99,7 @@ function Level() {
                   setIsOpenClosure(false);
                   setIsFeedbackExpanded(false);
                 }}
+                onNextStage={!isLastStage ? handleNextStage : undefined}
               />
             )}
           />

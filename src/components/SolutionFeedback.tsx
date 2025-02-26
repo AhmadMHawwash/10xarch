@@ -5,8 +5,10 @@ import {
 import {
   Award,
   Bot,
+  ChevronRight,
   Lightbulb,
   Loader2,
+  Sparkles,
   TrendingUp,
 } from "lucide-react";
 import React from "react";
@@ -36,6 +38,7 @@ interface SolutionFeedbackProps {
   isOpen: boolean;
   onClose: () => void;
   onOpen: () => void;
+  onNextStage?: () => void;
 }
 
 export const FeedbackList: React.FC<{
@@ -78,12 +81,26 @@ export const FeedbackList: React.FC<{
   </AccordionItem>
 );
 
-export const ScoreDisplay: React.FC<{ score: number }> = ({ score }) => {
+export const ScoreDisplay: React.FC<{ 
+  score: number;
+  onNextStage?: () => void;
+}> = ({ score, onNextStage }) => {
   const getScoreColor = (score: number) => {
     if (score < 50) return "text-red-500";
     if (score < 80) return "text-yellow-500";
     return "text-green-500";
   };
+
+  // Get a message based on the score
+  const getScoreMessage = (score: number) => {
+    if (score >= 95) return "Outstanding!";
+    if (score >= 90) return "Excellent!";
+    if (score >= 85) return "Great job!";
+    if (score >= 80) return "Well done!";
+    return "";
+  };
+
+  const scoreMessage = getScoreMessage(score);
 
   return (
     <div className="mb-6 text-center">
@@ -91,7 +108,35 @@ export const ScoreDisplay: React.FC<{ score: number }> = ({ score }) => {
       <div className={`text-4xl font-bold ${getScoreColor(score)}`}>
         {score}%
       </div>
+      {score >= 80 && (
+        <div className="mt-1 text-lg font-medium text-green-600 dark:text-green-400">
+          {scoreMessage}
+        </div>
+      )}
       <Progress value={score} className="mt-2" />
+      
+      {score >= 80 && onNextStage && (
+        <div className="relative mt-6 flex justify-center">
+          {/* Celebration sparkles for high scores */}
+          {score >= 90 && (
+            <>
+              <Sparkles className="absolute -top-6 -left-2 h-5 w-5 animate-pulse text-yellow-400" />
+              <Sparkles className="absolute -top-4 -right-4 h-6 w-6 animate-pulse text-yellow-400" />
+            </>
+          )}
+          <Button 
+            onClick={onNextStage} 
+            className="group relative overflow-hidden rounded-full px-6 py-3 font-medium text-white shadow-lg transition-all duration-300 ease-out hover:scale-105 hover:shadow-xl bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700"
+          >
+            <span className="relative z-10 flex items-center">
+              <Sparkles className="mr-2 h-4 w-4" />
+              Continue to Next Challenge
+              <ChevronRight className="ml-2 transition-transform duration-300 group-hover:translate-x-1" size={18} />
+            </span>
+            <span className="absolute inset-0 z-0 bg-gradient-to-r from-green-400 to-emerald-500 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
@@ -102,6 +147,7 @@ export const SolutionFeedback: React.FC<SolutionFeedbackProps> = ({
   isOpen,
   onClose,
   onOpen,
+  onNextStage,
 }) => {
   if (!answer && !isLoadingAnswer) return null;
 
@@ -132,7 +178,7 @@ export const SolutionFeedback: React.FC<SolutionFeedbackProps> = ({
           </div>
         ) : answer ? (
           <div className="mt-6">
-            {"score" in answer && <ScoreDisplay score={answer.score} />}
+            {"score" in answer && <ScoreDisplay score={answer.score} onNextStage={onNextStage} />}
             <Accordion type="single" collapsible className="w-full">
               <FeedbackList
                 items={answer.strengths}

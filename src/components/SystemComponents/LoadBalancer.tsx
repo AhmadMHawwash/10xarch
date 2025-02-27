@@ -2,6 +2,7 @@ import { useSystemDesigner } from "@/lib/hooks/_useSystemDesigner";
 import { cn } from "@/lib/utils";
 import { ExternalLink, HelpCircle } from "lucide-react";
 import { useState } from "react";
+import React from "react";
 import { type ComponentNodeProps } from "../ReactflowCustomNodes/SystemComponentNode";
 import {
   Dialog,
@@ -18,6 +19,7 @@ import { Switch } from "../ui/switch";
 import { Textarea } from "../ui/textarea";
 import { Small } from "../ui/typography";
 import { WithSettings } from "./Wrappers/WithSettings";
+import { type NodeSettingsRefObject } from "@/types/system";
 
 interface FeatureInfo {
   name: string;
@@ -88,19 +90,27 @@ const InfoPopup = ({ feature }: { feature: FeatureInfo }) => {
   );
 };
 
-export const LoadBalancer = ({ name, Icon }: ComponentNodeProps) => {
+export const LoadBalancer = ({ name, Icon, nodeSettingsRef }: ComponentNodeProps) => {
   return (
-    <div className="flex flex-col items-center text-gray-800 dark:text-gray-200 group">
+    <div className="group flex flex-col items-center text-gray-800 dark:text-gray-200">
       <div className="flex items-center gap-1">
-        {Icon && <Icon size={20} className="text-gray-700 dark:text-gray-300" />}
+        {Icon && (
+          <Icon size={20} className="text-gray-700 dark:text-gray-300" />
+        )}
         <Small>{name}</Small>
       </div>
-      <LoadBalancerSettings name={name} />
+      <LoadBalancerSettings name={name} nodeSettingsRef={nodeSettingsRef} />
     </div>
   );
 };
 
-const LoadBalancerSettings = ({ name: id }: { name: string }) => {
+const LoadBalancerSettings = ({
+  name: id,
+  nodeSettingsRef,
+}: {
+  name: string;
+  nodeSettingsRef: NodeSettingsRefObject;
+}) => {
   const { useSystemComponentConfigSlice } = useSystemDesigner();
   const [isFreeText, setIsFreeText] = useState<boolean>(true);
 
@@ -146,7 +156,7 @@ const LoadBalancerSettings = ({ name: id }: { name: string }) => {
   ];
 
   return (
-    <WithSettings name={id}>
+    <WithSettings name={id} nodeSettingsRef={nodeSettingsRef}>
       <div className="flex flex-col gap-4 w-full">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">

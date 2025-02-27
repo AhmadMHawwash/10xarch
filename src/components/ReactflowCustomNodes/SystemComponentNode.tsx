@@ -16,6 +16,8 @@ import { MessageQueue } from "../SystemComponents/MessageQueue";
 import { Server } from "../SystemComponents/Server";
 import { WithMarkdownDetails } from "../SystemComponents/Wrappers/WithMarkdownDetails";
 import { Small } from "../ui/typography";
+import { useRef } from "react";
+import { type NodeSettingsRefObject, type NodeSettingsRef } from "@/types/system";
 
 export type SystemComponentNodeDataProps = {
   icon?: typeof PiIcon;
@@ -46,6 +48,7 @@ export default function SystemComponentNode({
   selected,
 }: NodeProps<SystemComponentNodeDataProps>) {
   const { isEdgeBeingConnected } = useSystemDesigner();
+  const nodeSettingsRef = useRef<NodeSettingsRef>(null);
 
   const Component = components[data.name] ?? DefaultComponent;
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -76,12 +79,12 @@ export default function SystemComponentNode({
                 width: "10px",
                 height: "10px",
                 top: `calc(50% + ${yOffset}px)`,
-                cursor: handle.isConnected ? 'not-allowed' : 'pointer',
+                cursor: handle.isConnected ? "not-allowed" : "pointer",
                 zIndex: 5,
               }}
               className={cn(
                 "transition-all",
-                handle.isConnected && "opacity-50"
+                handle.isConnected && "opacity-50",
               )}
             />
           );
@@ -100,8 +103,17 @@ export default function SystemComponentNode({
         style={{
           height: `${Math.max(targetTotalHeight, sourceTotalHeight) + 20}px`,
         }}
+        onDoubleClick={() => {
+          if (nodeSettingsRef.current) {
+            nodeSettingsRef.current.open();
+          }
+        }}
       >
-        <Component name={displayName ?? data.id} Icon={data.icon} />
+        <Component
+          name={displayName ?? data.id}
+          Icon={data.icon}
+          nodeSettingsRef={nodeSettingsRef}
+        />
         {content && (
           <WithMarkdownDetails
             className="absolute left-0 top-[-17px] rounded-full bg-gray-200 opacity-0 transition-all group-hover:opacity-100 dark:bg-gray-700"
@@ -133,11 +145,11 @@ export default function SystemComponentNode({
                 width: "10px",
                 height: "10px",
                 top: `calc(50% + ${yOffset}px)`,
-                cursor: handle.isConnected ? 'not-allowed' : 'pointer'
+                cursor: handle.isConnected ? "not-allowed" : "pointer",
               }}
               className={cn(
                 "transition-all",
-                handle.isConnected && "opacity-50"
+                handle.isConnected && "opacity-50",
               )}
             />
           );
@@ -149,12 +161,13 @@ export default function SystemComponentNode({
 export type ComponentNodeProps = {
   name: string;
   Icon: SystemComponentNodeDataProps["icon"];
+  nodeSettingsRef: NodeSettingsRefObject;
 };
 
 const components: Partial<
   Record<
     SystemComponent["name"],
-    ({ name, Icon }: ComponentNodeProps) => React.ReactElement
+    ({ name, Icon, nodeSettingsRef }: ComponentNodeProps) => React.ReactElement
   >
 > = {
   Client,

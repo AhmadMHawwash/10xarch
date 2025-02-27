@@ -33,8 +33,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
+import React from "react";
+import { type NodeSettingsRefObject } from "@/types/system";
 
-export const Database = ({ name, Icon }: ComponentNodeProps) => {
+export const Database = ({ name, Icon, nodeSettingsRef }: ComponentNodeProps) => {
   return (
     <div className="group flex flex-col items-center text-gray-800 dark:text-gray-200">
       <div className="flex items-center gap-1">
@@ -43,7 +45,7 @@ export const Database = ({ name, Icon }: ComponentNodeProps) => {
         )}
         <Small className="text-gray-700 dark:text-gray-300">{name}</Small>
       </div>
-      <DatabaseSettings name={name} />
+      <DatabaseSettings name={name} nodeSettingsRef={nodeSettingsRef} />
     </div>
   );
 };
@@ -129,7 +131,13 @@ const configInfoMap: Record<string, FeatureInfo> = {
   },
 };
 
-const DatabaseSettings = ({ name: id }: { name: string }) => {
+const DatabaseSettings = ({
+  name: id,
+  nodeSettingsRef,
+}: {
+  name: string;
+  nodeSettingsRef: NodeSettingsRefObject;
+}) => {
   const { useSystemComponentConfigSlice } = useSystemDesigner();
   const [isFreeText, setIsFreeText] = useState<boolean>(true);
 
@@ -293,7 +301,7 @@ const DatabaseSettings = ({ name: id }: { name: string }) => {
   const currentEngineOptions = engineOptions[dbConfig.type] ?? [];
 
   return (
-    <WithSettings name={id}>
+    <WithSettings name={id} nodeSettingsRef={nodeSettingsRef}>
       <div className="flex w-full flex-col gap-4">
         <Tabs defaultValue="config" className="w-full">
           <TabsList className="grid w-full grid-cols-2">

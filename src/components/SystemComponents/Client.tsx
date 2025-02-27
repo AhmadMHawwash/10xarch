@@ -31,67 +31,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
+import React from "react";
+import { type NodeSettingsRefObject } from "@/types/system";
 
 interface FeatureInfo {
   name: string;
   description: string;
   learnMoreUrl?: string;
 }
-
-const featureInfoMap: Record<string, FeatureInfo> = {
-  "Error Handling": {
-    name: "Error Handling",
-    description:
-      "Implement robust error handling mechanisms to gracefully handle and recover from various types of errors, including network failures, API errors, and client-side exceptions.",
-    learnMoreUrl:
-      "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Control_flow_and_error_handling",
-  },
-  "Request Retries": {
-    name: "Request Retries",
-    description:
-      "Automatically retry failed network requests with configurable backoff strategies to improve reliability and handle temporary network issues.",
-    learnMoreUrl:
-      "https://developers.google.com/analytics/devguides/reporting/core/v4/errors#exponential_backoff",
-  },
-  "Request Timeout": {
-    name: "Request Timeout",
-    description:
-      "Set appropriate timeout limits for network requests to prevent hanging operations and provide better user feedback.",
-    learnMoreUrl:
-      "https://developer.mozilla.org/en-US/docs/Web/API/AbortController",
-  },
-  "Response Caching": {
-    name: "Response Caching",
-    description:
-      "Cache API responses locally to improve performance and enable offline functionality.",
-    learnMoreUrl: "https://web.dev/cache-api-quick-guide/",
-  },
-  "Service Workers": {
-    name: "Service Workers",
-    description:
-      "Use Service Workers to enable offline functionality, background sync, and push notifications in web applications.",
-    learnMoreUrl:
-      "https://developers.google.com/web/fundamentals/primers/service-workers",
-  },
-  "Progressive Loading": {
-    name: "Progressive Loading",
-    description:
-      "Implement progressive loading techniques to improve perceived performance and user experience.",
-    learnMoreUrl: "https://web.dev/progressive-loading/",
-  },
-  "Offline Support": {
-    name: "Offline Support",
-    description:
-      "Enable the application to function without an internet connection using service workers and local storage.",
-    learnMoreUrl: "https://web.dev/offline-cookbook/",
-  },
-  "State Management": {
-    name: "State Management",
-    description:
-      "Implement robust state management to handle complex application state and data flow.",
-    learnMoreUrl: "https://redux.js.org/introduction/getting-started",
-  },
-};
 
 const configInfoMap: Record<string, FeatureInfo> = {
   "Client Type": {
@@ -157,7 +104,7 @@ const InfoPopup = ({ feature }: { feature: FeatureInfo }) => {
   );
 };
 
-export const Client = ({ name, Icon }: ComponentNodeProps) => {
+export const Client = ({ name, Icon, nodeSettingsRef }: ComponentNodeProps) => {
   return (
     <div className="group flex flex-col items-center text-gray-800 dark:text-gray-200">
       <div className="flex items-center gap-1">
@@ -166,12 +113,18 @@ export const Client = ({ name, Icon }: ComponentNodeProps) => {
         )}
         <Small>{name}</Small>
       </div>
-      <ClientSettings name={name} />
+      <ClientSettings name={name} nodeSettingsRef={nodeSettingsRef} />
     </div>
   );
 };
 
-const ClientSettings = ({ name: id }: { name: string }) => {
+const ClientSettings = ({
+  name: id,
+  nodeSettingsRef,
+}: {
+  name: string;
+  nodeSettingsRef: NodeSettingsRefObject;
+}) => {
   const { useSystemComponentConfigSlice } = useSystemDesigner();
   const [isFreeText, setIsFreeText] = useState<boolean>(true);
 
@@ -196,66 +149,14 @@ const ClientSettings = ({ name: id }: { name: string }) => {
     "",
   );
 
-  const [features, setFeatures] = useSystemComponentConfigSlice<string[]>(
-    id,
-    "features",
-    [],
-  );
-
   const [freeFormText, setFreeFormText] = useSystemComponentConfigSlice<string>(
     id,
     "free_form_text",
     "",
   );
 
-  const getAvailableFeatures = (type: string): string[] => {
-    const commonFeatures = [
-      "Error Handling",
-      "Request Retries",
-      "Request Timeout",
-      "Response Caching",
-    ];
-
-    switch (type) {
-      case "web":
-        return [
-          ...commonFeatures,
-          "Service Workers",
-          "Progressive Loading",
-          "Offline Support",
-          "State Management",
-        ];
-      case "mobile":
-        return [
-          ...commonFeatures,
-          "Background Sync",
-          "Push Notifications",
-          "Data Persistence",
-          "Network Detection",
-        ];
-      case "iot":
-        return [
-          ...commonFeatures,
-          "Device Management",
-          "Data Buffering",
-          "Power Management",
-          "Secure Boot",
-        ];
-      case "desktop":
-        return [
-          ...commonFeatures,
-          "Auto Updates",
-          "Native Integration",
-          "Cross Platform",
-          "Resource Management",
-        ];
-      default:
-        return commonFeatures;
-    }
-  };
-
   return (
-    <WithSettings name={id}>
+    <WithSettings name={id} nodeSettingsRef={nodeSettingsRef}>
       <div className="flex w-full flex-col gap-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">

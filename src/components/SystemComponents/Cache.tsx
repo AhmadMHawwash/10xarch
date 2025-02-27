@@ -31,6 +31,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
+import React from "react";
+import { type NodeSettingsRefObject } from "@/types/system";
 
 interface FeatureInfo {
   name: string;
@@ -230,7 +232,7 @@ const InfoPopup = ({ feature }: { feature: FeatureInfo }) => {
   );
 };
 
-export const Cache = ({ name, Icon }: ComponentNodeProps) => {
+export const Cache = ({ name, Icon, nodeSettingsRef }: ComponentNodeProps) => {
   return (
     <div className="group flex flex-col items-center text-gray-800 dark:text-gray-200">
       <div className="flex items-center gap-1">
@@ -239,12 +241,18 @@ export const Cache = ({ name, Icon }: ComponentNodeProps) => {
         )}
         <Small>{name}</Small>
       </div>
-      <CacheSettings name={name} />
+      <CacheSettings name={name} nodeSettingsRef={nodeSettingsRef} />
     </div>
   );
 };
 
-const CacheSettings = ({ name: id }: { name: string }) => {
+const CacheSettings = ({
+  name: id,
+  nodeSettingsRef,
+}: {
+  name: string;
+  nodeSettingsRef: NodeSettingsRefObject;
+}) => {
   const { useSystemComponentConfigSlice } = useSystemDesigner();
   const [isFreeText, setIsFreeText] = useState<boolean>(true);
 
@@ -353,7 +361,7 @@ const CacheSettings = ({ name: id }: { name: string }) => {
   const availableFeatures = getAvailableFeatures(cacheType);
 
   return (
-    <WithSettings name={id}>
+    <WithSettings name={id} nodeSettingsRef={nodeSettingsRef}>
       <div className="flex w-full flex-col gap-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">

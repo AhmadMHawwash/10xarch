@@ -20,6 +20,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
+import React from "react";
+import { type NodeSettingsRefObject } from "@/types/system";
 
 interface FeatureInfo {
   name: string;
@@ -153,19 +155,27 @@ const InfoPopup = ({ feature }: { feature: FeatureInfo }) => {
   );
 };
 
-export const MessageQueue = ({ name, Icon }: ComponentNodeProps) => {
+export const MessageQueue = ({ name, Icon, nodeSettingsRef }: ComponentNodeProps) => {
   return (
-    <div className="flex flex-col items-center text-gray-800 dark:text-gray-200 group">
+    <div className="group flex flex-col items-center text-gray-800 dark:text-gray-200">
       <div className="flex items-center gap-1">
-        {Icon && <Icon size={20} className="text-gray-700 dark:text-gray-300" />}
+        {Icon && (
+          <Icon size={20} className="text-gray-700 dark:text-gray-300" />
+        )}
         <Small>{name}</Small>
       </div>
-      <MessageQueueSettings name={name} />
+      <MessageQueueSettings name={name} nodeSettingsRef={nodeSettingsRef} />
     </div>
   );
 };
 
-const MessageQueueSettings = ({ name: id }: { name: string }) => {
+const MessageQueueSettings = ({
+  name: id,
+  nodeSettingsRef,
+}: {
+  name: string;
+  nodeSettingsRef: NodeSettingsRefObject;
+}) => {
   const { useSystemComponentConfigSlice } = useSystemDesigner();
   const [isFreeText, setIsFreeText] = useState<boolean>(true);
 
@@ -223,7 +233,7 @@ const MessageQueueSettings = ({ name: id }: { name: string }) => {
   ];
 
   return (
-    <WithSettings name={id}>
+    <WithSettings name={id} nodeSettingsRef={nodeSettingsRef}>
       <div className="flex flex-col gap-4 w-full">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">

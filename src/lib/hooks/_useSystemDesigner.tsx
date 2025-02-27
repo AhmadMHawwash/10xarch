@@ -104,7 +104,7 @@ const componentTargets: Record<
   SystemComponent["name"],
   SystemComponent["name"][]
 > = {
-  Client: ["Server", "Load Balancer", "CDN"],
+  Client: ["Server", "Load Balancer", "CDN", "Message Queue"],
   CDN: ["Load Balancer", "Server"],
   "Load Balancer": ["Server"],
   Server: ["Cache", "Database", "Message Queue"],

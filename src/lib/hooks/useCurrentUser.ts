@@ -21,6 +21,7 @@ export function useCurrentUser() {
   // });
 
   return {
+    clerkUser,
     // user: dbUser,
     isSignedIn,
     isLoading: !isClerkLoaded,

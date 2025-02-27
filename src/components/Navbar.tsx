@@ -9,8 +9,8 @@ import challenges from "@/content/challenges";
 import { useCredits } from "@/hooks/useCredits";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
-import { SignInButton, UserButton, useUser } from "@clerk/nextjs";
-import { Menu, X, Coins } from "lucide-react";
+import { SignInButton, UserButton } from "@clerk/nextjs";
+import { Menu, X, Coins, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import { useCallback, useState } from "react";
@@ -18,6 +18,7 @@ import { ThemeToggle } from "./ThemeToggle";
 import { Logo } from "./icons/logo";
 import { Button } from "./ui/button";
 import { CreditAlert } from "@/components/credits/CreditAlert";
+import { useCurrentUser } from "@/lib/hooks/useCurrentUser";
 
 function RateLimitInfo() {
   const rateLimitQuery = api.challenges.getRateLimitInfo.useQuery(undefined, {
@@ -109,7 +110,7 @@ function FreeChallengeBadge() {
 }
 
 export default function Navbar() {
-  const { user } = useUser();
+  const { isSignedIn, isLoading: isUserLoading } = useCurrentUser();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { balance: credits, isLoading: isLoadingCredits } = useCredits();
   const pathname = usePathname();
@@ -146,7 +147,12 @@ export default function Navbar() {
 
         <div className="hidden items-center space-x-6 md:flex">
           <FreeChallengeBadge />
-          {user ? (
+          {isUserLoading ? (
+            <div className="flex items-center space-x-2">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span className="text-sm text-muted-foreground">Loading...</span>
+            </div>
+          ) : isSignedIn ? (
             <>
               <div className="flex items-center space-x-3">
                 <Link
@@ -200,7 +206,12 @@ export default function Navbar() {
         {isMenuOpen && (
           <div className="absolute left-0 right-0 top-[7vh] z-50 bg-slate-100 p-4 shadow-md dark:bg-gray-800 md:hidden">
             <FreeChallengeBadge />
-            {user && (
+            {isUserLoading ? (
+              <div className="flex items-center space-x-2 py-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span className="text-sm text-muted-foreground">Loading...</span>
+              </div>
+            ) : isSignedIn && (
               <Link
                 href="/credits"
                 className={cn(
@@ -217,7 +228,9 @@ export default function Navbar() {
             )}
             <div className="flex items-center justify-between py-2">
               <ThemeToggle />
-              {user ? (
+              {isUserLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : isSignedIn ? (
                 <UserButton afterSignOutUrl="/" />
               ) : (
                 <SignInButton>

@@ -5,14 +5,14 @@ export const useWithLogin = () => {
   const router = useRouter();
   const pathname = usePathname();
 
-  const { isSignedIn } = useCurrentUser();
+  const { isSignedIn, isLoading } = useCurrentUser();
   return {
     withLogin:
       <TArgs extends unknown[], TReturn>(fn: (...args: TArgs) => TReturn) =>
       (...args: TArgs) => {
-        if (!isSignedIn) {
+        if (!isLoading && !isSignedIn) {
           router.push("/sign-in?next=" + pathname);
-        } else {
+        } else if (!isLoading && isSignedIn) {
           return fn(...args);
         }
       },

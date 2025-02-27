@@ -11,26 +11,18 @@ export const redis = new Redis({
   token: process.env.UPSTASH_REDIS_REST_TOKEN,
 })
 
-// Create a new ratelimiter that allows 5 tokens per IP per week
-export const anonymousCreditsLimiter = new Ratelimit({
-  redis,
-  limiter: Ratelimit.slidingWindow(40, '1 d'),
-  analytics: true,
-  prefix: '@upstash/ratelimit/anonymous-credits',
-})
-
-// Create a new ratelimiter that allows 30 submissions per day per IP/user
+// Create a new ratelimiter that allows 5 submissions per day per IP/user
 export const freeChallengesLimiter = new Ratelimit({
   redis,
-  limiter: Ratelimit.fixedWindow(15, '1 d'),
+  limiter: Ratelimit.fixedWindow(5, '1 d'),
   analytics: true,
   prefix: '@upstash/ratelimit/free-challenges',
 })
 
-// Create a new ratelimiter for chat messages (10 per hour per IP per challenge)
+// Create a new ratelimiter for chat messages (5 per hour per IP per challenge)
 export const chatMessagesLimiter = new Ratelimit({
   redis,
-  limiter: Ratelimit.slidingWindow(10, '1 h'),
+  limiter: Ratelimit.slidingWindow(5, '1 h'),
   analytics: true,
   prefix: '@upstash/ratelimit/chat-messages',
 });

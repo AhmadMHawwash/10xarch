@@ -11,6 +11,7 @@ import { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import ReactMarkdown from "react-markdown";
 import { cn } from "@/lib/utils";
 import { useChatMessages } from "@/lib/hooks/useChatMessages_";
+import { CreditAlert } from "@/components/credits/CreditAlert";
 
 interface Message {
   role: "user" | "assistant" | "system";
@@ -42,8 +43,8 @@ interface WhiteboardConfigs {
 export function ChatUI({ challengeId, stageIndex = 0 }: ChatUIProps) {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [remainingMessages, setRemainingMessages] = useState(10);
-  const { balance: credits, refetch: refetchCredits } = useCredits();
+  const [remainingMessages, setRemainingMessages] = useState(5);
+  const { balance: credits, refetch: refetchCredits, hasLowCredits } = useCredits();
   const { getMessages, addMessage, clearSession } = useChatMessages();
   const [mounted, setMounted] = useState(false);
   
@@ -80,15 +81,10 @@ export function ChatUI({ challengeId, stageIndex = 0 }: ChatUIProps) {
 
   // Scroll to bottom when messages change
   useEffect(() => {
-    if (messagesEndRef.current && scrollAreaRef.current) {
-      const scrollArea = scrollAreaRef.current.querySelector(
-        "[data-radix-scroll-area-viewport]",
-      );
-      if (scrollArea) {
-        scrollArea.scrollTop = scrollArea.scrollHeight;
-      }
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [messages, isLoading]);
+  }, [messages]);
 
   const sendMessage = api.chat.sendMessage.useMutation({
     onSuccess: async (data) => {
@@ -249,15 +245,19 @@ export function ChatUI({ challengeId, stageIndex = 0 }: ChatUIProps) {
   }, [messages, isLoading, renderMessage]);
 
   return (
-    <div className="flex h-full w-full flex-col">
-      <ScrollArea ref={scrollAreaRef} className="flex-1 min-h-0">
+    <div className="flex h-full flex-col bg-secondary/30">
+      {/* Credit warning banner when user has no credits left */}
+      <CreditAlert variant="banner" className="mx-4 mt-3" />
+      
+      {/* Chat messages area */}
+      <ScrollArea ref={scrollAreaRef} className="flex-1 p-4">
         {MessageList}
       </ScrollArea>
       <div className="border-t border-border/40 bg-background/95">
         <div className="flex items-center justify-between px-4 py-2 text-xs text-muted-foreground">
           <div className="flex items-center gap-2">
             <MessageSquare className="h-3.5 w-3.5" />
-            <span>{remainingMessages}/10 free</span>
+            <span>{remainingMessages}/5 free</span>
             {remainingMessages === 0 && <span>(resets in 1h)</span>}
           </div>
           {credits > 0 && (

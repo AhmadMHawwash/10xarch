@@ -33,7 +33,7 @@ export const challengesRouter = createTRPCRouter({
     return {
       remaining,
       reset,
-      limit: 15, // Daily submission limit
+      limit: 5, // Daily submission limit
     };
   }),
 

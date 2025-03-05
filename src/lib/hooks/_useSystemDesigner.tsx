@@ -64,14 +64,16 @@ interface SystemDesignerState {
   onSelectNode: (
     node: Node<SystemComponentNodeDataProps | OtherNodeDataProps> | null,
   ) => void;
+  onSelectEdge: (edge: Edge | null) => void;
   selectedNode: Node<SystemComponentNodeDataProps | OtherNodeDataProps> | null;
+  selectedEdge: Edge | null;
   useSystemComponentConfigSlice: <T>(
     componentId: string,
     configKey: string,
     defaultValue?: T,
   ) => [T, (configValue: T) => void];
   handleCopy: () => void;
-  handlePaste: (event: KeyboardEvent) => void;
+  handlePaste: () => void;
 }
 
 const SystemDesignerContext = createContext<SystemDesignerState>({
@@ -94,7 +96,9 @@ const SystemDesignerContext = createContext<SystemDesignerState>({
   setNodes: noop,
   setEdges: noop,
   selectedNode: null,
+  selectedEdge: null,
   onSelectNode: noop,
+  onSelectEdge: noop,
   useSystemComponentConfigSlice: noop,
   handleCopy: noop,
   handlePaste: noop,
@@ -114,53 +118,58 @@ const componentTargets: Record<
 };
 
 const deserializeNodes = (nodes: string | null) => {
-  if (nodes === null) return [];
-  const parsedNodes = JSON.parse(nodes) as Node<
-    SystemComponentNodeDataProps | OtherNodeDataProps
-  >[];
+  if (nodes === null || nodes === undefined) return [];
+  try {
+    const parsedNodes = JSON.parse(nodes) as Node<
+      SystemComponentNodeDataProps | OtherNodeDataProps
+    >[];
 
-  // Instead of resetting, update the component numbering store to the highest number for each component
-  const componentCounts: Record<SystemComponent["name"], number> = {
-    Client: 1,
-    Server: 1,
-    Database: 1,
-    "Load Balancer": 1,
-    Cache: 1,
-    CDN: 1,
-    "Message Queue": 1,
-  };
+    // Instead of resetting, update the component numbering store to the highest number for each component
+    const componentCounts: Record<SystemComponent["name"], number> = {
+      Client: 1,
+      Server: 1,
+      Database: 1,
+      "Load Balancer": 1,
+      Cache: 1,
+      CDN: 1,
+      "Message Queue": 1,
+    };
 
-  // Calculate the highest number for each component type
-  parsedNodes.forEach((node) => {
-    if (node.data.name === "Whiteboard") return;
-    
-    const match = node.id.match(/^(.+)-(\d+)$/);
-    if (match?.[1] && match[2]) {
-      const componentName = match[1];
-      const number = parseInt(match[2], 10);
-      if (componentName in componentCounts && !isNaN(number)) {
-        componentCounts[componentName as SystemComponent["name"]] = 
-          Math.max(componentCounts[componentName as SystemComponent["name"]], number + 1);
+    // Calculate the highest number for each component type
+    parsedNodes.forEach((node) => {
+      if (node.data.name === "Whiteboard") return;
+      
+      const match = node.id.match(/^(.+)-(\d+)$/);
+      if (match?.[1] && match[2]) {
+        const componentName = match[1];
+        const number = parseInt(match[2], 10);
+        if (componentName in componentCounts && !isNaN(number)) {
+          componentCounts[componentName as SystemComponent["name"]] = 
+            Math.max(componentCounts[componentName as SystemComponent["name"]], number + 1);
+        }
       }
-    }
-  });
+    });
 
-  // Update the component numbering store with the highest numbers
-  componentsNumberingStore.setState({
-    componentsToCount: componentCounts,
-  });
+    // Update the component numbering store with the highest numbers
+    componentsNumberingStore.setState({
+      componentsToCount: componentCounts,
+    });
 
-  return parsedNodes.map((node) => ({
-    ...node,
-    data: {
-      ...node.data,
-      name: node.data.name as SystemComponent["name"],
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      icon: getSystemComponent(node.data.name as SystemComponentType)?.icon,
-      targetHandles: node.data.targetHandles ?? [],
-      sourceHandles: node.data.sourceHandles ?? [],
-    },
-  }));
+    return parsedNodes.map((node) => ({
+      ...node,
+      data: {
+        ...node.data,
+        name: node.data.name as SystemComponent["name"],
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        icon: getSystemComponent(node.data.name as SystemComponentType)?.icon,
+        targetHandles: node.data.targetHandles ?? [],
+        sourceHandles: node.data.sourceHandles ?? [],
+      },
+    }));
+  } catch (e) {
+    console.error("Error deserializing nodes:", e);
+    return [];
+  }
 };
 
 export const defaultStartingNodes: Node<
@@ -184,12 +193,25 @@ export const defaultStartingNodes: Node<
 
 export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
   const pathname = usePathname();
+  const normalizedPathname = pathname;
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [nodes, setNodes] = useLocalStorageState<
     Node<SystemComponentNodeDataProps | OtherNodeDataProps>[]
-  >(`${pathname}-reactflow-nodes`, defaultStartingNodes, deserializeNodes);
+  >(
+    `${normalizedPathname}-reactflow-nodes`, 
+    defaultStartingNodes, 
+    (value) => {
+      // Custom deserializer to ensure we always have at least the default nodes
+      const parsedNodes = deserializeNodes(value);
+      // If no nodes were parsed or the whiteboard node is missing, return the defaults
+      if (parsedNodes.length === 0 || !parsedNodes.some(node => node.id.includes('Whiteboard'))) {
+        return defaultStartingNodes;
+      }
+      return parsedNodes;
+    }
+  );
   const [edges, setEdges] = useLocalStorageState<Edge[]>(
-    `${pathname}-reactflow-edges`,
+    `${normalizedPathname}-reactflow-edges`,
     [],
   );
   const [reactFlowInstance, setReactFlowInstance] =
@@ -199,6 +221,7 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
   const [selectedNode, setSelectedNode] = useState<Node<
     SystemComponentNodeDataProps | OtherNodeDataProps
   > | null>(null);
+  const [selectedEdge, setSelectedEdge] = useState<Edge | null>(null);
   const { toast } = useToast();
   const [clipboardData, setClipboardData] = useState<{
     nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[];
@@ -615,52 +638,32 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
   }, []);
 
   const handleCopy = useCallback(() => {
-    if (!reactFlowInstance) return;
+    const selectedNodes = nodes.filter((node) => node.selected);
     
-    // Don't copy if focus is in a form input element
-    const activeElement = document.activeElement;
-    if (
-      activeElement instanceof HTMLInputElement ||
-      activeElement instanceof HTMLTextAreaElement ||
-      (activeElement instanceof HTMLElement && activeElement.isContentEditable)
-    ) {
-      return;
-    }
-
-    // Check if user is trying to copy a Whiteboard node
-    const hasWhiteboardSelected = reactFlowInstance.getNodes().some(
-      (n) => n.selected && n.id.includes("Whiteboard")
-    );
-
-    if (hasWhiteboardSelected) {
+    // Check if trying to copy a whiteboard node
+    const isWhiteboardSelected = selectedNodes.some((node) => node.id.includes("Whiteboard"));
+    if (isWhiteboardSelected) {
       toast({
         title: "Cannot copy System definitions",
-        description: "The System definitions cannot be copied or duplicated."
+        description: "System definition components cannot be copied.",
       });
+      return;
     }
-
-    // Filter out Whiteboard nodes from selection
-    const selectedNodes = nodes.filter((node) =>
-      reactFlowInstance.getNodes().find((n) => n.selected && n.id === node.id) && 
-      !node.id.includes("Whiteboard")
-    );
-
-    if (selectedNodes.length === 0) return;
-
+    
     const selectedEdges = edges.filter((edge) => {
-      const sourceNode = selectedNodes.find((node) => node.id === edge.source);
-      const targetNode = selectedNodes.find((node) => node.id === edge.target);
-      return sourceNode && targetNode;
+      const sourceSelected = selectedNodes.some((node) => node.id === edge.source);
+      const targetSelected = selectedNodes.some((node) => node.id === edge.target);
+      return sourceSelected && targetSelected;
     });
-
+    
     setClipboardData({
       nodes: selectedNodes,
       edges: selectedEdges,
     });
-  }, [nodes, edges, reactFlowInstance, toast]);
+  }, [nodes, edges, toast]);
 
   const handlePaste = useCallback(() => {
-    if (!clipboardData || !reactFlowInstance) return;
+    if (!clipboardData) return;
     
     // Don't paste if focus is in a form input element
     const activeElement = document.activeElement;
@@ -718,7 +721,7 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
       ...eds.map((edge) => ({ ...edge, selected: false })),
       ...newEdges,
     ]);
-  }, [clipboardData, reactFlowInstance, setNodes, setEdges]);
+  }, [clipboardData, setNodes, setEdges]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -759,7 +762,9 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
         setNodes,
         setEdges,
         selectedNode,
+        selectedEdge,
         onSelectNode: setSelectedNode,
+        onSelectEdge: setSelectedEdge,
         useSystemComponentConfigSlice,
         handleCopy,
         handlePaste,

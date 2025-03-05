@@ -13,14 +13,23 @@ const useLocalStorageState = <T>(
       if (deserializer) {
         return deserializer(storedValue);
       } else {
-        return JSON.parse(storedValue) as T;
+        try {
+          return JSON.parse(storedValue) as T;
+        } catch (e) {
+          console.error(`Error parsing localStorage value for key ${key}:`, e);
+          return defaultValue;
+        }
       }
     }
     return defaultValue;
   });
 
   useEffect(() => {
-    localStorage.setItem(key, JSON.stringify(state));
+    try {
+      localStorage.setItem(key, JSON.stringify(state));
+    } catch (e) {
+      console.error(`Error stringifying state for key ${key}:`, e);
+    }
   }, [key, state]);
 
   return [state, setState];

@@ -679,6 +679,14 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
 
     // Create a mapping of old IDs to new IDs
     const idMapping: Record<string, string> = {};
+    // Create a mapping for handle IDs
+    const handleMapping: Record<string, string> = {};
+
+    // Check if we're copying a single node or multiple nodes
+    const isSingleNodeCopy = clipboardNodes.length === 1;
+
+    // Get IDs of all nodes being copied for later validation
+    const copiedNodeIds = new Set(clipboardNodes.map(node => node.id));
 
     // Create new nodes with a fixed offset from original positions
     const newNodes = clipboardNodes.map((node) => {
@@ -688,29 +696,143 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
         .getNextId(componentName);
       idMapping[node.id] = newId;
 
-      return {
-        ...node,
-        id: newId,
-        position: {
-          x: node.position.x + 100,
-          y: node.position.y + 100,
-        },
-        data: {
-          ...node.data,
+      // Generate new timestamps for handles
+      const timestamp = Date.now() + Math.floor(Math.random() * 1000);
+
+      if (isSingleNodeCopy) {
+        // For single node copy, create fresh handles without connections
+        const newTargetHandleId = `${newId}-target-handle-${timestamp}`;
+        const newSourceHandleId = `${newId}-source-handle-${timestamp + 1}`;
+        
+        return {
+          ...node,
           id: newId,
-        },
-        selected: true,
-      };
+          position: {
+            x: node.position.x + 100,
+            y: node.position.y + 100,
+          },
+          data: {
+            ...node.data,
+            id: newId,
+            // Reset handles for single node copy
+            targetHandles: [{ 
+              id: newTargetHandleId, 
+              isConnected: false 
+            }],
+            sourceHandles: [{ 
+              id: newSourceHandleId, 
+              isConnected: false 
+            }],
+          },
+          selected: true,
+        };
+      } else {
+        // For multiple nodes, we need to determine which handles should remain
+        // First, check which edges involve this node and another node in the selection
+        const nodeEdges = clipboardEdges.filter(edge => 
+          (edge.source === node.id && copiedNodeIds.has(edge.target)) || 
+          (edge.target === node.id && copiedNodeIds.has(edge.source))
+        );
+        
+        // Create sets of handle IDs that should be kept (connected to other copied nodes)
+        const sourceHandlesToKeep = new Set(
+          nodeEdges
+            .filter(edge => edge.source === node.id)
+            .map(edge => edge.sourceHandle)
+            .filter(Boolean) as string[]
+        );
+        
+        const targetHandlesToKeep = new Set(
+          nodeEdges
+            .filter(edge => edge.target === node.id)
+            .map(edge => edge.targetHandle)
+            .filter(Boolean) as string[]
+        );
+        
+        // Only keep handles that are connected to other copied nodes
+        const connectedTargetHandles = node.data.targetHandles
+          ?.filter(handle => targetHandlesToKeep.has(handle.id))
+          ?.map(handle => {
+            // Create a new handle ID and store the mapping
+            const newHandleId = `${newId}-target-handle-${timestamp + Math.floor(Math.random() * 100)}`;
+            handleMapping[handle.id] = newHandleId;
+            
+            return {
+              id: newHandleId,
+              isConnected: true // These are definitely connected since we filtered them
+            };
+          }) ?? [];
+        
+        const connectedSourceHandles = node.data.sourceHandles
+          ?.filter(handle => sourceHandlesToKeep.has(handle.id))
+          ?.map(handle => {
+            // Create a new handle ID and store the mapping
+            const newHandleId = `${newId}-source-handle-${timestamp + Math.floor(Math.random() * 100) + 1000}`;
+            handleMapping[handle.id] = newHandleId;
+            
+            return {
+              id: newHandleId,
+              isConnected: true // These are definitely connected since we filtered them
+            };
+          }) ?? [];
+        
+        // Always add one unconnected handle of each type for future connections
+        const newFreeTargetHandle = { 
+          id: `${newId}-target-handle-${timestamp + 500}`, 
+          isConnected: false 
+        };
+        
+        const newFreeSourceHandle = { 
+          id: `${newId}-source-handle-${timestamp + 1500}`, 
+          isConnected: false 
+        };
+
+        // Combine the connected handles with the free handles
+        const finalTargetHandles = [...connectedTargetHandles, newFreeTargetHandle];
+        const finalSourceHandles = [...connectedSourceHandles, newFreeSourceHandle];
+
+        return {
+          ...node,
+          id: newId,
+          position: {
+            x: node.position.x + 100,
+            y: node.position.y + 100,
+          },
+          data: {
+            ...node.data,
+            id: newId,
+            targetHandles: finalTargetHandles,
+            sourceHandles: finalSourceHandles,
+          },
+          selected: true,
+        };
+      }
     });
 
-    // Create new edges with updated source/target IDs
-    const newEdges = clipboardEdges.map((edge) => ({
-      ...edge,
-      id: `${idMapping[edge.source]} -> ${idMapping[edge.target]}`,
-      source: idMapping[edge.source] ?? "",
-      target: idMapping[edge.target] ?? "",
-      selected: true,
-    })) as Edge[];
+    // Only create new edges when copying multiple nodes and only for connections between copied nodes
+    const newEdges = isSingleNodeCopy ? [] : clipboardEdges
+      .filter(edge => copiedNodeIds.has(edge.source) && copiedNodeIds.has(edge.target))
+      .map((edge) => {
+        const newSource = idMapping[edge.source] ?? "";
+        const newTarget = idMapping[edge.target] ?? "";
+        // Map the source and target handles to their new IDs
+        const newSourceHandle = handleMapping[edge.sourceHandle ?? ""] ?? "";
+        const newTargetHandle = handleMapping[edge.targetHandle ?? ""] ?? "";
+        
+        // Only create edges when all references are valid
+        if (newSource && newTarget && newSourceHandle && newTargetHandle) {
+          return {
+            ...edge,
+            id: `${newSource}:${newSourceHandle} -> ${newTarget}:${newTargetHandle}`,
+            source: newSource,
+            target: newTarget,
+            sourceHandle: newSourceHandle,
+            targetHandle: newTargetHandle,
+            selected: true,
+          } as Edge;
+        }
+        return null;
+      }).filter(Boolean) as Edge[];
 
     // Deselect all existing nodes and edges, then add new ones
     setNodes((nds) => [

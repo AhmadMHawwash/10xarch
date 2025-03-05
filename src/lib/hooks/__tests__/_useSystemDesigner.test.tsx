@@ -250,4 +250,154 @@ describe('useSystemDesigner', () => {
     const updatedNode = result.current.nodes.find(node => node.id === 'test-node');
     expect(updatedNode?.data.configs?.testConfig).toBe('newValue');
   });
+
+  it('should copy a single node without handles connections', () => {
+    const { result } = renderHook(() => useSystemDesigner(), {
+      wrapper: Wrapper,
+    });
+
+    // Mock a node with connected handles
+    const mockNode: Node<SystemComponentNodeDataProps> = {
+      id: 'test-node',
+      type: 'service',
+      position: { x: 100, y: 100 },
+      data: { 
+        name: 'Server',
+        icon: (() => 'IconMock') as unknown as typeof PiIcon,
+        id: 'test-node',
+        configs: {},
+        // Create handles that have isConnected=true to test if they get reset
+        targetHandles: [{ id: 'test-target-handle', isConnected: true }],
+        sourceHandles: [{ id: 'test-source-handle', isConnected: true }],
+      },
+      selected: true,
+    };
+
+    // Add the node to the board and select it
+    void act(() => {
+      const newNodes = [...defaultStartingNodes, mockNode] as Node<SystemComponentNodeDataProps | OtherNodeDataProps>[];
+      result.current.setNodes(newNodes);
+    });
+
+    // Copy the node
+    void act(() => {
+      result.current.handleCopy();
+    });
+
+    // Paste the node
+    void act(() => {
+      result.current.handlePaste();
+    });
+
+    // Should have original nodes plus the pasted one
+    expect(result.current.nodes.length).toBe(3);
+    
+    // Get the pasted node (should be the last one added)
+    const pastedNode = result.current.nodes[2];
+    
+    // Verify that the handles were reset (not connected)
+    expect(pastedNode?.data.targetHandles?.[0]?.isConnected).toBe(false);
+    expect(pastedNode?.data.sourceHandles?.[0]?.isConnected).toBe(false);
+    
+    // Verify that the handles have new IDs
+    expect(pastedNode?.data.targetHandles?.[0]?.id).not.toBe('test-target-handle');
+    expect(pastedNode?.data.sourceHandles?.[0]?.id).not.toBe('test-source-handle');
+  });
+
+  it('should preserve edges between multiple copied nodes', () => {
+    const { result } = renderHook(() => useSystemDesigner(), {
+      wrapper: Wrapper,
+    });
+
+    // Create two nodes with connected handles
+    const mockNode1: Node<SystemComponentNodeDataProps> = {
+      id: 'client-1',
+      type: 'service',
+      position: { x: 100, y: 100 },
+      data: { 
+        name: 'Client',
+        icon: (() => 'IconMock') as unknown as typeof PiIcon,
+        id: 'client-1',
+        configs: {},
+        targetHandles: [],
+        sourceHandles: [{ id: 'client-source-handle', isConnected: true }],
+      },
+      selected: true,
+    };
+
+    const mockNode2: Node<SystemComponentNodeDataProps> = {
+      id: 'server-1',
+      type: 'service',
+      position: { x: 300, y: 100 },
+      data: { 
+        name: 'Server',
+        icon: (() => 'IconMock') as unknown as typeof PiIcon,
+        id: 'server-1',
+        configs: {},
+        targetHandles: [{ id: 'server-target-handle', isConnected: true }],
+        sourceHandles: [],
+      },
+      selected: true,
+    };
+
+    // Create an edge between the nodes
+    const mockEdge: Edge = {
+      id: 'client-1 -> server-1',
+      source: 'client-1',
+      target: 'server-1',
+      sourceHandle: 'client-source-handle',
+      targetHandle: 'server-target-handle',
+    };
+
+    // Add the nodes and edge to the board
+    void act(() => {
+      const newNodes = [...defaultStartingNodes, mockNode1, mockNode2] as Node<SystemComponentNodeDataProps | OtherNodeDataProps>[];
+      result.current.setNodes(newNodes);
+      result.current.setEdges([mockEdge]);
+    });
+
+    // Copy the nodes (both are selected)
+    void act(() => {
+      result.current.handleCopy();
+    });
+
+    // Remember initial counts
+    const initialNodesCount = result.current.nodes.length;
+    const initialEdgesCount = result.current.edges.length;
+
+    // Paste the nodes
+    void act(() => {
+      result.current.handlePaste();
+    });
+
+    // Should have 2 new nodes and 1 new edge
+    expect(result.current.nodes.length).toBe(initialNodesCount + 2);
+    expect(result.current.edges.length).toBe(initialEdgesCount + 1);
+    
+    // Verify that the new nodes have handles marked as connected
+    const pastedNodes = result.current.nodes.filter(node => 
+      node.id !== 'client-1' && 
+      node.id !== 'server-1' && 
+      !node.id.includes('Whiteboard')
+    );
+    
+    // Find the client and server nodes in the pasted nodes
+    const pastedClient = pastedNodes.find(node => node.data.name === 'Client');
+    const pastedServer = pastedNodes.find(node => node.data.name === 'Server');
+    
+    expect(pastedClient).toBeDefined();
+    expect(pastedServer).toBeDefined();
+    
+    // At least one handle in the client node should be connected
+    const clientHasConnectedHandle = pastedClient?.data.sourceHandles?.some(
+      handle => handle.isConnected
+    );
+    expect(clientHasConnectedHandle).toBe(true);
+    
+    // At least one handle in the server node should be connected
+    const serverHasConnectedHandle = pastedServer?.data.targetHandles?.some(
+      handle => handle.isConnected
+    );
+    expect(serverHasConnectedHandle).toBe(true);
+  });
 }); 

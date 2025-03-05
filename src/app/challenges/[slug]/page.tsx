@@ -53,7 +53,7 @@ function Level() {
   const prevFeedback = usePrevious(feedback);
 
   useEffect(() => {
-    if (prevFeedback !== feedback && prevFeedback) {
+    if (prevFeedback !== feedback && feedback) {
       setIsFeedbackExpanded(true);
     }
   }, [feedback, prevFeedback]);

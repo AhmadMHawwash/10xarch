@@ -43,6 +43,13 @@ export default async function Home() {
               <span className="mr-2">Try for free</span>
               <ArrowRight className="transition-transform group-hover:translate-x-1" />
             </Link>
+            <Link
+              href="/pricing"
+              className="group inline-flex items-center overflow-hidden rounded-full bg-gradient-to-r from-purple-500 to-purple-600 px-8 py-3 text-white ring-1 ring-purple-500/10 transition-all hover:from-purple-600 hover:to-purple-700 hover:shadow-md hover:shadow-purple-500/20 dark:ring-purple-400/20"
+            >
+              <span className="mr-2">See Pricing</span>
+              <CreditCard className="h-4 w-4 transition-transform group-hover:scale-110" />
+            </Link>
           </div>
 
           <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">

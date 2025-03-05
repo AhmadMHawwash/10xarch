@@ -22,7 +22,7 @@ export const freeChallengesLimiter = new Ratelimit({
 // Create a new ratelimiter for chat messages (5 per hour per IP per challenge)
 export const chatMessagesLimiter = new Ratelimit({
   redis,
-  limiter: Ratelimit.slidingWindow(5, '1 h'),
+  limiter: Ratelimit.slidingWindow(3, '1 h'),
   analytics: true,
   prefix: '@upstash/ratelimit/chat-messages',
 });

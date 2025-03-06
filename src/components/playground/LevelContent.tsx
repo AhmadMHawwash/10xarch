@@ -102,7 +102,7 @@ const EnhancedSection: React.FC<SectionProps> = ({ title, content }) => (
 
 // Regular Section component for other sections
 const Section: React.FC<SectionProps> = ({ title, content }) => (
-  <div className="rounded-lg bg-gray-100 p-4 shadow-md dark:bg-gray-800">
+  <div className="rounded-lg bg-gray-50 p-4 shadow-md dark:bg-gray-800/50">
     <Muted className="mb-2 text-gray-600 dark:text-gray-400">{title}</Muted>
     <div className="mt-0 text-gray-700 dark:text-gray-300">
       {typeof content === "string" ? (

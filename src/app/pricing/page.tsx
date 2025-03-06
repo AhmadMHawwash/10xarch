@@ -21,7 +21,7 @@ import {
 import Link from "next/link";
 
 export const metadata = {
-  title: "Pricing - Archround | System Design Learning Platform",
+  title: "Pricing - 10xarch | System Design Learning Platform",
   description:
     "Learn system design with our flexible, affordable token-based pricing system.",
 };
@@ -537,7 +537,7 @@ export default function PricingPage() {
           Ready to level up your system design skills?
         </h2>
         <p className="mx-auto mb-6 max-w-2xl text-gray-600 dark:text-gray-400">
-          Improve your system design skills with Archround&apos;s interactive
+          Improve your system design skills with 10xarch&apos;s interactive
           learning platform. Start for free or go Pro today!
         </p>
         <div className="flex flex-wrap justify-center gap-4">

@@ -12,9 +12,9 @@ import { GeistSans } from "geist/font/sans";
 import { Analytics } from "@vercel/analytics/react";
 
 export const metadata = {
-  title: "Archround",
+  title: "10xarch",
   description:
-    "Archround is system design playground for learning and practicing system design concepts interactively following industry grade challenges.",
+    "10xarch is system design playground for learning and practicing system design concepts interactively following industry grade challenges.",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 

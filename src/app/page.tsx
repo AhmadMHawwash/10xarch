@@ -451,7 +451,7 @@ export default async function Home() {
           <div className="max-w-2xl mx-auto">
             <div className="flex justify-center">
               <Link
-                href="https://archround.userjot.com"
+                href="https://10xarch.userjot.com"
                 className="group inline-flex items-center gap-2 overflow-hidden rounded-full bg-blue-500 px-8 py-3 text-white shadow-md ring-1 ring-white/10 transition-all duration-300 hover:-translate-y-0.5 hover:bg-blue-600 hover:shadow-lg hover:shadow-blue-500/25 dark:bg-blue-600 dark:hover:bg-blue-700"
               >
                 <MessageSquareHeartIcon className="h-5 w-5 transition-transform group-hover:scale-105" />

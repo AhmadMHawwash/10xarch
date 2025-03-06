@@ -246,8 +246,12 @@ export function ChatUI({ challengeId, stageIndex = 0 }: ChatUIProps) {
 
   return (
     <div className="flex h-full flex-col bg-secondary/30">
-      {/* Credit warning banner when user has no credits left */}
-      <CreditAlert variant="banner" className="mx-4 mt-3" />
+      {/* Credit warning banner when user has no credits left AND no free prompts remaining */}
+      <CreditAlert 
+        variant="banner" 
+        className="mx-4 mt-3" 
+        hasNoFreePrompts={remainingMessages === 0} 
+      />
       
       {/* Chat messages area */}
       <ScrollArea ref={scrollAreaRef} className="flex-1 p-4">

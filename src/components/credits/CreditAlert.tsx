@@ -9,12 +9,13 @@ import { Button } from "@/components/ui/button";
 interface CreditAlertProps {
   className?: string;
   variant?: "inline" | "banner";
+  hasNoFreePrompts?: boolean;
 }
 
-export function CreditAlert({ className, variant = "inline" }: CreditAlertProps) {
+export function CreditAlert({ className, variant = "inline", hasNoFreePrompts = true }: CreditAlertProps) {
   const { hasLowCredits, balance } = useCredits();
 
-  if (!hasLowCredits) {
+  if (!hasLowCredits || !hasNoFreePrompts) {
     return null;
   }
 

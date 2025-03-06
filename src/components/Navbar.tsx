@@ -130,13 +130,41 @@ export default function Navbar() {
           shouldUseContainer ? "container" : "px-6",
         )}
       >
-        <div className="flex items-center space-x-4">
+        {/* Left section - Logo and Navigation Links */}
+        <div className="flex items-center space-x-6">
           <Link href="/" className="flex items-center space-x-2">
             <Logo className="h-8 w-8" />
             <span className="text-xl font-bold">Archround</span>
           </Link>
+          
+          {/* Navigation Links - Desktop */}
+          <div className="hidden md:flex items-center space-x-4">
+            <Link
+              href="/challenges"
+              className={cn(
+                "text-sm font-medium hover:text-primary",
+                pathname === "/challenges"
+                  ? "text-primary"
+                  : "text-muted-foreground",
+              )}
+            >
+              Challenges
+            </Link>
+            <Link
+              href="/playground"
+              className={cn(
+                "text-sm font-medium hover:text-primary",
+                pathname === "/playground"
+                  ? "text-primary"
+                  : "text-muted-foreground",
+              )}
+            >
+              Playground
+            </Link>
+          </div>
         </div>
 
+        {/* Mobile menu toggle */}
         <button
           className="block p-2 md:hidden"
           onClick={toggleMenu}
@@ -145,56 +173,33 @@ export default function Navbar() {
           {isMenuOpen ? <X /> : <Menu />}
         </button>
 
-        <div className="hidden items-center space-x-6 md:flex">
+        {/* Right section - User info, Credits, Theme Toggle */}
+        <div className="hidden md:flex items-center space-x-6">
           <FreeChallengeBadge />
+          
           {isUserLoading ? (
             <div className="flex items-center space-x-2">
               <Loader2 className="h-4 w-4 animate-spin" />
               <span className="text-sm text-muted-foreground">Loading...</span>
             </div>
           ) : isSignedIn ? (
-            <>
-              <div className="flex items-center space-x-3">
-                <Link
-                  href="/challenges"
-                  className={cn(
-                    "text-sm font-medium hover:text-primary",
-                    pathname === "/challenges"
-                      ? "text-primary"
-                      : "text-muted-foreground",
-                  )}
-                >
-                  Challenges
-                </Link>
-                <Link
-                  href="/playground"
-                  className={cn(
-                    "text-sm font-medium hover:text-primary",
-                    pathname === "/playground"
-                      ? "text-primary"
-                      : "text-muted-foreground",
-                  )}
-                >
-                  Playground
-                </Link>
-                <Link
-                  href="/credits"
-                  className="flex items-center gap-1.5 text-sm font-medium"
-                >
-                  <Coins className="h-4 w-4" />
-                  {isLoadingCredits ? (
-                    <span className="text-muted-foreground">Loading...</span>
-                  ) : (
-                    <span className="text-muted-foreground">
-                      {credits} credits
-                    </span>
-                  )}
-                </Link>
-                <CreditAlert className="ml-2" />
-              </div>
-
+            <div className="flex items-center space-x-4">
+              <Link
+                href="/credits"
+                className="flex items-center gap-1.5 text-sm font-medium"
+              >
+                <Coins className="h-4 w-4" />
+                {isLoadingCredits ? (
+                  <span className="text-muted-foreground">Loading...</span>
+                ) : (
+                  <span className="text-muted-foreground">
+                    {credits} credits
+                  </span>
+                )}
+              </Link>
+              <CreditAlert className="ml-2" />
               <UserButton afterSignOutUrl="/" />
-            </>
+            </div>
           ) : (
             <SignInButton mode="modal">
               <Button>Sign In</Button>
@@ -203,8 +208,36 @@ export default function Navbar() {
           <ThemeToggle />
         </div>
 
+        {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="absolute left-0 right-0 top-[7vh] z-50 bg-slate-100 p-4 shadow-md dark:bg-gray-800 md:hidden">
+            {/* Navigation Links - Mobile */}
+            <div className="space-y-2 mb-4">
+              <Link
+                href="/challenges"
+                className={cn(
+                  "block py-2 text-sm hover:text-primary",
+                  pathname === "/challenges"
+                    ? "text-primary"
+                    : "text-muted-foreground",
+                )}
+              >
+                Challenges
+              </Link>
+              <Link
+                href="/playground"
+                className={cn(
+                  "block py-2 text-sm hover:text-primary",
+                  pathname === "/playground"
+                    ? "text-primary"
+                    : "text-muted-foreground",
+                )}
+              >
+                Playground
+              </Link>
+            </div>
+            
+            {/* Challenge & Credits Info - Mobile */}
             <FreeChallengeBadge />
             {isUserLoading ? (
               <div className="flex items-center space-x-2 py-2">
@@ -226,6 +259,8 @@ export default function Navbar() {
                 )}
               </Link>
             )}
+            
+            {/* User & Theme - Mobile */}
             <div className="flex items-center justify-between py-2">
               <ThemeToggle />
               {isUserLoading ? (

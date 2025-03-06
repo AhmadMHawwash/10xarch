@@ -44,7 +44,7 @@ export function ChatUI({ challengeId, stageIndex = 0 }: ChatUIProps) {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [remainingMessages, setRemainingMessages] = useState(5);
-  const { balance: credits, refetch: refetchCredits, hasLowCredits } = useCredits();
+  const { balance: credits, refetch: refetchCredits } = useCredits();
   const { getMessages, addMessage, clearSession } = useChatMessages();
   const [mounted, setMounted] = useState(false);
   
@@ -261,7 +261,7 @@ export function ChatUI({ challengeId, stageIndex = 0 }: ChatUIProps) {
         <div className="flex items-center justify-between px-4 py-2 text-xs text-muted-foreground">
           <div className="flex items-center gap-2">
             <MessageSquare className="h-3.5 w-3.5" />
-            <span>{remainingMessages}/5 free</span>
+            <span>{remainingMessages}/3 free</span>
             {remainingMessages === 0 && <span>(resets in 1h)</span>}
           </div>
           {credits > 0 && (

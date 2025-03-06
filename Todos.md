@@ -12,10 +12,11 @@
 [x] being more strict and not too generous in challenges evaluation
 [x] Save latest feedback in local storage
 [ ] Multiple playgrounds
-[ ] Stripe integration and Zenvoice
+[x] Stripe integration
+[ ] Zenvoice
 [ ] Email integration
 [ ] Team signup
-[ ] Buy credit hints (AI hints)
+[x] Buy credit hints (AI hints)
 [ ] what could happen if I modified this or that? (ask AI so it helps you understand more the system design)
 [ ] Train AI to do System design stuff (Or upload files and specific cases)
 [ ] Tell the AI to behave like backend for stats and reports

@@ -108,13 +108,14 @@ const componentTargets: Record<
   SystemComponent["name"],
   SystemComponent["name"][]
 > = {
-  Client: ["Server", "Load Balancer", "CDN", "Message Queue"],
-  CDN: ["Load Balancer", "Server"],
-  "Load Balancer": ["Server"],
-  Server: ["Cache", "Database", "Message Queue"],
-  Cache: ["Database"],
-  Database: [],
-  "Message Queue": ["Server"],
+  Client: ["Server", "Load Balancer", "CDN", "Message Queue", "Custom Component"],
+  CDN: ["Load Balancer", "Server", "Custom Component"],
+  "Load Balancer": ["Server", "Custom Component"],
+  Server: ["Cache", "Database", "Message Queue", "Custom Component"],
+  Cache: ["Database", "Custom Component"],
+  Database: ["Custom Component"],
+  "Message Queue": ["Server", "Custom Component"],
+  "Custom Component": ["Client", "Server", "Load Balancer", "Cache", "CDN", "Database", "Message Queue", "Custom Component"],
 };
 
 const deserializeNodes = (nodes: string | null) => {
@@ -133,6 +134,7 @@ const deserializeNodes = (nodes: string | null) => {
       Cache: 1,
       CDN: 1,
       "Message Queue": 1,
+      "Custom Component": 1,
     };
 
     // Calculate the highest number for each component type
@@ -412,7 +414,9 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
         withTargetHandle: true,
         withSourceHandle: true,
         id,
-        configs: {},
+        configs: componentName === "Custom Component" 
+          ? { "display name": "Custom Component" } 
+          : {},
         targetHandles: [{ id: `${id}-target-handle-${timestamp}`, isConnected: false }],
         sourceHandles: [{ id: `${id}-source-handle-${timestamp + 1}`, isConnected: false }],
       };

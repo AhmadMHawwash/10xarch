@@ -14,6 +14,7 @@ export const componentsNumberingStore = create<{
     Cache: 1,
     CDN: 1,
     "Message Queue": 1,
+    "Custom Component": 1,
   },
   getNextId: (componentName) => {
     const id = get().componentsToCount[componentName];
@@ -35,6 +36,7 @@ export const componentsNumberingStore = create<{
         Cache: 1,
         CDN: 1,
         "Message Queue": 1,
+        "Custom Component": 1,
       },
     });
   },

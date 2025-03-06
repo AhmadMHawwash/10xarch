@@ -10,6 +10,7 @@ import { getSystemComponent } from "../Gallery";
 import { Cache } from "../SystemComponents/Cache";
 import { CDN } from "../SystemComponents/CDN";
 import { Client } from "../SystemComponents/Client";
+import { CustomComponent } from "../SystemComponents/CustomComponent";
 import { Database } from "../SystemComponents/Database";
 import { LoadBalancer } from "../SystemComponents/LoadBalancer";
 import { MessageQueue } from "../SystemComponents/MessageQueue";
@@ -53,8 +54,10 @@ export default function SystemComponentNode({
   const Component = components[data.name] ?? DefaultComponent;
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const { icon: ComponentIcon, content } = getSystemComponent(data.name);
-  const displayName = data.configs["display name"] as string;
-
+  const displayName = data.name === "Custom Component" 
+    ? (data.configs["display name"] as string) || "Custom Component"
+    : data.configs["display name"] as string;
+  
   // Calculate positions for target handles
   const targetHandles = data.targetHandles ?? [];
   const sourceHandles = data.sourceHandles ?? [];
@@ -111,6 +114,7 @@ export default function SystemComponentNode({
       >
         <Component
           name={displayName ?? data.id}
+          nodeId={data.id}
           Icon={data.icon}
           nodeSettingsRef={nodeSettingsRef}
         />
@@ -160,6 +164,7 @@ export default function SystemComponentNode({
 
 export type ComponentNodeProps = {
   name: string;
+  nodeId?: string;
   Icon: SystemComponentNodeDataProps["icon"];
   nodeSettingsRef: NodeSettingsRefObject;
 };
@@ -177,6 +182,7 @@ const components: Partial<
   CDN,
   "Message Queue": MessageQueue,
   "Load Balancer": LoadBalancer,
+  "Custom Component": CustomComponent,
 };
 
 const DefaultComponent = ({ name, Icon }: ComponentNodeProps) => (

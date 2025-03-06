@@ -15,6 +15,7 @@ import {
   Network,
   Search,
   Server,
+  Box
 } from "lucide-react";
 import type { DragEvent } from "react";
 import { useState } from "react";
@@ -67,6 +68,13 @@ const components: Record<SystemComponentType, SystemComponent> = {
     icon: HardDriveDownload,
     content: messageQueue,
   },
+  "Custom Component": {
+    name: "Custom Component",
+    description:
+      "A custom component that can be configured to represent any system component you need.",
+    icon: Box,
+    content: "# Custom Component\nA configurable component that can represent any system element you need in your architecture.",
+  },
 //   Whiteboard: {
 //     description:
 //       "Whiteboard is your area to write your notes and thoughts about the system.",
@@ -88,6 +96,7 @@ const components: Record<SystemComponentType, SystemComponent> = {
 const componentCategories = {
   "Basic Components": ["Client", "Server", "Database"],
   "Advanced Components": ["Load Balancer", "Cache", "CDN", "Message Queue"],
+  "Custom Components": ["Custom Component"],
 };
 
 const Gallery = () => {

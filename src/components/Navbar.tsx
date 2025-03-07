@@ -134,7 +134,7 @@ export default function Navbar() {
         <div className="flex items-center space-x-6">
           <Link href="/" className="flex items-center space-x-2">
             <Logo className="h-8 w-8" />
-            <span className="text-xl font-bold">10xarch</span>
+            <span className="text-xl font-bold">10×arch</span>
           </Link>
           
           {/* Navigation Links - Desktop */}

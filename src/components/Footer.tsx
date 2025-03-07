@@ -8,11 +8,11 @@ export function Footer() {
     <footer className="border-t border-gray-200 bg-white py-4 dark:border-gray-800 dark:bg-gray-900">
       <div className="container flex items-center justify-between px-4">
         <div className="text-sm text-muted-foreground">
-          © {new Date().getFullYear()} 10xarch. All rights reserved.
+          © {new Date().getFullYear()} 10×arch. All rights reserved.
         </div>
         <div className="flex items-center gap-4">
           <Link
-            href="https://10xarch.userjot.com/"
+            href="https://tenxarch.userjot.com/"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-blue-500"

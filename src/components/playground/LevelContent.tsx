@@ -463,7 +463,7 @@ export const LevelContent = () => {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <a
-                    href="https://10xarch.userjot.com/"
+                    href="https://tenxarch.userjot.com/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-2 rounded-md p-0.5 text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"

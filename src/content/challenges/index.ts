@@ -6,6 +6,10 @@ import chatSystemChallenge from "./chat-system";
 import fileStorageChallenge from "./file-storage";
 import taskManagementChallenge from "./task-management";
 import socialNetworkChallenge from "./social-network";
+import inventoryManagementChallenge from "./inventory-management";
+import notificationServiceChallenge from "./notification-service";
+import paymentProcessingChallenge from "./payment-processing";
+import mappingNavigationChallenge from "./mapping-navigation";
 
 const challenges = [
   chatSystemChallenge,
@@ -16,6 +20,10 @@ const challenges = [
   fileStorageChallenge,
   taskManagementChallenge,
   socialNetworkChallenge,
+  inventoryManagementChallenge,
+  notificationServiceChallenge,
+  paymentProcessingChallenge,
+  mappingNavigationChallenge,
 ];
 
 export default challenges;

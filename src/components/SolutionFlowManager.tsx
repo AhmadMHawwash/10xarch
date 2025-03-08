@@ -1,8 +1,5 @@
 import { useFeatureCustomisation, useFeatures } from "@/lib/hooks/useFeatures";
-import {
-  defaultStartingNodes,
-  useSystemDesigner,
-} from "@/lib/hooks/_useSystemDesigner";
+import { useSystemDesigner } from "@/lib/hooks/_useSystemDesigner";
 import { componentsNumberingStore } from "@/lib/levels/utils";
 import {
   type EvaluationResponse,
@@ -21,6 +18,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "./ui/dialog";
+import { defaultStartingNodes } from "@/lib/hooks/systemDesignerUtils";
 
 interface FlowManagerProps {
   checkSolution: () => void;
@@ -88,9 +86,7 @@ export const FlowManager: React.FC<FlowManagerProps> = ({
           />
         </div>
         <Suspense
-          fallback={
-            <div className="h-8 w-full animate-pulse-gentle"></div>
-          }
+          fallback={<div className="h-8 w-full animate-pulse-gentle"></div>}
         >
           <SolutionFeedback
             isLoadingAnswer={isLoadingAnswer}

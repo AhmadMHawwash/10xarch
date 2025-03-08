@@ -1,12 +1,12 @@
 import { renderHook, act } from '@testing-library/react-hooks';
 import { ReactFlowProvider } from 'reactflow';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { SystemDesignerProvider, useSystemDesigner, defaultStartingNodes } from '../_useSystemDesigner';
+import { SystemDesignerProvider, useSystemDesigner } from '../_useSystemDesigner';
 import { ToastProvider } from '@/components/ui/toast';
-import { type Node, type Edge, type NodeChange, type XYPosition, type ReactFlowInstance } from 'reactflow';
+import { type Node, type Edge, type NodeChange } from 'reactflow';
 import { type SystemComponentNodeDataProps, type OtherNodeDataProps } from '@/components/ReactflowCustomNodes/SystemComponentNode';
 import { type PiIcon } from 'lucide-react';
-
+import { defaultStartingNodes } from '../systemDesignerUtils';
 // Mock dependencies
 vi.mock('next/navigation', () => ({
   usePathname: () => '/test-path',
@@ -52,17 +52,6 @@ const Wrapper = ({ children }: { children: React.ReactNode }) => (
     </ToastProvider>
   </ReactFlowProvider>
 );
-
-// Mock ReactFlow instance
-const mockReactFlowInstance: Partial<ReactFlowInstance> = {
-  project: vi.fn((position: XYPosition): XYPosition => position),
-  toObject: vi.fn(() => ({
-    nodes: [],
-    edges: [],
-    viewport: { x: 0, y: 0, zoom: 1 },
-  })),
-  getNodes: vi.fn(() => []),
-};
 
 // Mock HTML element for ReactFlow wrapper
 const mockWrapperElement = document.createElement('div');

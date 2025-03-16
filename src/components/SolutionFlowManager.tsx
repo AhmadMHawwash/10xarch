@@ -63,7 +63,8 @@ export const FlowManager: React.FC<FlowManagerProps> = ({
 
   return (
     <div
-      className={`flex flex-col items-center rounded-lg border border-gray-300 bg-gray-100 p-4 shadow-lg dark:border-gray-700 dark:bg-gray-800 ${
+      id="flow-manager"
+      className={`flow-manager flex flex-col items-center rounded-lg border border-gray-300 bg-gray-100 p-4 shadow-lg dark:border-gray-700 dark:bg-gray-800 ${
         isFeedbackExpanded ? "w-full max-w-4xl" : "w-fit"
       } transition-all duration-300`}
     >
@@ -108,7 +109,7 @@ const ResetFlowButton: React.FC<{
 }> = ({ resetDone, onReset }) => (
   <ShouldResetFlowModal
     trigger={
-      <Button variant="outline" size="sm" className="flex items-center gap-2">
+      <Button variant="outline" size="sm" className="reset-flow-button flex items-center gap-2">
         {resetDone ? (
           <Check className="h-4 w-4 text-green-600 dark:text-green-400" />
         ) : (
@@ -131,7 +132,7 @@ const RunSolutionButton: React.FC<{
     size="sm"
     onClick={onClick}
     disabled={isLoading || disabled}
-    className="bg-blue-600 text-white transition-colors hover:bg-blue-700"
+    className="check-solution-button bg-blue-600 text-white transition-colors hover:bg-blue-700"
   >
     {isLoading ? (
       <Loader2 className="mr-2 h-4 w-4 animate-spin" />

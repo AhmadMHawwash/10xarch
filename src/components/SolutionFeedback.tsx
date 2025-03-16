@@ -81,7 +81,7 @@ export const FeedbackList: React.FC<{
   </AccordionItem>
 );
 
-export const ScoreDisplay: React.FC<{ 
+export const ScoreDisplay: React.FC<{
   score: number;
   onNextStage?: () => void;
 }> = ({ score, onNextStage }) => {
@@ -103,7 +103,7 @@ export const ScoreDisplay: React.FC<{
   const scoreMessage = getScoreMessage(score);
 
   return (
-    <div className="mb-6 text-center">
+    <div className="score-display mb-6 text-center">
       <div className="mb-2 text-2xl font-bold">Your Score</div>
       <div className={`text-4xl font-bold ${getScoreColor(score)}`}>
         {score}%
@@ -114,24 +114,27 @@ export const ScoreDisplay: React.FC<{
         </div>
       )}
       <Progress value={score} className="mt-2" />
-      
+
       {score >= 80 && onNextStage && (
         <div className="relative mt-6 flex justify-center">
           {/* Celebration sparkles for high scores */}
           {score >= 90 && (
             <>
-              <Sparkles className="absolute -top-6 -left-2 h-5 w-5 animate-pulse text-yellow-400" />
-              <Sparkles className="absolute -top-4 -right-4 h-6 w-6 animate-pulse text-yellow-400" />
+              <Sparkles className="absolute -left-2 -top-6 h-5 w-5 animate-pulse text-yellow-400" />
+              <Sparkles className="absolute -right-4 -top-4 h-6 w-6 animate-pulse text-yellow-400" />
             </>
           )}
-          <Button 
-            onClick={onNextStage} 
-            className="group relative overflow-hidden rounded-full px-6 py-3 font-medium text-white shadow-lg transition-all duration-300 ease-out hover:scale-105 hover:shadow-xl bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700"
+          <Button
+            onClick={onNextStage}
+            className="group relative overflow-hidden rounded-full bg-gradient-to-r from-green-500 to-emerald-600 px-6 py-3 font-medium text-white shadow-lg transition-all duration-300 ease-out hover:scale-105 hover:from-green-600 hover:to-emerald-700 hover:shadow-xl"
           >
             <span className="relative z-10 flex items-center">
               <Sparkles className="mr-2 h-4 w-4" />
               Continue to Next Challenge
-              <ChevronRight className="ml-2 transition-transform duration-300 group-hover:translate-x-1" size={18} />
+              <ChevronRight
+                className="ml-2 transition-transform duration-300 group-hover:translate-x-1"
+                size={18}
+              />
             </span>
             <span className="absolute inset-0 z-0 bg-gradient-to-r from-green-400 to-emerald-500 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
           </Button>
@@ -154,7 +157,7 @@ export const SolutionFeedback: React.FC<SolutionFeedbackProps> = ({
   return (
     <Sheet open={isOpen} onOpenChange={(v) => (v ? onOpen() : onClose())}>
       <SheetTrigger asChild>
-        <Button variant="outline">
+        <Button className="feedback-section" variant="outline">
           <Bot className="mr-2 text-amber-500" size="20" />
           Feedback
         </Button>
@@ -177,8 +180,10 @@ export const SolutionFeedback: React.FC<SolutionFeedbackProps> = ({
             </p>
           </div>
         ) : answer ? (
-          <div className="mt-6">
-            {"score" in answer && <ScoreDisplay score={answer.score} onNextStage={onNextStage} />}
+          <>
+            {"score" in answer && (
+              <ScoreDisplay score={answer.score} onNextStage={onNextStage} />
+            )}
             <Accordion type="single" collapsible className="w-full">
               <FeedbackList
                 items={answer.strengths}
@@ -196,7 +201,7 @@ export const SolutionFeedback: React.FC<SolutionFeedbackProps> = ({
                 icon={<Lightbulb className="text-blue-500" size="20" />}
               />
             </Accordion>
-          </div>
+          </>
         ) : null}
       </SheetContent>
     </Sheet>

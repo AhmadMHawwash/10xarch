@@ -26,27 +26,29 @@ import {
 } from "@/components/ui/accordion";
 import { H5, List, Muted, P } from "@/components/ui/typography";
 import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
-import { 
-  ArrowLeft, 
-  ArrowRight, 
-  InfoIcon, 
-  MessageSquareHeart, 
-  BookOpen, 
-  Database, 
-  Server, 
-  Gauge, 
-  FileJson, 
+import {
+  ArrowLeft,
+  ArrowRight,
+  InfoIcon,
+  MessageSquareHeart,
+  BookOpen,
+  Database,
+  Server,
+  Gauge,
+  FileJson,
   LayoutPanelTop,
   ExternalLink,
   FileText,
   Globe,
   CheckCircle,
   Link2,
-  ChevronDown
+  ChevronDown,
+  HelpCircle,
 } from "lucide-react";
 import { type ReactNode } from "react";
 import { PanelChat } from "@/components/ai-chat/PanelChat";
 import { buttonVariants } from "@/components/ui/button";
+import { Onboarding } from "../Onboarding";
 
 // Custom collapsible component that can handle React elements
 interface CollapsibleSectionProps {
@@ -67,10 +69,10 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
       <DialogTrigger>
         <span className={className}>{trigger}</span>
       </DialogTrigger>
-      <DialogContent className="min-h-95 w-[70vw] max-w-5xl dark:bg-gray-800 dark:border-gray-700 bg-gray-200 border">
+      <DialogContent className="min-h-95 w-[70vw] max-w-5xl border bg-gray-200 dark:border-gray-700 dark:bg-gray-800">
         <DialogHeader className="relative">
-          <span className="absolute -left-[104px] -top-0 rounded-md dark:bg-gray-700 bg-gray-200 p-4">
-            <Icon className="text-gray-300 dark:text-gray-600 stroke-gray-600 dark:stroke-gray-100" />
+          <span className="absolute -left-[104px] -top-0 rounded-md bg-gray-200 p-4 dark:bg-gray-700">
+            <Icon className="stroke-gray-600 text-gray-300 dark:stroke-gray-100 dark:text-gray-600" />
           </span>
           <div className="h-[90vh] overflow-scroll px-8 text-gray-200">
             {content}
@@ -88,8 +90,10 @@ interface SectionProps {
 
 // Enhanced Section component for Challenge Context
 const EnhancedSection: React.FC<SectionProps> = ({ title, content }) => (
-  <div className="rounded-lg bg-blue-50 p-5 shadow-lg border-l-4 border-blue-500 dark:bg-blue-900/30 dark:border-blue-300">
-    <Muted className="mb-2 text-lg font-semibold text-blue-700 dark:text-blue-300">{title}</Muted>
+  <div className="rounded-lg border-l-4 border-blue-500 bg-blue-50 p-5 shadow-lg dark:border-blue-300 dark:bg-blue-900/30">
+    <Muted className="mb-2 text-lg font-semibold text-blue-700 dark:text-blue-300">
+      {title}
+    </Muted>
     <div className="mt-0 text-gray-800 dark:text-gray-100">
       {typeof content === "string" ? (
         <P className="!mt-0">{content}</P>
@@ -118,21 +122,30 @@ const Section: React.FC<SectionProps> = ({ title, content }) => (
 const EnhancedKeySystemDesign = () => (
   <div className="p-6 text-gray-700 dark:text-gray-300">
     <div className="mb-6">
-      <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Key System Design Components</h3>
-      <p className="text-gray-600 dark:text-gray-400">A comprehensive system design should address these critical areas:</p>
+      <h3 className="mb-4 text-2xl font-bold text-gray-900 dark:text-gray-100">
+        Key System Design Components
+      </h3>
+      <p className="text-gray-600 dark:text-gray-400">
+        A comprehensive system design should address these critical areas:
+      </p>
     </div>
-    
+
     <Accordion type="multiple" className="space-y-3">
       {/* Requirements Analysis */}
-      <AccordionItem value="requirements" className="border rounded-lg shadow-sm overflow-hidden border-indigo-200 dark:border-indigo-900">
-        <AccordionTrigger className="px-5 py-3 hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center">
-          <div className="flex items-center flex-1">
-            <FileJson className="h-5 w-5 text-indigo-500 mr-2" />
-            <span className="text-lg font-medium text-gray-900 dark:text-gray-100">Requirements Analysis</span>
+      <AccordionItem
+        value="requirements"
+        className="overflow-hidden rounded-lg border border-indigo-200 shadow-sm dark:border-indigo-900"
+      >
+        <AccordionTrigger className="flex items-center px-5 py-3 hover:bg-gray-50 dark:hover:bg-gray-800">
+          <div className="flex flex-1 items-center">
+            <FileJson className="mr-2 h-5 w-5 text-indigo-500" />
+            <span className="text-lg font-medium text-gray-900 dark:text-gray-100">
+              Requirements Analysis
+            </span>
           </div>
         </AccordionTrigger>
-        <AccordionContent className="bg-white dark:bg-gray-800 px-5 py-3 border-t border-gray-100 dark:border-gray-700">
-          <ul className="space-y-2 pl-8 list-disc">
+        <AccordionContent className="border-t border-gray-100 bg-white px-5 py-3 dark:border-gray-700 dark:bg-gray-800">
+          <ul className="list-disc space-y-2 pl-8">
             <li>Core functionality definition</li>
             <li>System constraints & limitations</li>
             <li>Scalability requirements</li>
@@ -140,17 +153,22 @@ const EnhancedKeySystemDesign = () => (
           </ul>
         </AccordionContent>
       </AccordionItem>
-      
+
       {/* API Design */}
-      <AccordionItem value="api" className="border rounded-lg shadow-sm overflow-hidden border-green-200 dark:border-green-900">
-        <AccordionTrigger className="px-5 py-3 hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center">
-          <div className="flex items-center flex-1">
-            <Server className="h-5 w-5 text-green-500 mr-2" />
-            <span className="text-lg font-medium text-gray-900 dark:text-gray-100">API Design</span>
+      <AccordionItem
+        value="api"
+        className="overflow-hidden rounded-lg border border-green-200 shadow-sm dark:border-green-900"
+      >
+        <AccordionTrigger className="flex items-center px-5 py-3 hover:bg-gray-50 dark:hover:bg-gray-800">
+          <div className="flex flex-1 items-center">
+            <Server className="mr-2 h-5 w-5 text-green-500" />
+            <span className="text-lg font-medium text-gray-900 dark:text-gray-100">
+              API Design
+            </span>
           </div>
         </AccordionTrigger>
-        <AccordionContent className="bg-white dark:bg-gray-800 px-5 py-3 border-t border-gray-100 dark:border-gray-700">
-          <ul className="space-y-2 pl-8 list-disc">
+        <AccordionContent className="border-t border-gray-100 bg-white px-5 py-3 dark:border-gray-700 dark:bg-gray-800">
+          <ul className="list-disc space-y-2 pl-8">
             <li>Endpoints & interface definitions</li>
             <li>Request/response formats</li>
             <li>Error handling patterns</li>
@@ -160,15 +178,20 @@ const EnhancedKeySystemDesign = () => (
       </AccordionItem>
 
       {/* System Calculations */}
-      <AccordionItem value="calculations" className="border rounded-lg shadow-sm overflow-hidden border-amber-200 dark:border-amber-900">
-        <AccordionTrigger className="px-5 py-3 hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center">
-          <div className="flex items-center flex-1">
-            <Gauge className="h-5 w-5 text-amber-500 mr-2" />
-            <span className="text-lg font-medium text-gray-900 dark:text-gray-100">System Calculations</span>
+      <AccordionItem
+        value="calculations"
+        className="overflow-hidden rounded-lg border border-amber-200 shadow-sm dark:border-amber-900"
+      >
+        <AccordionTrigger className="flex items-center px-5 py-3 hover:bg-gray-50 dark:hover:bg-gray-800">
+          <div className="flex flex-1 items-center">
+            <Gauge className="mr-2 h-5 w-5 text-amber-500" />
+            <span className="text-lg font-medium text-gray-900 dark:text-gray-100">
+              System Calculations
+            </span>
           </div>
         </AccordionTrigger>
-        <AccordionContent className="bg-white dark:bg-gray-800 px-5 py-3 border-t border-gray-100 dark:border-gray-700">
-          <ul className="space-y-2 pl-8 list-disc">
+        <AccordionContent className="border-t border-gray-100 bg-white px-5 py-3 dark:border-gray-700 dark:bg-gray-800">
+          <ul className="list-disc space-y-2 pl-8">
             <li>Traffic patterns & load estimates</li>
             <li>Resource requirements (CPU, memory)</li>
             <li>Performance metrics & SLAs</li>
@@ -176,17 +199,22 @@ const EnhancedKeySystemDesign = () => (
           </ul>
         </AccordionContent>
       </AccordionItem>
-      
+
       {/* Architecture Overview */}
-      <AccordionItem value="architecture" className="border rounded-lg shadow-sm overflow-hidden border-blue-200 dark:border-blue-900">
-        <AccordionTrigger className="px-5 py-3 hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center">
-          <div className="flex items-center flex-1">
-            <LayoutPanelTop className="h-5 w-5 text-blue-500 mr-2" />
-            <span className="text-lg font-medium text-gray-900 dark:text-gray-100">Architecture Overview</span>
+      <AccordionItem
+        value="architecture"
+        className="overflow-hidden rounded-lg border border-blue-200 shadow-sm dark:border-blue-900"
+      >
+        <AccordionTrigger className="flex items-center px-5 py-3 hover:bg-gray-50 dark:hover:bg-gray-800">
+          <div className="flex flex-1 items-center">
+            <LayoutPanelTop className="mr-2 h-5 w-5 text-blue-500" />
+            <span className="text-lg font-medium text-gray-900 dark:text-gray-100">
+              Architecture Overview
+            </span>
           </div>
         </AccordionTrigger>
-        <AccordionContent className="bg-white dark:bg-gray-800 px-5 py-3 border-t border-gray-100 dark:border-gray-700">
-          <ul className="space-y-2 pl-8 list-disc">
+        <AccordionContent className="border-t border-gray-100 bg-white px-5 py-3 dark:border-gray-700 dark:bg-gray-800">
+          <ul className="list-disc space-y-2 pl-8">
             <li>Component interactions & dependencies</li>
             <li>System boundaries & interfaces</li>
             <li>Scalability patterns (horizontal/vertical)</li>
@@ -194,18 +222,23 @@ const EnhancedKeySystemDesign = () => (
           </ul>
         </AccordionContent>
       </AccordionItem>
-      
+
       {/* Data Layer */}
-      <AccordionItem value="data" className="border rounded-lg shadow-sm overflow-hidden border-purple-200 dark:border-purple-900">
-        <AccordionTrigger className="px-5 py-3 hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center">
-          <div className="flex items-center flex-1">
-            <Database className="h-5 w-5 text-purple-500 mr-2" />
-            <span className="text-lg font-medium text-gray-900 dark:text-gray-100">Data Layer</span>
+      <AccordionItem
+        value="data"
+        className="overflow-hidden rounded-lg border border-purple-200 shadow-sm dark:border-purple-900"
+      >
+        <AccordionTrigger className="flex items-center px-5 py-3 hover:bg-gray-50 dark:hover:bg-gray-800">
+          <div className="flex flex-1 items-center">
+            <Database className="mr-2 h-5 w-5 text-purple-500" />
+            <span className="text-lg font-medium text-gray-900 dark:text-gray-100">
+              Data Layer
+            </span>
           </div>
         </AccordionTrigger>
-        <AccordionContent className="bg-white dark:bg-gray-800 px-5 py-3 border-t border-gray-100 dark:border-gray-700">
+        <AccordionContent className="border-t border-gray-100 bg-white px-5 py-3 dark:border-gray-700 dark:bg-gray-800">
           <div className="space-y-4">
-            <ul className="space-y-2 pl-8 list-disc">
+            <ul className="list-disc space-y-2 pl-8">
               <li>Schema design & data modeling</li>
               <li>Storage solution selection</li>
               <li>Data access patterns</li>
@@ -246,33 +279,48 @@ const EnhancedLearningResources: React.FC<EnhancedLearningResourcesProps> = ({
 }) => (
   <div className="p-6 text-gray-700 dark:text-gray-300">
     <div className="mb-6">
-      <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Learning Resources</h3>
-      <p className="text-gray-600 dark:text-gray-400">Resources to help you master system design concepts and apply best practices.</p>
+      <h3 className="mb-4 text-2xl font-bold text-gray-900 dark:text-gray-100">
+        Learning Resources
+      </h3>
+      <p className="text-gray-600 dark:text-gray-400">
+        Resources to help you master system design concepts and apply best
+        practices.
+      </p>
     </div>
 
     <Accordion type="multiple" className="space-y-3">
       {/* Documentation Section */}
-      <AccordionItem value="documentation" className="border rounded-lg shadow-sm overflow-hidden border-blue-200 dark:border-blue-900">
-        <AccordionTrigger className="px-5 py-3 hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center">
-          <div className="flex items-center flex-1">
-            <FileText className="h-5 w-5 text-blue-500 mr-2" />
-            <span className="text-lg font-medium text-gray-900 dark:text-gray-100">Technical Documentation ({documentation.length})</span>
+      <AccordionItem
+        value="documentation"
+        className="overflow-hidden rounded-lg border border-blue-200 shadow-sm dark:border-blue-900"
+      >
+        <AccordionTrigger className="flex items-center px-5 py-3 hover:bg-gray-50 dark:hover:bg-gray-800">
+          <div className="flex flex-1 items-center">
+            <FileText className="mr-2 h-5 w-5 text-blue-500" />
+            <span className="text-lg font-medium text-gray-900 dark:text-gray-100">
+              Technical Documentation ({documentation.length})
+            </span>
           </div>
         </AccordionTrigger>
-        <AccordionContent className="bg-white dark:bg-gray-800 px-5 py-3 border-t border-gray-100 dark:border-gray-700">
+        <AccordionContent className="border-t border-gray-100 bg-white px-5 py-3 dark:border-gray-700 dark:bg-gray-800">
           <div className="space-y-4">
             {documentation.map((doc, index) => (
-              <div key={index} className="pb-3 border-b border-gray-100 dark:border-gray-700 last:border-0 last:pb-0">
-                <a 
-                  href={doc.url} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:underline font-medium"
+              <div
+                key={index}
+                className="border-b border-gray-100 pb-3 last:border-0 last:pb-0 dark:border-gray-700"
+              >
+                <a
+                  href={doc.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 font-medium text-blue-600 hover:underline dark:text-blue-400"
                 >
                   <ExternalLink className="h-4 w-4" />
                   {doc.title}
                 </a>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{doc.description}</p>
+                <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                  {doc.description}
+                </p>
               </div>
             ))}
           </div>
@@ -280,27 +328,37 @@ const EnhancedLearningResources: React.FC<EnhancedLearningResourcesProps> = ({
       </AccordionItem>
 
       {/* Real World Examples Section */}
-      <AccordionItem value="examples" className="border rounded-lg shadow-sm overflow-hidden border-green-200 dark:border-green-900">
-        <AccordionTrigger className="px-5 py-3 hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center">
-          <div className="flex items-center flex-1">
-            <Globe className="h-5 w-5 text-green-500 mr-2" />
-            <span className="text-lg font-medium text-gray-900 dark:text-gray-100">Real-World Examples ({realWorldCases.length})</span>
+      <AccordionItem
+        value="examples"
+        className="overflow-hidden rounded-lg border border-green-200 shadow-sm dark:border-green-900"
+      >
+        <AccordionTrigger className="flex items-center px-5 py-3 hover:bg-gray-50 dark:hover:bg-gray-800">
+          <div className="flex flex-1 items-center">
+            <Globe className="mr-2 h-5 w-5 text-green-500" />
+            <span className="text-lg font-medium text-gray-900 dark:text-gray-100">
+              Real-World Examples ({realWorldCases.length})
+            </span>
           </div>
         </AccordionTrigger>
-        <AccordionContent className="bg-white dark:bg-gray-800 px-5 py-3 border-t border-gray-100 dark:border-gray-700">
+        <AccordionContent className="border-t border-gray-100 bg-white px-5 py-3 dark:border-gray-700 dark:bg-gray-800">
           <div className="space-y-4">
             {realWorldCases.map((example, index) => (
-              <div key={index} className="pb-3 border-b border-gray-100 dark:border-gray-700 last:border-0 last:pb-0">
-                <a 
-                  href={example.url} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="flex items-center gap-2 text-green-600 dark:text-green-400 hover:underline font-medium"
+              <div
+                key={index}
+                className="border-b border-gray-100 pb-3 last:border-0 last:pb-0 dark:border-gray-700"
+              >
+                <a
+                  href={example.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 font-medium text-green-600 hover:underline dark:text-green-400"
                 >
                   <Link2 className="h-4 w-4" />
                   {example.name}
                 </a>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{example.description}</p>
+                <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                  {example.description}
+                </p>
               </div>
             ))}
           </div>
@@ -308,22 +366,36 @@ const EnhancedLearningResources: React.FC<EnhancedLearningResourcesProps> = ({
       </AccordionItem>
 
       {/* Best Practices Section */}
-      <AccordionItem value="practices" className="border rounded-lg shadow-sm overflow-hidden border-amber-200 dark:border-amber-900">
-        <AccordionTrigger className="px-5 py-3 hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center">
-          <div className="flex items-center flex-1">
-            <CheckCircle className="h-5 w-5 text-amber-500 mr-2" />
-            <span className="text-lg font-medium text-gray-900 dark:text-gray-100">Best Practices ({bestPractices.length})</span>
+      <AccordionItem
+        value="practices"
+        className="overflow-hidden rounded-lg border border-amber-200 shadow-sm dark:border-amber-900"
+      >
+        <AccordionTrigger className="flex items-center px-5 py-3 hover:bg-gray-50 dark:hover:bg-gray-800">
+          <div className="flex flex-1 items-center">
+            <CheckCircle className="mr-2 h-5 w-5 text-amber-500" />
+            <span className="text-lg font-medium text-gray-900 dark:text-gray-100">
+              Best Practices ({bestPractices.length})
+            </span>
           </div>
         </AccordionTrigger>
-        <AccordionContent className="bg-white dark:bg-gray-800 px-5 py-3 border-t border-gray-100 dark:border-gray-700">
+        <AccordionContent className="border-t border-gray-100 bg-white px-5 py-3 dark:border-gray-700 dark:bg-gray-800">
           <div className="space-y-4">
             {bestPractices.map((practice, index) => (
-              <div key={index} className="pb-4 border-b border-gray-100 dark:border-gray-700 last:border-0 last:pb-0">
-                <h5 className="font-medium text-gray-900 dark:text-gray-100">{practice.title}</h5>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{practice.description}</p>
+              <div
+                key={index}
+                className="border-b border-gray-100 pb-4 last:border-0 last:pb-0 dark:border-gray-700"
+              >
+                <h5 className="font-medium text-gray-900 dark:text-gray-100">
+                  {practice.title}
+                </h5>
+                <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                  {practice.description}
+                </p>
                 {practice.example && (
-                  <div className="mt-2 rounded-md bg-gray-100 dark:bg-gray-700 p-3 text-xs">
-                    <code className="whitespace-pre-wrap text-gray-800 dark:text-gray-300">{practice.example}</code>
+                  <div className="mt-2 rounded-md bg-gray-100 p-3 text-xs dark:bg-gray-700">
+                    <code className="whitespace-pre-wrap text-gray-800 dark:text-gray-300">
+                      {practice.example}
+                    </code>
                   </div>
                 )}
               </div>
@@ -336,30 +408,28 @@ const EnhancedLearningResources: React.FC<EnhancedLearningResourcesProps> = ({
 );
 
 export const LevelContent = () => {
-  const {
-    stage,
-    toNextStage,
-    toPreviousStage,
-    challenge,
-    currentStageIndex,
-  } = useChallengeManager();
+  const { stage, toNextStage, toPreviousStage, challenge, currentStageIndex } =
+    useChallengeManager();
 
   const oldRequirements = challenge.stages
     .slice(0, currentStageIndex)
     .reduce<string[]>((acc, stage) => acc.concat(stage.requirements), []);
 
   return (
-    <div className="flex h-full max-h-[100vh] flex-col justify-between bg-white text-gray-800 dark:bg-gray-900 dark:text-gray-200">
+    <div
+      id="challenge-content"
+      className="flex h-full max-h-[100vh] flex-col justify-between bg-white text-gray-800 dark:bg-gray-900 dark:text-gray-200"
+    >
       <div className="overflow-y-auto p-4 pb-8 pt-0">
         <div className="min-w-[17vw]">
-          <div className="sticky pt-[17px] z-10 w-full bg-white dark:bg-gray-900">
+          <div className="sticky z-10 w-full bg-white pt-[17px] dark:bg-gray-900">
             <div className="flex items-center justify-between">
               <H5 className="text-gray-900 dark:text-gray-100">
                 {challenge.title}
               </H5>
               <Badge
                 variant="outline"
-                className="border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400"
+                className="stage-badge border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400"
               >
                 Stage {currentStageIndex + 1} of {challenge.stages.length}
               </Badge>
@@ -371,12 +441,14 @@ export const LevelContent = () => {
             <EnhancedSection
               title="Challenge Context"
               content={
-                <div className="space-y-4">
+                <div className="space-y-4 challenge-description">
                   <div className="space-y-2">
                     <P className="!mt-0 font-medium">{stage?.problem}</P>
-                    <div className="pl-4 border-l-2 border-blue-500 dark:border-blue-400">
+                    <div className="border-l-2 border-blue-500 pl-4 dark:border-blue-400">
                       <P className="!mt-0 text-sm italic text-gray-600 dark:text-gray-400">
-                        As the Technical Lead, you&apos;ve been tasked with addressing this challenge. The CTO and CPO have outlined the following requirements:
+                        As the Technical Lead, you&apos;ve been tasked with
+                        addressing this challenge. The CTO and CPO have outlined
+                        the following requirements:
                       </P>
                       <List className="!ml-2">
                         {oldRequirements.map((requirement, index) => (
@@ -390,7 +462,7 @@ export const LevelContent = () => {
                         {stage?.requirements.map((requirement, index) => (
                           <P
                             key={index}
-                            className="!mt-0 ml-4 list-item list-decimal text-gray-700 dark:text-gray-300 font-medium"
+                            className="!mt-0 ml-4 list-item list-decimal font-medium text-gray-700 dark:text-gray-300"
                           >
                             {requirement}
                           </P>
@@ -401,23 +473,25 @@ export const LevelContent = () => {
                 </div>
               }
             />
-            
+
             {/* Add a spacer */}
             <div className="my-4"></div>
-            
+
             {/* Reference sections moved to the bottom */}
             <Section
               title="References & Resources"
               content={
-                <div className="space-y-4 mt-2">
+                <div className="references-section mt-2 space-y-4">
                   {/* Resources section - collapsible */}
                   {stage?.resources && (
                     <CollapsibleSection
                       Icon={BookOpen}
                       trigger={
-                        <div className="flex cursor-pointer items-center gap-2 p-2 rounded-md text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 transition-colors">
+                        <div className="flex cursor-pointer items-center gap-2 rounded-md p-2 text-gray-600 transition-colors hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800">
                           <BookOpen size="18" />
-                          <span className="font-medium">Learning Resources</span>
+                          <span className="font-medium">
+                            Learning Resources
+                          </span>
                         </div>
                       }
                       content={
@@ -429,14 +503,16 @@ export const LevelContent = () => {
                       }
                     />
                   )}
-                  
+
                   {/* Key System Design Components - collapsible with better content */}
                   <CollapsibleSection
                     Icon={InfoIcon}
                     trigger={
-                      <div className="flex cursor-pointer items-center gap-2 p-2 rounded-md text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 transition-colors">
+                      <div className="flex cursor-pointer items-center gap-2 rounded-md p-2 text-gray-600 transition-colors hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800">
                         <InfoIcon size="18" />
-                        <span className="font-medium">Key System Design Components</span>
+                        <span className="font-medium">
+                          Key System Design Components
+                        </span>
                       </div>
                     }
                     content={<EnhancedKeySystemDesign />}
@@ -447,9 +523,9 @@ export const LevelContent = () => {
           </div>
         </div>
       </div>
-      
+
       <div>
-        <div className="border-t border-gray-200 bg-white px-4 py-3 dark:border-gray-800 dark:bg-gray-900">
+        <div className="stage-progress border-t border-gray-200 bg-white px-4 py-3 dark:border-gray-800 dark:bg-gray-900">
           <StageProgress
             currentStage={currentStageIndex}
             totalStages={challenge.stages.length}
@@ -457,32 +533,59 @@ export const LevelContent = () => {
             onNext={toNextStage}
           />
         </div>
-        <div className="border-t border-gray-200 bg-white px-4 py-2 dark:border-gray-800 dark:bg-gray-900">
+        <div className="navigation-controls border-t border-gray-200 bg-white px-4 py-2 dark:border-gray-800 dark:bg-gray-900">
           <div className="flex items-center justify-between">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <a
-                    href="https://tenxarch.userjot.com/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 rounded-md p-0.5 text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-                    aria-label="Give Feedback"
+            <div className="flex items-center gap-4">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <a
+                      href="https://tenxarch.userjot.com/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex h-9 w-9 items-center justify-center rounded-md text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                      aria-label="Give Feedback"
+                    >
+                      <MessageSquareHeart className="h-5 w-5" />
+                      <span className="sr-only">Give Feedback</span>
+                    </a>
+                  </TooltipTrigger>
+                  <TooltipContent
+                    side="top"
+                    className="border-0 bg-gray-900/75 text-white backdrop-blur-sm"
                   >
-                    <MessageSquareHeart className="h-6 w-6" />
-                    <span className="sr-only">Give Feedback</span>
-                  </a>
-                </TooltipTrigger>
-                <TooltipContent side="top" className="bg-gray-900/75 text-white backdrop-blur-sm border-0">
-                  Give Feedback
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+                    Give Feedback
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+
+              {/* Add the help button here */}
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div>
+                      <Onboarding 
+                        isFirstVisit={true} 
+                        className="inline-block" 
+                        buttonClassName="flex h-9 w-9 items-center justify-center rounded-md text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                        icon={HelpCircle}
+                      />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent
+                    side="top"
+                    className="border-0 bg-gray-900/75 text-white backdrop-blur-sm"
+                  >
+                    Start Tour
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="fixed bottom-4 right-4 z-50">
+      <div className="fixed bottom-4 right-4 z-50 ai-chat-container">
         <PanelChat />
       </div>
     </div>
@@ -502,7 +605,7 @@ const StageProgress: React.FC<StageProgressProps> = ({
   onPrevious,
   onNext,
 }) => (
-  <div className="flex items-center justify-between gap-4">
+  <div className="stage-navigation flex items-center justify-between gap-4">
     <Button
       disabled={currentStage === 0}
       size="sm"
@@ -525,7 +628,9 @@ const StageProgress: React.FC<StageProgressProps> = ({
             side="top"
             className="bg-white text-sm text-gray-800 dark:bg-gray-800 dark:text-gray-200"
           >
-            <p>Stage {currentStage + 1} of {totalStages}</p>
+            <p>
+              Stage {currentStage + 1} of {totalStages}
+            </p>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>

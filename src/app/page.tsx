@@ -25,7 +25,7 @@ export default async function Home() {
             Learn, practice, and master system design concepts step by step.
           </p>
           <p className="mb-8 text-lg text-gray-500 dark:text-gray-400">
-            Join thousands of engineers who&apos;ve improved their system design skills through our interactive platform. From basic architectures to complex distributed systems.
+            Join us to improve your system design skills through our interactive platform. From basic architectures to complex distributed systems.
           </p>
           
           <div className="flex flex-wrap gap-4 mb-8">

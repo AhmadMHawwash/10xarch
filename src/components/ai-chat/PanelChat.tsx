@@ -26,7 +26,7 @@ export function PanelChat() {
   if (!params.slug) return null;
 
   return (
-    <div className="relative">
+    <div className="relative ai-chat-assistant">
       {/* Small Panel */}
       <AnimatePresence>
         {isPanelOpen && !isDialogOpen && (

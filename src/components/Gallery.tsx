@@ -114,7 +114,7 @@ const Gallery = () => {
   return (
     <div className="m-2 h-fit w-48 flex-col rounded-md border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 bg-opacity-70 p-2">
       <Lead className="h-fit text-gray-800 dark:text-gray-200 mb-2 text-sm">Components</Lead>
-      <div className="relative mb-2">
+      <div className="relative mb-2 component-search">
         <input
           type="text"
           placeholder="Search..."
@@ -124,11 +124,11 @@ const Gallery = () => {
         />
         <Search className="absolute right-1 top-1 text-gray-600 dark:text-gray-400" size={14} />
       </div>
-      <div className="max-h-64 overflow-y-auto">
+      <div className="max-h-64 overflow-y-auto component-list">
         {filteredComponents.map(([name, { icon: Icon, description }]) => (
           <div
             key={name}
-            className="my-1 flex cursor-grab items-center rounded-md border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 bg-opacity-70 p-1 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
+            className="component-item my-1 flex cursor-grab items-center rounded-md border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 bg-opacity-70 p-1 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
             onDragStart={(event) => onDragStart(event, name as SystemComponentType)}
             draggable
             title={description}

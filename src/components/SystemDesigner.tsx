@@ -65,8 +65,9 @@ const SystemDesigner = ({
 
   return (
     <div
-      className="relative flex h-full flex-grow flex-col bg-white dark:bg-gray-900"
+      className="relative flex h-full flex-grow flex-col bg-white dark:bg-gray-900 design-canvas"
       ref={initWrapper}
+      id="system-designer"
     >
       <ReactFlow
         nodes={nodes}
@@ -112,7 +113,9 @@ const SystemDesigner = ({
           <PassedFlowManager />
         </Panel>
         <Panel position="top-right" className="m-auto flex">
-          <Gallery />
+          <div className="component-gallery">
+            <Gallery />
+          </div>
         </Panel>
         <Controls />
       </ReactFlow>

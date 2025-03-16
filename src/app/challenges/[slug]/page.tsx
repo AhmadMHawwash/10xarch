@@ -64,7 +64,12 @@ function Level() {
 
   // Function to handle moving to the next stage when score is 80% or higher
   const handleNextStage = () => {
-    if (feedback && 'score' in feedback && feedback.score >= 80 && !isLastStage) {
+    if (
+      feedback &&
+      "score" in feedback &&
+      feedback.score >= 80 &&
+      !isLastStage
+    ) {
       toNextStage();
       setIsFeedbackExpanded(false);
     }
@@ -105,7 +110,6 @@ function Level() {
           />
         </ResizablePanel>
       </ResizablePanelGroup>
-      {/* <AIChatWidget /> */}
     </>
   );
 }

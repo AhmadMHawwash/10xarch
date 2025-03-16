@@ -10,27 +10,26 @@ const challenge: Challenge = {
     {
       problem: "A media company wants to launch an interactive polling feature that allows their audience to participate in live votes during events. Users need to create polls and collect votes, but currently, voters have to refresh the page to see results, which diminishes engagement and creates a poor user experience during fast-paced events.",
       requirements: [
-        "Design a system that allows poll creation with customizable options",
-        "Enable users to cast votes with minimal friction",
-        "Implement real-time vote count updates without page refreshes",
-        "Ensure vote count accuracy under concurrent voting conditions"
+        "Implement real-time vote count updates without page refreshes"
       ],
       metaRequirements: [
-        "Create a system that allows real-time vote updates without page refresh"
+        "Implement real-time vote count updates without page refreshes"
       ],
       hintsPerArea: {
         requirements: {
           functional: [
             "Design WebSocket or SSE implementation for pushing live updates to clients",
             "Create a publish-subscribe architecture for vote distribution",
-            "Implement atomic operations for vote counting to prevent race conditions",
-            "Design a serialization format for efficient real-time updates"
+            "Implement client-side logic for updating UI without refreshes",
+            "Design reconnection and state recovery mechanisms for clients",
+            "Create efficient serialization format for vote update messages"
           ],
           nonFunctional: [
             "Maintain vote count update latency under 500ms for 99% of updates",
             "Support at least 10,000 concurrent viewers per active poll",
-            "Design for 99.9% availability during live events",
-            "Ensure vote consistency across all viewers"
+            "Ensure consistent vote counts across all connected clients",
+            "Design for seamless recovery from network interruptions",
+            "Minimize bandwidth usage for update broadcasts"
           ]
         },
         systemAPI: [
@@ -76,9 +75,9 @@ const challenge: Challenge = {
       criteria: [
         "System updates vote counts in real-time across all connected clients",
         "Updates are received within 1 second of votes being cast for 99% of users",
-        "Vote counts remain accurate under concurrent voting (no lost votes)",
-        "System handles at least 1,000 votes per second with minimal latency",
-        "Clients automatically recover from temporary disconnections without data loss"
+        "Real-time updates work reliably under normal network conditions",
+        "Clients automatically recover from temporary disconnections",
+        "System provides a smooth, non-disruptive user experience during voting"
       ],
       learningsInMD: `
 # Key Learnings
@@ -163,28 +162,27 @@ const challenge: Challenge = {
     {
       problem: "The voting system has gained popularity and is now being used for major events with hundreds of thousands of concurrent voters. During popular events, the system becomes slow, sometimes shows incorrect vote counts, and occasionally crashes under load. The media company needs a solution that can scale reliably for high-profile events.",
       requirements: [
-        "Scale the system to handle 100,000+ concurrent voters",
-        "Ensure vote count consistency across distributed infrastructure",
-        "Maintain system availability during traffic spikes",
-        "Optimize resource utilization during varying load patterns"
+        "Scale the system to handle 100,000+ concurrent voters"
       ],
       metaRequirements: [
-        "Create a system that allows real-time updates without page refresh",
-        "Scale the system to handle high-concurrent voting while maintaining consistency"
+        "Implement real-time vote count updates without page refreshes",
+        "Scale the system to handle 100,000+ concurrent voters"
       ],
       hintsPerArea: {
         requirements: {
           functional: [
-            "Design a distributed vote processing architecture",
-            "Implement vote aggregation across multiple nodes",
-            "Create a consistent hashing mechanism for poll sharding",
-            "Design a load balancing strategy for WebSocket connections"
+            "Design a horizontally scalable architecture for all system components",
+            "Implement efficient connection distribution across server fleet",
+            "Create sharding strategy for polls to distribute load",
+            "Design a distributed vote processing pipeline",
+            "Implement autoscaling mechanisms based on traffic patterns"
           ],
           nonFunctional: [
-            "Maintain 99.99% uptime during peak events",
+            "Maintain 99.99% uptime during peak events with 100,000+ concurrent users",
             "Process 10,000+ votes per second with under 3 seconds of end-to-end latency",
             "Scale horizontally with near-linear performance characteristics",
-            "Implement graceful degradation during partial outages"
+            "Optimize infrastructure costs during varying load patterns",
+            "Design for seamless capacity expansion without downtime"
           ]
         },
         systemAPI: [
@@ -228,11 +226,11 @@ const challenge: Challenge = {
         ]
       },
       criteria: [
-        "System maintains accurate counts under load of 10,000+ votes per second",
-        "Vote processing end-to-end latency remains under 5 seconds during peak load",
-        "System scales horizontally with minimal configuration changes",
-        "No single point of failure in critical vote processing path",
-        "System recovers automatically from node failures without data loss"
+        "System maintains performance with 100,000+ concurrent voters",
+        "Architecture scales horizontally to accommodate increased load",
+        "Vote processing throughput sustains 10,000+ votes per second",
+        "System remains stable during sudden traffic spikes",
+        "Infrastructure efficiently adapts to varying load patterns"
       ],
       learningsInMD: `
 # Key Learnings
@@ -318,31 +316,28 @@ const challenge: Challenge = {
     {
       problem: "As the voting platform grows, there are increasing reports of vote manipulation attempts, including duplicate votes, bot-generated votes, and other fraudulent activities. The integrity of poll results is being questioned, which threatens user trust and the company's reputation. A robust security and validation system is needed.",
       requirements: [
-        "Prevent duplicate votes from the same user",
-        "Detect and block automated voting attempts",
-        "Implement comprehensive vote validation",
-        "Maintain audit trails for verification",
-        "Balance security with performance"
+        "Implement vote validation and deduplication"
       ],
       metaRequirements: [
-        "Create a system that allows real-time updates without page refresh",
-        "Scale the system to handle high-concurrent voting while maintaining consistency",
-        "Implement vote validation and deduplication while maintaining performance"
+        "Implement real-time vote count updates without page refreshes",
+        "Scale the system to handle 100,000+ concurrent voters",
+        "Implement vote validation and deduplication"
       ],
       hintsPerArea: {
         requirements: {
           functional: [
             "Design a multi-layer validation pipeline for votes",
-            "Implement rate limiting per user and IP address",
-            "Create user authentication with appropriate identity verification",
-            "Design comprehensive logging for vote audit trails",
+            "Implement efficient deduplication using probabilistic data structures",
+            "Create user identity verification mechanisms",
+            "Design comprehensive vote audit logging",
             "Implement anomaly detection for suspicious voting patterns"
           ],
           nonFunctional: [
             "Keep validation overhead under 100ms per vote",
-            "Store audit logs securely with tamper protection",
-            "Maintain privacy compliance with user data",
-            "Design for auditability without compromising performance"
+            "Achieve 99.9% accuracy in duplicate detection",
+            "Design for privacy compliance while maintaining security",
+            "Ensure validation system scales with voting volume",
+            "Maintain fraud detection effectiveness across all poll types"
           ]
         },
         systemAPI: [
@@ -386,11 +381,11 @@ const challenge: Challenge = {
         ]
       },
       criteria: [
-        "System prevents 99.9% of duplicate votes",
-        "Vote validation adds less than 100ms average latency",
-        "Rate limiting effectively prevents bot attacks",
-        "System maintains complete audit trail of all votes",
-        "Fraud detection identifies suspicious patterns within minutes"
+        "System effectively prevents duplicate votes from the same user",
+        "Vote validation adds minimal latency to the voting process",
+        "Suspicious voting patterns are automatically detected",
+        "System maintains comprehensive audit trails for verification",
+        "Security measures don't negatively impact legitimate user experience"
       ],
       learningsInMD: `
 # Key Learnings
@@ -476,31 +471,29 @@ const challenge: Challenge = {
     {
       problem: "The voting platform has expanded internationally, and users from different regions around the world are participating in global polls. International users are experiencing high latency when voting and viewing results, which reduces engagement. Additionally, regional differences in peak usage times and regulations present compliance challenges.",
       requirements: [
-        "Reduce vote latency for international users to under 200ms",
-        "Implement regional data synchronization for global consistency",
-        "Design for region-specific regulatory compliance",
-        "Optimize infrastructure for global distribution"
+        "Design a multi-region architecture with global accessibility"
       ],
       metaRequirements: [
-        "Create a system that allows real-time updates without page refresh",
-        "Scale the system to handle high-concurrent voting while maintaining consistency",
-        "Implement vote validation and deduplication while maintaining performance",
-        "Optimize the system for global access and reduce latency for international users"
+        "Implement real-time vote count updates without page refreshes",
+        "Scale the system to handle 100,000+ concurrent voters",
+        "Implement vote validation and deduplication",
+        "Design a multi-region architecture with global accessibility"
       ],
       hintsPerArea: {
         requirements: {
           functional: [
             "Design multi-region architecture with local vote processing",
-            "Implement cross-region data synchronization protocols",
-            "Create regional routing for optimal latency",
+            "Implement efficient cross-region data synchronization",
+            "Create intelligent request routing based on user location",
             "Design region-specific compliance rule engines",
-            "Implement global poll aggregation with consistency guarantees"
+            "Implement global consistency model for vote aggregation"
           ],
           nonFunctional: [
-            "Maintain global vote consistency with eventual consistency model",
+            "Achieve vote latency under 200ms for 95% of global users",
             "Ensure 99.9% global availability despite regional outages",
-            "Support regional data sovereignty requirements",
-            "Optimize for variable latency in cross-region communication"
+            "Maintain data residency compliance for regulated regions",
+            "Support graceful degradation during cross-region connectivity issues",
+            "Optimize for minimal cross-region synchronization overhead"
           ]
         },
         systemAPI: [
@@ -545,10 +538,10 @@ const challenge: Challenge = {
       },
       criteria: [
         "Vote latency under 200ms for 95% of global users",
-        "System maintains eventual consistency across all regions",
-        "Regional failures do not affect global availability",
-        "Compliance with regional data regulations",
-        "Real-time updates work efficiently across all regions"
+        "System routes users to their optimal regional endpoint",
+        "Regional failures don't affect global system availability",
+        "Data sovereignty compliance is maintained for all regions",
+        "Cross-region synchronization ensures consistent vote counts"
       ],
       learningsInMD: `
 # Key Learnings
@@ -634,33 +627,30 @@ const challenge: Challenge = {
     {
       problem: "The voting platform is expanding to support diverse use cases beyond simple polls. Clients are requesting advanced voting features like ranked-choice voting, weighted voting, delegate voting, and custom scoring algorithms. The current one-size-fits-all approach cannot meet these specialized needs while maintaining performance and user experience.",
       requirements: [
-        "Support multiple voting algorithms and calculation methods",
-        "Allow customizable vote validation rules",
-        "Enable complex result visualization",
-        "Maintain performance with computationally intensive algorithms",
-        "Ensure system extensibility for future voting methods"
+        "Support multiple voting algorithms and calculation methods"
       ],
       metaRequirements: [
-        "Create a system that allows real-time updates without page refresh",
-        "Scale the system to handle high-concurrent voting while maintaining consistency",
-        "Implement vote validation and deduplication while maintaining performance",
-        "Optimize the system for global access and reduce latency for international users",
-        "Implement support for multiple voting systems while maintaining performance"
+        "Implement real-time vote count updates without page refreshes",
+        "Scale the system to handle 100,000+ concurrent voters",
+        "Implement vote validation and deduplication",
+        "Design a multi-region architecture with global accessibility",
+        "Support multiple voting algorithms and calculation methods"
       ],
       hintsPerArea: {
         requirements: {
           functional: [
             "Design a pluggable algorithm architecture for voting methods",
-            "Implement customizable rule engines for vote validation",
-            "Create flexible data models to support diverse voting types",
-            "Design extensible result calculation pipelines",
-            "Implement versioned APIs for algorithm evolution"
+            "Implement standard voting algorithms (ranked-choice, weighted, approval)",
+            "Create flexible data models to support diverse vote structures",
+            "Design specialized visualization pipelines for different voting methods",
+            "Implement algorithm configuration system for customization"
           ],
           nonFunctional: [
             "Maintain algorithm computation time under 5 seconds for 99% of polls",
-            "Ensure backward compatibility with existing integrations",
-            "Support graceful fallbacks for complex algorithms",
-            "Design for algorithm testability and verification"
+            "Support dynamic switching between algorithms without system restart",
+            "Ensure result accuracy across all voting methods",
+            "Design for algorithm testability and verification",
+            "Optimize performance for computationally intensive algorithms"
           ]
         },
         systemAPI: [
@@ -698,17 +688,17 @@ const challenge: Challenge = {
         highLevelDesign: [
           "Design a plugin architecture for voting algorithms",
           "Implement a domain-specific language for vote calculations",
-          "Create a rule engine for customizable validation",
+          "Create a rule engine for algorithm-specific validation",
           "Design computation distribution for intensive algorithms",
           "Implement an algorithm versioning system"
         ]
       },
       criteria: [
         "System successfully implements at least 5 different voting algorithms",
-        "Complex calculations complete within 5 seconds for 10,000+ votes",
+        "Complex vote calculations complete within acceptable time limits",
         "New voting algorithms can be added without system modifications",
-        "Results remain accurate for all voting methods under load",
-        "Visualization correctly represents specialized voting outcomes"
+        "Algorithm selection and configuration is flexible for poll creators",
+        "Results visualization adapts appropriately for each voting method"
       ],
       learningsInMD: `
 # Key Learnings

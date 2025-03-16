@@ -10,14 +10,10 @@ const fileStorageChallenge: Challenge = {
     {
       problem: "A startup is building a cloud file storage service to compete with established players. The initial version needs to allow users to securely upload their personal files to the cloud and access them from anywhere. The system must handle files up to 100MB in size, support concurrent uploads and downloads, and ensure file integrity throughout the process. User experience during slow network conditions and interruptions is critical for adoption.",
       requirements: [
-        "Design a system that allows users to upload files up to 100MB in size",
-        "Implement reliable and resumable upload/download mechanisms",
-        "Ensure file integrity verification for all transfers",
-        "Create efficient file metadata indexing for quick retrieval",
-        "Build secure authentication and authorization for file access"
+        "Design a system that allows users to upload files up to 100MB in size"
       ],
       metaRequirements: [
-        "Allow users to upload files up to 100MB in size and download them later"
+        "Design a system that allows users to upload files up to 100MB in size"
       ],
       hintsPerArea: {
         requirements: {
@@ -25,42 +21,42 @@ const fileStorageChallenge: Challenge = {
             "Design chunked file upload system with 5-10MB chunks",
             "Implement MD5/SHA checksum verification for file integrity",
             "Create resumable upload protocol with chunk tracking",
-            "Design efficient file metadata system with search capabilities",
-            "Implement secure file retrieval with authenticated URLs"
+            "Design efficient file retrieval mechanism with appropriate authentication",
+            "Implement upload status tracking and progress reporting"
           ],
           nonFunctional: [
             "Ensure upload speeds of at least 10MB/s under good network conditions",
             "Support at least 1,000 concurrent uploads/downloads",
             "Achieve 99.9% upload success rate, even with network interruptions",
-            "Limit metadata retrieval latency to under 100ms",
-            "Design for 99.99% file retrieval availability"
+            "Limit retrieval latency to under 200ms for recently uploaded files",
+            "Design for reliable operation across various network conditions"
           ]
         },
         systemAPI: [
-          "Design RESTful API endpoints for file operations (upload, download, list, delete)",
+          "Design RESTful API endpoints for file operations (upload, download)",
           "Create chunked upload API with initialization, chunk upload, and finalization endpoints",
           "Implement progress tracking and resumption token endpoints",
-          "Design file metadata query and indexing APIs",
-          "Create authentication and authorization endpoints for secure file access"
+          "Design file metadata API for basic file information",
+          "Create authentication endpoints for secure file access"
         ],
         capacityEstimations: {
           traffic: [
             "Estimate 100,000 daily active users with 5 file operations per user per day",
             "Calculate peak upload rate during business hours (3x average rate)",
             "Estimate 30% of users uploading simultaneously during peak hours",
-            "Calculate QPS for metadata operations (10x actual file operations)",
-            "Model traffic growth at 20% month-over-month"
+            "Model traffic patterns based on file sizes (distribution of small vs large files)",
+            "Consider upload retry traffic due to network interruptions"
           ],
           storage: [
             "Estimate 1GB average storage per user with 10M users in year one",
             "Calculate storage growth rate based on user acquisition and usage patterns",
             "Determine metadata storage requirements (approximately 1KB per file)",
-            "Plan for file deduplication savings (estimate 30% duplication rate)",
-            "Consider storage needs for file versions and temporary chunks"
+            "Plan temporary storage for in-progress uploads and chunks",
+            "Consider redundant storage needs for reliability"
           ],
           memory: [
-            "Calculate memory needs for caching hot files (estimate 20% of daily accessed files)",
-            "Estimate memory requirements for active upload sessions",
+            "Calculate memory needs for tracking active upload sessions",
+            "Estimate memory requirements for caching recently uploaded files",
             "Determine cache size for frequently accessed metadata",
             "Calculate memory needs for authentication tokens and sessions",
             "Consider buffer requirements for upload/download operations"
@@ -69,24 +65,24 @@ const fileStorageChallenge: Challenge = {
             "Calculate inbound bandwidth for peak upload times",
             "Estimate outbound bandwidth for download operations",
             "Consider internal bandwidth between storage and application tiers",
-            "Plan for metadata synchronization bandwidth",
-            "Estimate backup and replication bandwidth requirements"
+            "Estimate bandwidth overhead for chunked upload protocol",
+            "Calculate bandwidth needs for upload status updates"
           ]
         },
         highLevelDesign: [
-          "Design separation of metadata service from blob storage",
-          "Create upload service with chunk management and session tracking",
-          "Implement download service with throttling and bandwidth management",
-          "Design authentication service with token-based authorization",
-          "Create file indexing service for search and retrieval"
+          "Design upload service with chunk management and session tracking",
+          "Implement download service with efficient retrieval mechanism",
+          "Create blob storage system for raw file data",
+          "Design metadata service for file information",
+          "Implement authentication service for secure file access"
         ]
       },
       criteria: [
         "System successfully handles uploads and downloads of files up to 100MB",
         "Upload operations can be paused and resumed after network interruptions",
         "Files maintain integrity with verification during all transfer operations",
-        "Users can reliably retrieve their files with minimal latency",
-        "System appropriately handles error cases (timeout, corruption, server failure)"
+        "System can handle multiple concurrent uploads efficiently",
+        "Upload mechanism works reliably across various network conditions"
       ],
       learningsInMD: `
 # Key Learnings
@@ -176,15 +172,11 @@ const fileStorageChallenge: Challenge = {
     {
       problem: "As the service grows, users are demanding the ability to collaborate on files. The startup needs to implement a comprehensive sharing system that allows users to share files with specific people, control access permissions, and manage shared content effectively. The system must ensure proper access control while maintaining good performance and user experience for both file owners and recipients.",
       requirements: [
-        "Design a sharing system with granular permission controls (viewer, editor, owner)",
-        "Implement secure sharing links with configurable expiration and access limitations",
-        "Create efficient access control validation that scales with millions of shared files",
-        "Build notification system for sharing events and permission changes",
-        "Implement sharing audit logs for security and compliance"
+        "Design a sharing system with granular permission controls (viewer, editor, owner)"
       ],
       metaRequirements: [
-        "Allow users to upload files up to 100MB in size and download them later",
-        "Enable file sharing with specific users and manage access permissions (read/write)"
+        "Design a system that allows users to upload files up to 100MB in size",
+        "Design a sharing system with granular permission controls (viewer, editor, owner)"
       ],
       hintsPerArea: {
         requirements: {
@@ -193,7 +185,7 @@ const fileStorageChallenge: Challenge = {
             "Implement sharing via email and secure links with customizable settings",
             "Create folder-level permissions with inheritance options",
             "Design revocation mechanisms for access rights",
-            "Implement real-time notifications for sharing activities"
+            "Implement permission validation at all access points"
           ],
           nonFunctional: [
             "Ensure permission checks add less than 50ms latency to file operations",
@@ -207,53 +199,53 @@ const fileStorageChallenge: Challenge = {
           "Design permission management API (grant, revoke, modify, check)",
           "Create sharing invitation endpoints with customization options",
           "Implement shared content discovery and navigation APIs",
-          "Design notification preferences and delivery APIs",
-          "Create audit log querying and reporting endpoints"
+          "Design secure link generation and validation endpoints",
+          "Create permission inheritance and propagation APIs"
         ],
         capacityEstimations: {
           traffic: [
             "Estimate 10 sharing operations per user per day",
             "Calculate permission checks per file access (minimum 1 check per operation)",
             "Model sharing patterns (average number of users a file is shared with)",
-            "Estimate notification delivery rates",
-            "Calculate audit log generation rate"
+            "Estimate peak permission modification times",
+            "Calculate traffic patterns for shared content access"
           ],
           storage: [
             "Calculate ACL storage requirements (permissions per file × total files)",
             "Estimate sharing invitation and link storage",
-            "Determine audit log storage with retention policy",
-            "Plan for notification storage and queuing",
-            "Consider storage for sharing analytics and reports"
+            "Determine audit log storage for permission changes",
+            "Plan for denormalized permission data for quick access",
+            "Consider storage for sharing analytics"
           ],
           memory: [
             "Estimate cache size for active permission sets",
             "Calculate memory for permission verification service",
             "Determine caching needs for frequently accessed shared content",
             "Plan memory for active sharing links",
-            "Consider memory requirements for notification dispatch"
+            "Consider memory requirements for permission inheritance calculation"
           ],
           bandwidth: [
             "Calculate bandwidth for permission synchronization",
-            "Estimate notification delivery bandwidth",
+            "Estimate notification delivery bandwidth for sharing events",
             "Consider additional traffic from shared file access",
             "Calculate bandwidth for permission propagation in hierarchies",
-            "Estimate audit log replication bandwidth"
+            "Estimate permission validation traffic"
           ]
         },
         highLevelDesign: [
           "Design access control service with caching and efficient lookups",
           "Create permission propagation system for hierarchical structures",
-          "Implement sharing notification service with delivery guarantees",
+          "Implement sharing management service with invitation handling",
           "Design secure link generation with cryptographic verification",
-          "Create comprehensive audit logging system"
+          "Create comprehensive permission enforcement layer"
         ]
       },
       criteria: [
-        "Users can share files with specific individuals with appropriate permissions",
-        "System correctly enforces all access controls with minimal latency",
-        "Sharing links work correctly with configured expiration and restrictions",
-        "Recipients receive proper notifications about shared content",
-        "Permission changes propagate correctly and consistently"
+        "System correctly implements and enforces viewer, editor, and owner permission roles",
+        "Permission checks add minimal latency to file operations",
+        "Permission changes propagate correctly and consistently",
+        "Access control system scales efficiently with large numbers of shared files",
+        "System prevents unauthorized access through proper permission validation"
       ],
       learningsInMD: `
 # Key Learnings
@@ -343,16 +335,12 @@ const fileStorageChallenge: Challenge = {
     {
       problem: "The startup is now facing feature requests for file versioning and history management. Users want to track changes, restore previous versions, and ensure they never lose important work. Additionally, enterprise customers require point-in-time recovery capabilities for compliance and business continuity. The system needs to implement efficient versioning that balances storage costs with comprehensive history preservation.",
       requirements: [
-        "Design a versioning system that tracks file changes for at least 30 days",
-        "Implement efficient delta storage to minimize space consumption",
-        "Create restore functionality for previous file versions",
-        "Build point-in-time recovery capability for folders and workspaces",
-        "Implement version browsing and comparison features"
+        "Design a versioning system that tracks file changes for at least 30 days"
       ],
       metaRequirements: [
-        "Allow users to upload files up to 100MB in size and download them later",
-        "Enable file sharing with specific users and manage access permissions (read/write)",
-        "Implement file versioning with ability to restore previous versions up to 30 days"
+        "Design a system that allows users to upload files up to 100MB in size",
+        "Design a sharing system with granular permission controls (viewer, editor, owner)",
+        "Design a versioning system that tracks file changes for at least 30 days"
       ],
       hintsPerArea: {
         requirements: {
@@ -360,38 +348,38 @@ const fileStorageChallenge: Challenge = {
             "Design version creation policies (on every change, scheduled, or manual)",
             "Implement delta compression for efficient version storage",
             "Create version metadata with user attribution and change descriptions",
-            "Design bulk restore operations for point-in-time recovery",
-            "Implement version retention and pruning policies"
+            "Design restore functionality for previous file versions",
+            "Implement version browsing interface with comparison capabilities"
           ],
           nonFunctional: [
             "Limit storage overhead from versioning to maximum 50% of base storage",
             "Ensure version retrieval completes within 2 seconds",
             "Support at least 100 versions per file within retention period",
             "Maintain version history integrity even during system failures",
-            "Design for consistent point-in-time views across related files"
+            "Design for efficient version discovery and navigation"
           ]
         },
         systemAPI: [
           "Design version history retrieval and navigation API",
           "Create version restoration endpoints with conflict resolution",
           "Implement delta comparison and visualization API",
-          "Design point-in-time snapshot and recovery endpoints",
-          "Create version retention policy management API"
+          "Design version creation and policy management endpoints",
+          "Create version metadata and annotation API"
         ],
         capacityEstimations: {
           traffic: [
             "Estimate version creation rate (changes per file per day)",
-            "Calculate version retrieval and comparison operations",
-            "Model frequency of restoration operations",
-            "Estimate point-in-time recovery operations",
-            "Calculate traffic for version cleanup and consolidation"
+            "Calculate version retrieval and comparison operations frequency",
+            "Model restoration operations frequency",
+            "Estimate traffic for version browsing and navigation",
+            "Calculate metadata operations for version management"
           ],
           storage: [
             "Calculate raw storage required for full versions",
             "Estimate storage savings from delta compression (60-90%)",
             "Determine metadata storage for version history",
             "Plan for temporary storage during restoration",
-            "Estimate storage for deleted file retention"
+            "Estimate storage for version comparison operations"
           ],
           memory: [
             "Calculate cache requirements for recent versions",
@@ -404,23 +392,23 @@ const fileStorageChallenge: Challenge = {
             "Calculate bandwidth for version generation and storage",
             "Estimate bandwidth for version retrieval operations",
             "Plan for delta calculation network requirements",
-            "Consider bandwidth for point-in-time snapshot creation",
-            "Estimate bandwidth needs for bulk restoration operations"
+            "Consider bandwidth for version comparison operations",
+            "Estimate bandwidth needs for version restoration"
           ]
         },
         highLevelDesign: [
           "Design version tracking service with metadata management",
           "Implement delta storage system with compression",
           "Create version restoration service with conflict resolution",
-          "Design point-in-time snapshot and recovery system",
-          "Implement version pruning and consolidation service"
+          "Design version browsing and comparison system",
+          "Implement version policy enforcement service"
         ]
       },
       criteria: [
         "System maintains accurate version history for at least 30 days",
         "Users can browse, compare and restore any version within retention period",
-        "Delta storage reduces version storage requirements by at least 60%",
-        "Point-in-time recovery successfully restores folder hierarchies to previous states",
+        "Delta storage efficiently minimizes space consumption for versions",
+        "Version creation has minimal impact on system performance",
         "Version metadata accurately tracks authorship and modification details"
       ],
       learningsInMD: `
@@ -501,9 +489,9 @@ const fileStorageChallenge: Challenge = {
             example: "Keep all versions for 48 hours, hourly versions for 7 days, daily versions for 30 days, and weekly versions for 90 days"
           },
           {
-            title: "Point-in-Time Recovery",
-            description: "Design consistent snapshot system for reliable point-in-time views",
-            example: "Implement global logical timestamps and maintain cross-reference indices for all files in a workspace to enable consistent recovery"
+            title: "Version Metadata",
+            description: "Store rich metadata with each version for navigation and management",
+            example: "Include user identity, timestamp, change description, parent version reference, and content hash for each version"
           }
         ]
       }
@@ -511,17 +499,13 @@ const fileStorageChallenge: Challenge = {
     {
       problem: "The file storage service has grown to millions of users globally, creating challenges with latency, regional compliance, and scalability. Users in different geographic regions experience slow file access, and enterprise customers require data residency compliance for specific regions. The system needs to implement an efficient global distribution architecture while ensuring consistency, compliance, and optimal performance.",
       requirements: [
-        "Design a globally distributed storage system with regional data centers",
-        "Implement intelligent content routing and replication",
-        "Create data residency controls for regulatory compliance",
-        "Build a caching layer for frequently accessed content",
-        "Ensure efficient cross-region synchronization"
+        "Design a globally distributed storage system with regional data centers"
       ],
       metaRequirements: [
-        "Allow users to upload files up to 100MB in size and download them later",
-        "Enable file sharing with specific users and manage access permissions (read/write)",
-        "Implement file versioning with ability to restore previous versions up to 30 days",
-        "Design a globally distributed system with low-latency access"
+        "Design a system that allows users to upload files up to 100MB in size",
+        "Design a sharing system with granular permission controls (viewer, editor, owner)",
+        "Design a versioning system that tracks file changes for at least 30 days",
+        "Design a globally distributed storage system with regional data centers"
       ],
       hintsPerArea: {
         requirements: {
@@ -589,8 +573,8 @@ const fileStorageChallenge: Challenge = {
         "Files are served to users from optimal geographic locations",
         "System enforces data residency requirements for compliance",
         "Cross-region replication maintains consistency within SLAs",
-        "CDN integration accelerates delivery of frequent accessed content",
-        "System handles regional failures with appropriate redundancy"
+        "System achieves low latency access for users in different regions",
+        "Architecture handles regional failures with appropriate redundancy"
       ],
       learningsInMD: `
 # Key Learnings
@@ -680,87 +664,83 @@ const fileStorageChallenge: Challenge = {
     {
       problem: "With millions of files stored in the system, users are struggling to find their content efficiently. Additionally, as storage costs grow, the company needs to optimize storage utilization while maintaining performance. The system needs to implement advanced search capabilities, intelligent storage tiering, and data analysis features to improve user experience and operational efficiency.",
       requirements: [
-        "Build a scalable search system with metadata and content indexing",
-        "Implement intelligent storage tiering for cost optimization",
-        "Create data analysis and visualization for storage usage",
-        "Design content organization with smart tagging and categorization",
-        "Develop recommendations for content management"
+        "Build a scalable search system with metadata and content indexing"
       ],
       metaRequirements: [
-        "Allow users to upload files up to 100MB in size and download them later",
-        "Enable file sharing with specific users and manage access permissions (read/write)",
-        "Implement file versioning with ability to restore previous versions up to 30 days",
-        "Design a globally distributed system with low-latency access",
-        "Implement search and analytics for content management"
+        "Design a system that allows users to upload files up to 100MB in size",
+        "Design a sharing system with granular permission controls (viewer, editor, owner)",
+        "Design a versioning system that tracks file changes for at least 30 days",
+        "Design a globally distributed storage system with regional data centers",
+        "Build a scalable search system with metadata and content indexing"
       ],
       hintsPerArea: {
         requirements: {
           functional: [
             "Design full-text search for file content and metadata",
-            "Implement automatic content classification and tagging",
-            "Create multi-tier storage with automatic migration policies",
-            "Design storage analytics with usage projections",
-            "Implement intelligent content organization and recommendations"
+            "Implement indexing pipeline for various file formats",
+            "Create search query language with filtering capabilities",
+            "Design relevance ranking algorithm for search results",
+            "Implement permission-aware search results filtering"
           ],
           nonFunctional: [
             "Ensure search queries return results in under 500ms for 95th percentile",
             "Support index updates within 5 minutes of content changes",
-            "Reduce storage costs by at least 40% through tiering optimization",
+            "Design for scalable indexing of at least 10TB of content daily",
             "Handle complex search queries with multiple filters and operators",
             "Support indexing for at least 100 file formats"
           ]
         },
         systemAPI: [
           "Design search query API with filtering and sorting options",
-          "Create content analysis and classification endpoints",
-          "Implement storage tiering policy management APIs",
-          "Design usage analytics and reporting endpoints",
-          "Create recommendation and organization APIs"
+          "Create content extraction and indexing endpoints",
+          "Implement search suggestion and autocomplete APIs",
+          "Design faceted search capability with aggregations",
+          "Create search analytics and reporting APIs"
         ],
         capacityEstimations: {
           traffic: [
-            "Estimate search queries per second",
+            "Estimate search queries per second (peak and average)",
             "Calculate indexing workload for new and modified content",
-            "Model analysis and classification processing requirements",
-            "Estimate recommendation engine query load",
-            "Consider background processing for tiering operations"
+            "Model query complexity distribution (simple vs. complex)",
+            "Estimate result set sizes and pagination patterns",
+            "Consider background processing for asynchronous indexing"
           ],
           storage: [
             "Calculate search index size (10-20% of original data size)",
-            "Estimate storage for analytics data and history",
-            "Plan for content classification metadata",
-            "Model storage distribution across tiers",
-            "Consider temporary storage for processing and analysis"
+            "Estimate storage for index shards and replicas",
+            "Plan for content extraction temporary storage",
+            "Model index growth rate based on content addition",
+            "Consider storage for search suggestion data structures"
           ],
           memory: [
-            "Estimate memory requirements for search index",
+            "Estimate memory requirements for search index segments",
             "Calculate cache size for frequent search queries",
-            "Plan memory needs for analytics processing",
-            "Consider recommendation model memory requirements",
-            "Determine memory for tiering decision algorithms"
+            "Plan memory needs for query processing",
+            "Consider memory for relevance scoring models",
+            "Determine memory for indexing pipeline operations"
           ],
           bandwidth: [
-            "Calculate bandwidth for content indexing",
-            "Estimate bandwidth for tiering migrations",
-            "Plan for analytics data collection",
-            "Consider bandwidth for distributed search operations",
+            "Calculate bandwidth for content extraction and indexing",
+            "Estimate bandwidth for distributed search operations",
+            "Plan for index replication and synchronization",
+            "Consider bandwidth for multi-region search federation",
             "Model internal service communication bandwidth"
           ]
         },
         highLevelDesign: [
           "Design search service with indexing and query processing",
-          "Implement multi-tier storage management system",
-          "Create content analysis and classification pipeline",
-          "Design usage analytics and recommendation engine",
-          "Implement content organization and metadata enrichment system"
+          "Implement content extraction and analysis pipeline",
+          "Create distributed index with sharding and replication",
+          "Design query parsing and execution engine",
+          "Implement relevance ranking and result processing system"
         ]
       },
       criteria: [
-        "Users can find files quickly using advanced search capabilities",
-        "Storage tiering automatically optimizes cost without impacting performance",
-        "System provides insightful analytics on storage usage and patterns",
-        "Content is automatically organized with relevant tags and categories",
-        "Recommendations help users discover and manage relevant content"
+        "System indexes both file content and metadata for searchability",
+        "Search queries return relevant results efficiently (under 500ms)",
+        "Search results respect user permissions and access controls",
+        "System handles complex search queries with filtering and sorting",
+        "Indexing process scales effectively with growing content volume"
       ],
       learningsInMD: `
 # Key Learnings
@@ -772,26 +752,26 @@ const fileStorageChallenge: Challenge = {
 - **Relevance Ranking**: Designing algorithms for result relevance scoring
 - **Distributed Search**: Scaling search across large datasets and multiple nodes
 
-## Storage Optimization
-- **Tiered Storage Architecture**: Implementing hot/warm/cold storage tiers
-- **Data Temperature Analysis**: Identifying access patterns for optimal placement
-- **Compression Strategies**: Selecting appropriate compression for different data types
-- **Deduplication Techniques**: Implementing block and file-level deduplication
-- **Lifecycle Management**: Creating automated policies for data lifecycle
-
-## Content Intelligence
-- **Document Classification**: Implementing machine learning for content categorization
+## Content Processing
+- **Document Parsing**: Extracting text and metadata from various file formats
+- **Content Classification**: Implementing automatic content categorization
 - **Entity Extraction**: Identifying entities and concepts within documents
-- **Automatic Tagging**: Generating relevant tags based on content analysis
-- **Content Clustering**: Grouping similar documents for organization
-- **Recommendation Systems**: Building personalized content recommendation engines
+- **Language Detection**: Determining document language for appropriate processing
+- **OCR Integration**: Converting images to searchable text content
 
-## Data Analytics
-- **Usage Patterns**: Analyzing user behavior and access patterns
-- **Storage Analytics**: Tracking and projecting storage utilization
-- **Visualization Techniques**: Creating insightful data visualizations
-- **Predictive Analytics**: Implementing predictive models for storage needs
-- **Anomaly Detection**: Identifying unusual access patterns or security concerns
+## Search Optimization
+- **Query Optimization**: Transforming user queries for efficient execution
+- **Index Partitioning**: Designing effective sharding strategies for large indexes
+- **Caching Strategies**: Implementing multi-level caching for search operations
+- **Query Expansion**: Enhancing queries with synonyms and related terms
+- **Result Highlighting**: Implementing efficient content snippet generation
+
+## Search User Experience
+- **Autocomplete Systems**: Building real-time query suggestion capabilities
+- **Spelling Correction**: Implementing "did you mean" functionality
+- **Search Analytics**: Tracking and optimizing based on user search patterns
+- **Personalized Ranking**: Tailoring results based on user behavior
+- **Facet Generation**: Automatically generating navigation facets from content
       `,
       resources: {
         documentation: [
@@ -801,9 +781,9 @@ const fileStorageChallenge: Challenge = {
             description: "Distributed search engine architecture and implementation"
           },
           {
-            title: "AWS S3 Intelligent Tiering",
-            url: "https://aws.amazon.com/s3/storage-classes/intelligent-tiering/",
-            description: "Automatic storage tiering implementation"
+            title: "Apache Lucene Implementation",
+            url: "https://lucene.apache.org/core/",
+            description: "Core search library powering many search platforms"
           },
           {
             title: "Azure Cognitive Search",
@@ -835,14 +815,14 @@ const fileStorageChallenge: Challenge = {
             example: "Index metadata in real-time; extract text content asynchronously; use sharded indices with appropriate routing; implement custom analyzers for different content types"
           },
           {
-            title: "Tiered Storage Implementation",
-            description: "Create data-driven storage tiering with automatic migration",
-            example: "Analyze access patterns over 30-day windows; move files without access to cold storage; use prefetch for predicted access; maintain hot metadata index for all content"
+            title: "Query Processing Pipeline",
+            description: "Create multi-stage query processing for optimal performance",
+            example: "Implement query parsing, analysis, expansion, execution and result processing stages; cache intermediate results for common query patterns"
           },
           {
-            title: "Content Intelligence Pipeline",
-            description: "Build modular content analysis system for extensibility",
-            example: "Implement extraction pipeline with document parsing, entity recognition, classification, and tagging stages; use machine learning models for automatic categorization"
+            title: "Content Extraction Strategy",
+            description: "Design efficient pipeline for content extraction from various file types",
+            example: "Use Apache Tika for format detection and extraction; implement format-specific optimizations for common types; index extracted metadata separately from content"
           }
         ]
       }

@@ -10,74 +10,78 @@ const chatSystemChallenge: Challenge = {
     {
       problem: "A startup is launching a new messaging application and needs to build the core messaging functionality. Users need to be able to send and receive text messages in real-time without significant delays. The initial version should focus on reliable 1-on-1 messaging with basic delivery confirmation.",
       requirements: [
-        "Design a system that enables users to send and receive text messages in real-time",
-        "Implement basic message status tracking (sent, delivered, read)",
-        "Provide message history when users open a conversation",
-        "Ensure message delivery within 500ms under normal network conditions"
+        "Design a real-time messaging system for 1-on-1 communication"
       ],
       metaRequirements: [
-        "Implement basic 1-on-1 text messaging functionality"
+        "Design a real-time messaging system for 1-on-1 communication"
       ],
       hintsPerArea: {
         requirements: {
           functional: [
             "Design message data structure with appropriate metadata (timestamp, sender, recipient, status)",
             "Implement real-time delivery mechanism using WebSockets or similar technology",
-            "Create message persistence layer for history and reliability",
-            "Implement message status updates (sent → delivered → read)"
+            "Create message persistence layer for history and reliable retrieval",
+            "Implement message status updates (sent → delivered → read)",
+            "Design conversation model for organizing messages between users"
           ],
           nonFunctional: [
             "Ensure message delivery latency under 500ms for 99th percentile",
             "Design for 99.9% message delivery success rate",
-            "Consider initial system capacity for 10,000 concurrent users",
-            "Implement basic security for message transport"
+            "Optimize real-time connection management for minimal overhead",
+            "Ensure efficient message history retrieval (under 300ms)",
+            "Implement secure transport for all message data"
           ]
         },
         systemAPI: [
-          "Design RESTful endpoints for message sending, history retrieval, and status updates",
-          "Implement WebSocket protocol for real-time message delivery",
-          "Create user presence indicators (online, offline, typing)",
-          "Design message payload structure with efficient serialization"
+          "Design send message API with status tracking capability",
+          "Create message history retrieval API with pagination",
+          "Implement WebSocket protocol for bidirectional real-time communication",
+          "Design status update API for message delivery confirmations",
+          "Create user presence indicators (online, offline, typing)"
         ],
         capacityEstimations: {
           traffic: [
-            "Estimate 20 messages per day per active user",
-            "Calculate peak message rate (messages per second)",
-            "Estimate concurrent connection count (active users * connection ratio)",
+            "Estimate daily active users (10,000 initially) and messages per user per day (20 avg)",
+            "Calculate peak message rate (typically 5x average)",
+            "Estimate concurrent connection count (30-50% of active users)",
+            "Model traffic patterns throughout the day",
             "Plan for 3x traffic growth in 6 months"
           ],
           storage: [
-            "Calculate message storage requirements (avg message size * messages per user * user count)",
+            "Calculate message storage (avg message size 1KB × messages per day × retention period)",
+            "Estimate metadata storage overhead (20-30% of message size)",
             "Plan for 90-day message retention policy",
-            "Estimate metadata storage overhead",
-            "Consider compression strategies for message content"
+            "Calculate conversation index size",
+            "Estimate status tracking data storage needs"
           ],
           memory: [
-            "Calculate memory needs for active connection state",
+            "Calculate memory needs for active WebSocket connections (2-5KB per connection)",
             "Estimate cache size for active conversations",
-            "Plan for user session data caching",
-            "Consider memory for message delivery queues"
+            "Plan for in-memory message status tracking",
+            "Calculate memory for message delivery queues",
+            "Estimate session state memory requirements"
           ],
           bandwidth: [
             "Calculate average message size including metadata (200-500 bytes)",
-            "Estimate WebSocket connection overhead",
+            "Estimate WebSocket connection overhead (ping/pong frames)",
             "Calculate bandwidth for peak message throughput",
-            "Consider protocol efficiency optimizations"
+            "Estimate bandwidth for message history retrieval",
+            "Model bandwidth needs for status updates"
           ]
         },
         highLevelDesign: [
           "Design connection management service for WebSocket connections",
-          "Implement message storage system with appropriate indexing",
-          "Create message delivery service with basic retry mechanism",
+          "Implement message storage system with efficient query patterns for history",
+          "Create message delivery service with status tracking",
           "Design user presence tracking system",
-          "Implement simple notification service for message delivery"
+          "Implement notification service for message delivery confirmations"
         ]
       },
       criteria: [
-        "Messages are delivered within 500ms under normal conditions",
+        "Messages are delivered in real-time (under 500ms) under normal conditions",
         "Users can view accurate message history when opening a conversation",
         "Message status updates (sent, delivered, read) work correctly",
-        "System handles at least 100 messages per second",
+        "System handles the expected message throughput",
         "Basic security measures are in place (TLS, authentication)"
       ],
       learningsInMD: `
@@ -164,68 +168,72 @@ const chatSystemChallenge: Challenge = {
     {
       problem: "As the application gains users, reliability issues have emerged. Users who experience poor connectivity or frequently switch between networks (mobile data to WiFi) report messages being lost. The product team wants to ensure that messages are reliably delivered even when users have unstable internet connections or go offline temporarily.",
       requirements: [
-        "Implement offline message queueing for message sending during connectivity issues",
-        "Design reliable message delivery with client-side persistence",
-        "Ensure messages are synced properly when users reconnect",
-        "Preserve message order even with delayed delivery"
+        "Implement offline message support for reliable delivery during connectivity issues"
       ],
       metaRequirements: [
-        "Implement basic 1-on-1 text messaging functionality",
-        "Implement reliable message delivery with offline support"
+        "Design a real-time messaging system for 1-on-1 communication",
+        "Implement offline message support for reliable delivery during connectivity issues"
       ],
       hintsPerArea: {
         requirements: {
           functional: [
-            "Design client-side message queue for offline operation",
-            "Implement message persistence on both client and server",
-            "Create message synchronization protocol for reconnection",
-            "Design sequence number system for message ordering"
+            "Design client-side message queue for storing messages during offline periods",
+            "Implement message persistence on both client and server sides",
+            "Create efficient synchronization protocol for reconnection scenarios",
+            "Design sequence numbering system for maintaining message order",
+            "Implement idempotent message delivery to prevent duplicates"
           ],
           nonFunctional: [
-            "Ensure system can handle message delivery delays up to 24 hours",
-            "Optimize reconnection data transfer for bandwidth efficiency",
-            "Limit client-side storage based on device constraints",
-            "Maintain causality of messages despite delays"
+            "Ensure system can handle extended offline periods (up to 24+ hours)",
+            "Optimize reconnection bandwidth usage for efficient sync",
+            "Implement efficient client storage for offline messages (size and access)",
+            "Ensure message ordering consistency across devices",
+            "Maintain battery-efficient background sync on mobile devices"
           ]
         },
         systemAPI: [
           "Design batch message sending API for reconnection scenarios",
-          "Create sync protocol to determine which messages need to be sent/received",
-          "Implement idempotent message submission to prevent duplicates",
-          "Design message status acknowledgment system"
+          "Create incremental sync protocol with message IDs and timestamps",
+          "Implement message status reconciliation for offline period",
+          "Design conflict resolution API for handling concurrent edits",
+          "Create robust retry mechanism with exponential backoff"
         ],
         capacityEstimations: {
           traffic: [
-            "Estimate percentage of users with occasional offline usage (20-30%)",
+            "Estimate percentage of users with intermittent connectivity (20-30%)",
             "Calculate average offline queue size (messages per offline period)",
-            "Model retry patterns and backoff strategies",
-            "Estimate reconnection load (batch size * reconnection frequency)"
+            "Model reconnection surge patterns (peak reconnection rate)",
+            "Estimate server-side queue size for offline recipients",
+            "Calculate batch sync throughput requirements"
           ],
           storage: [
-            "Calculate client-side storage requirements for offline messages",
-            "Estimate server-side queue size for offline recipients",
-            "Consider retention policy for undelivered messages",
-            "Plan for message state persistence"
+            "Estimate client-side storage needs for offline messages",
+            "Calculate server-side pending message queue storage",
+            "Model message state persistence requirements",
+            "Estimate metadata overhead for sync and ordering",
+            "Plan retention policy for undelivered messages"
           ],
           memory: [
-            "Estimate memory needed for tracking offline user message queues",
-            "Calculate caching requirements for pending deliveries",
-            "Consider buffer size for batched operations",
-            "Plan for message deduplication data structures"
+            "Calculate memory for tracking offline user message queues",
+            "Estimate memory for pending delivery tracking",
+            "Model memory needs for message ordering and deduplication",
+            "Calculate connection state restoration memory",
+            "Estimate client-side caching requirements"
           ],
           bandwidth: [
-            "Calculate batch sync payload sizes for various offline durations",
-            "Estimate bandwidth savings from incremental sync",
-            "Consider compression options for reconnection data",
-            "Model bandwidth usage during peak reconnection times"
+            "Calculate reconnection sync payload sizes for various offline durations",
+            "Estimate bandwidth savings from incremental sync mechanisms",
+            "Model compression options for batch message transfer",
+            "Calculate bandwidth for message state reconciliation",
+            "Estimate retry traffic overhead"
           ]
         },
         highLevelDesign: [
           "Design client-side persistence layer with appropriate storage selection",
-          "Create server-side queue management system for offline recipients",
-          "Implement reconnection protocol with efficient state synchronization",
+          "Create server-side message queue system for offline recipients",
+          "Implement efficient reconnection protocol with incremental synchronization",
           "Design message delivery tracking system with acknowledgments",
-          "Create conflict resolution mechanism for concurrent edits"
+          "Create versioning system for conflict detection and resolution"
         ]
       },
       criteria: [
@@ -319,69 +327,73 @@ const chatSystemChallenge: Challenge = {
     {
       problem: "The messaging application has grown rapidly to 500,000 daily active users, and the current infrastructure is struggling during peak hours. Users report increased message delivery times and occasional system unavailability. The engineering team needs to scale the system to handle growing traffic while maintaining performance and reliability.",
       requirements: [
-        "Scale the system to handle 500,000+ daily active users",
-        "Optimize infrastructure for 5,000+ messages per second at peak",
-        "Ensure message delivery latency remains under 500ms at scale",
-        "Implement efficient resource utilization across infrastructure"
+        "Scale the messaging system to handle increased user load"
       ],
       metaRequirements: [
-        "Implement basic 1-on-1 text messaging functionality",
-        "Implement reliable message delivery with offline support",
-        "Optimize system to handle increasing user load"
+        "Design a real-time messaging system for 1-on-1 communication",
+        "Implement offline message support for reliable delivery during connectivity issues",
+        "Scale the messaging system to handle increased user load"
       ],
       hintsPerArea: {
         requirements: {
           functional: [
-            "Design connection distribution across multiple servers",
-            "Implement horizontal scaling for all system components",
-            "Create efficient message routing between servers",
-            "Design load-aware resource allocation"
+            "Design horizontally scalable architecture for all system components",
+            "Implement efficient connection distribution across server fleet",
+            "Create message routing system between distributed servers",
+            "Design database sharding strategy for messages and conversations",
+            "Implement autoscaling mechanisms based on load metrics"
           ],
           nonFunctional: [
-            "Maintain 99.9% service availability during scaling events",
-            "Keep message delivery latency under 500ms for 99th percentile",
-            "Optimize for cost-efficient resource utilization",
-            "Design for dynamic capacity adjustment"
+            "Maintain message delivery latency under 500ms at 99th percentile during peak load",
+            "Ensure 99.95% service availability during scaling events",
+            "Design for linear cost scaling with increasing user base",
+            "Optimize resource utilization for cost efficiency",
+            "Support seamless capacity expansion without downtime"
           ]
         },
         systemAPI: [
           "Design service discovery mechanism for distributed components",
-          "Implement efficient connection pooling and management",
           "Create load balancing strategy for WebSocket connections",
-          "Design distributed rate limiting to prevent abuse"
+          "Implement connection affinity with consistent hashing",
+          "Design cross-server message routing protocol",
+          "Create health check and monitoring endpoints"
         ],
         capacityEstimations: {
           traffic: [
-            "Calculate messages per second at peak (5,000+)",
-            "Estimate WebSocket connection count (concurrent users * connection factor)",
-            "Model traffic patterns throughout the day for capacity planning",
-            "Calculate peak-to-average ratio for resource allocation"
+            "Calculate peak messages per second (5,000+) based on user activity patterns",
+            "Estimate WebSocket connection count (500,000 × active connection ratio)",
+            "Model regional distribution of users for global service",
+            "Calculate connection establishment rate during peak hours",
+            "Estimate database read/write operations per second"
           ],
           storage: [
+            "Calculate message storage growth rate (messages per day × avg size)",
+            "Design storage sharding strategy based on conversation ID",
             "Estimate database IOPS required for message throughput",
-            "Plan storage sharding strategy based on user or conversation IDs",
-            "Calculate storage growth rate and capacity planning",
-            "Consider read vs. write optimization based on access patterns"
+            "Plan storage capacity for user profile and connection data",
+            "Model index size growth for efficient message retrieval"
           ],
           memory: [
-            "Calculate memory requirements across distributed cache system",
-            "Estimate connection state memory per server",
-            "Plan cache distribution and replication strategy",
-            "Consider hot vs. cold data for tiered caching"
+            "Calculate per-server memory requirements for active connections",
+            "Estimate distributed cache size for active conversations",
+            "Model memory needs for connection state management",
+            "Calculate memory for message routing tables",
+            "Plan for in-memory queue sizing"
           ],
           bandwidth: [
-            "Estimate internal network traffic between components",
-            "Calculate external bandwidth for client connections",
-            "Plan for regional distribution of traffic",
-            "Consider bandwidth optimization techniques"
+            "Calculate internal network traffic between distributed components",
+            "Estimate external bandwidth for client connections during peak",
+            "Model cross-region bandwidth for global deployment",
+            "Calculate database replication bandwidth",
+            "Estimate monitoring and logging data volume"
           ]
         },
         highLevelDesign: [
           "Design horizontally scalable WebSocket server cluster",
           "Implement message broker for cross-server communication",
           "Create distributed caching layer for active conversations",
-          "Design database sharding strategy for messages",
-          "Implement autoscaling infrastructure based on load metrics"
+          "Design database sharding strategy for messages and conversations",
+          "Implement comprehensive monitoring and alerting system"
         ]
       },
       criteria: [
@@ -475,69 +487,73 @@ const chatSystemChallenge: Challenge = {
     {
       problem: "As the application scales, users are reporting issues with message ordering and occasional message duplication. Messages sometimes appear out of sequence in conversations, and the same message occasionally appears twice. The product team wants to ensure a consistent messaging experience across all devices, even when users access their accounts from multiple devices simultaneously.",
       requirements: [
-        "Ensure correct message ordering in all conversations",
-        "Eliminate message duplication across the system",
-        "Support consistent message state across multiple user devices",
-        "Implement efficient conflict resolution for concurrent operations"
+        "Implement consistent ordering and deduplication for messages across devices"
       ],
       metaRequirements: [
-        "Implement basic 1-on-1 text messaging functionality",
-        "Implement reliable message delivery with offline support",
-        "Optimize system to handle increasing user load",
-        "Ensure consistent message ordering and delivery"
+        "Design a real-time messaging system for 1-on-1 communication",
+        "Implement offline message support for reliable delivery during connectivity issues",
+        "Scale the messaging system to handle increased user load",
+        "Implement consistent ordering and deduplication for messages across devices"
       ],
       hintsPerArea: {
         requirements: {
           functional: [
-            "Design message sequencing mechanism with logical timestamps",
-            "Implement idempotent message processing for deduplication",
-            "Create multi-device synchronization protocol",
-            "Design conflict resolution strategy for concurrent edits"
+            "Design logical timestamp system for message ordering (vector clocks or Lamport timestamps)",
+            "Implement deduplication mechanism based on message identifiers",
+            "Create multi-device state synchronization protocol",
+            "Design conflict detection and resolution strategy",
+            "Implement causality tracking for related messages"
           ],
           nonFunctional: [
-            "Optimize storage efficiency for message sequencing metadata",
-            "Minimize overhead of deduplication mechanisms",
-            "Ensure consistency guarantees don't significantly impact performance",
-            "Balance consistency requirements with system complexity"
+            "Minimize overhead of ordering metadata (less than 5% of message size)",
+            "Ensure deduplication mechanism has near-zero false negatives",
+            "Optimize synchronization protocol for bandwidth efficiency",
+            "Ensure conflict resolution adds minimal latency (under 50ms)",
+            "Design for eventual consistency with clear visibility of state"
           ]
         },
         systemAPI: [
-          "Design sequence number or timestamp-based message identifiers",
+          "Design message submission API with ordering metadata",
           "Implement message deduplication based on unique identifiers",
           "Create multi-device state synchronization endpoints",
-          "Design conflict detection and resolution mechanisms"
+          "Design conflict detection API with appropriate metadata",
+          "Implement causality tracking for related message operations"
         ],
         capacityEstimations: {
           traffic: [
-            "Estimate ratio of users with multiple active devices (50-70%)",
-            "Calculate sync traffic between multiple devices",
-            "Model consistency protocol overhead",
-            "Estimate conflict rate in concurrent editing scenarios"
+            "Estimate percentage of users with multiple active devices (50-70%)",
+            "Calculate multi-device synchronization traffic",
+            "Model conflict rate during concurrent editing",
+            "Estimate deduplication check frequency",
+            "Calculate ordering metadata overhead in messages"
           ],
           storage: [
-            "Calculate storage overhead for sequencing metadata",
-            "Estimate space needed for deduplication tracking",
-            "Consider storage requirements for conflict resolution",
-            "Plan for additional indexing requirements"
+            "Estimate storage for message ordering metadata",
+            "Calculate deduplication tracking storage requirements",
+            "Model storage needs for conflict resolution data",
+            "Estimate multi-device state storage",
+            "Calculate causality graph storage requirements"
           ],
           memory: [
-            "Estimate memory needed for tracking message sequences",
-            "Calculate deduplication cache size requirements",
-            "Consider conflict detection data structures",
-            "Plan memory for state reconciliation"
+            "Calculate memory for active message sequence tracking",
+            "Estimate deduplication cache size requirements",
+            "Model memory needs for conflict detection",
+            "Calculate multi-device state reconciliation memory",
+            "Estimate causality tracking memory footprint"
           ],
           bandwidth: [
-            "Estimate additional bandwidth for sequence metadata",
-            "Calculate overhead of multi-device synchronization",
-            "Consider bandwidth for conflict resolution data",
-            "Model optimal sync frequency vs. bandwidth usage"
+            "Calculate ordering metadata bandwidth overhead",
+            "Estimate multi-device synchronization bandwidth",
+            "Model conflict resolution data transfer requirements",
+            "Calculate deduplication check bandwidth",
+            "Estimate causality tracking bandwidth needs"
           ]
         },
         highLevelDesign: [
           "Design logical timestamping system (vector clocks or Lamport timestamps)",
-          "Implement deduplication service with efficient lookup",
-          "Create device synchronization protocol with minimal overhead",
-          "Design multi-master replication with conflict detection",
+          "Implement message deduplication service with efficient lookup",
+          "Create multi-device synchronization protocol",
+          "Design conflict detection and resolution mechanism",
           "Implement causality tracking for related messages"
         ]
       },
@@ -624,7 +640,7 @@ const chatSystemChallenge: Challenge = {
           {
             title: "Conflict Resolution",
             description: "Use last-writer-wins with logical timestamps for simple conflicts",
-            example: "For concurrent edits, preserve both versions with metadata or use CRDTs"
+            example: "For concurrent edits, preserve both versions with timestamp metadata or use CRDTs"
           }
         ]
       }
@@ -632,73 +648,75 @@ const chatSystemChallenge: Challenge = {
     {
       problem: "The chat application has become business-critical, and any downtime or data loss directly impacts user trust and revenue. The current system occasionally experiences outages when specific components fail, and recovery requires manual intervention. The company needs a highly available system that can withstand various infrastructure failures without significant service disruption or data loss.",
       requirements: [
-        "Design for 99.99% service availability",
-        "Implement automated failure detection and recovery",
-        "Ensure no message loss during component failures",
-        "Enable geographic redundancy for disaster recovery",
-        "Implement comprehensive monitoring and alerting"
+        "Design a highly available system with automated recovery"
       ],
       metaRequirements: [
-        "Implement basic 1-on-1 text messaging functionality",
-        "Implement reliable message delivery with offline support",
-        "Optimize system to handle increasing user load",
-        "Ensure consistent message ordering and delivery",
-        "Implement basic fault tolerance and recovery"
+        "Design a real-time messaging system for 1-on-1 communication",
+        "Implement offline message support for reliable delivery during connectivity issues",
+        "Scale the messaging system to handle increased user load",
+        "Implement consistent ordering and deduplication for messages across devices",
+        "Design a highly available system with automated recovery"
       ],
       hintsPerArea: {
         requirements: {
           functional: [
-            "Design automated failover mechanisms for all critical components",
-            "Implement multi-region message replication",
-            "Create automated recovery procedures for various failure scenarios",
-            "Design comprehensive health monitoring system",
-            "Implement circuit breakers for dependent services"
+            "Design multi-region, multi-zone architecture with redundancy",
+            "Implement automated failover mechanisms for all critical components", 
+            "Create message replication across geographic regions",
+            "Design comprehensive health monitoring and alerting system",
+            "Implement circuit breakers to prevent cascading failures"
           ],
           nonFunctional: [
-            "Ensure recovery time objective (RTO) under 2 minutes",
-            "Maintain recovery point objective (RPO) under 10 seconds",
+            "Achieve recovery time objective (RTO) under 2 minutes for component failures",
+            "Maintain recovery point objective (RPO) under 10 seconds for message data",
+            "Ensure minimum 99.99% uptime (less than 1 hour downtime per year)",
             "Design for graceful degradation during partial failures",
             "Balance redundancy with operational costs"
           ]
         },
         systemAPI: [
-          "Design service health check endpoints",
-          "Implement service discovery with automatic failover",
-          "Create leader election protocol for stateful components",
-          "Design dead letter queues for undeliverable messages"
+          "Design robust health check endpoints for all services",
+          "Create service discovery with automatic failover capabilities",
+          "Implement leader election protocol for stateful components",
+          "Design dead letter queues for undeliverable messages",
+          "Create automatic service restart and recovery APIs"
         ],
         capacityEstimations: {
           traffic: [
-            "Calculate traffic distribution across redundant components",
-            "Estimate failover capacity requirements (N+1 or N+2)",
-            "Model recovery load patterns after failure events",
-            "Plan for regional traffic shifting"
+            "Calculate redundant capacity requirements (N+2 for critical components)",
+            "Estimate traffic distribution across redundant infrastructure",
+            "Model failover scenarios and capacity needs during recovery",
+            "Calculate cross-region replication traffic",
+            "Estimate monitoring data volume"
           ],
           storage: [
             "Calculate storage requirements for redundant message copies",
-            "Estimate replication lag and its impact",
-            "Plan backup storage capacity and retention",
-            "Consider storage requirements for disaster recovery"
+            "Estimate replication lag impact on storage",
+            "Plan backup storage capacity and retention policy",
+            "Model disaster recovery storage requirements",
+            "Calculate dead letter queue sizing"
           ],
           memory: [
-            "Estimate memory needed for redundant connection handling",
+            "Estimate memory for redundant connection handling",
             "Calculate cache warm-up time after failover",
-            "Plan memory requirements for monitoring and recovery systems",
-            "Consider state replication overhead"
+            "Model in-memory state replication requirements",
+            "Estimate monitoring and recovery system memory needs",
+            "Calculate memory for failover coordination"
           ],
           bandwidth: [
-            "Calculate cross-region replication bandwidth",
+            "Calculate cross-region replication bandwidth requirements",
             "Estimate failover traffic patterns",
-            "Plan for monitoring data transfer",
-            "Consider backup and restore bandwidth needs"
+            "Model disaster recovery data transfer needs",
+            "Calculate monitoring data transfer bandwidth",
+            "Estimate leader election protocol bandwidth"
           ]
         },
         highLevelDesign: [
-          "Design multi-region, multi-zone architecture",
-          "Implement distributed consensus for leader election",
+          "Design multi-region, multi-zone architecture with active-active configuration",
+          "Implement distributed consensus for leader election and coordination",
           "Create automated failure detection with minimal false positives",
           "Design message replication with appropriate consistency guarantees",
-          "Implement comprehensive monitoring and alerting system"
+          "Implement comprehensive monitoring and alerting system with proactive detection"
         ]
       },
       criteria: [

@@ -8,86 +8,80 @@ const bloggingPlatformChallenge: Challenge = {
   isFree: false,
   stages: [
     {
-      problem: "A startup is building a new blogging platform aimed at professional writers and content creators. The initial version needs to provide a seamless content creation experience with rich text editing, image embedding, draft management, and publishing workflows. Writers expect a responsive editor that autosaves their work, supports various formatting options, and allows them to visualize how content will appear when published.",
+      problem: "A startup is building a new blogging platform aimed at professional writers and content creators. The initial version needs to provide a seamless content creation experience with rich text editing, image embedding, draft management, and publishing workflows. The first challenge is to establish the foundation with a reliable content management system.",
       requirements: [
-        "Design a content management system for creating, editing, and publishing blog posts",
-        "Implement rich text editing with support for formatting, headings, links, and embedded media",
-        "Create an autosave system that prevents content loss during editing",
-        "Build a media uploading service that processes and stores images",
-        "Implement draft and publishing workflows with preview capabilities"
+        "Design a content management system for creating, editing, and publishing blog posts"
       ],
       metaRequirements: [
-        "Create a service that handles blog post creation and storage with rich media support"
+        "Design a content management system for creating, editing, and publishing blog posts"
       ],
       hintsPerArea: {
         requirements: {
           functional: [
-            "Design a rich text editor with markdown or WYSIWYG capabilities",
-            "Implement media upload with progress indicators and validation",
-            "Create draft state management with versioning and autosave",
-            "Design preview functionality that renders content as it will appear when published",
-            "Implement publishing workflow with scheduled publishing options"
+            "Design a flexible content model for blog posts with metadata and formatting",
+            "Create state management for draft, review, and published content",
+            "Implement versioning system for content history and rollback",
+            "Design content editing workflow with save and publish operations",
+            "Support taxonomy (categories, tags) and content organization"
           ],
           nonFunctional: [
-            "Ensure editor responsiveness with sub-100ms input latency",
-            "Implement autosave every 30 seconds or after significant changes",
-            "Support offline editing with local storage fallback",
-            "Ensure uploaded media processing completes within 3 seconds for typical images",
-            "Design for 99.9% data durability for content and drafts"
+            "Ensure content retrieval latency under 200ms for readers",
+            "Implement periodic backup and recovery mechanisms",
+            "Design for 99.9% data durability for published content",
+            "Support content model evolution without downtime",
+            "Enable efficient content queries and filtering"
           ]
         },
         systemAPI: [
-          "Design RESTful API endpoints for CRUD operations on posts and media",
-          "Create versioned content API with separate draft and published states",
-          "Implement media upload endpoints with multipart support",
-          "Design content structure API with metadata and formatting preservation",
-          "Create authentication and authorization endpoints for content access"
+          "Design RESTful API endpoints for CRUD operations on posts",
+          "Create versioned content API with draft and published states",
+          "Implement structured metadata endpoints for content organization",
+          "Design search and filtering endpoints for content retrieval",
+          "Create bulk operations API for content management"
         ],
         capacityEstimations: {
           traffic: [
             "Estimate 10,000 active writers creating/editing 2-3 posts per week",
-            "Calculate peak concurrent editing sessions (typically 10-15% of daily active writers)",
-            "Estimate autosave frequency and resulting request rate",
-            "Calculate media upload volume (2-5 images per post on average)",
-            "Consider traffic patterns across different time zones"
+            "Calculate peak concurrent editing sessions",
+            "Estimate read-to-write ratio for content access",
+            "Model traffic patterns across different time zones",
+            "Calculate impact of viral content on read traffic"
           ],
           storage: [
             "Calculate average post size (10-15KB text content, 50-100KB metadata and formatting)",
-            "Estimate media storage needs (2-5MB per image, 2-5 images per post)",
-            "Consider draft versioning storage overhead (3-5 versions per published post)",
-            "Estimate metadata and index storage requirements",
-            "Project storage growth based on content creation rate and retention policies"
+            "Estimate storage needs for draft versions (3-5 versions per published post)",
+            "Consider content metadata and index storage requirements",
+            "Project storage growth based on content creation rate",
+            "Calculate backup storage requirements"
           ],
           memory: [
-            "Calculate memory needed for active editing sessions",
-            "Estimate cache size for draft state and recently edited content",
-            "Consider in-memory processing needs for content rendering",
-            "Calculate session data memory requirements",
-            "Estimate memory needs for media processing"
+            "Estimate cache size for frequently accessed content",
+            "Calculate memory needed for concurrent editing sessions",
+            "Model memory requirements for content indexing",
+            "Consider memory needs for content processing and transformation",
+            "Estimate session data memory needs"
           ],
           bandwidth: [
-            "Calculate bandwidth for content editing operations",
-            "Estimate media upload bandwidth requirements during peak periods",
-            "Consider internal bandwidth between services",
-            "Calculate bandwidth for content publishing operations",
-            "Estimate bandwidth for draft synchronization across devices"
+            "Calculate bandwidth for content retrieval operations",
+            "Estimate bandwidth for editing operations",
+            "Consider internal bandwidth between CMS services",
+            "Model bandwidth for content backups and replication",
+            "Estimate content synchronization bandwidth"
           ]
         },
         highLevelDesign: [
           "Design content service with separate storage for drafts and published content",
-          "Create media service for upload, processing, and storage",
-          "Implement editor service with real-time collaboration capabilities",
-          "Design publishing workflow service with scheduling and validation",
-          "Implement authentication and authorization service for content access"
+          "Create database schema optimized for content versioning and metadata",
+          "Implement API layer with content validation and transformation",
+          "Design publishing workflow service with content state management",
+          "Develop content retrieval service with efficient query patterns"
         ]
       },
       criteria: [
-        "Writers can create and edit posts with various rich text formatting options",
-        "System successfully processes and stores uploaded images",
-        "Content is automatically saved during editing to prevent loss",
-        "Posts can be saved as drafts, previewed, and published",
-        "The editor remains responsive even during autosave operations",
-        "Writers can manage multiple drafts and published posts efficiently"
+        "Writers can create, edit, and publish blog posts through the content management system",
+        "The system stores and manages content with appropriate metadata and formatting",
+        "Content management system supports both draft and published states for posts",
+        "The architecture allows for future expansion to handle rich media and formatting"
       ],
       learningsInMD: `
 # Key Learnings
@@ -99,26 +93,12 @@ const bloggingPlatformChallenge: Challenge = {
 - **Content Validation**: Implementing checks for content quality and completeness
 - **WYSIWYG Editing**: Building rich text editing experiences that preserve formatting
 
-## Media Management
-- **Upload Pipelines**: Designing efficient multi-part upload systems
-- **Image Processing**: Implementing resizing, optimization, and format conversion
-- **Media Storage**: Creating scalable blob storage systems for images and attachments
-- **Media Metadata**: Indexing and organizing media assets with metadata
-- **Content Delivery Preparation**: Preparing media for optimized delivery
-
-## State Management
-- **Autosave Systems**: Implementing reliable background saving with conflict resolution
-- **Offline Support**: Creating offline-first experiences with synchronization
-- **Versioning Systems**: Tracking content changes with efficient version storage
-- **Concurrent Editing**: Handling simultaneous edits by multiple users
-- **Preview Rendering**: Implementing consistent preview environments
-
 ## Storage Architecture
 - **Document Databases**: Utilizing NoSQL databases for flexible content storage
-- **BLOB Storage**: Implementing object storage systems for media files
-- **Caching Strategies**: Designing caches for frequently accessed content
 - **Data Partitioning**: Structuring data for efficient access patterns
 - **Backup and Recovery**: Ensuring content durability with backup systems
+- **Schema Design**: Creating flexible data models for content evolution
+- **Query Optimization**: Designing efficient data access patterns for content retrieval
       `,
       resources: {
         documentation: [
@@ -133,14 +113,14 @@ const bloggingPlatformChallenge: Challenge = {
             description: "Rich text editor framework for React applications"
           },
           {
-            title: "Image Processing with Sharp",
-            url: "https://sharp.pixelplumbing.com/",
-            description: "High-performance Node.js image processing library"
-          },
-          {
             title: "MongoDB Content Storage Patterns",
             url: "https://www.mongodb.com/blog/post/building-content-management-systems-using-mongodb",
             description: "Best practices for storing content in document databases"
+          },
+          {
+            title: "Content Modelling Guide",
+            url: "https://www.contentful.com/help/content-modelling-basics/",
+            description: "Best practices for content schema design"
           }
         ],
         realWorldCases: [
@@ -162,100 +142,95 @@ const bloggingPlatformChallenge: Challenge = {
             example: "Store post content in MongoDB with text and metadata, use object storage (S3) for images with CDN integration, maintain references between content and media"
           },
           {
-            title: "Autosave Implementation",
-            description: "Implement efficient background saving with debouncing",
-            example: "Use a debounced save function triggered after 1.5 seconds of inactivity, with a forced save every 30 seconds regardless of activity"
-          },
-          {
             title: "Draft Management",
             description: "Implement a stateful draft system with version tracking",
             example: "Store draft versions with timestamps, author information, and change summaries to allow for version comparison and restoration"
+          },
+          {
+            title: "Content API Design",
+            description: "Create a flexible API that supports various content operations",
+            example: "Implement RESTful endpoints for CRUD operations with appropriate status codes, versioned API paths, and comprehensive query parameters for filtering and sorting content"
           }
         ]
       }
     },
     {
-      problem: "The blogging platform has gained popularity, and readers are now experiencing slow page loads, especially for content with multiple images or when accessing from different regions globally. Popular posts with high traffic are particularly affected. The startup needs to optimize content delivery to ensure fast page loads regardless of reader location or post popularity.",
+      problem: "The blogging platform has gained popularity, and readers are now experiencing slow page loads, especially for content with multiple images or when accessing from different regions globally. The team needs to focus on implementing a content delivery system that ensures fast access for readers regardless of their location.",
       requirements: [
-        "Design a content delivery architecture with global distribution",
-        "Implement image optimization pipeline for different devices and connections",
-        "Create caching strategy for static and dynamic content",
-        "Build a responsive frontend that loads content progressively",
-        "Implement performance monitoring and optimization system"
+        "Design a content delivery architecture with global distribution"
       ],
       metaRequirements: [
-        "Create a service that handles blog post creation and storage with rich media support",
-        "Optimize content delivery speed across regions"
+        "Design a content management system for creating, editing, and publishing blog posts",
+        "Design a content delivery architecture with global distribution"
       ],
       hintsPerArea: {
         requirements: {
           functional: [
-            "Design an image processing pipeline that creates multiple variants (sizes, formats, quality levels)",
-            "Implement CDN integration with appropriate cache policies for content types",
-            "Create adaptive content loading based on device capabilities and connection speed",
-            "Design API response compression and optimization",
-            "Implement preloading and lazy loading strategies for content"
+            "Design multi-region content distribution strategy with edge locations",
+            "Implement CDN integration with appropriate cache policies",
+            "Create origin failover for high availability",
+            "Design cache invalidation and purging mechanism",
+            "Implement regional routing to nearest content edge"
           ],
           nonFunctional: [
-            "Achieve page load time under 2 seconds for 90th percentile of readers",
-            "Reduce image sizes by at least 60% while maintaining acceptable quality",
+            "Achieve page load time under 2 seconds for 90th percentile globally",
             "Ensure 99.9% CDN availability across all regions",
-            "Set appropriate cache TTLs based on content update patterns",
-            "Optimize Time to First Byte (TTFB) to under 200ms"
+            "Optimize Time to First Byte (TTFB) to under 200ms",
+            "Support regional traffic spikes without origin overload",
+            "Design for bandwidth efficiency and cost optimization"
           ]
         },
         systemAPI: [
-          "Design image variant APIs with responsive parameters",
-          "Create cache control headers and invalidation endpoints",
-          "Implement content negotiation for format selection",
-          "Design resource hints API for preloading critical content",
+          "Design cache control header strategies for different content types",
+          "Create invalidation endpoints for content updates",
+          "Implement geo-routing APIs for edge location selection",
+          "Design health check endpoints for origin and edge services",
           "Create performance metrics collection endpoints"
         ],
         capacityEstimations: {
           traffic: [
             "Calculate read-to-write ratio (typically 1,000:1 for blogs)",
-            "Estimate daily page views and peak loads (6-10x average)",
-            "Model traffic distribution across global regions",
+            "Estimate daily page views by geographic region",
+            "Model peak loads (6-10x average) and regional distribution",
             "Calculate cache hit ratios for different content types",
-            "Estimate traffic growth patterns (20-30% monthly)"
+            "Estimate traffic growth patterns by region (20-30% monthly)"
           ],
           storage: [
-            "Calculate storage needs for multiple image variants (typically 3-5x original)",
-            "Estimate CDN storage requirements based on content catalog",
-            "Model edge cache storage across global points of presence",
-            "Calculate media transformation temporary storage",
-            "Estimate frontend asset storage requirements"
+            "Calculate edge cache storage needs for content catalog",
+            "Estimate storage requirements at each point of presence",
+            "Model content replication size across regions",
+            "Calculate origin storage redundancy requirements",
+            "Estimate content index size for edge locations"
           ],
           memory: [
-            "Estimate memory requirements for origin caching layer",
-            "Calculate image processing memory needs",
-            "Model cache memory requirements across CDN nodes",
-            "Estimate application server memory with caching",
-            "Consider memory needs for performance monitoring"
+            "Estimate memory requirements for edge caching",
+            "Calculate origin caching layer memory needs",
+            "Model cache key memory footprint",
+            "Estimate memory for request routing and load balancing",
+            "Calculate TLS session cache memory requirements"
           ],
           bandwidth: [
-            "Calculate CDN egress bandwidth during peak hours",
+            "Calculate CDN egress bandwidth during peak hours by region",
             "Estimate origin to CDN bandwidth requirements",
-            "Model bandwidth savings from compression and optimization",
-            "Calculate cost implications of bandwidth usage",
-            "Estimate backend service communication bandwidth"
+            "Model bandwidth savings from edge caching",
+            "Calculate inter-region replication bandwidth",
+            "Estimate SSL handshake bandwidth overhead"
           ]
         },
         highLevelDesign: [
           "Design multi-tier caching architecture (browser, CDN, origin)",
-          "Create image processing and optimization pipeline",
-          "Implement global content delivery network with appropriate routing",
+          "Implement global CDN with appropriate points of presence",
+          "Create origin shield to protect backend services",
           "Design cache invalidation and purging system",
-          "Create performance monitoring and optimization feedback loop"
+          "Develop traffic routing optimization for nearest edge location access"
         ]
       },
       criteria: [
-        "Content loads quickly (under 2 seconds) for readers across all regions",
-        "Images are automatically optimized for different devices and connections",
-        "System handles traffic spikes to popular content without performance degradation",
-        "Caching strategy effectively reduces load on origin servers",
-        "Performance metrics are captured and analyzed for continual improvement",
-        "Progressive loading provides good user experience even on slow connections"
+        "Content loads quickly for readers across all global regions",
+        "The system effectively uses CDN for global content distribution",
+        "Content delivery architecture handles traffic spikes to popular content",
+        "The design includes appropriate cache policies and invalidation strategies",
+        "The solution accounts for different network conditions and device capabilities"
       ],
       learningsInMD: `
 # Key Learnings
@@ -267,13 +242,6 @@ const bloggingPlatformChallenge: Challenge = {
 - **Routing Optimization**: Implementing efficient routing to nearest edge locations
 - **Cache Invalidation**: Creating effective cache purging mechanisms
 
-## Image Optimization Techniques
-- **Responsive Images**: Generating and serving appropriately sized images
-- **Format Selection**: Choosing optimal formats based on browser support and quality needs
-- **Compression Algorithms**: Implementing lossy and lossless compression strategies
-- **On-the-fly Processing**: Creating image transformations dynamically versus precomputing
-- **Progressive Loading**: Implementing techniques like LQIP (Low Quality Image Placeholders)
-
 ## Caching Architectures
 - **Multi-Tier Caching**: Designing browser, CDN, and origin caching layers
 - **Cache Coherence**: Maintaining consistency across distributed cache nodes
@@ -281,12 +249,12 @@ const bloggingPlatformChallenge: Challenge = {
 - **Cache Warming**: Preloading cache with anticipated high-demand content
 - **Cache Analytics**: Monitoring and optimizing cache hit rates
 
-## Frontend Performance
-- **Critical Rendering Path**: Optimizing resource loading sequence
-- **Progressive Enhancement**: Building experiences that work across device capabilities
-- **JavaScript Optimization**: Implementing code splitting and lazy loading
-- **Resource Hints**: Using preload, prefetch, and preconnect to optimize loading
-- **Performance Budgets**: Establishing and enforcing metrics for page performance
+## Global Content Distribution
+- **Regional Traffic Management**: Directing users to optimal edge locations
+- **Latency Optimization**: Minimizing distance-based delays in content delivery
+- **Bandwidth Efficiency**: Reducing data transfer costs while maintaining performance
+- **Regional Availability**: Ensuring content accessibility across geographic boundaries
+- **Compliance Considerations**: Managing content distribution with regional regulations
       `,
       resources: {
         documentation: [
@@ -301,14 +269,14 @@ const bloggingPlatformChallenge: Challenge = {
             description: "Google's guide to optimizing website performance"
           },
           {
-            title: "Image Optimization Techniques",
-            url: "https://images.guide/",
-            description: "Comprehensive guide to image optimization for the web"
-          },
-          {
             title: "Cache Control Strategies",
             url: "https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching",
             description: "Best practices for HTTP caching"
+          },
+          {
+            title: "Global Content Distribution",
+            url: "https://www.cloudflare.com/learning/cdn/cdn-load-balance-reliability/",
+            description: "Strategies for reliable global content delivery"
           }
         ],
         realWorldCases: [
@@ -325,106 +293,101 @@ const bloggingPlatformChallenge: Challenge = {
         ],
         bestPractices: [
           {
-            title: "Image Optimization Pipeline",
-            description: "Implement automated image processing with multiple variants",
-            example: "Process uploaded images into 5 size variants (thumbnail, small, medium, large, original), 2 formats (original and WebP when supported), and use quality optimization based on image content"
-          },
-          {
             title: "CDN Configuration",
             description: "Optimize CDN settings for different content types",
             example: "Use long cache TTLs (1 year) for content with versioned URLs, shorter TTLs (1 hour) for user profile data, and implement surrogate keys for targeted cache invalidation"
           },
           {
-            title: "Progressive Loading",
-            description: "Implement content prioritization for fast perceived performance",
-            example: "Load critical CSS inline, use low-quality image placeholders, prioritize visible content, and defer non-critical resources with intersection observers"
+            title: "Multi-Region Strategy",
+            description: "Design for optimal global content delivery",
+            example: "Implement a multi-region origin architecture with regional routing, replicate static content across all edge locations, and use dynamic edge computing for region-specific content adaptation"
+          },
+          {
+            title: "Cache Invalidation",
+            description: "Create efficient cache purging mechanisms",
+            example: "Implement versioned URLs for static assets, use targeted invalidation for dynamic content with cache tags, and create a propagation strategy for global cache updates"
           }
         ]
       }
     },
     {
-      problem: "With growing popularity, the platform is experiencing database bottlenecks and scaling issues as user engagement (comments, likes, shares) increases exponentially. Popular posts generate thousands of comments and interactions within minutes, creating performance issues and occasionally destabilizing the platform. The startup needs to redesign the engagement system to handle massive scale while maintaining responsiveness.",
+      problem: "With growing popularity, the platform is experiencing database bottlenecks and scaling issues as user engagement (comments, likes, shares) increases exponentially. Popular posts generate thousands of comments and interactions within minutes, creating performance issues. The team needs to redesign the database architecture to handle this high volume of engagement data.",
       requirements: [
-        "Design a scalable database architecture for high-volume engagement data",
-        "Implement real-time updates for comments and other interactions",
-        "Create an asynchronous processing system for engagement events",
-        "Build a comment system with threading and pagination",
-        "Implement engagement analytics and trending content detection"
+        "Design a scalable database architecture for high-volume engagement data"
       ],
       metaRequirements: [
-        "Create a service that handles blog post creation and storage with rich media support",
-        "Optimize content delivery speed across regions",
-        "Scale user engagement handling"
+        "Design a content management system for creating, editing, and publishing blog posts",
+        "Design a content delivery architecture with global distribution",
+        "Design a scalable database architecture for high-volume engagement data"
       ],
       hintsPerArea: {
         requirements: {
           functional: [
-            "Design sharded database architecture for engagement data",
-            "Implement publish-subscribe system for real-time updates",
-            "Create event processing pipeline for engagement actions",
-            "Design comment storage with efficient threading and retrieval",
-            "Implement counter systems for high-volume metrics"
+            "Design sharded database architecture with appropriate partition keys",
+            "Implement read/write splitting for different query patterns",
+            "Create distributed counter mechanism for engagement metrics",
+            "Design efficient database schema for engagement data types",
+            "Implement data access patterns for different engagement queries"
           ],
           nonFunctional: [
-            "Support at least 1,000 concurrent interactions per second per post",
-            "Ensure comment posting latency under 500ms for 95th percentile",
-            "Design for eventual consistency with clear boundaries",
-            "Maintain system stability during viral traffic spikes (10-100x normal)",
-            "Implement rate limiting and abuse prevention"
+            "Support peak write throughput of 1,000+ writes/second per popular post",
+            "Ensure read latency under 100ms for engagement data at 99th percentile",
+            "Design for horizontal scalability as engagement volume grows",
+            "Maintain data consistency with appropriate consistency models",
+            "Enable database resilience during traffic spikes (10-100x normal)"
           ]
         },
         systemAPI: [
-          "Design engagement endpoints with optimistic updates",
-          "Create WebSocket or SSE APIs for real-time updates",
-          "Implement efficient pagination for comments with cursor-based design",
-          "Design engagement notification APIs",
-          "Create moderation and reporting endpoints"
+          "Design database query interfaces for engagement retrieval",
+          "Create atomic update operations for engagement counters",
+          "Implement efficient pagination for high-volume engagement data",
+          "Design database transaction boundaries for engagement operations",
+          "Create database monitoring and alerting interfaces"
         ],
         capacityEstimations: {
           traffic: [
-            "Calculate engagement actions per post (5-10% of readers engage)",
-            "Estimate comment volume and distribution patterns",
-            "Model viral scenarios with sudden traffic increases",
-            "Calculate real-time connection requirements",
-            "Estimate notification volume from engagement"
+            "Calculate write operations per post (5-10% of readers engage)",
+            "Estimate read-to-write ratio for engagement data",
+            "Model peak write throughput during viral content spikes",
+            "Calculate query patterns across different engagement types",
+            "Estimate growth rate of engagement data over time"
           ],
           storage: [
-            "Calculate engagement data storage growth rate",
-            "Estimate comment storage with threading overhead",
-            "Model time-series data for trending analysis",
-            "Calculate moderation queue storage needs",
-            "Estimate notification storage requirements"
+            "Calculate storage required per engagement record",
+            "Estimate engagement data growth rate over time",
+            "Model storage requirements for engagement metadata and indexes",
+            "Calculate storage needs across database shards",
+            "Estimate backup and replication storage overhead"
           ],
           memory: [
-            "Calculate cache requirements for active post engagement data",
-            "Estimate real-time connection state memory needs",
-            "Model counter implementation memory usage",
-            "Calculate memory for rate limiting and throttling",
-            "Estimate event processing memory requirements"
+            "Estimate memory cache size for hot engagement data",
+            "Calculate database connection pool memory requirements",
+            "Model memory needs for database query execution",
+            "Estimate buffer pool sizing for database instances",
+            "Calculate memory for database replication and failover"
           ],
           bandwidth: [
-            "Calculate WebSocket message volume and size",
-            "Estimate engagement event streaming bandwidth",
-            "Model notification delivery bandwidth",
-            "Calculate database replication bandwidth",
-            "Estimate analytics event bandwidth"
+            "Calculate network throughput for peak write periods",
+            "Estimate bandwidth between application and database tiers",
+            "Model database replication bandwidth requirements",
+            "Calculate bandwidth for database backup operations",
+            "Estimate cross-region database traffic patterns"
           ]
         },
         highLevelDesign: [
           "Design sharded database system with appropriate partition keys",
-          "Implement message queue architecture for asynchronous processing",
-          "Create real-time notification system with fanout capabilities",
-          "Design counter service with aggregation and caching",
-          "Implement engagement analytics pipeline"
+          "Create read/write separation with primary and replica databases",
+          "Implement distributed counter service for high-volume metrics",
+          "Design data access patterns optimized for engagement retrieval",
+          "Develop database migration strategy from monolithic to distributed architecture"
         ]
       },
       criteria: [
-        "System handles high volumes of concurrent engagement without performance degradation",
-        "Comments and interactions appear in real-time for all viewers",
-        "Database performance remains stable even during viral traffic spikes",
-        "Comments are correctly threaded and efficiently paginated",
-        "Engagement data is consistently tracked and aggregated",
-        "System prevents abuse through appropriate rate limiting"
+        "Database architecture handles high-volume engagement data efficiently",
+        "The system scales horizontally to accommodate traffic growth",
+        "Database performance remains stable during viral traffic spikes",
+        "The design includes appropriate sharding and partitioning strategies",
+        "The solution addresses both read and write scalability challenges"
       ],
       learningsInMD: `
 # Key Learnings
@@ -436,26 +399,19 @@ const bloggingPlatformChallenge: Challenge = {
 - **Distributed Counters**: Implementing high-performance counting mechanisms
 - **NoSQL Migration Strategies**: Converting relational data to NoSQL when appropriate
 
-## Real-time Communication Systems
-- **WebSocket Architecture**: Designing scalable persistent connection management
-- **Pub/Sub Patterns**: Implementing efficient publisher-subscriber models
-- **Connection State Management**: Handling large numbers of concurrent connections
-- **Push Notification Systems**: Creating reliable notification delivery pipelines
-- **Presence Tracking**: Monitoring user online status efficiently
-
-## Event Processing Architectures
-- **Message Queue Design**: Building reliable asynchronous processing systems
-- **Event Sourcing**: Implementing event logs as system of record
-- **Stream Processing**: Creating real-time analytics on event streams
-- **Backpressure Handling**: Managing system behavior under heavy load
-- **Retry and Recovery**: Designing resilient event processing
-
 ## Data Consistency Models
 - **Eventual Consistency**: Implementing eventually consistent systems with clear boundaries
 - **CQRS Pattern**: Separating read and write models for scalability
 - **Optimistic Concurrency**: Managing concurrent updates without locking
 - **Conflict Resolution**: Resolving data conflicts in distributed systems
 - **Consistency Boundaries**: Defining transaction scopes and consistency domains
+
+## High-Volume Data Processing
+- **Write Optimization**: Designing systems for high-throughput data ingestion
+- **Read Scaling**: Creating efficient data access patterns for high-volume reads
+- **Partitioning Strategies**: Selecting effective partition keys for distributed data
+- **Indexing Approaches**: Designing indexes for efficient query patterns
+- **Hot Spot Mitigation**: Preventing performance bottlenecks from popular data
       `,
       resources: {
         documentation: [
@@ -465,19 +421,19 @@ const bloggingPlatformChallenge: Challenge = {
             description: "MongoDB sharding architecture and implementation strategies"
           },
           {
-            title: "Real-time WebSocket Scaling",
-            url: "https://www.nginx.com/blog/websocket-nginx/",
-            description: "Strategies for scaling WebSocket connections"
-          },
-          {
-            title: "Event-Driven Architecture",
-            url: "https://aws.amazon.com/event-driven-architecture/",
-            description: "AWS patterns for event-driven systems"
+            title: "Scaling Database Systems",
+            url: "https://aws.amazon.com/blogs/database/scaling-your-amazon-rds-instance-vertically-and-horizontally/",
+            description: "Techniques for scaling relational and NoSQL databases"
           },
           {
             title: "Distributed Counters",
             url: "https://redis.io/commands/incr",
             description: "Implementing high-volume counters with Redis"
+          },
+          {
+            title: "Data Partitioning Strategies",
+            url: "https://docs.microsoft.com/en-us/azure/architecture/best-practices/data-partitioning",
+            description: "Best practices for partitioning data in distributed systems"
           }
         ],
         realWorldCases: [
@@ -487,114 +443,109 @@ const bloggingPlatformChallenge: Challenge = {
             description: "How Reddit handles billions of comments and engagement interactions"
           },
           {
-            name: "Discord's Real-time Architecture",
-            url: "https://blog.discord.com/how-discord-scaled-elixir-to-5-000-000-concurrent-users-c0e933b76168",
-            description: "How Discord built a system supporting millions of concurrent connections"
+            name: "Pinterest's Sharded MySQL",
+            url: "https://medium.com/pinterest-engineering/sharding-pinterest-how-we-scaled-our-mysql-fleet-3f341e96ca6f",
+            description: "How Pinterest scaled their database architecture for massive growth"
           }
         ],
         bestPractices: [
           {
-            title: "Comment System Design",
-            description: "Implement efficient comment storage and retrieval patterns",
-            example: "Use a materialized path or adjacency list pattern for threading, implement cursor-based pagination, and cache comment subtrees for popular threads"
+            title: "Sharding Strategy",
+            description: "Choose effective partition keys for distributed data",
+            example: "Shard engagement data by post_id for comments, likes, and shares to ensure related engagement data stays together, while using consistent hashing for even distribution across shards"
           },
           {
-            title: "Engagement Processing Pipeline",
-            description: "Create an event-driven architecture for engagement actions",
-            example: "Send all engagement events (likes, comments, shares) to a message queue, process asynchronously, update counters in a distributed cache, and persist with batch operations"
+            title: "Read/Write Separation",
+            description: "Optimize for different access patterns",
+            example: "Direct writes to master databases while routing reads to read replicas, with appropriate consistency guarantees and caching layers to reduce database load for popular content"
           },
           {
-            title: "Real-time Update System",
-            description: "Implement efficient real-time notification delivery",
-            example: "Use a Redis pub/sub system with channel sharding based on post ID, implement connection pooling for WebSockets, and provide fallback to polling for environments where WebSockets aren't supported"
+            title: "Counter Implementation",
+            description: "Design high-performance counting mechanisms",
+            example: "Implement two-tier counter system with Redis for real-time approximate counts and batch aggregation to persistent storage, with eventual consistency and conflict resolution"
           }
         ]
       }
     },
     {
-      problem: "Writers and publishers are requesting more detailed insights into content performance. They need comprehensive analytics about reader behavior, content engagement, and audience demographics to improve their content strategy. Current basic metrics aren't sufficient for professional content creators who need deep insights to understand what content performs well and why.",
+      problem: "Writers and publishers are requesting more detailed insights into content performance. They need comprehensive analytics about reader behavior, content engagement, and audience demographics. The team must now design a data pipeline that collects, processes, and stores analytics data for both real-time and historical analysis.",
       requirements: [
-        "Design a comprehensive analytics data pipeline",
-        "Create real-time dashboards for content performance metrics",
-        "Implement audience segmentation and demographic analysis",
-        "Build content performance prediction and recommendation system",
-        "Create exportable reports and data visualization tools"
+        "Design a comprehensive analytics data pipeline"
       ],
       metaRequirements: [
-        "Create a service that handles blog post creation and storage with rich media support",
-        "Optimize content delivery speed across regions",
-        "Scale user engagement handling",
-        "Implement comprehensive analytics system"
+        "Design a content management system for creating, editing, and publishing blog posts",
+        "Design a content delivery architecture with global distribution",
+        "Design a scalable database architecture for high-volume engagement data",
+        "Design a comprehensive analytics data pipeline"
       ],
       hintsPerArea: {
         requirements: {
           functional: [
-            "Design event collection system for reader interactions",
-            "Implement data warehouse for analytics storage and querying",
-            "Create aggregation pipelines for metrics calculation",
-            "Design audience segmentation based on behavior and properties",
-            "Implement predictive models for content performance"
+            "Design event collection system for tracking user interactions",
+            "Implement data ingestion pipeline with buffering and batching",
+            "Create data transformation layers for ETL processing",
+            "Design data warehouse schema with appropriate dimensions and facts",
+            "Implement data access layer for analytics queries"
           ],
           nonFunctional: [
             "Process events in near real-time (under 30 seconds lag)",
-            "Support interactive query performance for dashboards (under 3 seconds)",
-            "Ensure analytics data accuracy within 99% confidence",
-            "Scale to handle billions of events per day",
-            "Maintain historical data for trend analysis (13+ months)"
+            "Support interactive query performance (under 3 seconds) for typical analytics",
+            "Scale to handle billions of events per day with linear cost growth",
+            "Ensure data durability and recovery for analytics storage",
+            "Maintain historical data with appropriate retention policies"
           ]
         },
         systemAPI: [
-          "Design analytics data collection APIs with minimal client impact",
-          "Create dashboard data endpoints with appropriate caching",
-          "Implement segmentation and filtering query APIs",
-          "Design report generation and export endpoints",
-          "Create recommendation APIs based on analytics insights"
+          "Design event collection API with minimal client impact",
+          "Create data ingestion endpoints with batching support",
+          "Implement query interfaces for analytics data access",
+          "Design data export API for external analysis",
+          "Create metadata endpoints for data dictionary access"
         ],
         capacityEstimations: {
           traffic: [
             "Calculate events per page view (typically 20-50 events)",
-            "Estimate dashboard query volume and patterns",
-            "Model analytical query complexity and frequency",
-            "Calculate report generation load",
-            "Estimate recommendation request volume"
+            "Estimate daily event volume and growth rate",
+            "Model peak event ingestion periods",
+            "Calculate query volume for analytics dashboards",
+            "Estimate export request volume and size"
           ],
           storage: [
-            "Calculate raw event storage growth (retain full fidelity for 30-90 days)",
-            "Estimate aggregated data storage needs (retain for 13+ months)",
-            "Model dimensional data size for analytics cubes",
-            "Calculate storage for machine learning models",
-            "Estimate report template and generated report storage"
+            "Calculate raw event storage growth (30-90 days retention)",
+            "Estimate aggregated data storage (13+ months retention)",
+            "Model storage requirements for different data granularities",
+            "Calculate index size for analytics queries",
+            "Estimate metadata and schema storage needs"
           ],
           memory: [
+            "Estimate memory for event processing and transformation",
             "Calculate query execution memory requirements",
-            "Estimate cache size for frequently accessed metrics",
-            "Model in-memory analytics processing needs",
-            "Calculate dashboard rendering data requirements",
-            "Estimate machine learning model serving memory"
+            "Model memory needs for frequently accessed metrics",
+            "Estimate cache size for common query results",
+            "Calculate memory for data pipeline components"
           ],
           bandwidth: [
-            "Calculate event ingestion bandwidth (typically 0.5-2KB per event)",
-            "Estimate query result payload sizes",
-            "Model dashboard data refresh bandwidth",
-            "Calculate report delivery bandwidth",
-            "Estimate model training data transfer"
+            "Calculate event ingestion bandwidth (0.5-2KB per event)",
+            "Estimate internal bandwidth between pipeline stages",
+            "Model data replication bandwidth requirements",
+            "Calculate query result payload bandwidth",
+            "Estimate data export bandwidth needs"
           ]
         },
         highLevelDesign: [
-          "Design event collection and processing pipeline",
+          "Design event collection and ingestion pipeline",
+          "Create data lake architecture for raw event storage",
           "Implement data warehouse with dimensional modeling",
-          "Create real-time analytics processing with stream analytics",
-          "Design machine learning pipeline for predictive insights",
-          "Implement dashboard rendering and visualization service"
+          "Develop stream processing for real-time analytics",
+          "Design batch processing for complex historical analysis"
         ]
       },
       criteria: [
-        "Writers can access detailed analytics dashboards for their content",
-        "System provides insights across multiple dimensions (time, geography, device, etc.)",
-        "Analytics are updated in near real-time for recent performance",
-        "Performance prediction helps writers optimize content strategy",
-        "Reports can be customized and exported for external use",
-        "Query performance remains interactive even for complex analysis"
+        "Analytics pipeline efficiently collects and processes user interaction data",
+        "The system supports both real-time and historical analytics",
+        "Data warehouse architecture enables flexible querying and aggregation",
+        "The design balances data retention needs with storage efficiency",
+        "The pipeline scales to handle increasing event volume as the platform grows"
       ],
       learningsInMD: `
 # Key Learnings
@@ -613,19 +564,12 @@ const bloggingPlatformChallenge: Challenge = {
 - **Approximation Algorithms**: Using techniques like HyperLogLog for large-scale metrics
 - **Stream Windowing**: Processing data in time-based windows
 
-## Data Visualization and Dashboarding
-- **Metrics Definition**: Creating clear, actionable metrics
-- **Dashboard Design**: Building effective visualization interfaces
-- **Data Cube Generation**: Pre-computing multidimensional aggregates
-- **Interactive Query Patterns**: Supporting drill-down and exploration
-- **Rendering Optimization**: Ensuring responsive dashboard performance
-
-## Predictive Analytics
-- **Feature Engineering**: Transforming raw events into meaningful features
-- **Model Training Pipelines**: Building workflows for creating prediction models
-- **Recommendation Systems**: Implementing content recommendation algorithms
-- **A/B Testing Infrastructure**: Creating systems to validate predictive insights
-- **Model Serving**: Deploying machine learning models for real-time predictions
+## Data Warehouse Design
+- **Dimensional Modeling**: Creating star and snowflake schemas for analytics
+- **Partitioning Strategies**: Organizing data for efficient query performance
+- **Query Optimization**: Designing for interactive analysis performance
+- **Data Lifecycle Management**: Implementing tiered storage and retention policies
+- **Metadata Management**: Creating data dictionaries and semantic layers
       `,
       resources: {
         documentation: [
@@ -669,103 +613,98 @@ const bloggingPlatformChallenge: Challenge = {
             example: "Implement a hierarchical event naming (category:action:label), include standard context (user_id, session_id, timestamp, device_info), and define custom properties for specific events"
           },
           {
-            title: "Real-time Dashboard Architecture",
-            description: "Implement efficient dashboard data delivery",
-            example: "Use materialized views for common queries, implement progressive loading for dashboards, cache data at multiple levels, and refresh different components at appropriate intervals"
+            title: "Data Pipeline Architecture",
+            description: "Design for both real-time and batch processing",
+            example: "Implement Lambda architecture with stream processing for real-time metrics and batch processing for historical analysis, using data lake storage for raw events and transformed data warehouse for analysis"
           },
           {
-            title: "Predictive Content Performance",
-            description: "Create a machine learning pipeline for engagement prediction",
-            example: "Extract features from content (length, images, topics), combine with historical performance patterns, train models for different engagement types, and serve predictions via low-latency API"
+            title: "Query Performance Optimization",
+            description: "Structure data for efficient analytical queries",
+            example: "Implement pre-aggregated materialized views for common metrics, design efficient partitioning strategies based on query patterns, and use columnar storage formats for analytical workloads"
           }
         ]
       }
     },
     {
-      problem: "As the platform grows, security concerns have emerged. A recent security audit revealed vulnerabilities in content access control, user authentication, and potential data privacy issues. The platform needs to implement robust security measures to protect user data, ensure proper content access controls, and comply with privacy regulations like GDPR and CCPA.",
+      problem: "As the platform grows, security concerns have emerged. A recent security audit revealed vulnerabilities in content access control, user authentication, and potential data privacy issues. The team must now implement a secure authentication and authorization system to protect content and user data.",
       requirements: [
-        "Implement secure authentication and authorization system",
-        "Design content access control with fine-grained permissions",
-        "Create privacy-compliant data handling practices",
-        "Build security monitoring and threat detection",
-        "Implement secure API access and rate limiting"
+        "Implement secure authentication and authorization system"
       ],
       metaRequirements: [
-        "Create a service that handles blog post creation and storage with rich media support",
-        "Optimize content delivery speed across regions",
-        "Scale user engagement handling",
-        "Implement comprehensive analytics system",
-        "Implement robust security measures"
+        "Design a content management system for creating, editing, and publishing blog posts",
+        "Design a content delivery architecture with global distribution",
+        "Design a scalable database architecture for high-volume engagement data",
+        "Design a comprehensive analytics data pipeline",
+        "Implement secure authentication and authorization system"
       ],
       hintsPerArea: {
         requirements: {
           functional: [
-            "Design authentication system with MFA and session management",
-            "Implement role-based access control for platform functionality",
-            "Create content permission model with public/private/limited access",
-            "Design data privacy controls with user consent management",
-            "Implement security logging and monitoring system"
+            "Design authentication service with multiple factor support",
+            "Implement token-based authentication with appropriate lifecycle",
+            "Create role-based access control for platform functionality",
+            "Design permission system for content access control",
+            "Implement secure session management with proper termination"
           ],
           nonFunctional: [
-            "Ensure authentication responses under 300ms for 99th percentile",
-            "Implement secure data encryption at rest and in transit",
-            "Support compliance with major privacy regulations (GDPR, CCPA)",
-            "Ensure security logs are tamper-evident and preserved",
-            "Design for security without significant performance overhead"
+            "Ensure authentication response time under 300ms at 99th percentile",
+            "Implement secure data protection with encryption at rest and in transit",
+            "Design for authentication service high availability (99.99%)",
+            "Create secure credential storage with appropriate hashing",
+            "Enable audit logging for all security-related events"
           ]
         },
         systemAPI: [
-          "Design secure authentication endpoints with token management",
-          "Create permission verification middleware for API endpoints",
-          "Implement user consent and privacy preference APIs",
-          "Design security event logging and monitoring endpoints",
-          "Create secure content sharing and access control APIs"
+          "Design secure login and registration endpoints",
+          "Create token management API (issuance, validation, revocation)",
+          "Implement permission verification middleware for all protected endpoints",
+          "Design password reset and account recovery flows",
+          "Create security event logging endpoints"
         ],
         capacityEstimations: {
           traffic: [
             "Calculate authentication request volume (logins, token refreshes)",
-            "Estimate permission check frequency per request",
-            "Model security audit log generation rate",
-            "Calculate privacy request handling volume",
-            "Estimate security monitoring event rate"
+            "Estimate permission check frequency per user request",
+            "Model account creation and management operations",
+            "Calculate password reset and recovery request volume",
+            "Estimate security audit logging volume"
           ],
           storage: [
-            "Calculate authentication token and session storage",
-            "Estimate permission model storage requirements",
-            "Model security audit log storage with retention policy",
-            "Calculate user consent and privacy preference storage",
-            "Estimate security configuration and policy storage"
+            "Calculate user identity storage requirements",
+            "Estimate token storage for active sessions",
+            "Model permission data storage size",
+            "Calculate security audit log storage with retention policy",
+            "Estimate credential recovery data storage"
           ],
           memory: [
-            "Calculate token validation cache requirements",
-            "Estimate permission checking cache size",
-            "Model real-time security monitoring memory needs",
-            "Calculate rate limiting counter memory",
-            "Estimate security rule evaluation memory"
+            "Estimate token validation cache size",
+            "Calculate authentication service memory requirements",
+            "Model permission checking cache memory needs",
+            "Estimate session state memory usage",
+            "Calculate memory for rate limiting and security controls"
           ],
           bandwidth: [
-            "Calculate authentication service bandwidth",
-            "Estimate security log transport bandwidth",
-            "Model security monitoring alert bandwidth",
-            "Calculate permission synchronization bandwidth",
-            "Estimate security scan network utilization"
+            "Calculate authentication service bandwidth requirements",
+            "Estimate token exchange bandwidth needs",
+            "Model security service internal communication bandwidth",
+            "Calculate security logging bandwidth",
+            "Estimate cross-region security data replication bandwidth"
           ]
         },
         highLevelDesign: [
-          "Design authentication service with token management",
-          "Implement authorization service with permission verification",
-          "Create security logging and monitoring pipeline",
-          "Design privacy compliance infrastructure",
-          "Implement API gateway with security controls"
+          "Design authentication service with token-based authentication",
+          "Create authorization service with role and attribute-based permissions",
+          "Implement API gateway with security middleware",
+          "Develop user identity management with secure credential handling",
+          "Design security monitoring and audit logging system"
         ]
       },
       criteria: [
-        "System implements secure authentication with appropriate controls",
-        "Content access controls properly protect private or limited-access content",
-        "Platform handles user data in compliance with privacy regulations",
-        "Security monitoring detects and alerts on suspicious activities",
-        "API access is properly secured and rate-limited",
-        "Security measures don't significantly impact system performance"
+        "Authentication system securely manages user identity and sessions",
+        "Authorization controls properly restrict access to sensitive content and features",
+        "The system implements appropriate security measures for data protection",
+        "Security design accounts for performance requirements while maintaining protection",
+        "The architecture supports compliance with privacy regulations"
       ],
       learningsInMD: `
 # Key Learnings
@@ -784,19 +723,12 @@ const bloggingPlatformChallenge: Challenge = {
 - **Authorization Caching**: Optimizing permission checks for performance
 - **Delegation Patterns**: Implementing secure access delegation
 
-## Security Monitoring
-- **Audit Logging**: Creating comprehensive security event trails
-- **Threat Detection**: Implementing anomaly detection for security events
-- **Real-time Alerting**: Designing security notification systems
-- **Security Analytics**: Analyzing patterns in security data
-- **Incident Response**: Building automated and manual response procedures
-
-## Privacy Engineering
-- **Data Minimization**: Implementing collection limitation principles
-- **Consent Management**: Creating user privacy preference systems
-- **Data Subject Rights**: Building infrastructure for privacy requests
-- **Data Lifecycle Management**: Implementing retention and deletion policies
-- **Privacy by Design**: Integrating privacy considerations into system architecture
+## Security Architecture
+- **Defense in Depth**: Implementing multiple security layers
+- **Principle of Least Privilege**: Restricting access to minimum necessary
+- **Secure API Design**: Creating APIs with built-in security controls
+- **Rate Limiting**: Preventing abuse through request throttling
+- **Security Monitoring**: Detecting and responding to security events
       `,
       resources: {
         documentation: [
@@ -811,14 +743,14 @@ const bloggingPlatformChallenge: Challenge = {
             description: "Top web application security risks and mitigation strategies"
           },
           {
-            title: "AWS Security Architecture",
-            url: "https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/welcome.html",
-            description: "Best practices for secure system design on AWS"
+            title: "JWT Authentication",
+            url: "https://jwt.io/introduction/",
+            description: "Introduction to JSON Web Tokens for authentication"
           },
           {
-            title: "GDPR Compliance Guide",
-            url: "https://gdpr.eu/checklist/",
-            description: "Requirements and implementation guidance for GDPR compliance"
+            title: "API Security Best Practices",
+            url: "https://datatracker.ietf.org/doc/html/draft-ietf-oauth-security-topics",
+            description: "IETF OAuth 2.0 Security Best Current Practice"
           }
         ],
         realWorldCases: [
@@ -840,14 +772,14 @@ const bloggingPlatformChallenge: Challenge = {
             example: "Use JWT tokens with short expiration for authentication, implement refresh token rotation, support MFA with TOTP or WebAuthn, and maintain a token blacklist for revoked sessions"
           },
           {
-            title: "Content Access Control",
-            description: "Create a flexible, performant permission system",
-            example: "Implement a hybrid RBAC/ABAC system, cache permission decisions, use permission inheritance for hierarchical content, and enforce access control at the API gateway level"
+            title: "Authorization Strategy",
+            description: "Create a scalable and flexible permission system",
+            example: "Implement a combination of role-based and attribute-based access control, with centralized policy management, distributed enforcement, and cached permission decisions"
           },
           {
-            title: "Security Monitoring",
-            description: "Implement comprehensive security event tracking",
-            example: "Log all security-relevant events with contextual data, implement real-time alerting for suspicious patterns, use ML-based anomaly detection, and maintain an immutable audit trail"
+            title: "API Security",
+            description: "Protect API endpoints with comprehensive security controls",
+            example: "Implement authentication middleware, rate limiting, input validation, output encoding, and request/response logging for all API endpoints"
           }
         ]
       }
@@ -855,20 +787,20 @@ const bloggingPlatformChallenge: Challenge = {
   ],
   generalLearnings: [
     "Content management system architecture",
-    "Media processing and delivery optimization",
-    "Database scaling and sharding strategies",
-    "Real-time update systems",
-    "Analytics pipeline design",
-    "Security and access control patterns",
+    "Global content delivery networks and caching strategies",
+    "Database scaling and sharding for high-volume data",
+    "Analytics data pipeline design and implementation",
+    "Secure authentication and authorization systems",
+    "Distributed system design patterns",
     "Performance optimization techniques",
-    "Distributed system monitoring",
-    "Event-driven architecture patterns",
-    "Data consistency models",
-    "Global content delivery architecture",
-    "Machine learning integration for content platforms",
-    "Privacy engineering and compliance",
+    "Data consistency models in distributed databases",
+    "Real-time and batch data processing",
+    "API design and security best practices",
+    "Capacity planning and estimation",
     "Caching strategies across system tiers",
-    "Resilient system design for high-traffic platforms"
+    "Privacy-compliant data handling",
+    "Resilient system design for high-traffic platforms",
+    "Global distribution and latency optimization"
   ]
 };
 

@@ -1,28 +1,10 @@
 import { useSystemDesigner } from "@/lib/hooks/_useSystemDesigner";
-import { type ComponentNodeProps } from "../ReactflowCustomNodes/SystemComponentNode";
-import { Label } from "../ui/label";
-import { Textarea } from "../ui/textarea";
-import { Small } from "../ui/typography";
-import { WithSettings } from "./Wrappers/WithSettings";
-import { useState } from "react";
-import { Input } from "../ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
-import { HelpCircle, ExternalLink } from "lucide-react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "../ui/tooltip";
 import { cn } from "@/lib/utils";
+import { type NodeSettingsRefObject } from "@/types/system";
+import { ExternalLink, HelpCircle } from "lucide-react";
+import { useState } from "react";
+import { type ComponentNodeProps } from "../ReactflowCustomNodes/SystemComponentNode";
 import { Checkbox } from "../ui/checkbox";
-import { Switch } from "../ui/switch";
 import {
   Dialog,
   DialogContent,
@@ -31,8 +13,19 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
-import React from "react";
-import { type NodeSettingsRefObject } from "@/types/system";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+import { Switch } from "../ui/switch";
+import { Textarea } from "../ui/textarea";
+import { Muted, Small } from "../ui/typography";
+import { WithSettings } from "./Wrappers/WithSettings";
 
 interface FeatureInfo {
   name: string;
@@ -167,14 +160,20 @@ const InfoPopup = ({ feature }: { feature: FeatureInfo }) => {
   );
 };
 
-export const Server = ({ name, Icon, nodeSettingsRef }: ComponentNodeProps) => {
+export const Server = ({
+  name,
+  Icon,
+  nodeSettingsRef,
+  subtitle,
+}: ComponentNodeProps) => {
   return (
     <div className="group flex flex-col items-center text-gray-800 dark:text-gray-200">
-      <div className="flex items-center gap-1">
+      <div className="flex flex-col items-center gap-1">
         {Icon && (
           <Icon size={20} className="text-gray-700 dark:text-gray-300" />
         )}
         <Small>{name}</Small>
+        {subtitle && <Muted>{subtitle}</Muted>}
       </div>
       <ServerSettings name={name} nodeSettingsRef={nodeSettingsRef} />
     </div>

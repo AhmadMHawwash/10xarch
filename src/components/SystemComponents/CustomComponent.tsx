@@ -1,17 +1,17 @@
 import { useSystemDesigner } from "@/lib/hooks/_useSystemDesigner";
 import { type ComponentNodeProps } from "../ReactflowCustomNodes/SystemComponentNode";
+import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
-import { Small } from "../ui/typography";
+import { Muted, Small } from "../ui/typography";
 import { WithSettings } from "./Wrappers/WithSettings";
-import { Input } from "../ui/input";
-import React from "react";
 
 export function CustomComponent({
   name,
   nodeId,
   Icon,
   nodeSettingsRef,
+  subtitle,
 }: ComponentNodeProps) {
   const { useSystemComponentConfigSlice } = useSystemDesigner();
 
@@ -29,19 +29,13 @@ export function CustomComponent({
   );
 
   return (
-    <>
-      {/* Display the icon and name on the node itself */}
-      <div className="flex items-center gap-2">
+    <div className="flex flex-col items-center text-gray-800 dark:text-gray-200">
+      <div className="flex flex-col items-center gap-1">
         {Icon && (
-          <Icon
-            height="20px"
-            width="20px"
-            className="text-gray-700 dark:text-gray-300"
-          />
+          <Icon size={20} className="text-gray-700 dark:text-gray-300" />
         )}
-        <Small className="text-gray-700 dark:text-gray-300">
-          {displayName || "Custom Component"}
-        </Small>
+        <Small>{displayName || "Custom Component"}</Small>
+        {subtitle && <Muted>{subtitle}</Muted>}
       </div>
       {/* Settings dialog */}
       <WithSettings
@@ -84,6 +78,6 @@ export function CustomComponent({
           </div>
         </div>
       </WithSettings>
-    </>
+    </div>
   );
 }

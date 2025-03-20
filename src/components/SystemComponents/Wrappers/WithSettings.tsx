@@ -6,12 +6,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Settings } from "lucide-react";
-import { Separator } from "../../ui/separator";
+import { Input } from "@/components/ui/input";
 import { useSystemDesigner } from "@/lib/hooks/_useSystemDesigner";
-import { useCallback, useImperativeHandle, useState } from "react";
-import React from "react";
 import { type NodeSettingsRefObject } from "@/types/system";
+import { Settings } from "lucide-react";
+import React, { useCallback, useImperativeHandle, useState } from "react";
+import { Separator } from "../../ui/separator";
 
 export const WithSettings = ({
   name,
@@ -24,6 +24,12 @@ export const WithSettings = ({
 }) => {
   const { onSelectNode } = useSystemDesigner();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const { useSystemComponentConfigSlice } = useSystemDesigner();
+  const [subtitle, setSubtitle] = useSystemComponentConfigSlice<string>(
+    name ?? "",
+    "subtitle",
+    "",
+  );
 
   // Function to handle dialog open/close
   const handleDialogChange = useCallback(
@@ -59,6 +65,15 @@ export const WithSettings = ({
         <DialogHeader>
           <DialogTitle>Configuring {name}</DialogTitle>
           <DialogDescription>
+            <Input
+              placeholder="Component subtitle"
+              className="mb-4 mt-2 dark:text-gray-100 text-gray-900"
+              value={subtitle}
+              onChange={(e) => {
+                if (!name) return;
+                setSubtitle(e.target.value);
+              }}
+            />
             <Separator className="mb-4 mt-2" />
             <div className="flex items-center">{children}</div>
           </DialogDescription>

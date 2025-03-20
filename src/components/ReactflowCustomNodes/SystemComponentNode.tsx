@@ -16,7 +16,7 @@ import { LoadBalancer } from "../SystemComponents/LoadBalancer";
 import { MessageQueue } from "../SystemComponents/MessageQueue";
 import { Server } from "../SystemComponents/Server";
 import { WithMarkdownDetails } from "../SystemComponents/Wrappers/WithMarkdownDetails";
-import { Small } from "../ui/typography";
+import { Muted, Small } from "../ui/typography";
 import { useRef } from "react";
 import { type NodeSettingsRefObject, type NodeSettingsRef } from "@/types/system";
 
@@ -104,7 +104,7 @@ export default function SystemComponentNode({
             "opacity-50",
         )}
         style={{
-          height: `${Math.max(targetTotalHeight, sourceTotalHeight) + 20}px`,
+          height: `${Math.max(targetTotalHeight, sourceTotalHeight) + (data.configs.subtitle ? 80 : 60)}px`,
         }}
         onDoubleClick={() => {
           if (nodeSettingsRef.current) {
@@ -117,6 +117,7 @@ export default function SystemComponentNode({
           nodeId={data.id}
           Icon={data.icon}
           nodeSettingsRef={nodeSettingsRef}
+          subtitle={data.configs.subtitle as string}
         />
         {content && (
           <WithMarkdownDetails
@@ -167,12 +168,13 @@ export type ComponentNodeProps = {
   nodeId?: string;
   Icon: SystemComponentNodeDataProps["icon"];
   nodeSettingsRef: NodeSettingsRefObject;
+  subtitle?: string;
 };
 
 const components: Partial<
   Record<
     SystemComponent["name"],
-    ({ name, Icon, nodeSettingsRef }: ComponentNodeProps) => React.ReactElement
+    ({ name, Icon, nodeSettingsRef, subtitle }: ComponentNodeProps) => React.ReactElement
   >
 > = {
   Client,
@@ -185,7 +187,7 @@ const components: Partial<
   "Custom Component": CustomComponent,
 };
 
-const DefaultComponent = ({ name, Icon }: ComponentNodeProps) => (
+const DefaultComponent = ({ name, Icon, subtitle }: ComponentNodeProps) => (
   <>
     {Icon && (
       <Icon
@@ -195,6 +197,7 @@ const DefaultComponent = ({ name, Icon }: ComponentNodeProps) => (
       />
     )}
     <Small className="text-gray-700 dark:text-gray-300">{name}</Small>
+    {subtitle && <Muted>{subtitle}</Muted>}
   </>
 );
 

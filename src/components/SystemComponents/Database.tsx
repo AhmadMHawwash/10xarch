@@ -1,30 +1,11 @@
 import { useSystemDesigner } from "@/lib/hooks/_useSystemDesigner";
-import { type ComponentNodeProps } from "../ReactflowCustomNodes/SystemComponentNode";
-import { Label } from "../ui/label";
-import { Textarea } from "../ui/textarea";
-import { H6, Small } from "../ui/typography";
-import { WithSettings } from "./Wrappers/WithSettings";
-import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { HelpCircle, PlusIcon, X, ExternalLink } from "lucide-react";
+import { type NodeSettingsRefObject } from "@/types/system";
+import { ExternalLink, HelpCircle, PlusIcon, X } from "lucide-react";
+import { useState } from "react";
+import { type ComponentNodeProps } from "../ReactflowCustomNodes/SystemComponentNode";
 import { Button } from "../ui/button";
-import { Input } from "../ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "../ui/tooltip";
 import { Checkbox } from "../ui/checkbox";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import { Switch } from "../ui/switch";
 import {
   Dialog,
   DialogContent,
@@ -33,17 +14,30 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
-import React from "react";
-import { type NodeSettingsRefObject } from "@/types/system";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+import { Switch } from "../ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
+import { Textarea } from "../ui/textarea";
+import { H6, Muted, Small } from "../ui/typography";
+import { WithSettings } from "./Wrappers/WithSettings";
 
-export const Database = ({ name, Icon, nodeSettingsRef }: ComponentNodeProps) => {
+export const Database = ({ name, Icon, nodeSettingsRef, subtitle }: ComponentNodeProps) => {
   return (
     <div className="group flex flex-col items-center text-gray-800 dark:text-gray-200">
-      <div className="flex items-center gap-1">
+      <div className="flex flex-col items-center gap-1">
         {Icon && (
           <Icon size={20} className="text-gray-700 dark:text-gray-300" />
         )}
-        <Small className="text-gray-700 dark:text-gray-300">{name}</Small>
+        <Small>{name}</Small>
+        {subtitle && <Muted>{subtitle}</Muted>}
       </div>
       <DatabaseSettings name={name} nodeSettingsRef={nodeSettingsRef} />
     </div>

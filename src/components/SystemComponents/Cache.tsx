@@ -2,7 +2,7 @@ import { useSystemDesigner } from "@/lib/hooks/_useSystemDesigner";
 import { type ComponentNodeProps } from "../ReactflowCustomNodes/SystemComponentNode";
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
-import { Small } from "../ui/typography";
+import { Small, Muted } from "../ui/typography";
 import { WithSettings } from "./Wrappers/WithSettings";
 import { useState } from "react";
 import { Input } from "../ui/input";
@@ -232,14 +232,15 @@ const InfoPopup = ({ feature }: { feature: FeatureInfo }) => {
   );
 };
 
-export const Cache = ({ name, Icon, nodeSettingsRef }: ComponentNodeProps) => {
+export const Cache = ({ name, Icon, nodeSettingsRef, subtitle }: ComponentNodeProps) => {
   return (
     <div className="group flex flex-col items-center text-gray-800 dark:text-gray-200">
-      <div className="flex items-center gap-1">
+      <div className="flex flex-col items-center gap-1">
         {Icon && (
           <Icon size={20} className="text-gray-700 dark:text-gray-300" />
         )}
         <Small>{name}</Small>
+        {subtitle && <Muted>{subtitle}</Muted>}
       </div>
       <CacheSettings name={name} nodeSettingsRef={nodeSettingsRef} />
     </div>

@@ -355,12 +355,13 @@ describe('systemDesignerUtils', () => {
       ];
       
       const notifyMock = vi.fn();
+      const edges: Edge[] = [];
       
-      const result = handleNodesChange(changes, nodes, notifyMock);
+      const result = handleNodesChange(changes, nodes, edges, notifyMock);
       
       expect(notifyMock).toHaveBeenCalled();
-      expect(result).toHaveLength(2); // Whiteboard should not be removed
-      expect(result.find(n => n.id === 'Whiteboard-1')).toBeDefined();
+      expect(result.updatedNodes).toHaveLength(2); // Whiteboard should not be removed
+      expect(result.updatedNodes.find(n => n.id === 'Whiteboard-1')).toBeDefined();
     });
 
     it('should apply valid node changes', () => {
@@ -374,12 +375,13 @@ describe('systemDesignerUtils', () => {
       ];
       
       const notifyMock = vi.fn();
+      const edges: Edge[] = [];
       
-      const result = handleNodesChange(changes, nodes, notifyMock);
+      const result = handleNodesChange(changes, nodes, edges, notifyMock);
       
       expect(notifyMock).not.toHaveBeenCalled();
-      expect(result).toHaveLength(1);
-      const firstNode = result[0];
+      expect(result.updatedNodes).toHaveLength(1);
+      const firstNode = result.updatedNodes[0];
       expect(firstNode?.id).toBe('Server-1');
     });
   });

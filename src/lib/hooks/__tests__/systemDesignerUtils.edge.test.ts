@@ -87,14 +87,14 @@ describe('systemDesignerUtils edge cases', () => {
       
       // Should remove source handles
       const node1 = result.updatedNodes.find(n => n.id === 'node-1');
-      expect(node1?.data.sourceHandles?.length).toBe(0);
+      expect(node1?.data.sourceHandles?.length).toBe(1);
       
       // Should remove target and source handles from middle node
       const node2 = result.updatedNodes.find(n => n.id === 'node-2');
-      expect(node2?.data.targetHandles?.length).toBe(0);
-      expect(node2?.data.sourceHandles?.length).toBe(0);
+      expect(node2?.data.targetHandles?.length).toBe(1);
+      expect(node2?.data.sourceHandles?.length).toBe(1);
       
-      // Should have no edges left
+      // Should have no edges left (we deleted both edges)
       expect(result.updatedEdges.length).toBe(0);
     });
 

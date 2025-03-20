@@ -29,6 +29,7 @@ export const CustomEdge: FC<EdgeProps<EdgeData>> = ({
   markerEnd,
   id,
   data,
+  selected,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -147,6 +148,8 @@ export const CustomEdge: FC<EdgeProps<EdgeData>> = ({
     setIsEditing(true);
   };
 
+  console.log("selected", selected);
+
   return (
     <>
       {/* Invisible wider path for easier interaction - 12px width */}
@@ -169,13 +172,13 @@ export const CustomEdge: FC<EdgeProps<EdgeData>> = ({
       <path
         id={id}
         style={{
-          strokeWidth: isHovered ? "4px" : "3px",
+          strokeWidth: isHovered || selected ? "4px" : "3px",
           transition: "stroke-width 0.2s",
           cursor: "pointer",
         }}
         className={cn(
           "react-flow__edge-path",
-          isHovered && "stroke-blue-500 dark:stroke-blue-400"
+          selected  && "!stroke-blue-500 dark:!stroke-blue-400",
         )}
         d={edgePath}
         markerEnd={markerEnd}

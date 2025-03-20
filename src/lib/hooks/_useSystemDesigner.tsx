@@ -153,9 +153,11 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
   const onConnect: OnConnect = useCallback(
     (params) => {
       const result = handleConnect(params, nodes, edges);
-      setNodes(result.updatedNodes);
-      setEdges(result.updatedEdges);
-      
+      queueMicrotask(() => {
+        setNodes(result.updatedNodes);
+        setEdges(result.updatedEdges);
+      });
+
       // Update node internals
       setTimeout(() => {
         result.nodesToUpdate.forEach(nodeId => {

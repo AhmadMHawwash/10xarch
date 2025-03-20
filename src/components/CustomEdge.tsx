@@ -198,7 +198,7 @@ export const CustomEdge: FC<EdgeProps<EdgeData>> = ({
             <input
               type="text"
               defaultValue={data?.label ?? ""}
-              placeholder="Type API name"
+              placeholder="Add connection"
               className="min-w-[100px] rounded border border-gray-300 bg-white px-2 py-1 text-sm shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:focus:border-blue-400 dark:focus:ring-blue-400"
               autoFocus
               onBlur={handleBlur}
@@ -218,7 +218,7 @@ export const CustomEdge: FC<EdgeProps<EdgeData>> = ({
                 isHovered && !data?.label && "border-dashed border-gray-400 dark:border-gray-500"
               )}
             >
-              {data?.label ?? '•••'}
+              {data?.label ?? (isHovered ? 'Add connection' : '•••')}
             </div>
           )}
           

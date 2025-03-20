@@ -12,7 +12,6 @@ import ReactFlow, {
   type EdgeProps,
   type NodeProps,
   type OnConnect,
-  type OnConnectStartParams,
   type OnConnectStart,
   type OnConnectEnd,
 } from "reactflow";

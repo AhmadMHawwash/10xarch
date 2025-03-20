@@ -128,12 +128,6 @@ const LoadBalancerSettings = ({
     throughput: 1000
   });
 
-  const [features, setFeatures] = useSystemComponentConfigSlice<string[]>(
-    id,
-    "features",
-    []
-  );
-
   const [details, setDetails] = useSystemComponentConfigSlice<string>(
     id,
     "details",
@@ -145,15 +139,6 @@ const LoadBalancerSettings = ({
     "free_form_text",
     ""
   );
-
-  const availableFeatures = [
-    "SSL Termination",
-    "Session Persistence",
-    "Health Checks",
-    "Rate Limiting",
-    "DDoS Protection",
-    "HTTP/2 Support"
-  ];
 
   return (
     <WithSettings name={id} nodeSettingsRef={nodeSettingsRef}>

@@ -26,59 +26,6 @@ interface FeatureInfo {
   learnMoreUrl?: string;
 }
 
-const featureInfoMap: Record<string, FeatureInfo> = {
-  "Message Persistence": {
-    name: "Message Persistence",
-    description: "Store messages on disk to prevent data loss in case of system failures.",
-    learnMoreUrl: "https://docs.example.com/message-queue/persistence"
-  },
-  "Dead Letter Queue": {
-    name: "Dead Letter Queue",
-    description: "A queue for messages that cannot be processed successfully, enabling error handling and debugging.",
-    learnMoreUrl: "https://docs.example.com/message-queue/dlq"
-  },
-  "Message Filtering": {
-    name: "Message Filtering",
-    description: "Filter messages based on content or metadata before processing.",
-    learnMoreUrl: "https://docs.example.com/message-queue/filtering"
-  },
-  "Message Routing": {
-    name: "Message Routing",
-    description: "Route messages to different queues based on content or metadata.",
-    learnMoreUrl: "https://docs.example.com/message-queue/routing"
-  },
-  "Message Batching": {
-    name: "Message Batching",
-    description: "Group multiple messages together for more efficient processing.",
-    learnMoreUrl: "https://docs.example.com/message-queue/batching"
-  },
-  "Message Compression": {
-    name: "Message Compression",
-    description: "Compress messages to reduce storage and bandwidth usage.",
-    learnMoreUrl: "https://docs.example.com/message-queue/compression"
-  },
-  "Message Encryption": {
-    name: "Message Encryption",
-    description: "Encrypt messages for secure transmission and storage.",
-    learnMoreUrl: "https://docs.example.com/message-queue/encryption"
-  },
-  "Message Deduplication": {
-    name: "Message Deduplication",
-    description: "Prevent duplicate message processing by identifying and removing duplicates.",
-    learnMoreUrl: "https://docs.example.com/message-queue/deduplication"
-  },
-  "Message Prioritization": {
-    name: "Message Prioritization",
-    description: "Process messages based on priority levels for optimized handling of critical messages.",
-    learnMoreUrl: "https://docs.example.com/message-queue/prioritization"
-  },
-  "Message Replay": {
-    name: "Message Replay",
-    description: "Ability to replay messages from a specific point in time for recovery or debugging.",
-    learnMoreUrl: "https://docs.example.com/message-queue/replay"
-  }
-};
-
 const configInfoMap: Record<string, FeatureInfo> = {
   "Free-form Text Mode": {
     name: "Free-form Text Mode",
@@ -199,12 +146,6 @@ const MessageQueueSettings = ({
     retention: 7
   });
 
-  const [features, setFeatures] = useSystemComponentConfigSlice<string[]>(
-    id,
-    "features",
-    []
-  );
-
   const [details, setDetails] = useSystemComponentConfigSlice<string>(
     id,
     "details",
@@ -216,19 +157,6 @@ const MessageQueueSettings = ({
     "free_form_text",
     ""
   );
-
-  const availableFeatures = [
-    "Message Persistence",
-    "Dead Letter Queue",
-    "Message Filtering",
-    "Message Routing",
-    "Message Batching",
-    "Message Compression",
-    "Message Encryption",
-    "Message Deduplication",
-    "Message Prioritization",
-    "Message Replay"
-  ];
 
   return (
     <WithSettings name={id} nodeSettingsRef={nodeSettingsRef}>

@@ -33,58 +33,6 @@ interface FeatureInfo {
   learnMoreUrl?: string;
 }
 
-const featureInfoMap: Record<string, FeatureInfo> = {
-  "Health monitoring": {
-    name: "Health Monitoring",
-    description:
-      "Monitor server health metrics, uptime, and performance indicators to ensure optimal operation.",
-    learnMoreUrl: "https://docs.example.com/server-features/health-monitoring",
-  },
-  "Fault tolerance": {
-    name: "Fault Tolerance",
-    description:
-      "Implement mechanisms to handle and recover from various types of failures without service interruption.",
-    learnMoreUrl: "https://docs.example.com/server-features/fault-tolerance",
-  },
-  "Logging & Monitoring": {
-    name: "Logging & Monitoring",
-    description:
-      "Comprehensive logging and monitoring capabilities for debugging, auditing, and performance analysis.",
-    learnMoreUrl: "https://docs.example.com/server-features/logging-monitoring",
-  },
-  "Backup & Restore": {
-    name: "Backup & Restore",
-    description:
-      "Regular backup of server data and configuration with quick restore capabilities.",
-    learnMoreUrl: "https://docs.example.com/server-features/backup-restore",
-  },
-  "Request rate limiting": {
-    name: "Request Rate Limiting",
-    description:
-      "Control the rate of incoming requests to prevent server overload and ensure fair resource allocation.",
-    learnMoreUrl: "https://docs.example.com/server-features/rate-limiting",
-  },
-  "Database connection pooling": {
-    name: "Database Connection Pooling",
-    description:
-      "Efficiently manage database connections to improve performance and resource utilization.",
-    learnMoreUrl: "https://docs.example.com/server-features/connection-pooling",
-  },
-  "Session management": {
-    name: "Session Management",
-    description:
-      "Handle user sessions securely and efficiently across multiple server instances.",
-    learnMoreUrl: "https://docs.example.com/server-features/session-management",
-  },
-  "Application caching": {
-    name: "Application Caching",
-    description:
-      "Cache frequently accessed data to reduce database load and improve response times.",
-    learnMoreUrl:
-      "https://docs.example.com/server-features/application-caching",
-  },
-};
-
 const configInfoMap: Record<string, FeatureInfo> = {
   "Free-form Text Mode": {
     name: "Free-form Text Mode",
@@ -212,12 +160,6 @@ const ServerSettings = ({
     storage: 100,
   });
 
-  const [features, setFeatures] = useSystemComponentConfigSlice<string[]>(
-    id,
-    "features",
-    [],
-  );
-
   const [details, setDetails] = useSystemComponentConfigSlice<string>(
     id,
     "details",
@@ -245,62 +187,6 @@ const ServerSettings = ({
     "free_form_text",
     "",
   );
-
-  const getAvailableFeatures = (type: string): string[] => {
-    const commonFeatures = [
-      "Health monitoring",
-      "Fault tolerance",
-      "Logging & Monitoring",
-      "Backup & Restore",
-    ];
-
-    switch (type) {
-      case "application":
-        return [
-          ...commonFeatures,
-          "Request rate limiting",
-          "Database connection pooling",
-          "Session management",
-          "Application caching",
-        ];
-      case "api":
-        return [
-          ...commonFeatures,
-          "API Gateway",
-          "Request validation",
-          "Rate limiting",
-          "API versioning",
-        ];
-      case "web":
-        return [
-          ...commonFeatures,
-          "Static file serving",
-          "Compression",
-          "URL rewriting",
-          "Virtual hosting",
-        ];
-      case "processing":
-        return [
-          ...commonFeatures,
-          "Job scheduling",
-          "Queue processing",
-          "Resource isolation",
-          "Batch processing",
-        ];
-      case "caching":
-        return [
-          ...commonFeatures,
-          "Cache coherence",
-          "Cache partitioning",
-          "Eviction policies",
-          "Cache statistics",
-        ];
-      default:
-        return commonFeatures;
-    }
-  };
-
-  const availableFeatures = getAvailableFeatures(serverType);
 
   return (
     <WithSettings name={id} nodeSettingsRef={nodeSettingsRef}>

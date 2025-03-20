@@ -32,66 +32,6 @@ interface FeatureInfo {
   learnMoreUrl?: string;
 }
 
-const featureInfoMap: Record<string, FeatureInfo> = {
-  "Edge Caching": {
-    name: "Edge Caching",
-    description:
-      "Cache content at edge locations closest to users for faster delivery.",
-    learnMoreUrl: "https://docs.example.com/cdn/edge-caching",
-  },
-  "Dynamic Content": {
-    name: "Dynamic Content",
-    description:
-      "Cache and serve dynamic content with configurable TTL and invalidation rules.",
-    learnMoreUrl: "https://docs.example.com/cdn/dynamic-content",
-  },
-  "HTTP/3 Support": {
-    name: "HTTP/3 Support",
-    description:
-      "Support for the latest HTTP protocol version for improved performance.",
-    learnMoreUrl: "https://docs.example.com/cdn/http3",
-  },
-  "SSL/TLS": {
-    name: "SSL/TLS",
-    description: "Secure content delivery with modern SSL/TLS encryption.",
-    learnMoreUrl: "https://docs.example.com/cdn/ssl-tls",
-  },
-  "DDoS Protection": {
-    name: "DDoS Protection",
-    description:
-      "Built-in protection against distributed denial of service attacks.",
-    learnMoreUrl: "https://docs.example.com/cdn/ddos-protection",
-  },
-  "Origin Shield": {
-    name: "Origin Shield",
-    description: "Additional caching layer to reduce load on origin servers.",
-    learnMoreUrl: "https://docs.example.com/cdn/origin-shield",
-  },
-  "Smart Purging": {
-    name: "Smart Purging",
-    description:
-      "Selectively invalidate cached content based on tags or patterns.",
-    learnMoreUrl: "https://docs.example.com/cdn/smart-purging",
-  },
-  "Real-time Analytics": {
-    name: "Real-time Analytics",
-    description: "Monitor CDN performance and usage in real-time.",
-    learnMoreUrl: "https://docs.example.com/cdn/analytics",
-  },
-  "Image Optimization": {
-    name: "Image Optimization",
-    description:
-      "Automatically optimize and transform images for different devices.",
-    learnMoreUrl: "https://docs.example.com/cdn/image-optimization",
-  },
-  "Video Streaming": {
-    name: "Video Streaming",
-    description:
-      "Optimized delivery of streaming video content with adaptive bitrate.",
-    learnMoreUrl: "https://docs.example.com/cdn/video-streaming",
-  },
-};
-
 const configInfoMap: Record<string, FeatureInfo> = {
   "Free-form Text Mode": {
     name: "Free-form Text Mode",
@@ -196,12 +136,6 @@ const CDNSettings = ({
     edgeLocations: 10,
   });
 
-  const [features, setFeatures] = useSystemComponentConfigSlice<string[]>(
-    id,
-    "features",
-    [],
-  );
-
   const [details, setDetails] = useSystemComponentConfigSlice<string>(
     id,
     "details",
@@ -213,19 +147,6 @@ const CDNSettings = ({
     "free_form_text",
     "",
   );
-
-  const availableFeatures = [
-    "Edge Caching",
-    "Dynamic Content",
-    "HTTP/3 Support",
-    "SSL/TLS",
-    "DDoS Protection",
-    "Origin Shield",
-    "Smart Purging",
-    "Real-time Analytics",
-    "Image Optimization",
-    "Video Streaming",
-  ];
 
   return (
     <WithSettings name={id} nodeSettingsRef={nodeSettingsRef}>

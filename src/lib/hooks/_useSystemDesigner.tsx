@@ -241,13 +241,17 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
     };
     
     const newNodes = handleNodesChange(changes, nodes, notifyWhiteboardDeletion);
-    setNodes(newNodes);
+    queueMicrotask(() => {
+      setNodes(newNodes);
+    });
   }, [nodes, toast]);
 
   const onEdgesChange: OnEdgesChange = useCallback((changes) => {
     const result = handleEdgesChange(changes, edges, nodes);
-    setNodes(result.updatedNodes);
-    setEdges(result.updatedEdges);
+    queueMicrotask(() => {
+      setNodes(result.updatedNodes);
+      setEdges(result.updatedEdges);
+    });
 
     if (result.nodesToUpdateUI.length > 0) {
       setTimeout(() => {

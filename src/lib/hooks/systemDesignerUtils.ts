@@ -354,9 +354,25 @@ export const handleEdgesChange = (
       const sourceNode = updatedNodes[sourceNodeIndex];
       if (!sourceNode) continue;
       
-      const updatedSourceHandles = sourceNode.data.sourceHandles?.filter(
-        (handle) => handle.id !== sourceHandleId
-      ) ?? [];
+      const sourceHandles = sourceNode.data.sourceHandles ?? [];
+      
+      // Only remove the handle if it's not the last one
+      const updatedSourceHandles = sourceHandles.length > 1
+        ? sourceHandles.filter(handle => handle.id !== sourceHandleId)
+        : sourceHandles.map(handle => ({
+            ...handle,
+            isConnected: false // Set existing handle to disconnected if it's the last one
+          }));
+      
+      // Always ensure at least one handle exists
+      if (updatedSourceHandles.length === 0) {
+        const timestamp = Date.now();
+        const randomId = Math.floor(Math.random() * 10000);
+        updatedSourceHandles.push({
+          id: `${sourceId}-source-handle-${timestamp}-${randomId}`,
+          isConnected: false
+        });
+      }
       
       updatedNodes[sourceNodeIndex] = {
         ...sourceNode,
@@ -370,9 +386,25 @@ export const handleEdgesChange = (
       const targetNode = updatedNodes[targetNodeIndex];
       if (!targetNode) continue;
       
-      const updatedTargetHandles = targetNode.data.targetHandles?.filter(
-        (handle) => handle.id !== targetHandleId
-      ) ?? [];
+      const targetHandles = targetNode.data.targetHandles ?? [];
+      
+      // Only remove the handle if it's not the last one
+      const updatedTargetHandles = targetHandles.length > 1
+        ? targetHandles.filter(handle => handle.id !== targetHandleId)
+        : targetHandles.map(handle => ({
+            ...handle,
+            isConnected: false // Set existing handle to disconnected if it's the last one
+          }));
+      
+      // Always ensure at least one handle exists
+      if (updatedTargetHandles.length === 0) {
+        const timestamp = Date.now();
+        const randomId = Math.floor(Math.random() * 10000);
+        updatedTargetHandles.push({
+          id: `${targetId}-target-handle-${timestamp}-${randomId}`,
+          isConnected: false
+        });
+      }
       
       updatedNodes[targetNodeIndex] = {
         ...targetNode,

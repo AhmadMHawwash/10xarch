@@ -1,3 +1,4 @@
 yarn
 yarn lint
 yarn ts-check
+yarn test

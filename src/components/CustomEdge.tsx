@@ -148,8 +148,6 @@ export const CustomEdge: FC<EdgeProps<EdgeData>> = ({
     setIsEditing(true);
   };
 
-  console.log("selected", selected);
-
   return (
     <>
       {/* Invisible wider path for easier interaction - 12px width */}

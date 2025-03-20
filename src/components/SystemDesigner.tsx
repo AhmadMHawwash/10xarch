@@ -12,6 +12,9 @@ import ReactFlow, {
   type EdgeProps,
   type NodeProps,
   type OnConnect,
+  type OnConnectStartParams,
+  type OnConnectStart,
+  type OnConnectEnd,
 } from "reactflow";
 import "reactflow/dist/base.css";
 import "reactflow/dist/style.css";
@@ -48,6 +51,7 @@ const SystemDesigner = ({
     onConnectStart,
     onConnectEnd,
     onSelectNode,
+    setNodes,
   } = useSystemDesigner();
 
   const handleConnect: OnConnect = (params) => {
@@ -63,6 +67,32 @@ const SystemDesigner = ({
     onSelectNode(whiteboardNode);
   }, []);
 
+  // Handler to deselect all nodes when starting a connection
+  const handleConnectStart: OnConnectStart = (event, params) => {
+    // Deselect all nodes
+    const deselectedNodes = nodes.map(node => ({
+      ...node,
+      selected: false
+    }));
+    setNodes(deselectedNodes);
+    
+    // Call the original handler
+    onConnectStart(event, params);
+  };
+
+  // Handler to deselect all nodes when ending a connection
+  const handleConnectEnd: OnConnectEnd = (event) => {
+    // Deselect all nodes
+    const deselectedNodes = nodes.map(node => ({
+      ...node,
+      selected: false
+    }));
+    setNodes(deselectedNodes);
+    
+    // Call the original handler
+    onConnectEnd(event);
+  };
+
   return (
     <div
       className="relative flex h-full flex-grow flex-col bg-white dark:bg-gray-900 design-canvas"
@@ -75,8 +105,8 @@ const SystemDesigner = ({
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={handleConnect}
-        onConnectStart={onConnectStart}
-        onConnectEnd={onConnectEnd}
+        onConnectStart={handleConnectStart}
+        onConnectEnd={handleConnectEnd}
         onInit={initInstance}
         onDrop={onDrop}
         onDragOver={onDragOver}

@@ -13,7 +13,7 @@ export const componentTargets: Record<
   Client: ["Server", "Load Balancer", "CDN", "Message Queue", "Custom Component"],
   CDN: ["Load Balancer", "Server", "Custom Component"],
   "Load Balancer": ["Server", "Custom Component"],
-  Server: ["Server", "Cache", "Database", "Message Queue", "Custom Component"],
+  Server: ["Server", "Cache", "Database", "Message Queue", "Custom Component", "Load Balancer"],
   Cache: ["Database", "Custom Component"],
   Database: ["Custom Component"],
   "Message Queue": ["Server", "Custom Component"],
@@ -225,6 +225,7 @@ export const handleConnectStart = (
   return (nodes as Node<SystemComponentNodeDataProps>[]).map(
     (node) => ({
       ...node,
+      selected: false,
       data: {
         ...node.data,
         withTargetHandle: isSource && targets.includes(node.data.name),
@@ -240,6 +241,7 @@ export const handleConnectEnd = (
 ): Node<SystemComponentNodeDataProps | OtherNodeDataProps>[] => {
   return nodes.map((node) => ({
     ...node,
+    selected: false,
     data: {
       ...node.data,
       withTargetHandle: true,
@@ -291,8 +293,12 @@ export const handleNodeDrop = (
 export const handleNodesChange = (
   changes: NodeChange[],
   nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[],
+  edges: Edge[],
   notifyWhiteboardDeletion: () => void
-): Node<SystemComponentNodeDataProps | OtherNodeDataProps>[] => {
+): {
+  updatedNodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[],
+  updatedEdges: Edge[]
+} => {
   const isDeletingWhiteboard = changes.some(
     (change) => change.type === "remove" && change.id.includes("Whiteboard"),
   );
@@ -306,7 +312,140 @@ export const handleNodesChange = (
       !(change.type === "remove" && change.id.includes("Whiteboard")),
   );
   
-  return applyNodeChanges(changesWithKeptSystemDefs, nodes);
+  // Find all node deletions
+  const nodeDeletions = changesWithKeptSystemDefs.filter(
+    (change) => change.type === "remove"
+  );
+  
+  let updatedEdges = [...edges];
+  let updatedNodes = [...nodes];
+  
+  // If nodes are being deleted, update connected nodes and edges
+  if (nodeDeletions.length > 0) {
+    const nodeIdsToDelete = new Set(
+      nodeDeletions.map((change) => change.id)
+    );
+    
+    // Find all edges connected to the deleted nodes
+    const connectedEdges = edges.filter((edge) => 
+      nodeIdsToDelete.has(edge.source) || nodeIdsToDelete.has(edge.target)
+    );
+    
+    // Track nodes that need their handles updated
+    const nodesToUpdate = new Map<string, { 
+      targetHandlesToRemove: Set<string>, 
+      sourceHandlesToRemove: Set<string> 
+    }>();
+    
+    // For each connected edge, collect the handles that need to be updated
+    connectedEdges.forEach(edge => {
+      // Handle source node deletion
+      if (nodeIdsToDelete.has(edge.source) && !nodeIdsToDelete.has(edge.target)) {
+        // Target node stays but needs its targetHandle updated
+        const targetId = edge.target;
+        const targetHandleId = edge.targetHandle;
+        
+        if (!nodesToUpdate.has(targetId)) {
+          nodesToUpdate.set(targetId, {
+            targetHandlesToRemove: new Set(),
+            sourceHandlesToRemove: new Set()
+          });
+        }
+        
+        if (targetHandleId) {
+          nodesToUpdate.get(targetId)!.targetHandlesToRemove.add(targetHandleId);
+        }
+      }
+      
+      // Handle target node deletion
+      if (nodeIdsToDelete.has(edge.target) && !nodeIdsToDelete.has(edge.source)) {
+        // Source node stays but needs its sourceHandle updated
+        const sourceId = edge.source;
+        const sourceHandleId = edge.sourceHandle;
+        
+        if (!nodesToUpdate.has(sourceId)) {
+          nodesToUpdate.set(sourceId, {
+            targetHandlesToRemove: new Set(),
+            sourceHandlesToRemove: new Set()
+          });
+        }
+        
+        if (sourceHandleId) {
+          nodesToUpdate.get(sourceId)!.sourceHandlesToRemove.add(sourceHandleId);
+        }
+      }
+    });
+    
+    // Update the nodes with the collected handles to remove
+    updatedNodes = updatedNodes.map(node => {
+      const nodeId = node.id;
+      const updateInfo = nodesToUpdate.get(nodeId);
+      
+      if (!updateInfo) {
+        return node;
+      }
+      
+      // Update source handles
+      let sourceHandles = node.data.sourceHandles ?? [];
+      if (updateInfo.sourceHandlesToRemove.size > 0) {
+        // Filter out handles that were connected to deleted nodes
+        sourceHandles = sourceHandles.filter(
+          handle => !updateInfo.sourceHandlesToRemove.has(handle.id)
+        );
+        
+        // Ensure at least one source handle exists
+        if (sourceHandles.length === 0) {
+          const timestamp = Date.now();
+          const randomId = Math.floor(Math.random() * 10000);
+          sourceHandles.push({
+            id: `${nodeId}-source-handle-${timestamp}-${randomId}`,
+            isConnected: false
+          });
+        }
+      }
+      
+      // Update target handles
+      let targetHandles = node.data.targetHandles ?? [];
+      if (updateInfo.targetHandlesToRemove.size > 0) {
+        // Filter out handles that were connected to deleted nodes
+        targetHandles = targetHandles.filter(
+          handle => !updateInfo.targetHandlesToRemove.has(handle.id)
+        );
+        
+        // Ensure at least one target handle exists
+        if (targetHandles.length === 0) {
+          const timestamp = Date.now();
+          const randomId = Math.floor(Math.random() * 10000);
+          targetHandles.push({
+            id: `${nodeId}-target-handle-${timestamp}-${randomId}`,
+            isConnected: false
+          });
+        }
+      }
+      
+      return {
+        ...node,
+        data: {
+          ...node.data,
+          sourceHandles,
+          targetHandles
+        }
+      };
+    });
+    
+    // Filter out any edges connected to the deleted nodes
+    updatedEdges = edges.filter((edge) => {
+      return !nodeIdsToDelete.has(edge.source) && !nodeIdsToDelete.has(edge.target);
+    });
+  }
+  
+  // Apply the node changes
+  updatedNodes = applyNodeChanges(changesWithKeptSystemDefs, updatedNodes);
+  
+  return {
+    updatedNodes,
+    updatedEdges
+  };
 };
 
 // Pure function to handle edge changes

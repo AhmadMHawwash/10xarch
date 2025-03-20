@@ -240,11 +240,43 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
       });
     };
     
-    const newNodes = handleNodesChange(changes, nodes, notifyWhiteboardDeletion);
+    const result = handleNodesChange(changes, nodes, edges, notifyWhiteboardDeletion);
+    
+    // Update both edges and nodes
     queueMicrotask(() => {
-      setNodes(newNodes);
+      setEdges(result.updatedEdges);
+      setNodes(result.updatedNodes);
     });
-  }, [nodes, toast]);
+    
+    // Find nodes that might have had handles changed
+    const nodeDeletions = changes.filter(change => change.type === 'remove');
+    if (nodeDeletions.length > 0) {
+      // For each deleted node, find connected nodes that need their internals updated
+      const deletedNodeIds = nodeDeletions.map(change => change.id);
+      const nodesToUpdateInternals: string[] = [];
+      
+      // Check all edges to see which nodes were connected to deleted nodes
+      edges.forEach(edge => {
+        // If source was deleted, update target node
+        if (deletedNodeIds.includes(edge.source) && !deletedNodeIds.includes(edge.target)) {
+          nodesToUpdateInternals.push(edge.target);
+        }
+        // If target was deleted, update source node
+        if (deletedNodeIds.includes(edge.target) && !deletedNodeIds.includes(edge.source)) {
+          nodesToUpdateInternals.push(edge.source);
+        }
+      });
+      
+      // Update the internals of all affected nodes
+      if (nodesToUpdateInternals.length > 0) {
+        queueMicrotask(() => {
+          nodesToUpdateInternals.forEach(nodeId => {
+            updateNodeInternals(nodeId);
+          });
+        });
+      }
+    }
+  }, [nodes, edges, toast, updateNodeInternals]);
 
   const onEdgesChange: OnEdgesChange = useCallback((changes) => {
     const result = handleEdgesChange(changes, edges, nodes);

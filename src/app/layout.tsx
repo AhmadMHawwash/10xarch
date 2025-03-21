@@ -10,12 +10,21 @@ import { dark } from "@clerk/themes";
 import { ClerkProvider } from "@clerk/nextjs";
 import { GeistSans } from "geist/font/sans";
 import { Analytics } from "@vercel/analytics/react";
+import { type Metadata } from "next";
+import { buildCspPolicy, securityHeaders } from "@/lib/csp";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "10×arch",
   description:
     "10×arch is system design playground for learning and practicing system design concepts interactively following industry grade challenges.",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
+  // Security headers using our centralized configuration
+  other: {
+    // Content Security Policy
+    "Content-Security-Policy": buildCspPolicy(),
+    // Other security headers
+    ...securityHeaders
+  }
 };
 
 export default async function RootLayout({

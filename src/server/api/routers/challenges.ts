@@ -1,5 +1,10 @@
 import challenges from "@/content/challenges";
 import { freeChallengesLimiter } from "@/lib/rate-limit";
+import { logSecurityEvent } from "@/lib/security-logger";
+import {
+  challengeSolutionSchema,
+  sanitizePrompt
+} from "@/lib/validations/challenge";
 import {
   createCallerFactory,
   createTRPCRouter,
@@ -13,12 +18,6 @@ import { z } from "zod";
 import { checkSolution } from "./checkAnswer";
 
 const createAICaller = createCallerFactory(checkSolution);
-
-const submitChallengeSchema = z.object({
-  challengeSlug: z.string(),
-  criteria: z.array(z.string()),
-  challengeAndSolutionPrompt: z.string(),
-});
 
 export const challengesRouter = createTRPCRouter({
   getRateLimitInfo: publicProcedure.query(async ({ ctx }) => {
@@ -38,8 +37,12 @@ export const challengesRouter = createTRPCRouter({
   }),
 
   submit: publicProcedure
-    .input(submitChallengeSchema)
+    .input(challengeSolutionSchema)
     .mutation(async ({ ctx, input }) => {
+      // Get user info for security logging
+      const { userId } = await auth();
+      const ipAddress = ctx.headers.get("x-forwarded-for") ?? null;
+      
       // Get the challenge
       const challenge = challenges.find((c) => c.slug === input.challengeSlug);
 
@@ -50,7 +53,23 @@ export const challengesRouter = createTRPCRouter({
         });
       }
 
-      const { userId } = await auth();
+      // Sanitize the prompt to prevent injection attacks and log any attempt
+      const sanitizedPrompt = sanitizePrompt(
+        input.challengeAndSolutionPrompt,
+        userId ?? undefined,
+        ipAddress,
+        `/api/challenges/${input.challengeSlug}`
+      );
+      
+      // Check length after sanitization to avoid processing extremely large inputs
+      if (sanitizedPrompt.length < 10) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Solution is too short after sanitization",
+        });
+      }
+
+      // Get identifier for rate limiting
       const identifier =
         userId ?? ctx.headers.get("x-forwarded-for") ?? "127.0.0.1";
 
@@ -59,8 +78,6 @@ export const challengesRouter = createTRPCRouter({
 
       // Handle free challenges (both anonymous and authenticated users)
       if (challenge.isFree && remaining > 0) {
-        // Get client IP or user ID for rate limiting
-
         const response = await freeChallengesLimiter.limit(identifier);
 
         if (!response.success) {
@@ -71,17 +88,32 @@ export const challengesRouter = createTRPCRouter({
             hour12: true,
           });
 
+          // Log the rate limit exceeded event
+          logSecurityEvent({
+            eventType: 'rate-limit-exceeded',
+            message: `Challenge submission rate limit exceeded`,
+            userId: userId ?? undefined,
+            ipAddress: ipAddress ?? undefined,
+            endpoint: `/api/challenges/${input.challengeSlug}`,
+            metadata: {
+              limitType: "challenge-submissions",
+              reset: response.reset,
+              challengeId: input.challengeSlug
+            }
+          });
+
           throw new TRPCError({
             code: "TOO_MANY_REQUESTS",
             message: `Rate limit exceeded. You can try again at ${formattedTime}`,
           });
         }
 
-        // Process free challenge submission
+        // Process free challenge submission with sanitized prompt
         const aiCaller = createAICaller(ctx);
         const result = await aiCaller.hello({
+          challengeSlug: input.challengeSlug,
           criteria: input.criteria,
-          challengeAndSolutionPrompt: input.challengeAndSolutionPrompt,
+          challengeAndSolutionPrompt: sanitizedPrompt,
           bypassInternalToken: process.env.BYPASS_TOKEN,
         });
 
@@ -90,21 +122,46 @@ export const challengesRouter = createTRPCRouter({
 
       // Handle paid challenges (must be authenticated)
       if (!userId) {
+        // Log the unauthorized access attempt
+        logSecurityEvent({
+          eventType: 'unauthorized-access',
+          message: `Unauthorized attempt to access paid challenge`,
+          ipAddress: ipAddress ?? undefined,
+          endpoint: `/api/challenges/${input.challengeSlug}`,
+          metadata: {
+            challengeId: input.challengeSlug
+          }
+        });
+
         throw new TRPCError({
           code: "UNAUTHORIZED",
-          message: "Authentication required for paid challenges",
+          message: "You must be signed in to submit this challenge",
         });
       }
 
-      // Only check and deduct credits for paid challenges
+      // Check if user has credits
       const userCredits = await ctx.db.query.credits.findFirst({
         where: eq(credits.userId, userId),
       });
 
-      if (!userCredits || userCredits.balance < 1) {
+      if (!userCredits || userCredits.balance <= 0) {
+        // Log the credit issue
+        logSecurityEvent({
+          eventType: 'rate-limit-exceeded',
+          message: `User has insufficient credits`,
+          userId,
+          ipAddress: ipAddress ?? undefined,
+          endpoint: `/api/challenges/${input.challengeSlug}`,
+          metadata: {
+            limitType: "credits",
+            challengeId: input.challengeSlug,
+            currentBalance: userCredits?.balance ?? 0
+          }
+        });
+
         throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Insufficient credits",
+          code: "FORBIDDEN",
+          message: "You need to purchase credits to submit this challenge",
         });
       }
 
@@ -114,11 +171,13 @@ export const challengesRouter = createTRPCRouter({
         .set({ balance: userCredits.balance - 1 })
         .where(eq(credits.userId, userId));
 
-      // Process paid challenge submission
+      // Process submission
       const aiCaller = createAICaller(ctx);
       const result = await aiCaller.hello({
+        challengeSlug: input.challengeSlug,
         criteria: input.criteria,
-        challengeAndSolutionPrompt: input.challengeAndSolutionPrompt,
+        challengeAndSolutionPrompt: sanitizedPrompt,
+        bypassInternalToken: process.env.BYPASS_TOKEN,
       });
 
       return { success: true, evaluation: result };

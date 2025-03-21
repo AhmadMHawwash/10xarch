@@ -8,6 +8,13 @@ import { eq } from 'drizzle-orm'
 import { credits } from '@/server/db/schema'
 import { calculateTextTokens, costToCredits, calculateGPTCost } from '@/lib/tokens'
 import challenges from "@/content/challenges"
+import { 
+  chatMessageSchema, 
+  containsSensitiveContent, 
+  sanitizeInput,
+  checkAndLogPromptInjection 
+} from '@/lib/validations/chat'
+import { logSecurityEvent } from '@/lib/security-logger'
 
 export const chatRouter = createTRPCRouter({
   getRemainingPrompts: publicProcedure
@@ -37,35 +44,33 @@ export const chatRouter = createTRPCRouter({
     }),
 
   sendMessage: publicProcedure
-    .input(
-      z.object({
-        message: z.string(),
-        challengeId: z.string(),
-        stageIndex: z.number().min(0),
-        history: z.array(
-          z.object({
-            role: z.enum(['user', 'assistant', 'system']),
-            content: z.string(),
-          })
-        ),
-        solution: z.object({
-          components: z.array(z.any()),
-          apiDefinitions: z.array(z.any()).optional(),
-          capacityEstimations: z.object({
-            traffic: z.string().optional(),
-            storage: z.string().optional(),
-            bandwidth: z.string().optional(),
-            memory: z.string().optional(),
-          }).optional(),
-          functionalRequirements: z.string().optional(),
-          nonFunctionalRequirements: z.string().optional(),
-        }).optional(),
-      })
-    )
+    .input(chatMessageSchema)
     .mutation(async ({ input, ctx }) => {
-      const { message, challengeId, stageIndex, history, solution } = input
+      const { message: rawMessage, challengeId, stageIndex, history, solution } = input
       const { userId } = await auth();
-      const identifier = ctx.headers.get("x-forwarded-for") ?? "127.0.0.1"
+      
+      // Get IP address for security logging and convert to string | null
+      const ipAddress = ctx.headers.get("x-forwarded-for");
+      const clientIp = ipAddress ? ipAddress : "127.0.0.1"; // Use fallback only for rate limiting
+      
+      // Apply sanitization to user message
+      const message = sanitizeInput(rawMessage);
+      
+      // Check for potential prompt injection attempt (and log it)
+      if (checkAndLogPromptInjection(message, userId ?? undefined, ipAddress, '/api/trpc/chat.sendMessage')) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'Your message contains patterns that violate our usage policies.',
+        });
+      }
+      
+      // Check for potentially harmful content
+      if (containsSensitiveContent(message)) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'Your message contains content that violates our usage policies.',
+        });
+      }
 
       // Get challenge context
       const challenge = challenges.find((c) => c.slug === challengeId);
@@ -114,14 +119,50 @@ Keep these requirements in mind when providing assistance. Guide the user withou
 
       // Check rate limit for free prompts
       const { success, reset, remaining } = await chatMessagesLimiter.limit(
-        `${identifier}:${challengeId}`
+        `${clientIp}:${challengeId}`
       )
+      
+      // Log rate limit events
+      if (!success) {
+        logSecurityEvent({
+          eventType: 'rate-limit-exceeded',
+          message: 'Rate limit exceeded for chat messages',
+          userId: userId ?? undefined,
+          ipAddress: ipAddress ?? undefined,
+          endpoint: '/api/trpc/chat.sendMessage',
+          metadata: {
+            limitType: 'chat_messages',
+            challengeId
+          }
+        });
+      }
+      
+      // Pre-validate all history messages to prevent prompt injection
+      const sanitizedHistory = history.map(msg => {
+        if (msg.role === 'user') {
+          const sanitizedContent = sanitizeInput(msg.content);
+          
+          // Check history messages for prompt injection
+          checkAndLogPromptInjection(
+            sanitizedContent, 
+            userId ?? undefined, 
+            ipAddress, 
+            '/api/trpc/chat.sendMessage/history'
+          );
+          
+          return {
+            role: msg.role,
+            content: sanitizedContent
+          };
+        }
+        return msg;
+      });
       
       // Prepare messages for OpenAI with challenge context
       const messages = [
         { role: 'system' as const, content: CHAT_SYSTEM_PROMPT },
         { role: 'system' as const, content: challengeContext },
-        ...history,
+        ...sanitizedHistory,
         { role: 'user' as const, content: message },
       ]
 

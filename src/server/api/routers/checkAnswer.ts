@@ -1,19 +1,25 @@
+import { logSecurityEvent } from "@/lib/security-logger";
+import {
+  calculateTextTokens,
+  costToCredits,
+  GPT_TOKEN_COSTS,
+} from "@/lib/tokens";
+import {
+  challengeSolutionSchema,
+  playgroundSolutionSchema,
+  sanitizePrompt,
+} from "@/lib/validations/challenge";
 import {
   createCallerFactory,
   createTRPCRouter,
   protectedProcedure,
   publicProcedure,
 } from "@/server/api/trpc";
+import { auth } from "@clerk/nextjs/server";
+import { TRPCError } from "@trpc/server";
 import OpenAI from "openai";
 import { z } from "zod";
-import {
-  calculateTextTokens,
-  costToCredits,
-  GPT_TOKEN_COSTS,
-} from "@/lib/tokens";
-import { TRPCError } from "@trpc/server";
 import { creditsRouter } from "./credits";
-import { auth } from "@clerk/nextjs/server";
 
 const createCreditsCaller = createCallerFactory(creditsRouter);
 
@@ -37,16 +43,12 @@ const openai = new OpenAI({
 
 export const checkSolution = createTRPCRouter({
   hello: publicProcedure
-    .input(
-      z.object({
-        criteria: z.array(z.string()),
-        challengeAndSolutionPrompt: z.string(),
-        bypassInternalToken: z.string().optional(),
-      }),
-    )
+    .input(challengeSolutionSchema)
     .output(EvaluationResponseSchema)
     .mutation(async ({ input, ctx }) => {
       const { userId } = await auth();
+      // Get IP address for security logging
+      const ipAddress = ctx.headers.get("x-forwarded-for") ?? null;
 
       const canUseAI =
         input.bypassInternalToken === process.env.BYPASS_TOKEN || userId;
@@ -56,7 +58,22 @@ export const checkSolution = createTRPCRouter({
           message: "You are not authorized to use this endpoint",
         });
       }
-      const { criteria, challengeAndSolutionPrompt } = input;
+
+      // Sanitize the prompt to prevent injection attacks and log any attempt
+      const sanitizedPrompt = sanitizePrompt(
+        input.challengeAndSolutionPrompt,
+        userId ?? undefined,
+        ipAddress,
+        "/api/check-solution",
+      );
+
+      // Check length after sanitization to avoid processing extremely large inputs
+      if (sanitizedPrompt.length < 10) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Solution is too short after sanitization",
+        });
+      }
 
       const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
         {
@@ -66,7 +83,7 @@ export const checkSolution = createTRPCRouter({
         },
         {
           role: "assistant",
-          content: `Accept the solution if it meets the following criteria: \n${JSON.stringify(criteria, null, 2)}. \nIf any criteria are not met, inform the user and reduce their overall score.`,
+          content: `Accept the solution if it meets the following criteria: \n${JSON.stringify(input.criteria, null, 2)}. \nIf any criteria are not met, inform the user and reduce their overall score.`,
         },
         {
           role: "assistant",
@@ -84,7 +101,7 @@ export const checkSolution = createTRPCRouter({
         },
         {
           role: "user",
-          content: challengeAndSolutionPrompt,
+          content: sanitizedPrompt,
         },
         {
           role: "assistant",
@@ -116,7 +133,10 @@ export const checkSolution = createTRPCRouter({
 
         // Parse the content as JSON with type checking
         try {
-          if (userId && input.bypassInternalToken !== process.env.BYPASS_TOKEN) {
+          if (
+            userId &&
+            input.bypassInternalToken !== process.env.BYPASS_TOKEN
+          ) {
             const inputTokens = calculateTextTokens(JSON.stringify(messages));
             const outputTokens = calculateTextTokens(content);
 
@@ -126,12 +146,29 @@ export const checkSolution = createTRPCRouter({
               (outputTokens / 1000) * GPT_TOKEN_COSTS["gpt-4o-mini"].output;
             const totalCredits = costToCredits(inputCost + outputCost);
 
-            // Use credits via TRPC
-            const caller = createCreditsCaller(ctx);
-            await caller.use({
-              amount: totalCredits,
-              description: "AI Solution Evaluation",
-            });
+            try {
+              // Use credits via TRPC
+              const caller = createCreditsCaller(ctx);
+              await caller.use({
+                amount: totalCredits,
+                description: "AI Solution Evaluation",
+              });
+            } catch (creditError) {
+              // Log rate limit exceeded
+              logSecurityEvent({
+                eventType: "rate-limit-exceeded",
+                message: `Rate limit exceeded for credits`,
+                userId,
+                ipAddress: ipAddress ?? undefined,
+                endpoint: "/api/check-solution",
+                metadata: {
+                  limitType: "credits",
+                  requiredCredits: totalCredits,
+                  error: (creditError as Error).message,
+                },
+              });
+              throw creditError;
+            }
           }
           const jsonResponse = JSON.parse(content) as EvaluationResponse;
 
@@ -153,17 +190,31 @@ export const checkSolution = createTRPCRouter({
       }
     }),
   playground: protectedProcedure
-    .input(
-      z.object({
-        systemDesign: z.string(),
-        systemDesignContext: z.string().optional(),
-      }),
-    )
+    .input(playgroundSolutionSchema)
     .mutation(async ({ input, ctx }) => {
-      const { systemDesign, systemDesignContext } = input;
+      const { userId } = ctx.auth;
+      // Get IP address for security logging
+      const ipAddress = ctx.headers.get("x-forwarded-for") ?? null;
+
+      // Sanitize inputs to prevent injection attacks and log any attempts
+      const sanitizedSystemDesign = sanitizePrompt(
+        input.systemDesign,
+        userId ?? undefined,
+        ipAddress,
+        "/api/playground",
+      );
+
+      const sanitizedContext = input.systemDesignContext
+        ? sanitizePrompt(
+            input.systemDesignContext,
+            userId ?? undefined,
+            ipAddress,
+            "/api/playground/context",
+          )
+        : "";
 
       // Calculate input tokens
-      const inputText = `systemDesignContext: ${systemDesignContext} \n systemDesign: ${systemDesign}`;
+      const inputText = `systemDesignContext: ${sanitizedContext} \n systemDesign: ${sanitizedSystemDesign}`;
       const inputTokens = calculateTextTokens(inputText);
       const estimatedOutputTokens = 512; // max_tokens from the API call
 
@@ -174,12 +225,29 @@ export const checkSolution = createTRPCRouter({
         (estimatedOutputTokens / 1000) * GPT_TOKEN_COSTS["gpt-4o-mini"].output;
       const totalCredits = costToCredits(inputCost + outputCost);
 
-      // Use credits via TRPC
-      const caller = createCreditsCaller(ctx);
-      await caller.use({
-        amount: totalCredits,
-        description: "AI Playground Feedback",
-      });
+      try {
+        // Use credits via TRPC
+        const caller = createCreditsCaller(ctx);
+        await caller.use({
+          amount: totalCredits,
+          description: "AI Playground Feedback",
+        });
+      } catch (creditError) {
+        // Log rate limit exceeded
+        logSecurityEvent({
+          eventType: "rate-limit-exceeded",
+          message: `Rate limit exceeded for credits`,
+          userId: userId ?? undefined,
+          ipAddress: ipAddress ?? undefined,
+          endpoint: "/api/playground",
+          metadata: {
+            limitType: "credits",
+            requiredCredits: totalCredits,
+            error: (creditError as Error).message,
+          },
+        });
+        throw creditError;
+      }
 
       try {
         const response = await openai.chat.completions.create({
@@ -197,7 +265,7 @@ export const checkSolution = createTRPCRouter({
             },
             {
               role: "user",
-              content: `systemDesignContext: ${systemDesignContext} \n systemDesign: ${systemDesign}`,
+              content: `systemDesignContext: ${sanitizedContext} \n systemDesign: ${sanitizedSystemDesign}`,
             },
             {
               role: "assistant",

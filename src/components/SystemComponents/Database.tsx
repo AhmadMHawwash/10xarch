@@ -233,7 +233,7 @@ const DatabaseSettings = ({
   const currentEngineOptions = engineOptions[dbConfig.type] ?? [];
 
   return (
-    <WithSettings name={id} nodeSettingsRef={nodeSettingsRef}>
+    <WithSettings id={id} name={id} nodeSettingsRef={nodeSettingsRef}>
       <div className="flex w-full flex-col gap-4">
         <Tabs defaultValue="config" className="w-full">
           <TabsList className="grid w-full grid-cols-2">

@@ -5,21 +5,26 @@ import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
 import { Muted, Small } from "../ui/typography";
 import { WithSettings } from "./Wrappers/WithSettings";
+import { useUpdateNodeInternals } from "reactflow";
 
 export function CustomComponent({
   name,
   nodeId,
   Icon,
   nodeSettingsRef,
-  subtitle,
 }: ComponentNodeProps) {
   const { useSystemComponentConfigSlice } = useSystemDesigner();
-
   // Use the provided hook for config slices instead of custom implementation
   const [displayName, setDisplayName] = useSystemComponentConfigSlice<string>(
-    nodeId ?? name,
+    nodeId!,
     "display name",
     "Custom Component",
+  );
+
+  const [subtitle, setSubtitle] = useSystemComponentConfigSlice<string>(
+    nodeId!,
+    "subtitle",
+    "",
   );
 
   const [freeFormText, setFreeFormText] = useSystemComponentConfigSlice<string>(
@@ -39,6 +44,7 @@ export function CustomComponent({
       </div>
       {/* Settings dialog */}
       <WithSettings
+        id={nodeId ?? name}
         name={displayName || "Custom Component"}
         nodeSettingsRef={nodeSettingsRef}
       >
@@ -51,6 +57,7 @@ export function CustomComponent({
               >
                 Display Name
               </Label>
+
               <Input
                 id="display-name"
                 value={displayName}
@@ -59,7 +66,18 @@ export function CustomComponent({
                 className="w-full text-black placeholder:text-gray-500 dark:text-white dark:placeholder:text-gray-400"
               />
             </div>
-
+            <div className="w-full space-y-2">
+              <Label htmlFor="subtitle" className="text-black dark:text-white">
+                Subtitle
+              </Label>
+              <Input
+                id="subtitle"
+                value={subtitle}
+                onChange={(e) => setSubtitle(e.target.value)}
+                placeholder="Enter component subtitle"
+                className="w-full text-black placeholder:text-gray-500 dark:text-white dark:placeholder:text-gray-400"
+              />
+            </div>
             <div className="flex h-full w-full flex-grow flex-col space-y-2">
               <Label
                 htmlFor="free-form-text"

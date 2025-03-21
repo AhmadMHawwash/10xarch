@@ -14,10 +14,12 @@ import React, { useCallback, useImperativeHandle, useState } from "react";
 import { Separator } from "../../ui/separator";
 
 export const WithSettings = ({
+  id,
   name,
   children,
   nodeSettingsRef,
 }: {
+  id: string;
   name: string;
   children?: React.ReactNode;
   nodeSettingsRef: NodeSettingsRefObject;
@@ -26,7 +28,7 @@ export const WithSettings = ({
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { useSystemComponentConfigSlice } = useSystemDesigner();
   const [subtitle, setSubtitle] = useSystemComponentConfigSlice<string>(
-    name ?? "",
+    id ?? "",
     "subtitle",
     "",
   );
@@ -65,15 +67,18 @@ export const WithSettings = ({
         <DialogHeader>
           <DialogTitle>Configuring {name}</DialogTitle>
           <DialogDescription>
-            <Input
-              placeholder="Component subtitle"
-              className="mb-4 mt-2 dark:text-gray-100 text-gray-900"
-              value={subtitle}
-              onChange={(e) => {
-                if (!name) return;
-                setSubtitle(e.target.value);
-              }}
-            />
+            {/* Only show subtitle input for non-custom components. Because custom components have their own subtitle input. */}
+            {!id?.includes("Custom Component") && (
+              <Input
+                placeholder="Component subtitle"
+                className="mb-4 mt-2 text-gray-900 dark:text-gray-100"
+                value={subtitle}
+                onChange={(e) => {
+                  if (!name) return;
+                  setSubtitle(e.target.value);
+                }}
+              />
+            )}
             <Separator className="mb-4 mt-2" />
             <div className="flex items-center">{children}</div>
           </DialogDescription>

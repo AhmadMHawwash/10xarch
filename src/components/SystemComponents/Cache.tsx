@@ -279,12 +279,6 @@ const CacheSettings = ({
     "lru",
   );
 
-  const [features, setFeatures] = useSystemComponentConfigSlice<string[]>(
-    id,
-    "features",
-    [],
-  );
-
   const [details, setDetails] = useSystemComponentConfigSlice<string>(
     id,
     "details",
@@ -311,58 +305,9 @@ const CacheSettings = ({
     "",
   );
 
-  const getAvailableFeatures = (type: string): string[] => {
-    const commonFeatures = [
-      "Data Eviction",
-      "Data Compression",
-      "Data Encryption",
-      "Data Monitoring",
-      "TTL Support",
-      "Cache Invalidation",
-    ];
-
-    switch (type) {
-      case "in-memory":
-        return [
-          ...commonFeatures,
-          "Write-Through",
-          "Write-Behind",
-          "Cache Preloading",
-          "Data Persistence",
-        ];
-      case "distributed":
-        return [
-          ...commonFeatures,
-          "Data Replication",
-          "Data Partitioning",
-          "Data Migration",
-          "Write-Through",
-        ];
-      case "cdn":
-        return [
-          ...commonFeatures,
-          "Data Replication",
-          "Data Partitioning",
-          "Cache Preloading",
-          "Write-Behind",
-        ];
-      case "browser":
-        return [
-          ...commonFeatures,
-          "Data Persistence",
-          "Cache Preloading",
-          "Write-Through",
-          "Write-Behind",
-        ];
-      default:
-        return commonFeatures;
-    }
-  };
-
-  const availableFeatures = getAvailableFeatures(cacheType);
 
   return (
-    <WithSettings name={id} nodeSettingsRef={nodeSettingsRef}>
+    <WithSettings id={id} name={id} nodeSettingsRef={nodeSettingsRef}>
       <div className="flex w-full flex-col gap-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">

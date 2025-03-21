@@ -141,7 +141,7 @@ const LoadBalancerSettings = ({
   );
 
   return (
-    <WithSettings name={id} nodeSettingsRef={nodeSettingsRef}>
+    <WithSettings id={id} name={id} nodeSettingsRef={nodeSettingsRef}>
       <div className="flex flex-col gap-4 w-full">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">

@@ -1,28 +1,10 @@
 import { useSystemDesigner } from "@/lib/hooks/_useSystemDesigner";
-import { type ComponentNodeProps } from "../ReactflowCustomNodes/SystemComponentNode";
-import { Label } from "../ui/label";
-import { Textarea } from "../ui/textarea";
-import { Small, Muted } from "../ui/typography";
-import { WithSettings } from "./Wrappers/WithSettings";
-import { useState } from "react";
-import { Input } from "../ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
-import { HelpCircle, ExternalLink } from "lucide-react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "../ui/tooltip";
 import { cn } from "@/lib/utils";
+import { type NodeSettingsRefObject } from "@/types/system";
+import { ExternalLink, HelpCircle } from "lucide-react";
+import { useState } from "react";
+import { type ComponentNodeProps } from "../ReactflowCustomNodes/SystemComponentNode";
 import { Checkbox } from "../ui/checkbox";
-import { Switch } from "../ui/switch";
 import {
   Dialog,
   DialogContent,
@@ -31,95 +13,25 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
-import React from "react";
-import { type NodeSettingsRefObject } from "@/types/system";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+import { Switch } from "../ui/switch";
+import { Textarea } from "../ui/textarea";
+import { Muted, Small } from "../ui/typography";
+import { WithSettings } from "./Wrappers/WithSettings";
 
 interface FeatureInfo {
   name: string;
   description: string;
   learnMoreUrl?: string;
 }
-
-const featureInfoMap: Record<string, FeatureInfo> = {
-  "Data Eviction": {
-    name: "Data Eviction",
-    description:
-      "Automatically remove least used data when cache is full using configurable policies.",
-    learnMoreUrl: "https://docs.example.com/cache/eviction",
-  },
-  "Data Persistence": {
-    name: "Data Persistence",
-    description:
-      "Save cache data to disk to prevent data loss on restart and enable recovery.",
-    learnMoreUrl: "https://docs.example.com/cache/persistence",
-  },
-  "Data Encryption": {
-    name: "Data Encryption",
-    description:
-      "Encrypt cached data at rest and in transit for enhanced security.",
-    learnMoreUrl: "https://docs.example.com/cache/encryption",
-  },
-  "Data Compression": {
-    name: "Data Compression",
-    description:
-      "Compress cached data to optimize memory usage and improve performance.",
-    learnMoreUrl: "https://docs.example.com/cache/compression",
-  },
-  "Data Replication": {
-    name: "Data Replication",
-    description:
-      "Replicate data across multiple nodes for high availability and fault tolerance.",
-    learnMoreUrl: "https://docs.example.com/cache/replication",
-  },
-  "Data Partitioning": {
-    name: "Data Partitioning",
-    description:
-      "Distribute data across multiple nodes for better scalability and performance.",
-    learnMoreUrl: "https://docs.example.com/cache/partitioning",
-  },
-  "Data Migration": {
-    name: "Data Migration",
-    description:
-      "Move data between nodes during scaling operations or maintenance.",
-    learnMoreUrl: "https://docs.example.com/cache/migration",
-  },
-  "Data Monitoring": {
-    name: "Data Monitoring",
-    description:
-      "Monitor cache usage, hit rates, and performance metrics in real-time.",
-    learnMoreUrl: "https://docs.example.com/cache/monitoring",
-  },
-  "TTL Support": {
-    name: "TTL Support",
-    description:
-      "Set expiration times for cached items to automatically manage data lifecycle.",
-    learnMoreUrl: "https://docs.example.com/cache/ttl",
-  },
-  "Cache Invalidation": {
-    name: "Cache Invalidation",
-    description:
-      "Manually or automatically invalidate cached items based on specific events or patterns.",
-    learnMoreUrl: "https://docs.example.com/cache/invalidation",
-  },
-  "Cache Preloading": {
-    name: "Cache Preloading",
-    description:
-      "Proactively load frequently accessed data into cache to improve hit rates.",
-    learnMoreUrl: "https://docs.example.com/cache/preloading",
-  },
-  "Write-Through": {
-    name: "Write-Through",
-    description:
-      "Simultaneously update both cache and backing store to ensure consistency.",
-    learnMoreUrl: "https://docs.example.com/cache/write-through",
-  },
-  "Write-Behind": {
-    name: "Write-Behind",
-    description:
-      "Asynchronously update backing store after cache update for better performance.",
-    learnMoreUrl: "https://docs.example.com/cache/write-behind",
-  },
-};
 
 const configInfoMap: Record<string, FeatureInfo> = {
   "Free-form Text Mode": {

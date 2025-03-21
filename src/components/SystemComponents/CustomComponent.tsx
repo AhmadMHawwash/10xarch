@@ -5,7 +5,6 @@ import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
 import { Muted, Small } from "../ui/typography";
 import { WithSettings } from "./Wrappers/WithSettings";
-import { useUpdateNodeInternals } from "reactflow";
 
 export function CustomComponent({
   name,

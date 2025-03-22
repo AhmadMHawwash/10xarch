@@ -24,6 +24,9 @@ export const cspDirectives = {
     "https://va.vercel-scripts.com"
   ],
   
+  // Worker sources - allow blob URLs for web workers
+  'worker-src': ["'self'", "blob:"],
+  
   // Style sources - same origin and inline styles
   'style-src': ["'self'", "'unsafe-inline'"],
   
@@ -50,7 +53,8 @@ export const cspDirectives = {
     "https://*.stripe.com", 
     "https://*.10xarch.com", 
     "https://*.vercel-insights.com", 
-    "wss://ws.pusherapp.com"
+    "wss://ws.pusherapp.com",
+    "https://clerk-telemetry.com"
   ],
   
   // Frame sources - same origin and trusted providers

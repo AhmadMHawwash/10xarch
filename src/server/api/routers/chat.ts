@@ -1,6 +1,6 @@
 import challenges from "@/content/challenges";
 import { CHAT_SYSTEM_PROMPT, openai } from '@/lib/openai';
-import { authenticatedChatMessagesLimiter, chatMessagesLimiter, enforceRateLimit, getRateLimitIdentifier } from '@/lib/rate-limit';
+import { authenticatedFreeChatMessagesLimiter, chatMessagesLimiter, enforceRateLimit, getRateLimitIdentifier } from '@/lib/rate-limit';
 import { calculateGPTCost, calculateTextTokens, costToCredits } from "@/lib/tokens";
 import { chatMessageSchema, checkAndLogPromptInjection, containsSensitiveContent, sanitizeInput } from "@/lib/validations/chat";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
@@ -15,12 +15,18 @@ export const chatRouter = createTRPCRouter({
     .input(z.object({ challengeId: z.string() }))
     .query(async ({ input, ctx }) => {
       const { userId } = await auth();
-      const identifier = ctx.headers.get("x-forwarded-for") ?? "127.0.0.1"
-      const { remaining, reset } = await chatMessagesLimiter.getRemaining(
+      const ipAddress = ctx.headers.get("x-forwarded-for") ?? "127.0.0.1";
+      
+      // Create identifier using the shared utility function
+      const identifier = getRateLimitIdentifier(ipAddress, userId);
+      
+      // Get remaining free prompts (for both authenticated and unauthenticated users)
+      const limiter = userId ? authenticatedFreeChatMessagesLimiter : chatMessagesLimiter;
+      const { remaining, reset } = await limiter.getRemaining(
         `${identifier}:${input.challengeId}`
-      )
-
-      // If user is signed in, check their credits
+      );
+      
+      // If user is signed in, also check their credits
       let creditsBalance = 0;
       if (userId) {
         const userCredits = await ctx.db.query.credits.findFirst({
@@ -32,7 +38,7 @@ export const chatRouter = createTRPCRouter({
       return {
         remaining,
         reset,
-        limit: 10,
+        limit: 3,
         credits: creditsBalance,
       }
     }),
@@ -120,37 +126,8 @@ ${solution.nonFunctionalRequirements ? `- Non-Functional Requirements: ${solutio
 Keep these requirements in mind when providing assistance. Guide the user without giving direct solutions.
 `
 
-      // Create identifier for rate limiting
+      // Create identifier using the shared utility function
       const identifier = getRateLimitIdentifier(ipAddress, userId);
-      
-      let rateLimit = { success: true, remaining: 0, reset: 0 };
-      
-      try {
-        // Select appropriate rate limiter based on authentication status
-        const limiter = userId ? authenticatedChatMessagesLimiter : chatMessagesLimiter;
-        
-        // Apply rate limit with enhanced error handling
-        rateLimit = await enforceRateLimit({
-          limiter,
-          identifier: `${identifier}:${challengeId}`,
-          userId: userId,
-          ipAddress,
-          endpoint: '/api/trpc/chat.sendMessage',
-          errorMessage: 'Rate limit exceeded for chat messages',
-          limitType: 'chat_messages',
-          metadata: {
-            challengeId
-          }
-        });
-      } catch (error) {
-        // If user is authenticated, try using credits instead of stopping
-        if (userId) {
-          // We'll continue and handle with credits below
-        } else {
-          // For anonymous users, simply throw the rate limit error
-          throw error;
-        }
-      }
       
       // Pre-validate all history messages to prevent prompt injection
       const sanitizedHistory = history.map(msg => {
@@ -186,35 +163,52 @@ Keep these requirements in mind when providing assistance. Guide the user withou
         return acc + calculateTextTokens(msg.content)
       }, 0);
       
-      // If rate limit exceeded and user is signed in, try to use credits
-      if (!rateLimit.success && userId) {
-        const userCredits = await ctx.db.query.credits.findFirst({
-          where: eq(credits.userId, userId),
+      // Initialize rate limit info
+      let rateLimit = { success: true, remaining: 0, reset: 0 };
+      let useCredits = false;
+      
+      try {
+        // Check rate limits for both authenticated and unauthenticated users
+        const limiter = userId ? authenticatedFreeChatMessagesLimiter : chatMessagesLimiter;
+        rateLimit = await enforceRateLimit({
+          limiter,
+          identifier: `${identifier}:${challengeId}`,
+          userId: userId,
+          ipAddress,
+          endpoint: '/api/trpc/chat.sendMessage',
+          errorMessage: 'Rate limit exceeded for chat messages',
+          limitType: 'chat_messages',
+          metadata: {
+            challengeId
+          }
         });
-
-        // Calculate credit cost based on tokens and model
-        const tokenCost = calculateGPTCost(inputTokens, 400, 'gpt-4o-mini'); // 400 tokens is our max for chat completion
-        const requiredCredits = costToCredits(tokenCost);
-
-        if (!userCredits || userCredits.balance < requiredCredits) {
-          // No credits available, throw rate limit error
-          const secondsUntilReset = Math.ceil((rateLimit.reset - Date.now()) / 1000);
-          throw new TRPCError({
-            code: "TOO_MANY_REQUESTS",
-            message: `Rate limit exceeded. Try again in ${secondsUntilReset} seconds, or purchase credits.`,
+      } catch (error) {
+        // If authenticated user has hit their free limit, try to use credits
+        if (userId) {
+          useCredits = true;
+          
+          // Check if user has sufficient credits
+          const userCredits = await ctx.db.query.credits.findFirst({
+            where: eq(credits.userId, userId),
           });
+          
+          // Calculate estimated cost
+          const estimatedCost = calculateGPTCost(inputTokens, 400, 'gpt-4o-mini');
+          const requiredCredits = costToCredits(estimatedCost);
+          
+          if (!userCredits || userCredits.balance < requiredCredits) {
+            throw new TRPCError({
+              code: "FORBIDDEN",
+              message: `You've used all your free messages and don't have enough credits. You need at least ${requiredCredits} credits. Current balance: ${userCredits?.balance ?? 0}`,
+            });
+          }
+        } else {
+          // Unauthenticated users can't bypass rate limits with credits
+          throw error;
         }
-
-        // NOTE: We will deduct credits AFTER successful API call
-      } else if (!rateLimit.success) {
-        const secondsUntilReset = Math.ceil((rateLimit.reset - Date.now()) / 1000);
-        throw new TRPCError({
-          code: "TOO_MANY_REQUESTS",
-          message: `Rate limit exceeded. Try again in ${secondsUntilReset} seconds.`,
-        });
       }
       
-      // Using free prompts or credits
+      // Using free prompts or credits based on rate limit
       const completion = await openai.chat.completions.create({
         model: 'gpt-4o-mini',
         messages: messageArray,
@@ -229,8 +223,8 @@ Keep these requirements in mind when providing assistance. Guide the user withou
       const totalCost = calculateGPTCost(inputTokens, outputTokens, 'gpt-4o-mini');
       const actualCredits = costToCredits(totalCost);
 
-      // Now deduct credits if we're using them (after successful API call)
-      if (!rateLimit.success && userId) {
+      // Deduct credits only if we're using them (rate limit was exceeded)
+      if (useCredits && userId) {
         const userCredits = await ctx.db.query.credits.findFirst({
           where: eq(credits.userId, userId),
         });

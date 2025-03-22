@@ -43,9 +43,9 @@ export const chatMessagesLimiter = new Ratelimit({
 });
 
 // Create a new ratelimiter for authenticated chat messages
-export const authenticatedChatMessagesLimiter = new Ratelimit({
+export const authenticatedFreeChatMessagesLimiter = new Ratelimit({
   redis,
-  limiter: Ratelimit.slidingWindow(100, ONE_HOUR),
+  limiter: Ratelimit.slidingWindow(3, ONE_HOUR),
   analytics: true,
   prefix: '@upstash/ratelimit/auth-chat-messages',
 });

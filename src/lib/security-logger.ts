@@ -10,7 +10,8 @@ type SecurityEventType =
   | 'rate-limit-exceeded'
   | 'unauthorized-access'
   | 'input-validation-failure'
-  | 'suspicious-activity';
+  | 'suspicious-activity'
+  | 'insufficient-credits';
 
 interface SecurityLogEvent {
   eventType: SecurityEventType;

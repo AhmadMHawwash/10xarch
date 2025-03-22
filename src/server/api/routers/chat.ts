@@ -1,20 +1,14 @@
-import { z } from 'zod'
-import { createTRPCRouter, publicProcedure } from '@/server/api/trpc'
-import { openai, CHAT_SYSTEM_PROMPT } from '@/lib/openai'
-import { TRPCError } from '@trpc/server'
-import { chatMessagesLimiter } from '@/lib/rate-limit'
-import { auth } from '@clerk/nextjs/server'
-import { eq } from 'drizzle-orm'
-import { credits } from '@/server/db/schema'
-import { calculateTextTokens, costToCredits, calculateGPTCost } from '@/lib/tokens'
-import challenges from "@/content/challenges"
-import { 
-  chatMessageSchema, 
-  containsSensitiveContent, 
-  sanitizeInput,
-  checkAndLogPromptInjection 
-} from '@/lib/validations/chat'
-import { logSecurityEvent } from '@/lib/security-logger'
+import challenges from "@/content/challenges";
+import { CHAT_SYSTEM_PROMPT, openai } from '@/lib/openai';
+import { authenticatedChatMessagesLimiter, chatMessagesLimiter, enforceRateLimit, getRateLimitIdentifier } from '@/lib/rate-limit';
+import { calculateGPTCost, calculateTextTokens, costToCredits } from "@/lib/tokens";
+import { chatMessageSchema, checkAndLogPromptInjection, containsSensitiveContent, sanitizeInput } from "@/lib/validations/chat";
+import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
+import { credits } from "@/server/db/schema";
+import { auth } from "@clerk/nextjs/server";
+import { TRPCError } from "@trpc/server";
+import { eq } from "drizzle-orm";
+import { z } from "zod";
 
 export const chatRouter = createTRPCRouter({
   getRemainingPrompts: publicProcedure
@@ -45,62 +39,71 @@ export const chatRouter = createTRPCRouter({
 
   sendMessage: publicProcedure
     .input(chatMessageSchema)
-    .mutation(async ({ input, ctx }) => {
-      const { message: rawMessage, challengeId, stageIndex, history, solution } = input
+    .mutation(async ({ ctx, input }) => {
+      const { message: rawMessage, challengeId, stageIndex, history, solution } = input;
+      
+      // Get user identity for tracking and rate limits
       const { userId } = await auth();
       
-      // Get IP address for security logging and convert to string | null
-      const ipAddress = ctx.headers.get("x-forwarded-for");
-      const clientIp = ipAddress ? ipAddress : "127.0.0.1"; // Use fallback only for rate limiting
+      // Get IP address for security logging and rate limiting
+      const ipAddress = ctx.headers.get("x-forwarded-for") ?? null;
       
-      // Apply sanitization to user message
-      const message = sanitizeInput(rawMessage);
+      // Sanitize user message to prevent XSS and other attacks  
+      const sanitizedMessage = sanitizeInput(rawMessage);
       
-      // Check for potential prompt injection attempt (and log it)
-      if (checkAndLogPromptInjection(message, userId ?? undefined, ipAddress, '/api/trpc/chat.sendMessage')) {
+      // Check for prompt injection attempts and throw error if detected
+      const hasPromptInjection = checkAndLogPromptInjection(
+        sanitizedMessage, 
+        userId as string | undefined, 
+        ipAddress,
+        '/api/trpc/chat.sendMessage'
+      );
+      
+      if (hasPromptInjection) {
         throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'Your message contains patterns that violate our usage policies.',
+          code: "BAD_REQUEST",
+          message: "Your message contains disallowed patterns",
         });
       }
       
       // Check for potentially harmful content
-      if (containsSensitiveContent(message)) {
+      if (containsSensitiveContent(sanitizedMessage)) {
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'Your message contains content that violates our usage policies.',
         });
       }
 
-      // Get challenge context
+      // Validate challenge and stage index
       const challenge = challenges.find((c) => c.slug === challengeId);
       if (!challenge) {
         throw new TRPCError({
-          code: 'NOT_FOUND',
-          message: 'Challenge not found',
-        })
+          code: "BAD_REQUEST", 
+          message: "Invalid challenge ID"
+        });
       }
-
-      // Get current stage
-      const currentStage = challenge.stages[stageIndex]
-      if (!currentStage) {
+      
+      if (stageIndex < 0 || stageIndex >= challenge.stages.length) {
         throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'Invalid stage index',
-        })
+          code: "BAD_REQUEST",
+          message: "Invalid stage index",
+        });
       }
-
+      
+      const currentStage = challenge.stages[stageIndex];
+      
+      // Get stage info (simple approach)
+      const stageName = `Stage ${stageIndex + 1}`;
+        
+      // Prepare challenge context for the assistant
       const challengeContext = `
-You are helping with the "${challenge.title}" challenge (${challenge.difficulty} difficulty).
+You are assisting with the "${challenge.title}" challenge, currently at stage ${stageIndex + 1}: "${stageName}".
 
-Current stage (${stageIndex + 1}/${challenge.stages.length}):
-${currentStage.problem}
-
-Requirements:
-${currentStage.requirements.map(req => `- ${req}`).join('\n')}
+Requirements for this stage:
+${currentStage?.requirements?.map(req => `- ${req}`).join('\n') ?? 'No requirements specified'}
 
 Meta Requirements:
-${currentStage.metaRequirements.map(req => `- ${req}`).join('\n')}
+${currentStage?.metaRequirements?.map(req => `- ${req}`).join('\n') ?? 'No meta requirements specified'}
 
 ${solution ? `
 Current Solution State:
@@ -117,24 +120,36 @@ ${solution.nonFunctionalRequirements ? `- Non-Functional Requirements: ${solutio
 Keep these requirements in mind when providing assistance. Guide the user without giving direct solutions.
 `
 
-      // Check rate limit for free prompts
-      const { success, reset, remaining } = await chatMessagesLimiter.limit(
-        `${clientIp}:${challengeId}`
-      )
+      // Create identifier for rate limiting
+      const identifier = getRateLimitIdentifier(ipAddress, userId);
       
-      // Log rate limit events
-      if (!success) {
-        logSecurityEvent({
-          eventType: 'rate-limit-exceeded',
-          message: 'Rate limit exceeded for chat messages',
-          userId: userId ?? undefined,
-          ipAddress: ipAddress ?? undefined,
+      let rateLimit = { success: true, remaining: 0, reset: 0 };
+      
+      try {
+        // Select appropriate rate limiter based on authentication status
+        const limiter = userId ? authenticatedChatMessagesLimiter : chatMessagesLimiter;
+        
+        // Apply rate limit with enhanced error handling
+        rateLimit = await enforceRateLimit({
+          limiter,
+          identifier: `${identifier}:${challengeId}`,
+          userId: userId,
+          ipAddress,
           endpoint: '/api/trpc/chat.sendMessage',
+          errorMessage: 'Rate limit exceeded for chat messages',
+          limitType: 'chat_messages',
           metadata: {
-            limitType: 'chat_messages',
             challengeId
           }
         });
+      } catch (error) {
+        // If user is authenticated, try using credits instead of stopping
+        if (userId) {
+          // We'll continue and handle with credits below
+        } else {
+          // For anonymous users, simply throw the rate limit error
+          throw error;
+        }
       }
       
       // Pre-validate all history messages to prevent prompt injection
@@ -145,7 +160,7 @@ Keep these requirements in mind when providing assistance. Guide the user withou
           // Check history messages for prompt injection
           checkAndLogPromptInjection(
             sanitizedContent, 
-            userId ?? undefined, 
+            userId as string | undefined, 
             ipAddress, 
             '/api/trpc/chat.sendMessage/history'
           );
@@ -158,97 +173,75 @@ Keep these requirements in mind when providing assistance. Guide the user withou
         return msg;
       });
       
-      // Prepare messages for OpenAI with challenge context
-      const messages = [
+      // Prepare messages array for token calculation and API call
+      const messageArray = [
         { role: 'system' as const, content: CHAT_SYSTEM_PROMPT },
         { role: 'system' as const, content: challengeContext },
         ...sanitizedHistory,
-        { role: 'user' as const, content: message },
-      ]
-
+        { role: 'user' as const, content: sanitizedMessage }
+      ];
+      
       // Calculate input tokens
-      const inputTokens = messages.reduce((acc, msg) => {
+      const inputTokens = messageArray.reduce((acc, msg) => {
         return acc + calculateTextTokens(msg.content)
-      }, 0)
-
+      }, 0);
+      
       // If rate limit exceeded and user is signed in, try to use credits
-      if (!success && userId) {
+      if (!rateLimit.success && userId) {
         const userCredits = await ctx.db.query.credits.findFirst({
           where: eq(credits.userId, userId),
         });
 
-        // Calculate maximum possible cost (assuming max output tokens)
-        const maxCost = costToCredits(calculateGPTCost(inputTokens, 100)); // 100 is max_tokens
+        // Calculate credit cost based on tokens and model
+        const tokenCost = calculateGPTCost(inputTokens, 400, 'gpt-4o-mini'); // 400 tokens is our max for chat completion
+        const requiredCredits = costToCredits(tokenCost);
 
-        if (!userCredits || userCredits.balance < maxCost) {
-          const secondsUntilReset = Math.ceil((reset - Date.now()) / 1000)
+        if (!userCredits || userCredits.balance < requiredCredits) {
+          // No credits available, throw rate limit error
+          const secondsUntilReset = Math.ceil((rateLimit.reset - Date.now()) / 1000);
           throw new TRPCError({
-            code: 'TOO_MANY_REQUESTS',
-            message: `You've used all your free prompts and don't have enough credits (need ${maxCost}). Free prompts reset in ${Math.ceil(secondsUntilReset / 60)} minutes.`
-          })
+            code: "TOO_MANY_REQUESTS",
+            message: `Rate limit exceeded. Try again in ${secondsUntilReset} seconds, or purchase credits.`,
+          });
         }
 
-        // Call OpenAI API
-        const completion = await openai.chat.completions.create({
-          model: 'gpt-4o-mini',
-          messages: messages.map(({ role, content }) => ({ role, content })),
-          temperature: 0.1,
-          max_tokens: 400,
-        })
-
-        const response = completion.choices[0]?.message?.content ?? 'No response generated.'
-        const outputTokens = calculateTextTokens(response)
-        const actualCost = costToCredits(calculateGPTCost(inputTokens, outputTokens));
-
-        // Check if response is system design related by looking for the disclaimer
-        const isSystemDesignRelated = !response.includes("Sorry, I can't help with that. I specialise in system design.");
-
-        // Use credits
-        const [updatedCredits] = await ctx.db
-          .update(credits)
-          .set({ 
-            balance: userCredits.balance - actualCost,
-            updatedAt: new Date()
-          })
-          .where(eq(credits.userId, userId))
-          .returning();
-
-        if (!updatedCredits) {
-          throw new TRPCError({
-            code: 'INTERNAL_SERVER_ERROR',
-            message: 'Failed to update credits',
-          })
-        }
-
-        return {
-          message: response,
-          isSystemDesignRelated,
-          remainingMessages: remaining,
-          credits: updatedCredits.balance,
-          tokensUsed: {
-            input: inputTokens,
-            output: outputTokens,
-            cost: actualCost
-          }
-        }
-      } else if (!success) {
-        const secondsUntilReset = Math.ceil((reset - Date.now()) / 1000)
+        // NOTE: We will deduct credits AFTER successful API call
+      } else if (!rateLimit.success) {
+        const secondsUntilReset = Math.ceil((rateLimit.reset - Date.now()) / 1000);
         throw new TRPCError({
-          code: 'TOO_MANY_REQUESTS',
-          message: `Rate limit exceeded. Please try again in ${Math.ceil(secondsUntilReset / 60)} minutes or sign in to use credits.`
-        })
+          code: "TOO_MANY_REQUESTS",
+          message: `Rate limit exceeded. Try again in ${secondsUntilReset} seconds.`,
+        });
       }
-
-      // Using free prompts
+      
+      // Using free prompts or credits
       const completion = await openai.chat.completions.create({
         model: 'gpt-4o-mini',
-        messages: messages.map(({ role, content }) => ({ role, content })),
+        messages: messageArray,
         temperature: 0.1,
         max_tokens: 400,
-      })
+      });
 
-      const response = completion.choices[0]?.message?.content ?? 'No response generated.'
-      const outputTokens = calculateTextTokens(response)
+      const response = completion.choices[0]?.message?.content ?? 'No response generated.';
+      const outputTokens = calculateTextTokens(response);
+
+      // Calculate the actual cost for this API call
+      const totalCost = calculateGPTCost(inputTokens, outputTokens, 'gpt-4o-mini');
+      const actualCredits = costToCredits(totalCost);
+
+      // Now deduct credits if we're using them (after successful API call)
+      if (!rateLimit.success && userId) {
+        const userCredits = await ctx.db.query.credits.findFirst({
+          where: eq(credits.userId, userId),
+        });
+        
+        if (userCredits) {
+          await ctx.db.update(credits).set({
+            balance: userCredits.balance - actualCredits,
+            updatedAt: new Date()
+          }).where(eq(credits.userId, userId));
+        }
+      }
 
       // Check if response is system design related by looking for the disclaimer
       const isSystemDesignRelated = !response.includes("Sorry, I can't help with that. I specialise in system design.");
@@ -265,13 +258,13 @@ Keep these requirements in mind when providing assistance. Guide the user withou
       return {
         message: response,
         isSystemDesignRelated,
-        remainingMessages: remaining,
+        remainingMessages: rateLimit.remaining,
         credits: creditsBalance,
         tokensUsed: {
           input: inputTokens,
           output: outputTokens,
-          cost: 0 // Free prompt
+          cost: totalCost // Use the calculated cost
         }
-      }
+      };
     })
-})
+});

@@ -46,10 +46,10 @@ export const challengesRouter = createTRPCRouter({
     };
   }),
 
-  submit: protectedProcedure
+  submit: publicProcedure
     .input(challengeSolutionSchema)
     .mutation(async ({ input, ctx }) => {
-      const { userId } = ctx.auth;
+      const { userId } = await auth();
 
       // Get the challenge
       const challenge = challenges.find((c) => c.slug === input.challengeSlug);

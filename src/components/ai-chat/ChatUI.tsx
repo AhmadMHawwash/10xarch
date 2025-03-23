@@ -43,7 +43,7 @@ interface WhiteboardConfigs {
 export function ChatUI({ challengeId, stageIndex = 0 }: ChatUIProps) {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [remainingMessages, setRemainingMessages] = useState(5);
+  const [remainingMessages, setRemainingMessages] = useState(3);
   const { balance: credits, refetch: refetchCredits } = useCredits();
   const { getMessages, addMessage, clearSession } = useChatMessages();
   const [mounted, setMounted] = useState(false);
@@ -88,6 +88,9 @@ export function ChatUI({ challengeId, stageIndex = 0 }: ChatUIProps) {
 
   const sendMessage = api.chat.sendMessage.useMutation({
     onSuccess: async (data) => {
+      // Immediately set isLoading to false when we get a response
+      setIsLoading(false);
+      
       const assistantMessage: Message = {
         role: "assistant",
         content: data.message,
@@ -113,15 +116,27 @@ export function ChatUI({ challengeId, stageIndex = 0 }: ChatUIProps) {
       setRemainingMessages(data.remainingMessages);
       // Refetch credits to update the navbar
       await refetchCredits();
-      setIsLoading(false);
     },
     onError: (error) => {
-      console.error("Chat error:", error);
+      // Immediately set isLoading to false when we get an error
       setIsLoading(false);
+      
+      console.error("Chat error:", error);
+      
+      // Create a user-friendly error message based on the error type
+      let errorContent = error.message;
+      
+      // Check for specific error messages like "stream closed"
+      if (error.message.toLowerCase().includes("stream closed") || 
+          error.message.toLowerCase().includes("network") ||
+          error.message.toLowerCase().includes("connection")) {
+        errorContent = "The connection to the AI service was interrupted. Please try again.";
+      }
+      
       // Display error message to user
       const errorMessage: Message = {
         role: "system",
-        content: error.message,
+        content: errorContent,
         isSystemDesignRelated: false
       };
       addMessage(chatSessionId, errorMessage);
@@ -129,7 +144,7 @@ export function ChatUI({ challengeId, stageIndex = 0 }: ChatUIProps) {
   });
 
   // Extract solution data
-  const extractSolutionData = () => {
+  const extractSolutionData = useCallback(() => {
     const whiteboardNode = nodes.find((node) => node.type === "Whiteboard");
     const configs = whiteboardNode?.data.configs as WhiteboardConfigs | undefined ?? {};
 
@@ -153,7 +168,7 @@ export function ChatUI({ challengeId, stageIndex = 0 }: ChatUIProps) {
       functionalRequirements: configs["functional requirements"] ?? "",
       nonFunctionalRequirements: configs["non-functional requirements"] ?? "",
     };
-  };
+  }, [nodes]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -197,26 +212,84 @@ export function ChatUI({ challengeId, stageIndex = 0 }: ChatUIProps) {
           {isUser ? (
             <div className="whitespace-pre-wrap">{message.content}</div>
           ) : (
-            <ReactMarkdown
-              className={cn(
-                "prose prose-sm max-w-none dark:prose-invert",
-                isSystem
-                  ? "prose-invert"
-                  : "prose-neutral",
-                "break-words [&_p:last-child]:mb-0",
-                "[&_pre]:bg-secondary/50 [&_pre]:p-2 [&_pre]:rounded",
-                "[&_code]:bg-secondary/50 [&_code]:px-1 [&_code]:py-0.5 [&_code]:rounded",
-                "[&_table]:border-collapse [&_td]:border [&_th]:border [&_td]:px-2 [&_th]:px-2",
-                "[&_blockquote]:border-l-4 [&_blockquote]:border-primary/20 [&_blockquote]:pl-4 [&_blockquote]:italic"
+            <>
+              <ReactMarkdown
+                className={cn(
+                  "prose prose-sm max-w-none dark:prose-invert",
+                  isSystem
+                    ? "prose-invert"
+                    : "prose-neutral",
+                  "break-words [&_p:last-child]:mb-0",
+                  "[&_pre]:bg-secondary/50 [&_pre]:p-2 [&_pre]:rounded",
+                  "[&_code]:bg-secondary/50 [&_code]:px-1 [&_code]:py-0.5 [&_code]:rounded",
+                  "[&_table]:border-collapse [&_td]:border [&_th]:border [&_td]:px-2 [&_th]:px-2",
+                  "[&_blockquote]:border-l-4 [&_blockquote]:border-primary/20 [&_blockquote]:pl-4 [&_blockquote]:italic"
+                )}
+              >
+                {message.content}
+              </ReactMarkdown>
+              
+              {/* Add retry button for system error messages */}
+              {isSystem && !isLoading && (
+                <div className="mt-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => handleRetry()}
+                    className="text-xs"
+                  >
+                    Retry
+                  </Button>
+                </div>
               )}
-            >
-              {message.content}
-            </ReactMarkdown>
+            </>
           )}
         </div>
       </div>
     );
-  }, []);
+  }, [isLoading]);
+
+  // Add the retry handler function
+  const handleRetry = useCallback(() => {
+    // Get the last user message
+    const userMessages = messages.filter(msg => msg.role === "user");
+    if (userMessages.length === 0 || isLoading) {
+      return;
+    }
+    
+    const lastUserMessage = userMessages[userMessages.length - 1];
+    // Additional safety check
+    if (!lastUserMessage?.content) {
+      return;
+    }
+    
+    // Remove the error message from the chat
+    const messagesWithoutLastError = [...messages];
+    // If the last message is a system message, remove it
+    const lastMessage = messagesWithoutLastError.length > 0 
+      ? messagesWithoutLastError[messagesWithoutLastError.length - 1] 
+      : undefined;
+      
+    if (lastMessage && lastMessage.role === "system") {
+      messagesWithoutLastError.pop();
+    }
+    
+    // Update session messages
+    clearSession(chatSessionId);
+    messagesWithoutLastError.forEach(msg => addMessage(chatSessionId, msg));
+    
+    // Set loading state
+    setIsLoading(true);
+    
+    // Retry the API call with the last user message
+    sendMessage.mutate({
+      message: lastUserMessage.content,
+      challengeId,
+      stageIndex: stageIndex ?? 0,
+      history: messagesWithoutLastError.filter((msg) => msg.isSystemDesignRelated),
+      solution: extractSolutionData(),
+    });
+  }, [messages, isLoading, clearSession, chatSessionId, addMessage, sendMessage, challengeId, stageIndex, extractSolutionData]);
 
   const MessageList = useMemo(() => {
     return (
@@ -234,8 +307,8 @@ export function ChatUI({ challengeId, stageIndex = 0 }: ChatUIProps) {
         ))}
         {isLoading && (
           <div className="flex justify-start">
-            <div className="max-w-[80%] rounded-lg bg-muted px-4 py-2">
-              Thinking...
+            <div className="max-w-[80%] rounded-lg bg-muted px-4 py-2 min-h-[40px]">
+              <span className="animate-pulse">Thinking...</span>
             </div>
           </div>
         )}

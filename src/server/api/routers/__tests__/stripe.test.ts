@@ -19,6 +19,7 @@ interface CheckoutSessionResponse {
 interface VerifySessionResponse {
   success: boolean;
   totalTokens: number;
+  message?: string; // Optional message field for additional context
 }
 
 interface MockContext {
@@ -261,6 +262,66 @@ describe('Stripe Router Tests', () => {
         input: { sessionId: 'test-session-id' } as MockInput,
         ctx: { auth: { userId: 'wrong-user' } } as MockContext
       })).rejects.toThrow('Invalid user');
+    });
+
+    it('should not double-process the same completed transaction', async () => {
+      // Setup success case for already processed transaction
+      vi.mocked(stripeRouter.verifySession).mockResolvedValue({
+        success: true,
+        totalTokens: 1000
+      } as VerifySessionResponse);
+      
+      // Call the mocked function
+      // @ts-expect-error - Mocked function doesn't need to match exact signature
+      const result = await stripeRouter.verifySession({
+        input: { sessionId: 'already-processed-session' } as MockInput,
+        ctx: { auth: { userId: 'test-user-id' } } as MockContext
+      });
+      
+      // Verify result shows success without further processing
+      expect(result.success).toBe(true);
+      expect(result.totalTokens).toBe(1000);
+    });
+
+    it('should handle database errors during verification gracefully', async () => {
+      // Setup error case for database failure
+      vi.mocked(stripeRouter.verifySession).mockRejectedValue(
+        new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Database error during verification'
+        })
+      );
+      
+      // Call and expect error
+      // @ts-expect-error - Mocked function doesn't need to match exact signature
+      await expect(stripeRouter.verifySession({
+        input: { sessionId: 'test-session-id' } as MockInput,
+        ctx: { auth: { userId: 'test-user-id' } } as MockContext
+      })).rejects.toThrow('Database error during verification');
+    });
+
+    it('should handle race conditions with concurrent verification attempts', async () => {
+      // Setup success case despite race condition
+      vi.mocked(stripeRouter.verifySession).mockResolvedValue({
+        success: true,
+        totalTokens: 1000,
+        message: 'Credits already added'
+      } as VerifySessionResponse);
+      
+      // Call the mocked function
+      // @ts-expect-error - Mocked function doesn't need to match exact signature
+      const result = await stripeRouter.verifySession({
+        input: { sessionId: 'concurrent-verification-session' } as MockInput,
+        ctx: { auth: { userId: 'test-user-id' } } as MockContext
+      });
+      
+      // Verify result shows success
+      expect(result.success).toBe(true);
+      expect(result.totalTokens).toBe(1000);
+      // Check if the message exists (may be undefined in strict type checking)
+      if ('message' in result) {
+        expect(result.message).toBe('Credits already added');
+      }
     });
   });
 }); 

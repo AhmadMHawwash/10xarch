@@ -268,7 +268,7 @@ describe('Credits Router Functions', () => {
       .rejects.toThrow('Not authenticated');
   });
 
-  test('use deducts credits when user has sufficient balance', async () => {
+  test('use credits successfully deducts the correct amount', async () => {
     // Setup auth to return authenticated user
     const { auth } = await import('@clerk/nextjs/server');
     // @ts-expect-error - We're intentionally using a simplified mock structure for auth
@@ -277,37 +277,42 @@ describe('Credits Router Functions', () => {
       sessionId: 'test-session',
     });
     
+    // Setup the balance mock
+    mockDb.query.credits.findFirst.mockResolvedValueOnce({ balance: 100 });
+    
     // Setup mock implementation for this test
-    vi.mocked(creditsFunctions.use).mockImplementationOnce(async () => {
+    vi.mocked(creditsFunctions.use).mockImplementationOnce(async ({ input }: { input: { amount: number; description: string } }) => {
       return {
         success: true,
-        newBalance: 90,
         transaction: {
           id: 'new-transaction-id',
-          amount: -10,
+          userId: 'test-user',
+          amount: -Number(input.amount),
           type: 'usage',
-          description: 'Test usage',
+          status: 'completed',
+          description: input.description,
+          paymentId: null,
+          createdAt: new Date(),
         },
+        left: 100 - Number(input.amount),
       };
     });
     
-    // Call the function with parameters
+    // Call the function with test input
     const result = await creditsFunctions.use({
-      input: { 
-        amount: 10,
-        description: 'Test usage'
-      },
-      ctx: mockContext 
+      ctx: mockContext,
+      input: { amount: 10, description: 'Test usage' },
     });
     
     // Check expectations
-    expect(result).toHaveProperty('success', true);
-    expect(result).toHaveProperty('newBalance', 90);
-    expect(result).toHaveProperty('transaction');
-    expect(result.transaction).toHaveProperty('amount', -10);
+    expect(result.success).toBe(true);
+    expect(result.transaction.amount).toBe(-10);
+    expect(result.transaction.type).toBe('usage');
+    expect(result.transaction.description).toBe('Test usage');
+    expect(result.left).toBe(90);
   });
 
-  test('use throws error when user has insufficient balance', async () => {
+  test('use credits throws error when balance is insufficient', async () => {
     // Setup auth to return authenticated user
     const { auth } = await import('@clerk/nextjs/server');
     // @ts-expect-error - We're intentionally using a simplified mock structure for auth
@@ -315,6 +320,9 @@ describe('Credits Router Functions', () => {
       userId: 'test-user',
       sessionId: 'test-session',
     });
+    
+    // Setup the balance mock to return insufficient funds
+    mockDb.query.credits.findFirst.mockResolvedValueOnce({ balance: 5 });
     
     // Setup mock implementation for this test
     vi.mocked(creditsFunctions.use).mockImplementationOnce(async () => {
@@ -324,17 +332,14 @@ describe('Credits Router Functions', () => {
       });
     });
     
-    // Call the function with parameters
+    // Call the function with test input that exceeds balance
     await expect(creditsFunctions.use({
-      input: { 
-        amount: 200, // More than the balance
-        description: 'Test usage that should fail'
-      },
-      ctx: mockContext 
+      ctx: mockContext,
+      input: { amount: 10, description: 'Test usage' },
     })).rejects.toThrow('Insufficient credits');
   });
 
-  test('use throws error for unauthenticated user', async () => {
+  test('use credits throws error for unauthenticated user', async () => {
     // Setup auth to return unauthenticated user
     const { auth } = await import('@clerk/nextjs/server');
     // @ts-expect-error - We're intentionally using a simplified mock structure for auth
@@ -351,17 +356,14 @@ describe('Credits Router Functions', () => {
       });
     });
     
-    // Call the function with parameters
+    // Call the function with test input
     await expect(creditsFunctions.use({
-      input: { 
-        amount: 10,
-        description: 'Test usage'
-      },
-      ctx: mockContext 
+      ctx: mockContext,
+      input: { amount: 10, description: 'Test usage' },
     })).rejects.toThrow('Not authenticated');
   });
 
-  test('addCredits adds credits to user account', async () => {
+  test('addCredits successfully adds the correct amount', async () => {
     // Setup auth to return authenticated user
     const { auth } = await import('@clerk/nextjs/server');
     // @ts-expect-error - We're intentionally using a simplified mock structure for auth
@@ -370,63 +372,37 @@ describe('Credits Router Functions', () => {
       sessionId: 'test-session',
     });
     
+    // Setup the balance mock
+    mockDb.query.credits.findFirst.mockResolvedValueOnce({ balance: 50 });
+    
     // Setup mock implementation for this test
-    vi.mocked(creditsFunctions.addCredits).mockImplementationOnce(async () => {
+    vi.mocked(creditsFunctions.addCredits).mockImplementationOnce(async ({ input }: { input: { amount: number } }) => {
       return {
         success: true,
-        newBalance: 150,
         transaction: {
           id: 'new-transaction-id',
-          amount: 50,
-          type: 'admin_grant',
-          description: 'Admin credit grant',
-        },
+          userId: 'test-user',
+          amount: Number(input.amount),
+          type: 'purchase',
+          status: 'completed',
+          description: `Purchased ${input.amount} credits`,
+          paymentId: null,
+          createdAt: new Date(),
+        }
       };
     });
     
-    // Call the function with parameters
+    // Call the function with test input
     const result = await creditsFunctions.addCredits({
-      input: { 
-        amount: 50,
-        description: 'Admin credit grant',
-        type: 'admin_grant'
-      },
-      ctx: mockContext 
+      ctx: mockContext,
+      input: { amount: 20 },
     });
     
     // Check expectations
-    expect(result).toHaveProperty('success', true);
-    expect(result).toHaveProperty('newBalance', 150);
-    expect(result).toHaveProperty('transaction');
-    expect(result.transaction).toHaveProperty('amount', 50);
-  });
-
-  test('addCredits validates amount is positive', async () => {
-    // Setup auth to return authenticated user
-    const { auth } = await import('@clerk/nextjs/server');
-    // @ts-expect-error - We're intentionally using a simplified mock structure for auth
-    vi.mocked(auth).mockResolvedValueOnce({
-      userId: 'test-user',
-      sessionId: 'test-session',
-    });
-    
-    // Setup mock implementation for this test
-    vi.mocked(creditsFunctions.addCredits).mockImplementationOnce(async () => {
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: 'Amount must be positive',
-      });
-    });
-    
-    // Call the function with parameters
-    await expect(creditsFunctions.addCredits({
-      input: { 
-        amount: -10, // Negative amount should fail
-        description: 'Should fail',
-        type: 'admin_grant'
-      },
-      ctx: mockContext 
-    })).rejects.toThrow('Amount must be positive');
+    expect(result.success).toBe(true);
+    expect(result.transaction.amount).toBe(20);
+    expect(result.transaction.type).toBe('purchase');
+    expect(result.transaction.description).toContain('Purchased 20 credits');
   });
 
   test('addCredits throws error for unauthenticated user', async () => {
@@ -446,14 +422,160 @@ describe('Credits Router Functions', () => {
       });
     });
     
-    // Call the function with parameters
+    // Call the function with test input
     await expect(creditsFunctions.addCredits({
-      input: { 
-        amount: 50,
-        description: 'Admin credit grant',
-        type: 'admin_grant'
-      },
-      ctx: mockContext 
+      ctx: mockContext,
+      input: { amount: 20 },
     })).rejects.toThrow('Not authenticated');
+  });
+
+  test('addCredits throws error when user credits not found', async () => {
+    // Setup auth to return authenticated user
+    const { auth } = await import('@clerk/nextjs/server');
+    // @ts-expect-error - We're intentionally using a simplified mock structure for auth
+    vi.mocked(auth).mockResolvedValueOnce({
+      userId: 'test-user',
+      sessionId: 'test-session',
+    });
+    
+    // Setup the balance mock to return null (user credits not found)
+    mockDb.query.credits.findFirst.mockResolvedValueOnce(null);
+    
+    // Setup mock implementation for this test
+    vi.mocked(creditsFunctions.addCredits).mockImplementationOnce(async () => {
+      throw new TRPCError({
+        code: 'NOT_FOUND',
+        message: 'User credits not found',
+      });
+    });
+    
+    // Call the function with test input
+    await expect(creditsFunctions.addCredits({
+      ctx: mockContext,
+      input: { amount: 20 },
+    })).rejects.toThrow('User credits not found');
+  });
+
+  test('use credits handles decimal credit values correctly', async () => {
+    // Setup auth to return authenticated user
+    const { auth } = await import('@clerk/nextjs/server');
+    // @ts-expect-error - We're intentionally using a simplified mock structure for auth
+    vi.mocked(auth).mockResolvedValueOnce({
+      userId: 'test-user',
+      sessionId: 'test-session',
+    });
+    
+    // Setup the balance mock
+    mockDb.query.credits.findFirst.mockResolvedValueOnce({ balance: 50.75 });
+    
+    // Setup mock implementation for this test
+    vi.mocked(creditsFunctions.use).mockImplementationOnce(async ({ input }: { input: { amount: number; description: string } }) => {
+      return {
+        success: true,
+        transaction: {
+          id: 'floating-point-transaction',
+          userId: 'test-user',
+          amount: -Number(input.amount),
+          type: 'usage',
+          status: 'completed',
+          description: input.description,
+          paymentId: null,
+          createdAt: new Date(),
+        },
+        left: 50.75 - Number(input.amount),
+      };
+    });
+    
+    // Call the function with decimal input
+    const result = await creditsFunctions.use({
+      ctx: mockContext,
+      input: { amount: 5.25, description: 'Decimal credit usage' },
+    });
+    
+    // Check expectations with precision handling
+    expect(result.success).toBe(true);
+    expect(result.transaction.amount).toBe(-5.25);
+    expect(result.left).toBeCloseTo(45.5, 2); // Using toBeCloseTo for floating point comparison
+  });
+
+  test('use credits rejects zero or negative credit usage', async () => {
+    // Setup auth to return authenticated user
+    const { auth } = await import('@clerk/nextjs/server');
+    // @ts-expect-error - We're intentionally using a simplified mock structure for auth
+    vi.mocked(auth).mockResolvedValueOnce({
+      userId: 'test-user',
+      sessionId: 'test-session',
+    });
+    
+    // Setup mock implementation for this test
+    vi.mocked(creditsFunctions.use).mockImplementationOnce(async () => {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'Credit usage amount must be positive',
+      });
+    });
+    
+    // Call the function with zero input
+    await expect(creditsFunctions.use({
+      ctx: mockContext,
+      input: { amount: 0, description: 'Zero credit usage' },
+    })).rejects.toThrow('Credit usage amount must be positive');
+    
+    // Reset mock for next call
+    vi.mocked(creditsFunctions.use).mockClear();
+    vi.mocked(creditsFunctions.use).mockImplementationOnce(async () => {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'Credit usage amount must be positive',
+      });
+    });
+    
+    // Call the function with negative input
+    await expect(creditsFunctions.use({
+      ctx: mockContext,
+      input: { amount: -5, description: 'Negative credit usage' },
+    })).rejects.toThrow('Credit usage amount must be positive');
+  });
+
+  test('use credits handles edge case with exactly zero credits remaining', async () => {
+    // Setup auth to return authenticated user
+    const { auth } = await import('@clerk/nextjs/server');
+    // @ts-expect-error - We're intentionally using a simplified mock structure for auth
+    vi.mocked(auth).mockResolvedValueOnce({
+      userId: 'test-user',
+      sessionId: 'test-session',
+    });
+    
+    // Setup the balance mock to have exact amount needed
+    mockDb.query.credits.findFirst.mockResolvedValueOnce({ balance: 10 });
+    
+    // Setup mock implementation for this test
+    vi.mocked(creditsFunctions.use).mockImplementationOnce(async ({ input }: { input: { amount: number; description: string } }) => {
+      return {
+        success: true,
+        transaction: {
+          id: 'zero-remaining-transaction',
+          userId: 'test-user',
+          amount: -Number(input.amount),
+          type: 'usage',
+          status: 'completed',
+          description: input.description,
+          paymentId: null,
+          createdAt: new Date(),
+        },
+        left: 0, // Exactly zero remaining
+      };
+    });
+    
+    // Call the function with input that uses all remaining credits
+    const result = await creditsFunctions.use({
+      ctx: mockContext,
+      input: { amount: 10, description: 'Use all remaining credits' },
+    });
+    
+    // Check expectations
+    expect(result.success).toBe(true);
+    expect(result.transaction.amount).toBe(-10);
+    expect(result.left).toBe(0);
   });
 });

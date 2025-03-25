@@ -1,30 +1,70 @@
-# Create T3 App
+# System Design Playground
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+A modern web application for learning and practicing system design concepts. Built with the T3 Stack.
 
-## What's next? How do I make an app with this?
+## Our Mission
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+This project is part of a charitable initiative. All profits generated from commercial use of this software will be donated to charitable causes. We believe in making technology education accessible while giving back to society.
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+## Features
 
-- [Next.js](https://nextjs.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
-- [Railway.app](https://railway.app)
+- Interactive system design learning environment
+- Modern tech stack with Next.js, Drizzle, and Tailwind CSS
+- Type-safe API with tRPC
+- Comprehensive testing setup with Vitest
 
-## Learn More
+## Tech Stack
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+- [Next.js](https://nextjs.org) - React framework
+- [Drizzle](https://orm.drizzle.team) - TypeScript ORM
+- [Tailwind CSS](https://tailwindcss.com) - Utility-first CSS framework
+- [tRPC](https://trpc.io) - End-to-end typesafe APIs
+- [Vitest](https://vitest.dev) - Unit testing framework
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+## Getting Started
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+1. Clone the repository:
 
-## How do I deploy this?
+```bash
+git clone https://github.com/yourusername/system-design-playground.git
+cd system-design-playground
+```
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+2. Install dependencies:
 
+```bash
+yarn
+```
+
+3. Set up your environment variables:
+
+```bash
+cp .env.example .env.local
+```
+
+Then edit `.env.local` with your configuration.
+
+4. Start the development server:
+
+```bash
+yarn dev
+```
+
+## Contributing
+
+We welcome contributions! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
+
+1. Fork the repo and create your feature branch (`git checkout -b feature/AmazingFeature`)
+2. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+3. Push to the branch (`git push origin feature/AmazingFeature`)
+4. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details. While the software is open source and can be used by anyone, any commercial use of this software by the original author will result in profits being donated to charitable causes.
+
+## Acknowledgments
+
+- [T3 Stack](https://create.t3.gg/) - The foundation of this project
+- All contributors who have helped shape this project
+- The open source community for their continued support

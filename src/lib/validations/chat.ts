@@ -20,8 +20,8 @@ export const chatMessageSchema = z.object({
         message: "Message contains disallowed patterns",
       }
     ),
-  challengeId: z.string().trim().min(1, "Challenge ID is required"),
-  stageIndex: z.number().int().min(0, "Stage index must be a non-negative integer"),
+  challengeId: z.string().trim().min(1, "Challenge ID is required").optional().or(z.literal('')),
+  stageIndex: z.number().int().min(0, "Stage index must be a non-negative integer").optional(),
   history: z.array(
     z.object({
       role: z.enum(["user", "assistant", "system"]),
@@ -30,6 +30,7 @@ export const chatMessageSchema = z.object({
   ),
   solution: z.object({
     components: z.array(z.any()),
+    edges: z.array(z.any()).optional(),
     apiDefinitions: z.array(z.any()).optional(),
     capacityEstimations: z.object({
       traffic: z.string().optional(),
@@ -40,6 +41,10 @@ export const chatMessageSchema = z.object({
     functionalRequirements: z.string().optional(),
     nonFunctionalRequirements: z.string().optional(),
   }).optional(),
+  // New fields for playground mode
+  isPlayground: z.boolean().optional(),
+  playgroundId: z.string().trim().optional(),
+  playgroundTitle: z.string().trim().optional(),
 });
 
 // Type for the validated chat message input

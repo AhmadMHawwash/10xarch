@@ -2,6 +2,7 @@
   "name": "system-design-playground",
   "version": "0.1.0",
   "private": true,
+  "license": "GPL-3.0",
   "type": "module",
   "scripts": {
     "build": "next build",

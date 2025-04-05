@@ -1,9 +1,20 @@
 "use client";
 
-import { WithMarkdownDetails } from "@/components/SystemComponents/Wrappers/WithMarkdownDetails";
-import { Resources } from "@/components/resources";
+import { PanelChat } from "@/components/ai-chat/PanelChat";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -12,42 +23,28 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import { H5, List, Muted, P } from "@/components/ui/typography";
 import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
 import {
   ArrowLeft,
   ArrowRight,
-  InfoIcon,
-  MessageSquareHeart,
   BookOpen,
-  Database,
-  Server,
-  Gauge,
-  FileJson,
-  LayoutPanelTop,
-  ExternalLink,
-  FileText,
-  Globe,
   CheckCircle,
-  Link2,
-  ChevronDown,
+  Database,
+  ExternalLink,
+  FileJson,
+  FileText,
+  Gauge,
+  Globe,
   HelpCircle,
+  InfoIcon,
+  LayoutPanelTop,
+  Link2,
+  MessageSquareHeart,
+  Server
 } from "lucide-react";
+import { useParams } from "next/navigation";
 import { type ReactNode } from "react";
-import { PanelChat } from "@/components/ai-chat/PanelChat";
-import { buttonVariants } from "@/components/ui/button";
 import { Onboarding } from "../Onboarding";
 
 // Custom collapsible component that can handle React elements
@@ -410,6 +407,7 @@ const EnhancedLearningResources: React.FC<EnhancedLearningResourcesProps> = ({
 export const LevelContent = () => {
   const { stage, toNextStage, toPreviousStage, challenge, currentStageIndex } =
     useChallengeManager();
+  const params = useParams<{ id: string }>();
 
   const oldRequirements = challenge.stages
     .slice(0, currentStageIndex)
@@ -586,7 +584,11 @@ export const LevelContent = () => {
       </div>
 
       <div className="fixed bottom-4 right-4 z-50 ai-chat-container">
-        <PanelChat />
+        <PanelChat 
+          isPlayground={true}
+          playgroundId={params.id}
+          playgroundTitle={challenge.title}
+        />
       </div>
     </div>
   );

@@ -1,3 +1,9 @@
+import {
+  authenticatedFreeChatMessagesLimiter,
+  enforceRateLimit,
+  getRateLimitIdentifier,
+  unauthenticatedPlaygroundLimiter,
+} from "@/lib/rate-limit";
 import { logSecurityEvent } from "@/lib/security-logger";
 import {
   calculateTextTokens,
@@ -12,8 +18,7 @@ import {
 import {
   createCallerFactory,
   createTRPCRouter,
-  protectedProcedure,
-  publicProcedure,
+  publicProcedure
 } from "@/server/api/trpc";
 import { auth } from "@clerk/nextjs/server";
 import { TRPCError } from "@trpc/server";
@@ -189,10 +194,10 @@ export const checkSolution = createTRPCRouter({
         });
       }
     }),
-  playground: protectedProcedure
+  playground: publicProcedure
     .input(playgroundSolutionSchema)
     .mutation(async ({ input, ctx }) => {
-      const { userId } = ctx.auth;
+      const { userId } = await auth();
       // Get IP address for security logging
       const ipAddress = ctx.headers.get("x-forwarded-for") ?? null;
 
@@ -213,40 +218,66 @@ export const checkSolution = createTRPCRouter({
           )
         : "";
 
-      // Calculate input tokens
-      const inputText = `systemDesignContext: ${sanitizedContext} \n systemDesign: ${sanitizedSystemDesign}`;
-      const inputTokens = calculateTextTokens(inputText);
-      const estimatedOutputTokens = 512; // max_tokens from the API call
-
-      // Calculate required credits
-      const inputCost =
-        (inputTokens / 1000) * GPT_TOKEN_COSTS["gpt-4o-mini"].input;
-      const outputCost =
-        (estimatedOutputTokens / 1000) * GPT_TOKEN_COSTS["gpt-4o-mini"].output;
-      const totalCredits = costToCredits(inputCost + outputCost);
-
+      // Apply rate limiting based on authentication status
+      // Stricter rate limiting for anonymous users
+      const identifier = getRateLimitIdentifier(ipAddress, userId);
+      const limiter = userId ? authenticatedFreeChatMessagesLimiter : unauthenticatedPlaygroundLimiter;
+      const rateLimitEndpoint = '/api/trpc/ai.playground';
+      const rateLimitType = userId ? 'authenticated_playground' : 'unauthenticated_playground';
+      
       try {
-        // Use credits via TRPC
-        const caller = createCreditsCaller(ctx);
-        await caller.use({
-          amount: totalCredits,
-          description: "AI Playground Feedback",
+        await enforceRateLimit({
+          limiter,
+          identifier,
+          userId: userId ?? null,
+          ipAddress: ipAddress ?? null,
+          endpoint: rateLimitEndpoint,
+          errorMessage: userId 
+            ? 'You have reached the evaluation limit. Try again later or upgrade your account for more evaluations'
+            : 'You have reached the free evaluation limit. Please sign in to get additional evaluations',
+          limitType: rateLimitType,
         });
-      } catch (creditError) {
-        // Log rate limit exceeded
-        logSecurityEvent({
-          eventType: "rate-limit-exceeded",
-          message: `Rate limit exceeded for credits`,
-          userId: userId ?? undefined,
-          ipAddress: ipAddress ?? undefined,
-          endpoint: "/api/playground",
-          metadata: {
-            limitType: "credits",
-            requiredCredits: totalCredits,
-            error: (creditError as Error).message,
-          },
-        });
-        throw creditError;
+      } catch (error) {
+        console.error("Rate limit exceeded:", error);
+        // Only proceed with credits if user is authenticated
+        if (!userId) throw error;
+        
+        // Rest of the rate limit exceeded handling for authenticated users
+        // Calculate required credits
+        const inputText = `systemDesignContext: ${sanitizedContext} \n systemDesign: ${sanitizedSystemDesign}`;
+        const inputTokens = calculateTextTokens(inputText);
+        const estimatedOutputTokens = 512; // max_tokens from the API call
+
+        // Calculate required credits
+        const inputCost =
+          (inputTokens / 1000) * GPT_TOKEN_COSTS["gpt-4o-mini"].input;
+        const outputCost =
+          (estimatedOutputTokens / 1000) * GPT_TOKEN_COSTS["gpt-4o-mini"].output;
+        const totalCredits = costToCredits(inputCost + outputCost);
+
+        try {
+          // Use credits via TRPC
+          const caller = createCreditsCaller(ctx);
+          await caller.use({
+            amount: totalCredits,
+            description: "AI Playground Feedback",
+          });
+        } catch (creditError) {
+          // Log rate limit exceeded
+          logSecurityEvent({
+            eventType: "rate-limit-exceeded",
+            message: `Rate limit exceeded for credits`,
+            userId: userId ?? undefined,
+            ipAddress: ipAddress ?? undefined,
+            endpoint: "/api/playground",
+            metadata: {
+              limitType: "credits",
+              requiredCredits: totalCredits,
+              error: (creditError as Error).message,
+            },
+          });
+          throw creditError;
+        }
       }
 
       try {
@@ -256,7 +287,12 @@ export const checkSolution = createTRPCRouter({
             {
               role: "system",
               content:
-                "You are a system design evaluation expert. You will receive: \n1. The systemDesignContext, which describes the system and business \n2. the systemDesign, which is the proposed solution. \nYour task is to evaluate the provided solution in the context of: \n1. systemDesignContext, \n2. The systemDesign. And then provide some feedback for the user to improve their solution.",
+                `You are a system design evaluation expert. You will receive: 
+                1. The systemDesignContext, which describes the system and business 
+                2. the systemDesign, which is the proposed solution. 
+                Your task is to evaluate the provided solution in the context of: 
+                1. systemDesignContext, 
+                2. The systemDesign. And then provide some feedback for the user to improve their solution.`,
             },
             {
               role: "assistant",
@@ -269,10 +305,10 @@ export const checkSolution = createTRPCRouter({
             },
             {
               role: "assistant",
-              content: `Respond concisely in JSON format {strengths: string, improvementAreas: string, recommendations: string}. 
+              content: `Respond concisely in JSON format {strengths: string, improvementAreas: string, recommendations: string}.
                   * Regarding improvementAreas: each improvement area, should be one specific improvement. So if you have multiple improvements, you should list them separately in markdown format.
                   * Regarding strengths, improvementAreas and recommendations should be in markdown format.
-                  * Rules: 1. If you don't follow the instructions, bad things will happen! 2. Give the feedback like this {score: number, strengths: string, improvementAreas: string, recommendations: string}. No further wrapping`,
+                  * Rules: 1. If you don't follow the instructions, bad things will happen! 2. Give the feedback like this {strengths: string, improvementAreas: string, recommendations: string}. No further wrapping`,
             },
             {
               role: "assistant",

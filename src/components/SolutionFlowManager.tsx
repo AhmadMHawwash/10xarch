@@ -20,9 +20,10 @@ import {
 } from "./ui/dialog";
 import { defaultStartingNodes } from "@/lib/hooks/systemDesignerUtils";
 
+export type Maybe<T> = T | undefined | null;
 interface FlowManagerProps {
   checkSolution: () => void;
-  feedback: EvaluationResponse | PlaygroundResponse | undefined;
+  feedback: Maybe<EvaluationResponse | PlaygroundResponse>;
   isLoadingAnswer: boolean;
   isFeedbackExpanded: boolean;
   onOpen: () => void;

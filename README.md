@@ -61,7 +61,7 @@ We welcome contributions! Please feel free to submit a Pull Request. For major c
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details. While the software is open source and can be used by anyone, any commercial use of this software by the original author will result in profits being donated to charitable causes.
+This project is licensed under the GNU General Public License v3.0 (GPL-3.0) - see the [LICENSE](LICENSE) file for details. This strong copyleft license ensures that all modifications and derivative works are also open source. While the software is free to use, any commercial use of this software by the original author will result in profits being donated to charitable causes.
 
 ## Acknowledgments
 

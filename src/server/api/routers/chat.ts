@@ -10,6 +10,26 @@ import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
+// Add these interfaces at the top of the file, after imports
+
+// Type definitions for components and connections
+interface Component {
+  id: string;
+  type?: string;
+  name?: string;
+  description?: string;
+  config?: unknown;
+  position?: unknown;
+}
+
+interface Edge {
+  id: string;
+  source: string;
+  target: string;
+  label?: string;
+  data?: unknown;
+}
+
 export const chatRouter = createTRPCRouter({
   getRemainingPrompts: publicProcedure
     .input(z.object({ challengeId: z.string() }))
@@ -46,7 +66,7 @@ export const chatRouter = createTRPCRouter({
   sendMessage: publicProcedure
     .input(chatMessageSchema)
     .mutation(async ({ ctx, input }) => {
-      const { message: rawMessage, challengeId, stageIndex, history, solution } = input;
+      const { message: rawMessage, challengeId, stageIndex, history, solution, isPlayground, playgroundId, playgroundTitle } = input;
       
       // Get user identity for tracking and rate limits
       const { userId } = await auth();
@@ -80,29 +100,77 @@ export const chatRouter = createTRPCRouter({
         });
       }
 
-      // Validate challenge and stage index
-      const challenge = challenges.find((c) => c.slug === challengeId);
-      if (!challenge) {
-        throw new TRPCError({
-          code: "BAD_REQUEST", 
-          message: "Invalid challenge ID"
-        });
-      }
+      // Determine context based on whether this is a playground or challenge chat
+      let contextMessage = '';
       
-      if (stageIndex < 0 || stageIndex >= challenge.stages.length) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Invalid stage index",
-        });
-      }
-      
-      const currentStage = challenge.stages[stageIndex];
-      
-      // Get stage info (simple approach)
-      const stageName = `Stage ${stageIndex + 1}`;
+      if (isPlayground) {
+        // Playground mode context
+        contextMessage = `
+You are assisting with a system design playground titled "${playgroundTitle ?? 'Untitled Design'}".
+
+${solution ? `
+Current Solution State:
+- Components: ${solution.components.length} components defined
+${solution.edges?.length ? `- Connections: ${solution.edges.length} connections between components` : ''}
+${solution.apiDefinitions?.length ? `- API Definitions: ${solution.apiDefinitions.length} endpoints defined` : ''}
+${solution.capacityEstimations?.traffic ? `- Traffic Estimation: ${solution.capacityEstimations.traffic}` : ''}
+${solution.capacityEstimations?.storage ? `- Storage Estimation: ${solution.capacityEstimations.storage}` : ''}
+${solution.capacityEstimations?.bandwidth ? `- Bandwidth Estimation: ${solution.capacityEstimations.bandwidth}` : ''}
+${solution.capacityEstimations?.memory ? `- Memory Estimation: ${solution.capacityEstimations.memory}` : ''}
+${solution.functionalRequirements ? `- Functional Requirements: ${solution.functionalRequirements}` : ''}
+${solution.nonFunctionalRequirements ? `- Non-Functional Requirements: ${solution.nonFunctionalRequirements}` : ''}
+
+${solution.components.length > 0 ? `
+Component Details:
+${solution.components.map((component: Component, index: number) => 
+  `Component ${index + 1}: ${component.name ?? component.type ?? 'Unnamed Component'}${
+    component.description ? `\n  Description: ${component.description}` : ''
+  }${
+    component.config ? `\n  Configuration: ${typeof component.config === 'string' ? component.config : JSON.stringify(component.config)}` : ''
+  }`
+).join('\n\n')}
+` : ''}
+
+${solution.edges && solution.edges.length > 0 ? `
+Connection Details:
+${solution.edges.map((edge: Edge, index: number) => 
+  `Connection ${index + 1}: ${edge.source} → ${edge.target}${
+    edge.label ? `\n  Label: ${edge.label}` : ''
+  }${
+    edge.data ? `\n  Data: ${typeof edge.data === 'string' ? edge.data : JSON.stringify(edge.data)}` : ''
+  }`
+).join('\n\n')}
+` : ''}
+` : ''}
+
+Provide guidance on system design best practices. Help the user think through their design decisions, 
+suggest alternatives where appropriate, and point out potential issues or improvements. Pay special 
+attention to how components are connected and the data flow between them.
+`;
+      } else {
+        // Challenge mode - requires valid challenge and stage
+        const challenge = challenges.find((c) => c.slug === challengeId);
+        if (!challenge) {
+          throw new TRPCError({
+            code: "BAD_REQUEST", 
+            message: "Invalid challenge ID"
+          });
+        }
         
-      // Prepare challenge context for the assistant
-      const challengeContext = `
+        if (stageIndex === undefined || stageIndex < 0 || stageIndex >= challenge.stages.length) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Invalid stage index",
+          });
+        }
+        
+        const currentStage = challenge.stages[stageIndex];
+        
+        // Get stage info (simple approach)
+        const stageName = `Stage ${stageIndex + 1}`;
+          
+        // Prepare challenge context for the assistant
+        contextMessage = `
 You are assisting with the "${challenge.title}" challenge, currently at stage ${stageIndex + 1}: "${stageName}".
 
 Requirements for this stage:
@@ -114,6 +182,7 @@ ${currentStage?.metaRequirements?.map(req => `- ${req}`).join('\n') ?? 'No meta 
 ${solution ? `
 Current Solution State:
 - Components: ${solution.components.length} components defined
+${solution.edges?.length ? `- Connections: ${solution.edges.length} connections between components` : ''}
 ${solution.apiDefinitions?.length ? `- API Definitions: ${solution.apiDefinitions.length} endpoints defined` : ''}
 ${solution.capacityEstimations?.traffic ? `- Traffic Estimation: ${solution.capacityEstimations.traffic}` : ''}
 ${solution.capacityEstimations?.storage ? `- Storage Estimation: ${solution.capacityEstimations.storage}` : ''}
@@ -121,13 +190,41 @@ ${solution.capacityEstimations?.bandwidth ? `- Bandwidth Estimation: ${solution.
 ${solution.capacityEstimations?.memory ? `- Memory Estimation: ${solution.capacityEstimations.memory}` : ''}
 ${solution.functionalRequirements ? `- Functional Requirements: ${solution.functionalRequirements}` : ''}
 ${solution.nonFunctionalRequirements ? `- Non-Functional Requirements: ${solution.nonFunctionalRequirements}` : ''}
+
+${solution.components.length > 0 ? `
+Component Details:
+${solution.components.map((component: Component, index: number) => 
+  `Component ${index + 1}: ${component.name ?? component.type ?? 'Unnamed Component'}${
+    component.description ? `\n  Description: ${component.description}` : ''
+  }${
+    component.config ? `\n  Configuration: ${typeof component.config === 'string' ? component.config : JSON.stringify(component.config)}` : ''
+  }`
+).join('\n\n')}
+` : ''}
+
+${solution.edges && solution.edges.length > 0 ? `
+Connection Details:
+${solution.edges.map((edge: Edge, index: number) => 
+  `Connection ${index + 1}: ${edge.source} → ${edge.target}${
+    edge.label ? `\n  Label: ${edge.label}` : ''
+  }${
+    edge.data ? `\n  Data: ${typeof edge.data === 'string' ? edge.data : JSON.stringify(edge.data)}` : ''
+  }`
+).join('\n\n')}
+` : ''}
 ` : ''}
 
 Keep these requirements in mind when providing assistance. Guide the user without giving direct solutions.
-`
+`;
+      }
 
       // Create identifier using the shared utility function
       const identifier = getRateLimitIdentifier(ipAddress, userId);
+      
+      // Define a rate limit key based on mode
+      const rateLimitKey = isPlayground 
+        ? `${identifier}:playground:${playgroundId ?? 'default'}`
+        : `${identifier}:${challengeId}`;
       
       // Pre-validate all history messages to prevent prompt injection
       const sanitizedHistory = history.map(msg => {
@@ -153,7 +250,7 @@ Keep these requirements in mind when providing assistance. Guide the user withou
       // Prepare messages array for token calculation and API call
       const messageArray = [
         { role: 'system' as const, content: CHAT_SYSTEM_PROMPT },
-        { role: 'system' as const, content: challengeContext },
+        { role: 'system' as const, content: contextMessage },
         ...sanitizedHistory,
         { role: 'user' as const, content: sanitizedMessage }
       ];
@@ -172,14 +269,15 @@ Keep these requirements in mind when providing assistance. Guide the user withou
         const limiter = userId ? authenticatedFreeChatMessagesLimiter : chatMessagesLimiter;
         rateLimit = await enforceRateLimit({
           limiter,
-          identifier: `${identifier}:${challengeId}`,
+          identifier: rateLimitKey,
           userId: userId,
           ipAddress,
           endpoint: '/api/trpc/chat.sendMessage',
           errorMessage: 'Rate limit exceeded for chat messages',
           limitType: 'chat_messages',
           metadata: {
-            challengeId
+            mode: isPlayground ? 'playground' : 'challenge',
+            contextId: isPlayground ? playgroundId : challengeId
           }
         });
       } catch (error) {

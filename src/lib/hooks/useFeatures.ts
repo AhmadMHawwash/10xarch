@@ -5,7 +5,7 @@ export const useFeatures = () => {
 
   if (pathname.includes("playground")) {
     return {
-      canRunSolution: false,
+      canRunSolution: true,
     };
   }
 

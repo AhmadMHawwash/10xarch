@@ -1,9 +1,9 @@
-import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc";
-import { checkSolution } from "./routers/checkAnswer";
-import { creditsRouter } from "@/server/api/routers/credits";
-import { stripeRouter } from "./routers/stripe";
-import { challengesRouter } from "./routers/challenges";
 import { chatRouter } from "@/server/api/routers/chat";
+import { creditsRouter } from "@/server/api/routers/credits";
+import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc";
+import { challengesRouter } from "./routers/challenges";
+import { checkSolution } from "./routers/checkAnswer";
+import { stripeRouter } from "./routers/stripe";
 
 /**
  * This is the primary router for your server.

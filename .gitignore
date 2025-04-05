@@ -43,3 +43,5 @@ yarn-error.log*
 *.tsbuildinfo
 
 .windsurfrules
+
+.cursor

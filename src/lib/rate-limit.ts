@@ -58,6 +58,14 @@ export const authAttemptsLimiter = new Ratelimit({
   prefix: '@upstash/ratelimit/auth-attempts',
 });
 
+// Create a new ratelimiter for unauthenticated playground users (more strict)
+export const unauthenticatedPlaygroundLimiter = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(5, ONE_DAY), // Only 2 evaluations per day for unauthenticated users
+  analytics: true,
+  prefix: '@upstash/ratelimit/unauth-playground',
+});
+
 // Create a new ratelimiter for general API requests
 export const apiRequestsLimiter = new Ratelimit({
   redis,

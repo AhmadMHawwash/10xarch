@@ -60,6 +60,12 @@ export const playgrounds = createTable("playgrounds", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
   ownerId: text("owner_id").references(() => users.id),
+  lastEvaluationAt: timestamp("last_evaluation_at"),
+  evaluationScore: integer("evaluation_score"),
+  evaluationFeedback: text("evaluation_feedback"),
+  isPublic: integer("is_public").notNull().default(0),
+  tags: text("tags"),
+  description: text("description"),
 });
 
 export type Playground = typeof playgrounds.$inferSelect;

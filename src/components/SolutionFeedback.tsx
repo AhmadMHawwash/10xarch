@@ -31,10 +31,11 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "./ui/sheet";
+import { type Maybe } from "./SolutionFlowManager";
 
 interface SolutionFeedbackProps {
   isLoadingAnswer: boolean;
-  answer: EvaluationResponse | PlaygroundResponse | undefined;
+  answer: Maybe<EvaluationResponse | PlaygroundResponse>;
   isOpen: boolean;
   onClose: () => void;
   onOpen: () => void;

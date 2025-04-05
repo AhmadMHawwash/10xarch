@@ -23,12 +23,16 @@ import { type SystemComponentType } from "@/lib/levels/type";
 import { useEffect, useState } from "react";
 import { usePrevious } from "react-use";
 import { ReactFlowProvider } from "reactflow";
+import { PanelChat } from "@/components/ai-chat/PanelChat";
+import { ChatMessagesProvider } from "@/lib/hooks/useChatMessages_";
 
 export default function Page() {
   return (
     <ReactFlowProvider>
       <SystemDesignerProvider>
-        <PageContent />
+        <ChatMessagesProvider>
+          <PageContent />
+        </ChatMessagesProvider>
       </SystemDesignerProvider>
     </ReactFlowProvider>
   );
@@ -78,79 +82,97 @@ function PageContent() {
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const Icon = comp?.icon ?? (() => null);
-
+  const isSystem = !selectedNode?.data.id || selectedNode.type === "Whiteboard";
   return (
-    <ResizablePanelGroup direction="horizontal">
-      <ResizablePanel defaultSize={25} minSize={3}>
-        <div className="h-full bg-gray-50/50 dark:bg-gray-900/50 p-4">
-          <Card className="h-full border-gray-200 dark:border-gray-800">
-            <div className="flex items-center border-b border-gray-200 dark:border-gray-800 p-4">
-              <div className="flex items-center gap-2">
-                <Icon className="w-4 h-4 text-gray-700 dark:text-gray-300" />
-                <span className="text-base font-medium">
-                  {selectedNode?.data.id && selectedNode.type !== "Whiteboard"
-                    ? selectedNode?.data.name
-                    : "System"}
-                </span>
+    <>
+      <ResizablePanelGroup direction="horizontal">
+        <ResizablePanel defaultSize={25} minSize={3}>
+          <div className="h-full bg-gray-50/50 p-4 dark:bg-gray-900/50">
+            <Card className="h-full border-gray-200 dark:border-gray-800">
+              <div className="flex items-center border-b border-gray-200 p-4 dark:border-gray-800">
+                <div className="flex items-center gap-2">
+                  <Icon className="h-4 w-4 text-gray-700 dark:text-gray-300" />
+                  <span className="text-base font-medium">
+                    {isSystem ? "System" : selectedNode?.data.name}
+                  </span>
+                </div>
               </div>
-            </div>
-            
-            <div className="p-4 space-y-4">
-              {selectedNode && (
-                <div className="space-y-2">
-                  <Label htmlFor="name" className="text-sm font-medium">
-                    Name
-                  </Label>
-                  <Input
-                    id="name"
-                    className="w-full"
-                    placeholder="Component name"
-                    value={displayName}
-                    onChange={(e) => {
-                      if (!selectedNode?.id) return;
-                      setDisplayName(e.target.value);
-                    }}
-                  />
-                </div>
-              )}
-              
-              <Tabs defaultValue="context" className="w-full">
-                <TabsList className="w-full grid grid-cols-3 gap-1">
-                  <TabsTrigger value="context" className="text-sm">Context</TabsTrigger>
-                  <TabsTrigger value="todo" className="text-sm">Todo</TabsTrigger>
-                  <TabsTrigger value="notes" className="text-sm">Notes</TabsTrigger>
-                </TabsList>
-                <div className="mt-4 h-[calc(100vh-280px)]">
-                  <TabsContent value="todo" className="h-full m-0">
-                    <TodoList todos={todos} setTodos={setTodos} />
-                  </TabsContent>
-                  <TabsContent value="notes" className="h-full m-0">
-                    <Notes notes={notes} setNotes={setNotes} />
-                  </TabsContent>
-                  <TabsContent value="context" className="h-full m-0">
-                    <SystemContext context={context} setContext={setContext} />
-                  </TabsContent>
-                </div>
-              </Tabs>
-            </div>
-          </Card>
-        </div>
-      </ResizablePanel>
-      <ResizableHandle className="w-1 bg-gray-300 transition-colors hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600" />
-      <ResizablePanel defaultSize={75} minSize={60}>
-        <SystemBuilder
-          PassedFlowManager={() => (
-            <FlowManager
-              checkSolution={checkSolution}
-              feedback={feedback}
-              isLoadingAnswer={isLoadingAnswer}
-              isFeedbackExpanded={isFeedbackExpanded}
-              onOpen={() => setIsFeedbackExpanded(true)}
-              onClose={() => setIsFeedbackExpanded(false)}
-            />
-          )}
+
+              <div className="space-y-4 p-4">
+                {selectedNode && !isSystem && (
+                  <div className="space-y-2">
+                    <Label htmlFor="name" className="text-sm font-medium">
+                      Name
+                    </Label>
+                    <Input
+                      id="name"
+                      className="w-full"
+                      placeholder="Component name"
+                      value={displayName}
+                      onChange={(e) => {
+                        if (!selectedNode?.id) return;
+                        setDisplayName(e.target.value);
+                      }}
+                    />
+                  </div>
+                )}
+
+                <Tabs defaultValue="context" className="w-full">
+                  <TabsList className="grid w-full grid-cols-3 gap-1">
+                    <TabsTrigger value="context" className="text-sm">
+                      Context
+                    </TabsTrigger>
+                    <TabsTrigger value="todo" className="text-sm">
+                      Todo
+                    </TabsTrigger>
+                    <TabsTrigger value="notes" className="text-sm">
+                      Notes
+                    </TabsTrigger>
+                  </TabsList>
+                  <div className="mt-4 h-[calc(100vh-280px)]">
+                    <TabsContent value="todo" className="m-0 h-full">
+                      <TodoList todos={todos} setTodos={setTodos} />
+                    </TabsContent>
+                    <TabsContent value="notes" className="m-0 h-full">
+                      <Notes notes={notes} setNotes={setNotes} />
+                    </TabsContent>
+                    <TabsContent value="context" className="m-0 h-full">
+                      <SystemContext
+                        context={context}
+                        setContext={setContext}
+                      />
+                    </TabsContent>
+                  </div>
+                </Tabs>
+              </div>
+            </Card>
+          </div>
+        </ResizablePanel>
+        <ResizableHandle className="w-1 bg-gray-300 transition-colors hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600" />
+        <ResizablePanel defaultSize={75} minSize={60}>
+          <SystemBuilder
+            PassedFlowManager={() => (
+              <FlowManager
+                checkSolution={checkSolution}
+                feedback={feedback}
+                isLoadingAnswer={isLoadingAnswer}
+                isFeedbackExpanded={isFeedbackExpanded}
+                onOpen={() => setIsFeedbackExpanded(true)}
+                onClose={() => setIsFeedbackExpanded(false)}
+              />
+            )}
+          />
+        </ResizablePanel>
+      </ResizablePanelGroup>
+
+      {/* Add the chat component */}
+      <div className="ai-chat-container fixed bottom-4 right-4 z-50">
+        <PanelChat
+          isPlayground={true}
+          playgroundId="default"
+          playgroundTitle="System Design Playground"
         />
-      </ResizablePanel>
-    </ResizablePanelGroup>
+      </div>
+    </>
   );
 }

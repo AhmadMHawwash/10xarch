@@ -20,8 +20,11 @@ interface Message {
 }
 
 interface ChatUIProps {
-  challengeId: string;
-  stageIndex: number;
+  challengeId?: string;
+  stageIndex?: number;
+  isPlayground?: boolean;
+  playgroundId?: string;
+  playgroundTitle?: string;
 }
 
 interface WhiteboardConfigs {
@@ -40,7 +43,13 @@ interface WhiteboardConfigs {
   "non-functional requirements"?: string;
 }
 
-export function ChatUI({ challengeId, stageIndex = 0 }: ChatUIProps) {
+export function ChatUI({ 
+  challengeId, 
+  stageIndex = 0, 
+  isPlayground = false,
+  playgroundId,
+  playgroundTitle 
+}: ChatUIProps) {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [remainingMessages, setRemainingMessages] = useState(3);
@@ -49,7 +58,10 @@ export function ChatUI({ challengeId, stageIndex = 0 }: ChatUIProps) {
   const [mounted, setMounted] = useState(false);
   
   // Create a stable chat session ID that persists across component mounts
-  const chatSessionId = useMemo(() => `chat:${challengeId}`, [challengeId]);
+  const chatSessionId = useMemo(() => 
+    isPlayground ? `playground:${playgroundId}` : `chat:${challengeId}`, 
+    [isPlayground, playgroundId, challengeId]
+  );
   
   // Only get messages after component is mounted to avoid hydration issues
   useEffect(() => {
@@ -67,7 +79,7 @@ export function ChatUI({ challengeId, stageIndex = 0 }: ChatUIProps) {
 
   // Get remaining prompts on load
   const { data: rateLimitInfo } = api.chat.getRemainingPrompts.useQuery({
-    challengeId,
+    challengeId: isPlayground ? playgroundId ?? '' : challengeId ?? '',
   });
 
   // Update remaining messages when rate limit info changes
@@ -181,10 +193,13 @@ export function ChatUI({ challengeId, stageIndex = 0 }: ChatUIProps) {
 
     sendMessage.mutate({
       message: input,
-      challengeId,
-      stageIndex: stageIndex ?? 0,
+      challengeId: isPlayground ? undefined : challengeId,
+      stageIndex: isPlayground ? undefined : stageIndex,
       history: messages.filter((msg) => msg.isSystemDesignRelated),
       solution: extractSolutionData(),
+      isPlayground,
+      playgroundId,
+      playgroundTitle,
     });
   }
 
@@ -284,12 +299,15 @@ export function ChatUI({ challengeId, stageIndex = 0 }: ChatUIProps) {
     // Retry the API call with the last user message
     sendMessage.mutate({
       message: lastUserMessage.content,
-      challengeId,
-      stageIndex: stageIndex ?? 0,
+      challengeId: isPlayground ? undefined : challengeId,
+      stageIndex: isPlayground ? undefined : stageIndex,
       history: messagesWithoutLastError.filter((msg) => msg.isSystemDesignRelated),
       solution: extractSolutionData(),
+      isPlayground,
+      playgroundId,
+      playgroundTitle,
     });
-  }, [messages, isLoading, clearSession, chatSessionId, addMessage, sendMessage, challengeId, stageIndex, extractSolutionData]);
+  }, [messages, isLoading, clearSession, chatSessionId, addMessage, sendMessage, challengeId, stageIndex, extractSolutionData, isPlayground, playgroundId, playgroundTitle]);
 
   const MessageList = useMemo(() => {
     return (

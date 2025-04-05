@@ -6,9 +6,15 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Bot, X, Maximize2, Minimize2 } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useState } from "react";
-import { AIChatAssistant } from ".";
+import { ChatUI } from "./ChatUI";
 
-export function PanelChat() {
+interface PanelChatProps {
+  isPlayground?: boolean;
+  playgroundId?: string;
+  playgroundTitle?: string;
+}
+
+export function PanelChat({ isPlayground = false, playgroundId, playgroundTitle }: PanelChatProps) {
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const params = useParams<{ slug: string }>();
@@ -23,7 +29,8 @@ export function PanelChat() {
     setIsPanelOpen(true);
   };
 
-  if (!params.slug) return null;
+  if (isPlayground && !playgroundId) return null;
+  if (!isPlayground && !params.slug) return null;
 
   return (
     <div className="relative ai-chat-assistant">
@@ -62,7 +69,13 @@ export function PanelChat() {
               </div>
             </div>
             <div className="flex-1 overflow-hidden">
-              <AIChatAssistant />
+              <ChatUI
+                challengeId={isPlayground ? undefined : params.slug}
+                stageIndex={isPlayground ? undefined : 0}
+                isPlayground={isPlayground}
+                playgroundId={playgroundId}
+                playgroundTitle={playgroundTitle}
+              />
             </div>
           </motion.div>
         )}
@@ -88,7 +101,13 @@ export function PanelChat() {
             </div>
           </div>
           <div className="flex-1 overflow-hidden">
-            <AIChatAssistant />
+            <ChatUI
+              challengeId={isPlayground ? undefined : params.slug}
+              stageIndex={isPlayground ? undefined : 0}
+              isPlayground={isPlayground}
+              playgroundId={playgroundId}
+              playgroundTitle={playgroundTitle}
+            />
           </div>
         </DialogContent>
       </Dialog>

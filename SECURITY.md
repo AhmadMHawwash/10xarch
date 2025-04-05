@@ -34,4 +34,4 @@ We regularly update our dependencies to patch security vulnerabilities. We recom
 
 ## Contact
 
-For security-related questions or concerns, please contact <ahmad.m.hawwash@gmail.com>
+For security-related questions or concerns, please contact us

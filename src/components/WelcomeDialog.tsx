@@ -63,7 +63,7 @@ export function WelcomeDialog({ startTour, isFirstVisit = false }: WelcomeDialog
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="sm:max-w-[500px] bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
         <DialogHeader className="relative">
-          <DialogTitle className="text-2xl font-bold text-center">Welcome to System Design Playground!</DialogTitle>
+          <DialogTitle className="text-2xl font-bold text-center">Welcome to 10×arch!</DialogTitle>
           <DialogDescription className="text-center pt-2">
             Learn system design through interactive challenges
           </DialogDescription>

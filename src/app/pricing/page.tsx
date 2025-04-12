@@ -24,9 +24,9 @@ import {
 import Link from "next/link";
 
 export const metadata = {
-  title: "Pricing - System Design Playground",
+  title: "Pricing - 10×arch",
   description:
-    "Access our system design playground with flexible, affordable token-based pricing.",
+    "Access our 10×arch with flexible, affordable token-based pricing.",
 };
 
 export default function PricingPage() {
@@ -43,7 +43,7 @@ export default function PricingPage() {
           Unleash Your Design Potential
         </h1>
         <p className="mx-auto mb-6 max-w-2xl text-xl text-gray-600 dark:text-gray-400">
-          Get unlimited access to our system design playground with flexible pricing
+          Get unlimited access to our 10×arch with flexible pricing
         </p>
       </div>
 
@@ -396,9 +396,9 @@ export default function PricingPage() {
         <div className="space-y-4">
           {[
             {
-              question: "What is the System Design Playground?",
+              question: "What is the 10×arch?",
               answer:
-                "The System Design Playground is an interactive environment where you can create, visualize, and document your system architecture designs. It provides a drag-and-drop interface and AI feedback to help you build better systems.",
+                "The 10×arch is an interactive environment where you can create, visualize, and document your system architecture designs. It provides a drag-and-drop interface and AI feedback to help you build better systems.",
             },
             {
               question: "Can I use the playground for free?",

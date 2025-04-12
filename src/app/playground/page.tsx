@@ -233,7 +233,7 @@ function PageContent() {
         <PanelChat
           isPlayground={true}
           playgroundId="default"
-          playgroundTitle="System Design Playground"
+          playgroundTitle="10×arch"
         />
       </div>
     </>

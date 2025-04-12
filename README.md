@@ -1,4 +1,4 @@
-# System Design Playground
+# 10×arch
 
 A modern web application for learning and practicing system design concepts. Built with the T3 Stack.
 

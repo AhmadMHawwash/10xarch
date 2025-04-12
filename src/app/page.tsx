@@ -19,7 +19,7 @@ export default async function Home() {
       <header className="mb-14 flex flex-col md:flex-row items-center justify-between">
         <div className="md:w-1/2 text-left md:pr-8">
           <h1 className="mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-4xl font-bold text-transparent md:text-6xl">
-            System Design Playground
+            10xarch
           </h1>
           <p className="mb-4 text-xl text-gray-600 dark:text-gray-400">
             Your space to design, visualize, and document your system architecture.
@@ -206,8 +206,8 @@ export default async function Home() {
             <Accordion type="single" collapsible className="w-full">
               {[
                 {
-                  question: "What is the System Design Playground?",
-                  answer: "The System Design Playground is a free, interactive environment where you can create, visualize, and document your system architecture designs. It provides a drag-and-drop interface, component library, and AI feedback to help you build better systems."
+                  question: "What is the 10×arch?",
+                  answer: "The 10×arch is a free, interactive environment where you can create, visualize, and document your system architecture designs. It provides a drag-and-drop interface, component library, and AI feedback to help you build better systems."
                 },
                 {
                   question: "Is the playground completely free to use?",

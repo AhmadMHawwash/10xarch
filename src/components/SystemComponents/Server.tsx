@@ -123,17 +123,16 @@ export const Server = ({
         <Small>{name}</Small>
         {subtitle && <Muted>{subtitle}</Muted>}
       </div>
-      <ServerSettings name={name} nodeSettingsRef={nodeSettingsRef} />
+      {/*   <ServerSettings name={name} nodeSettingsRef={nodeSettingsRef} /> */}
     </div>
   );
 };
 
 const ServerSettings = ({
   name: id,
-  nodeSettingsRef,
 }: {
   name: string;
-  nodeSettingsRef: NodeSettingsRefObject;
+  nodeSettingsRef?: NodeSettingsRefObject;
 }) => {
   const { useSystemComponentConfigSlice } = useSystemDesigner();
   const [isFreeText, setIsFreeText] = useState<boolean>(true);
@@ -189,413 +188,408 @@ const ServerSettings = ({
   );
 
   return (
-    <WithSettings id={id} name={id} nodeSettingsRef={nodeSettingsRef}>
-      <div className="flex w-full flex-col gap-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Label
-              htmlFor="free-text-mode"
-              className="text-gray-700 dark:text-gray-300"
-            >
-              Free-form Text
-            </Label>
-            {configInfoMap["Free-form Text Mode"] && (
-              <InfoPopup feature={configInfoMap["Free-form Text Mode"]} />
-            )}
-          </div>
-          <Switch
-            id="free-text-mode"
-            checked={isFreeText}
-            onCheckedChange={setIsFreeText}
-          />
+    <div className="flex w-full flex-col gap-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Label
+            htmlFor="free-text-mode"
+            className="text-gray-700 dark:text-gray-300"
+          >
+            Free-form Text
+          </Label>
+          {configInfoMap["Free-form Text Mode"] && (
+            <InfoPopup feature={configInfoMap["Free-form Text Mode"]} />
+          )}
         </div>
+        <Switch
+          id="free-text-mode"
+          checked={isFreeText}
+          onCheckedChange={setIsFreeText}
+        />
+      </div>
 
-        {!isFreeText ? (
-          <div className="grid w-full grid-flow-row grid-cols-1 gap-4 text-gray-800 dark:text-gray-200">
-            <div className="rounded-md border border-yellow-200 bg-yellow-50 p-3 dark:border-yellow-900/50 dark:bg-yellow-900/20">
-              <div className="flex items-center gap-2 text-sm text-yellow-800 dark:text-yellow-200">
-                <Small>
-                  Note: Detailed configuration options are still a work in
-                  progress. Options might get added or deleted.
-                </Small>
-              </div>
+      {!isFreeText ? (
+        <div className="grid w-full grid-flow-row grid-cols-1 gap-4 text-gray-800 dark:text-gray-200">
+          <div className="rounded-md border border-yellow-200 bg-yellow-50 p-3 dark:border-yellow-900/50 dark:bg-yellow-900/20">
+            <div className="flex items-center gap-2 text-sm text-yellow-800 dark:text-yellow-200">
+              <Small>
+                Note: Detailed configuration options are still a work in
+                progress. Options might get added or deleted.
+              </Small>
             </div>
+          </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2">
-                  <Label
-                    htmlFor="server-type"
-                    className="text-gray-700 dark:text-gray-300"
-                  >
-                    Server Type
-                  </Label>
-                  {configInfoMap["Server Type"] && (
-                    <InfoPopup feature={configInfoMap["Server Type"]} />
-                  )}
-                </div>
-                <Select value={serverType} onValueChange={setServerType}>
-                  <SelectTrigger
-                    className={cn(
-                      "w-full border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
-                      "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
-                    )}
-                  >
-                    <SelectValue placeholder="Select server type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="application">
-                      Application Server
-                    </SelectItem>
-                    <SelectItem value="api">API Server</SelectItem>
-                    <SelectItem value="web">Web Server</SelectItem>
-                    <SelectItem value="processing">
-                      Processing Server
-                    </SelectItem>
-                    <SelectItem value="caching">Caching Server</SelectItem>
-                  </SelectContent>
-                </Select>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <Label
+                  htmlFor="server-type"
+                  className="text-gray-700 dark:text-gray-300"
+                >
+                  Server Type
+                </Label>
+                {configInfoMap["Server Type"] && (
+                  <InfoPopup feature={configInfoMap["Server Type"]} />
+                )}
               </div>
-
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2">
-                  <Label
-                    htmlFor="compute-type"
-                    className="text-gray-700 dark:text-gray-300"
-                  >
-                    Compute Type
-                  </Label>
-                  {configInfoMap["Compute Type"] && (
-                    <InfoPopup feature={configInfoMap["Compute Type"]} />
+              <Select value={serverType} onValueChange={setServerType}>
+                <SelectTrigger
+                  className={cn(
+                    "w-full border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                    "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
                   )}
-                </div>
-                <Select value={computeType} onValueChange={setComputeType}>
-                  <SelectTrigger
-                    className={cn(
-                      "w-full border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
-                      "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
-                    )}
-                  >
-                    <SelectValue placeholder="Select compute type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="general">General Purpose</SelectItem>
-                    <SelectItem value="compute">Compute Optimized</SelectItem>
-                    <SelectItem value="memory">Memory Optimized</SelectItem>
-                    <SelectItem value="storage">Storage Optimized</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+                >
+                  <SelectValue placeholder="Select server type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="application">
+                    Application Server
+                  </SelectItem>
+                  <SelectItem value="api">API Server</SelectItem>
+                  <SelectItem value="web">Web Server</SelectItem>
+                  <SelectItem value="processing">Processing Server</SelectItem>
+                  <SelectItem value="caching">Caching Server</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
-                <Label className="text-gray-700 dark:text-gray-300">
-                  Scaling Configuration
+                <Label
+                  htmlFor="compute-type"
+                  className="text-gray-700 dark:text-gray-300"
+                >
+                  Compute Type
                 </Label>
-                {configInfoMap["Scaling Configuration"] && (
-                  <InfoPopup feature={configInfoMap["Scaling Configuration"]} />
+                {configInfoMap["Compute Type"] && (
+                  <InfoPopup feature={configInfoMap["Compute Type"]} />
                 )}
               </div>
-
-              <div className="mb-2 flex items-center gap-2">
-                <Checkbox
-                  id="scaling-enabled"
-                  checked={scaling.enabled}
-                  onCheckedChange={(checked) => {
-                    setScaling({ ...scaling, enabled: !!checked });
-                  }}
-                  className="border-gray-400 dark:border-gray-600"
-                />
-                <Label
-                  htmlFor="scaling-enabled"
-                  className="text-sm text-gray-700 dark:text-gray-300"
-                >
-                  Enable High Availability
-                </Label>
-              </div>
-
-              {scaling.enabled && (
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="flex flex-col gap-2">
-                    <div className="flex items-center gap-2">
-                      <Label
-                        htmlFor="min-instances"
-                        className="text-gray-700 dark:text-gray-300"
-                      >
-                        Min Instances
-                      </Label>
-                      <InfoPopup
-                        feature={{
-                          name: "Minimum Instances",
-                          description:
-                            "The minimum number of server instances that should be running at all times. This ensures baseline availability and performance even during low traffic periods.",
-                          learnMoreUrl:
-                            "https://docs.example.com/server-scaling#min-instances",
-                        }}
-                      />
-                    </div>
-                    <Input
-                      type="number"
-                      id="min-instances"
-                      value={scaling.minInstances}
-                      onChange={(e) =>
-                        setScaling({
-                          ...scaling,
-                          minInstances: Number(e.target.value),
-                        })
-                      }
-                      className={cn(
-                        "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
-                        "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
-                      )}
-                      min={1}
-                    />
-                  </div>
-
-                  <div className="flex flex-col gap-2">
-                    <div className="flex items-center gap-2">
-                      <Label
-                        htmlFor="max-instances"
-                        className="text-gray-700 dark:text-gray-300"
-                      >
-                        Max Instances
-                      </Label>
-                      <InfoPopup
-                        feature={{
-                          name: "Maximum Instances",
-                          description:
-                            "The maximum number of server instances that can be running at any time. This helps control costs while ensuring your system can handle peak loads.",
-                          learnMoreUrl:
-                            "https://docs.example.com/server-scaling#max-instances",
-                        }}
-                      />
-                    </div>
-                    <Input
-                      type="number"
-                      id="max-instances"
-                      value={scaling.maxInstances}
-                      onChange={(e) =>
-                        setScaling({
-                          ...scaling,
-                          maxInstances: Number(e.target.value),
-                        })
-                      }
-                      className={cn(
-                        "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
-                        "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
-                      )}
-                      min={scaling.minInstances}
-                    />
-                  </div>
-
-                  <div className="col-span-2">
-                    <div className="flex items-center gap-2">
-                      <Checkbox
-                        id="auto-scaling"
-                        checked={scaling.autoScalingEnabled}
-                        onCheckedChange={(checked) => {
-                          setScaling({
-                            ...scaling,
-                            autoScalingEnabled: !!checked,
-                          });
-                        }}
-                        className="border-gray-400 dark:border-gray-600"
-                      />
-                      <Label
-                        htmlFor="auto-scaling"
-                        className="text-sm text-gray-700 dark:text-gray-300"
-                      >
-                        Enable Auto-scaling
-                      </Label>
-                      <InfoPopup
-                        feature={{
-                          name: "Auto-scaling",
-                          description:
-                            "Automatically adjust the number of server instances based on defined metrics and thresholds. This ensures optimal resource utilization and cost efficiency.",
-                          learnMoreUrl:
-                            "https://docs.example.com/server-scaling#auto-scaling",
-                        }}
-                      />
-                    </div>
-                  </div>
-
-                  {scaling.autoScalingEnabled && (
-                    <>
-                      <div className="flex flex-col gap-2">
-                        <div className="flex items-center gap-2">
-                          <Label
-                            htmlFor="scaling-metric"
-                            className="text-gray-700 dark:text-gray-300"
-                          >
-                            Scaling Metric
-                          </Label>
-                          <InfoPopup
-                            feature={{
-                              name: "Scaling Metric",
-                              description:
-                                "The metric used to determine when to scale your server instances. Common metrics include CPU utilization, memory usage, request count, and response latency.",
-                              learnMoreUrl:
-                                "https://docs.example.com/server-scaling#metrics",
-                            }}
-                          />
-                        </div>
-                        <Select
-                          value={scaling.scalingMetric}
-                          onValueChange={(value) =>
-                            setScaling({ ...scaling, scalingMetric: value })
-                          }
-                        >
-                          <SelectTrigger
-                            className={cn(
-                              "w-full border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
-                              "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
-                            )}
-                          >
-                            <SelectValue placeholder="Select scaling metric" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="cpu">CPU Utilization</SelectItem>
-                            <SelectItem value="memory">Memory Usage</SelectItem>
-                            <SelectItem value="requests">
-                              Request Count
-                            </SelectItem>
-                            <SelectItem value="latency">
-                              Response Latency
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      <div className="flex flex-col gap-2">
-                        <div className="flex items-center gap-2">
-                          <Label
-                            htmlFor="scaling-threshold"
-                            className="text-gray-700 dark:text-gray-300"
-                          >
-                            Scaling Threshold (%)
-                          </Label>
-                          <InfoPopup
-                            feature={{
-                              name: "Scaling Threshold",
-                              description:
-                                "The threshold value that triggers auto-scaling actions. When the chosen metric exceeds this threshold, the system will automatically scale up the number of instances.",
-                              learnMoreUrl:
-                                "https://docs.example.com/server-scaling#thresholds",
-                            }}
-                          />
-                        </div>
-                        <Input
-                          type="number"
-                          id="scaling-threshold"
-                          value={scaling.scalingThreshold}
-                          onChange={(e) =>
-                            setScaling({
-                              ...scaling,
-                              scalingThreshold: Number(e.target.value),
-                            })
-                          }
-                          className={cn(
-                            "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
-                            "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
-                          )}
-                          min={1}
-                          max={100}
-                        />
-                      </div>
-                    </>
+              <Select value={computeType} onValueChange={setComputeType}>
+                <SelectTrigger
+                  className={cn(
+                    "w-full border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                    "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
                   )}
-                </div>
+                >
+                  <SelectValue placeholder="Select compute type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="general">General Purpose</SelectItem>
+                  <SelectItem value="compute">Compute Optimized</SelectItem>
+                  <SelectItem value="memory">Memory Optimized</SelectItem>
+                  <SelectItem value="storage">Storage Optimized</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <Label className="text-gray-700 dark:text-gray-300">
+                Scaling Configuration
+              </Label>
+              {configInfoMap["Scaling Configuration"] && (
+                <InfoPopup feature={configInfoMap["Scaling Configuration"]} />
               )}
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2">
-                  <Label
-                    htmlFor="cpu"
-                    className="text-gray-700 dark:text-gray-300"
-                  >
-                    CPU (cores)
-                  </Label>
-                  {configInfoMap.CPU && (
-                    <InfoPopup feature={configInfoMap.CPU} />
-                  )}
-                </div>
-                <Input
-                  type="number"
-                  id="cpu"
-                  value={capacity.cpu}
-                  onChange={(e) =>
-                    setCapacity({ ...capacity, cpu: Number(e.target.value) })
-                  }
-                  className={cn(
-                    "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
-                    "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
-                  )}
-                  min={1}
-                />
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2">
-                  <Label
-                    htmlFor="memory"
-                    className="text-gray-700 dark:text-gray-300"
-                  >
-                    Memory (GB)
-                  </Label>
-                  {configInfoMap.Memory && (
-                    <InfoPopup feature={configInfoMap.Memory} />
-                  )}
-                </div>
-                <Input
-                  type="number"
-                  id="memory"
-                  value={capacity.memory}
-                  onChange={(e) =>
-                    setCapacity({ ...capacity, memory: Number(e.target.value) })
-                  }
-                  className={cn(
-                    "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
-                    "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
-                  )}
-                  min={1}
-                />
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2">
-                  <Label
-                    htmlFor="storage"
-                    className="text-gray-700 dark:text-gray-300"
-                  >
-                    Storage (GB)
-                  </Label>
-                  {configInfoMap.Storage && (
-                    <InfoPopup feature={configInfoMap.Storage} />
-                  )}
-                </div>
-                <Input
-                  type="number"
-                  id="storage"
-                  value={capacity.storage}
-                  onChange={(e) =>
-                    setCapacity({
-                      ...capacity,
-                      storage: Number(e.target.value),
-                    })
-                  }
-                  className={cn(
-                    "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
-                    "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
-                  )}
-                  min={1}
-                />
-              </div>
+            <div className="mb-2 flex items-center gap-2">
+              <Checkbox
+                id="scaling-enabled"
+                checked={scaling.enabled}
+                onCheckedChange={(checked) => {
+                  setScaling({ ...scaling, enabled: !!checked });
+                }}
+                className="border-gray-400 dark:border-gray-600"
+              />
+              <Label
+                htmlFor="scaling-enabled"
+                className="text-sm text-gray-700 dark:text-gray-300"
+              >
+                Enable High Availability
+              </Label>
             </div>
 
-            {/* <div className="flex flex-col gap-2">
+            {scaling.enabled && (
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center gap-2">
+                    <Label
+                      htmlFor="min-instances"
+                      className="text-gray-700 dark:text-gray-300"
+                    >
+                      Min Instances
+                    </Label>
+                    <InfoPopup
+                      feature={{
+                        name: "Minimum Instances",
+                        description:
+                          "The minimum number of server instances that should be running at all times. This ensures baseline availability and performance even during low traffic periods.",
+                        learnMoreUrl:
+                          "https://docs.example.com/server-scaling#min-instances",
+                      }}
+                    />
+                  </div>
+                  <Input
+                    type="number"
+                    id="min-instances"
+                    value={scaling.minInstances}
+                    onChange={(e) =>
+                      setScaling({
+                        ...scaling,
+                        minInstances: Number(e.target.value),
+                      })
+                    }
+                    className={cn(
+                      "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                      "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+                    )}
+                    min={1}
+                  />
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center gap-2">
+                    <Label
+                      htmlFor="max-instances"
+                      className="text-gray-700 dark:text-gray-300"
+                    >
+                      Max Instances
+                    </Label>
+                    <InfoPopup
+                      feature={{
+                        name: "Maximum Instances",
+                        description:
+                          "The maximum number of server instances that can be running at any time. This helps control costs while ensuring your system can handle peak loads.",
+                        learnMoreUrl:
+                          "https://docs.example.com/server-scaling#max-instances",
+                      }}
+                    />
+                  </div>
+                  <Input
+                    type="number"
+                    id="max-instances"
+                    value={scaling.maxInstances}
+                    onChange={(e) =>
+                      setScaling({
+                        ...scaling,
+                        maxInstances: Number(e.target.value),
+                      })
+                    }
+                    className={cn(
+                      "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                      "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+                    )}
+                    min={scaling.minInstances}
+                  />
+                </div>
+
+                <div className="col-span-2">
+                  <div className="flex items-center gap-2">
+                    <Checkbox
+                      id="auto-scaling"
+                      checked={scaling.autoScalingEnabled}
+                      onCheckedChange={(checked) => {
+                        setScaling({
+                          ...scaling,
+                          autoScalingEnabled: !!checked,
+                        });
+                      }}
+                      className="border-gray-400 dark:border-gray-600"
+                    />
+                    <Label
+                      htmlFor="auto-scaling"
+                      className="text-sm text-gray-700 dark:text-gray-300"
+                    >
+                      Enable Auto-scaling
+                    </Label>
+                    <InfoPopup
+                      feature={{
+                        name: "Auto-scaling",
+                        description:
+                          "Automatically adjust the number of server instances based on defined metrics and thresholds. This ensures optimal resource utilization and cost efficiency.",
+                        learnMoreUrl:
+                          "https://docs.example.com/server-scaling#auto-scaling",
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {scaling.autoScalingEnabled && (
+                  <>
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center gap-2">
+                        <Label
+                          htmlFor="scaling-metric"
+                          className="text-gray-700 dark:text-gray-300"
+                        >
+                          Scaling Metric
+                        </Label>
+                        <InfoPopup
+                          feature={{
+                            name: "Scaling Metric",
+                            description:
+                              "The metric used to determine when to scale your server instances. Common metrics include CPU utilization, memory usage, request count, and response latency.",
+                            learnMoreUrl:
+                              "https://docs.example.com/server-scaling#metrics",
+                          }}
+                        />
+                      </div>
+                      <Select
+                        value={scaling.scalingMetric}
+                        onValueChange={(value) =>
+                          setScaling({ ...scaling, scalingMetric: value })
+                        }
+                      >
+                        <SelectTrigger
+                          className={cn(
+                            "w-full border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                            "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+                          )}
+                        >
+                          <SelectValue placeholder="Select scaling metric" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="cpu">CPU Utilization</SelectItem>
+                          <SelectItem value="memory">Memory Usage</SelectItem>
+                          <SelectItem value="requests">
+                            Request Count
+                          </SelectItem>
+                          <SelectItem value="latency">
+                            Response Latency
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center gap-2">
+                        <Label
+                          htmlFor="scaling-threshold"
+                          className="text-gray-700 dark:text-gray-300"
+                        >
+                          Scaling Threshold (%)
+                        </Label>
+                        <InfoPopup
+                          feature={{
+                            name: "Scaling Threshold",
+                            description:
+                              "The threshold value that triggers auto-scaling actions. When the chosen metric exceeds this threshold, the system will automatically scale up the number of instances.",
+                            learnMoreUrl:
+                              "https://docs.example.com/server-scaling#thresholds",
+                          }}
+                        />
+                      </div>
+                      <Input
+                        type="number"
+                        id="scaling-threshold"
+                        value={scaling.scalingThreshold}
+                        onChange={(e) =>
+                          setScaling({
+                            ...scaling,
+                            scalingThreshold: Number(e.target.value),
+                          })
+                        }
+                        className={cn(
+                          "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                          "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+                        )}
+                        min={1}
+                        max={100}
+                      />
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+
+          <div className="grid grid-cols-3 gap-4">
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <Label
+                  htmlFor="cpu"
+                  className="text-gray-700 dark:text-gray-300"
+                >
+                  CPU (cores)
+                </Label>
+                {configInfoMap.CPU && <InfoPopup feature={configInfoMap.CPU} />}
+              </div>
+              <Input
+                type="number"
+                id="cpu"
+                value={capacity.cpu}
+                onChange={(e) =>
+                  setCapacity({ ...capacity, cpu: Number(e.target.value) })
+                }
+                className={cn(
+                  "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                  "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+                )}
+                min={1}
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <Label
+                  htmlFor="memory"
+                  className="text-gray-700 dark:text-gray-300"
+                >
+                  Memory (GB)
+                </Label>
+                {configInfoMap.Memory && (
+                  <InfoPopup feature={configInfoMap.Memory} />
+                )}
+              </div>
+              <Input
+                type="number"
+                id="memory"
+                value={capacity.memory}
+                onChange={(e) =>
+                  setCapacity({ ...capacity, memory: Number(e.target.value) })
+                }
+                className={cn(
+                  "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                  "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+                )}
+                min={1}
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <Label
+                  htmlFor="storage"
+                  className="text-gray-700 dark:text-gray-300"
+                >
+                  Storage (GB)
+                </Label>
+                {configInfoMap.Storage && (
+                  <InfoPopup feature={configInfoMap.Storage} />
+                )}
+              </div>
+              <Input
+                type="number"
+                id="storage"
+                value={capacity.storage}
+                onChange={(e) =>
+                  setCapacity({
+                    ...capacity,
+                    storage: Number(e.target.value),
+                  })
+                }
+                className={cn(
+                  "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                  "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+                )}
+                min={1}
+              />
+            </div>
+          </div>
+
+          {/* <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
                 <Label className="text-gray-700 dark:text-gray-300">
                   Features
@@ -637,55 +631,55 @@ const ServerSettings = ({
               </div>
             </div> */}
 
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-2">
-                <Label
-                  htmlFor="server-details"
-                  className="text-gray-700 dark:text-gray-300"
-                >
-                  Additional Configuration
-                </Label>
-                <InfoPopup
-                  feature={{
-                    name: "Additional Configuration",
-                    description:
-                      "Specify any additional server configuration details, requirements, or constraints. This can include specific middleware requirements, security configurations, performance requirements, or deployment constraints.",
-                    learnMoreUrl:
-                      "https://docs.example.com/server-configuration#additional",
-                  }}
-                />
-              </div>
-              <Textarea
-                name="server-details"
-                id="server-details"
-                rows={6}
-                placeholder={`Example:
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <Label
+                htmlFor="server-details"
+                className="text-gray-700 dark:text-gray-300"
+              >
+                Additional Configuration
+              </Label>
+              <InfoPopup
+                feature={{
+                  name: "Additional Configuration",
+                  description:
+                    "Specify any additional server configuration details, requirements, or constraints. This can include specific middleware requirements, security configurations, performance requirements, or deployment constraints.",
+                  learnMoreUrl:
+                    "https://docs.example.com/server-configuration#additional",
+                }}
+              />
+            </div>
+            <Textarea
+              name="server-details"
+              id="server-details"
+              rows={6}
+              placeholder={`Example:
 - Specific middleware requirements
 - Security configurations
 - Performance requirements
 - Deployment constraints`}
-                className={cn(
-                  "text-md border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
-                  "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
-                  "placeholder:text-gray-500 dark:placeholder:text-gray-400",
-                )}
-                value={details}
-                onChange={(e) => setDetails(e.target.value)}
-              />
-            </div>
+              className={cn(
+                "text-md border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+                "placeholder:text-gray-500 dark:placeholder:text-gray-400",
+              )}
+              value={details}
+              onChange={(e) => setDetails(e.target.value)}
+            />
           </div>
-        ) : (
-          <div className="flex flex-col gap-2">
-            <Label
-              htmlFor="free-form"
-              className="text-gray-700 dark:text-gray-300"
-            >
-              Server Configuration
-            </Label>
-            <Textarea
-              id="free-form"
-              rows={20}
-              placeholder={`Describe your server configuration here. Example:
+        </div>
+      ) : (
+        <div className="flex flex-col gap-2">
+          <Label
+            htmlFor="free-form"
+            className="text-gray-700 dark:text-gray-300"
+          >
+            Server Configuration
+          </Label>
+          <Textarea
+            id="free-form"
+            rows={20}
+            placeholder={`Describe your server configuration here. Example:
 
 Server Type: Application Server
 Compute Type: General Purpose
@@ -712,17 +706,18 @@ Additional Requirements:
 - Security settings
 - Monitoring requirements
 - Deployment constraints`}
-              className={cn(
-                "text-md border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
-                "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
-                "placeholder:text-gray-500 dark:placeholder:text-gray-400",
-              )}
-              value={freeFormText}
-              onChange={(e) => setFreeFormText(e.target.value)}
-            />
-          </div>
-        )}
-      </div>
-    </WithSettings>
+            className={cn(
+              "text-md border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+              "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+              "placeholder:text-gray-500 dark:placeholder:text-gray-400",
+            )}
+            value={freeFormText}
+            onChange={(e) => setFreeFormText(e.target.value)}
+          />
+        </div>
+      )}
+    </div>
   );
 };
+
+export { ServerSettings };

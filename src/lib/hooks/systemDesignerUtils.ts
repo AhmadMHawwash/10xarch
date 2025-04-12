@@ -273,7 +273,7 @@ export const handleNodeDrop = (
     withSourceHandle: true,
     id,
     configs: typedComponentName === "Custom Component" 
-      ? { "display name": "Custom Component" } 
+      ? { "title": "Custom Component" } 
       : {},
     targetHandles: [{ id: `${id}-target-handle-${timestamp}`, isConnected: false }],
     sourceHandles: [{ id: `${id}-source-handle-${timestamp + 1}`, isConnected: false }],

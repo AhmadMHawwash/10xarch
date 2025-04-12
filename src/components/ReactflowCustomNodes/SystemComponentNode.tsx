@@ -18,7 +18,10 @@ import { Server } from "../SystemComponents/Server";
 import { WithMarkdownDetails } from "../SystemComponents/Wrappers/WithMarkdownDetails";
 import { Muted, Small } from "../ui/typography";
 import { useRef } from "react";
-import { type NodeSettingsRefObject, type NodeSettingsRef } from "@/types/system";
+import {
+  type NodeSettingsRefObject,
+  type NodeSettingsRef,
+} from "@/types/system";
 
 export type SystemComponentNodeDataProps = {
   icon?: typeof PiIcon;
@@ -28,6 +31,8 @@ export type SystemComponentNodeDataProps = {
   withSourceHandle?: boolean;
   configs: Record<string, unknown>;
   displayName?: string;
+  subtitle?: string;
+  title?: string;
   targetHandles?: Array<{ id: string; isConnected: boolean }>;
   sourceHandles?: Array<{ id: string; isConnected: boolean }>;
 };
@@ -40,6 +45,8 @@ export type OtherNodeDataProps = {
   withSourceHandle?: boolean;
   configs: Record<string, unknown>;
   displayName?: string;
+  subtitle?: string;
+  title?: string;
   targetHandles?: Array<{ id: string; isConnected: boolean }>;
   sourceHandles?: Array<{ id: string; isConnected: boolean }>;
 };
@@ -54,10 +61,11 @@ export default function SystemComponentNode({
   const Component = components[data.name] ?? DefaultComponent;
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const { icon: ComponentIcon, content } = getSystemComponent(data.name);
-  const displayName = data.name === "Custom Component" 
-    ? (data.configs["display name"] as string) || "Custom Component"
-    : data.configs["display name"] as string;
-  
+  const displayName =
+    data.name === "Custom Component"
+      ? (data.configs.title as string) || "Custom Component"
+      : (data.configs.title as string);
+
   // Calculate positions for target handles
   const targetHandles = data.targetHandles ?? [];
   const sourceHandles = data.sourceHandles ?? [];
@@ -105,11 +113,6 @@ export default function SystemComponentNode({
         )}
         style={{
           height: `${Math.max(targetTotalHeight, sourceTotalHeight) + (data.configs.subtitle ? 80 : 60)}px`,
-        }}
-        onDoubleClick={() => {
-          if (nodeSettingsRef.current) {
-            nodeSettingsRef.current.open();
-          }
         }}
       >
         <Component
@@ -166,25 +169,9 @@ export default function SystemComponentNode({
 export type ComponentNodeProps = {
   name: string;
   nodeId?: string;
-  Icon: SystemComponentNodeDataProps["icon"];
-  nodeSettingsRef: NodeSettingsRefObject;
+  Icon?: SystemComponentNodeDataProps["icon"];
+  nodeSettingsRef?: NodeSettingsRefObject;
   subtitle?: string;
-};
-
-const components: Partial<
-  Record<
-    SystemComponent["name"],
-    ({ name, Icon, nodeSettingsRef, subtitle }: ComponentNodeProps) => React.ReactElement
-  >
-> = {
-  Client,
-  Server,
-  Database,
-  Cache,
-  CDN,
-  "Message Queue": MessageQueue,
-  "Load Balancer": LoadBalancer,
-  "Custom Component": CustomComponent,
 };
 
 const DefaultComponent = ({ name, Icon, subtitle }: ComponentNodeProps) => (
@@ -197,9 +184,30 @@ const DefaultComponent = ({ name, Icon, subtitle }: ComponentNodeProps) => (
       />
     )}
     <Small className="text-gray-700 dark:text-gray-300">{name}</Small>
-    {subtitle && <Muted>{subtitle}</Muted>}
+    {subtitle && subtitle !== name && <Muted>{subtitle}</Muted>}
   </>
 );
+
+const components: Partial<
+  Record<
+    SystemComponent["name"],
+    ({
+      name,
+      Icon,
+      nodeSettingsRef,
+      subtitle,
+    }: ComponentNodeProps) => React.ReactElement
+  >
+> = {
+  Client: DefaultComponent,
+  Server: DefaultComponent,
+  Database: DefaultComponent,
+  Cache: DefaultComponent,
+  CDN: DefaultComponent,
+  "Message Queue": DefaultComponent,
+  "Load Balancer": DefaultComponent,
+  "Custom Component": CustomComponent,
+};
 
 const withoutTargetHandle: SystemComponentType[] = ["Client"];
 const withoutSourceHandle: SystemComponentType[] = ["Database"];

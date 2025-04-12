@@ -144,7 +144,12 @@ const InfoPopup = ({ feature }: { feature: FeatureInfo }) => {
   );
 };
 
-export const Cache = ({ name, Icon, nodeSettingsRef, subtitle }: ComponentNodeProps) => {
+export const Cache = ({
+  name,
+  Icon,
+  nodeSettingsRef,
+  subtitle,
+}: ComponentNodeProps) => {
   return (
     <div className="group flex flex-col items-center text-gray-800 dark:text-gray-200">
       <div className="flex flex-col items-center gap-1">
@@ -154,7 +159,7 @@ export const Cache = ({ name, Icon, nodeSettingsRef, subtitle }: ComponentNodePr
         <Small>{name}</Small>
         {subtitle && <Muted>{subtitle}</Muted>}
       </div>
-      <CacheSettings name={name} nodeSettingsRef={nodeSettingsRef} />
+      {/* <CacheSettings name={name} nodeSettingsRef={nodeSettingsRef} /> */}
     </div>
   );
 };
@@ -164,7 +169,7 @@ const CacheSettings = ({
   nodeSettingsRef,
 }: {
   name: string;
-  nodeSettingsRef: NodeSettingsRefObject;
+  nodeSettingsRef?: NodeSettingsRefObject;
 }) => {
   const { useSystemComponentConfigSlice } = useSystemDesigner();
   const [isFreeText, setIsFreeText] = useState<boolean>(true);
@@ -217,377 +222,370 @@ const CacheSettings = ({
     "",
   );
 
-
   return (
-    <WithSettings id={id} name={id} nodeSettingsRef={nodeSettingsRef}>
-      <div className="flex w-full flex-col gap-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Label
-              htmlFor="free-text-mode"
-              className="text-gray-700 dark:text-gray-300"
-            >
-              Free-form Text
-            </Label>
-            {configInfoMap["Free-form Text Mode"] && (
-              <InfoPopup feature={configInfoMap["Free-form Text Mode"]} />
-            )}
-          </div>
-          <Switch
-            id="free-text-mode"
-            checked={isFreeText}
-            onCheckedChange={setIsFreeText}
-          />
+    <div className="flex w-full flex-col gap-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Label
+            htmlFor="free-text-mode"
+            className="text-gray-700 dark:text-gray-300"
+          >
+            Free-form Text
+          </Label>
+          {configInfoMap["Free-form Text Mode"] && (
+            <InfoPopup feature={configInfoMap["Free-form Text Mode"]} />
+          )}
         </div>
+        <Switch
+          id="free-text-mode"
+          checked={isFreeText}
+          onCheckedChange={setIsFreeText}
+        />
+      </div>
 
-        {!isFreeText ? (
-          <div className="grid w-full grid-flow-row grid-cols-1 gap-4 text-gray-800 dark:text-gray-200">
-            <div className="rounded-md border border-yellow-200 bg-yellow-50 p-3 dark:border-yellow-900/50 dark:bg-yellow-900/20">
-              <div className="flex items-center gap-2 text-sm text-yellow-800 dark:text-yellow-200">
-                <Small>
-                Note: Detailed configuration options are still a work in progress. Options might get added or deleted.
-                </Small>
-              </div>
+      {!isFreeText ? (
+        <div className="grid w-full grid-flow-row grid-cols-1 gap-4 text-gray-800 dark:text-gray-200">
+          <div className="rounded-md border border-yellow-200 bg-yellow-50 p-3 dark:border-yellow-900/50 dark:bg-yellow-900/20">
+            <div className="flex items-center gap-2 text-sm text-yellow-800 dark:text-yellow-200">
+              <Small>
+                Note: Detailed configuration options are still a work in
+                progress. Options might get added or deleted.
+              </Small>
             </div>
+          </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2">
-                  <Label
-                    htmlFor="cache-type"
-                    className="text-gray-700 dark:text-gray-300"
-                  >
-                    Cache Type
-                  </Label>
-                  {configInfoMap["Cache Type"] && (
-                    <InfoPopup feature={configInfoMap["Cache Type"]} />
-                  )}
-                </div>
-                <Select value={cacheType} onValueChange={setCacheType}>
-                  <SelectTrigger
-                    className={cn(
-                      "w-full border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
-                      "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
-                    )}
-                  >
-                    <SelectValue placeholder="Select cache type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="in-memory">In-Memory Cache</SelectItem>
-                    <SelectItem value="distributed">
-                      Distributed Cache
-                    </SelectItem>
-                    <SelectItem value="cdn">CDN Cache</SelectItem>
-                    <SelectItem value="browser">Browser Cache</SelectItem>
-                  </SelectContent>
-                </Select>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <Label
+                  htmlFor="cache-type"
+                  className="text-gray-700 dark:text-gray-300"
+                >
+                  Cache Type
+                </Label>
+                {configInfoMap["Cache Type"] && (
+                  <InfoPopup feature={configInfoMap["Cache Type"]} />
+                )}
               </div>
-
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2">
-                  <Label
-                    htmlFor="eviction-policy"
-                    className="text-gray-700 dark:text-gray-300"
-                  >
-                    Eviction Policy
-                  </Label>
-                  {configInfoMap["Eviction Policy"] && (
-                    <InfoPopup feature={configInfoMap["Eviction Policy"]} />
+              <Select value={cacheType} onValueChange={setCacheType}>
+                <SelectTrigger
+                  className={cn(
+                    "w-full border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                    "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
                   )}
-                </div>
-                <Select value={policy} onValueChange={setPolicy}>
-                  <SelectTrigger
-                    className={cn(
-                      "w-full border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
-                      "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
-                    )}
-                  >
-                    <SelectValue placeholder="Select eviction policy" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="lru">
-                      LRU (Least Recently Used)
-                    </SelectItem>
-                    <SelectItem value="lfu">
-                      LFU (Least Frequently Used)
-                    </SelectItem>
-                    <SelectItem value="fifo">
-                      FIFO (First In First Out)
-                    </SelectItem>
-                    <SelectItem value="random">Random Replacement</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+                >
+                  <SelectValue placeholder="Select cache type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="in-memory">In-Memory Cache</SelectItem>
+                  <SelectItem value="distributed">Distributed Cache</SelectItem>
+                  <SelectItem value="cdn">CDN Cache</SelectItem>
+                  <SelectItem value="browser">Browser Cache</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
-                <Label className="text-gray-700 dark:text-gray-300">
-                  Distribution Configuration
+                <Label
+                  htmlFor="eviction-policy"
+                  className="text-gray-700 dark:text-gray-300"
+                >
+                  Eviction Policy
                 </Label>
-                {configInfoMap["Distribution Configuration"] && (
-                  <InfoPopup
-                    feature={configInfoMap["Distribution Configuration"]}
-                  />
+                {configInfoMap["Eviction Policy"] && (
+                  <InfoPopup feature={configInfoMap["Eviction Policy"]} />
                 )}
               </div>
-
-              <div className="mb-2 flex items-center gap-2">
-                <Checkbox
-                  id="distribution-enabled"
-                  checked={distribution.enabled}
-                  onCheckedChange={(checked) => {
-                    setDistribution({ ...distribution, enabled: !!checked });
-                  }}
-                  className="border-gray-400 dark:border-gray-600"
-                />
-                <Label
-                  htmlFor="distribution-enabled"
-                  className="text-sm text-gray-700 dark:text-gray-300"
+              <Select value={policy} onValueChange={setPolicy}>
+                <SelectTrigger
+                  className={cn(
+                    "w-full border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                    "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+                  )}
                 >
-                  Enable Distributed Cache
-                </Label>
-              </div>
+                  <SelectValue placeholder="Select eviction policy" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="lru">LRU (Least Recently Used)</SelectItem>
+                  <SelectItem value="lfu">
+                    LFU (Least Frequently Used)
+                  </SelectItem>
+                  <SelectItem value="fifo">
+                    FIFO (First In First Out)
+                  </SelectItem>
+                  <SelectItem value="random">Random Replacement</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
 
-              {distribution.enabled && (
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="flex flex-col gap-2">
-                    <div className="flex items-center gap-2">
-                      <Label
-                        htmlFor="nodes"
-                        className="text-gray-700 dark:text-gray-300"
-                      >
-                        Number of Nodes
-                      </Label>
-                      {configInfoMap["Number of Nodes"] && (
-                        <InfoPopup feature={configInfoMap["Number of Nodes"]} />
-                      )}
-                    </div>
-                    <Input
-                      type="number"
-                      id="nodes"
-                      value={distribution.nodes}
-                      onChange={(e) =>
-                        setDistribution({
-                          ...distribution,
-                          nodes: Number(e.target.value),
-                        })
-                      }
-                      className={cn(
-                        "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
-                        "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
-                      )}
-                      min={1}
-                    />
-                  </div>
-
-                  <div className="flex flex-col gap-2">
-                    <div className="flex items-center gap-2">
-                      <Label
-                        htmlFor="replication-factor"
-                        className="text-gray-700 dark:text-gray-300"
-                      >
-                        Replication Factor
-                      </Label>
-                      {configInfoMap["Replication Factor"] && (
-                        <InfoPopup
-                          feature={configInfoMap["Replication Factor"]}
-                        />
-                      )}
-                    </div>
-                    <Input
-                      type="number"
-                      id="replication-factor"
-                      value={distribution.replicationFactor}
-                      onChange={(e) =>
-                        setDistribution({
-                          ...distribution,
-                          replicationFactor: Number(e.target.value),
-                        })
-                      }
-                      className={cn(
-                        "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
-                        "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
-                      )}
-                      min={1}
-                      max={distribution.nodes}
-                    />
-                  </div>
-
-                  <div className="flex flex-col gap-2">
-                    <div className="flex items-center gap-2">
-                      <Label
-                        htmlFor="partitioning-strategy"
-                        className="text-gray-700 dark:text-gray-300"
-                      >
-                        Partitioning Strategy
-                      </Label>
-                      {configInfoMap["Partitioning Strategy"] && (
-                        <InfoPopup
-                          feature={configInfoMap["Partitioning Strategy"]}
-                        />
-                      )}
-                    </div>
-                    <Select
-                      value={distribution.partitioningStrategy}
-                      onValueChange={(value) =>
-                        setDistribution({
-                          ...distribution,
-                          partitioningStrategy: value,
-                        })
-                      }
-                    >
-                      <SelectTrigger
-                        className={cn(
-                          "w-full border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
-                          "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
-                        )}
-                      >
-                        <SelectValue placeholder="Select partitioning strategy" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="consistent-hashing">
-                          Consistent Hashing
-                        </SelectItem>
-                        <SelectItem value="range">Range Based</SelectItem>
-                        <SelectItem value="modulo">Modulo Based</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="flex flex-col gap-2">
-                    <div className="flex items-center gap-2">
-                      <Label
-                        htmlFor="consistency-level"
-                        className="text-gray-700 dark:text-gray-300"
-                      >
-                        Consistency Level
-                      </Label>
-                      {configInfoMap["Consistency Level"] && (
-                        <InfoPopup
-                          feature={configInfoMap["Consistency Level"]}
-                        />
-                      )}
-                    </div>
-                    <Select
-                      value={distribution.consistencyLevel}
-                      onValueChange={(value) =>
-                        setDistribution({
-                          ...distribution,
-                          consistencyLevel: value,
-                        })
-                      }
-                    >
-                      <SelectTrigger
-                        className={cn(
-                          "w-full border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
-                          "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
-                        )}
-                      >
-                        <SelectValue placeholder="Select consistency level" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="one">ONE</SelectItem>
-                        <SelectItem value="quorum">QUORUM</SelectItem>
-                        <SelectItem value="all">ALL</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <Label className="text-gray-700 dark:text-gray-300">
+                Distribution Configuration
+              </Label>
+              {configInfoMap["Distribution Configuration"] && (
+                <InfoPopup
+                  feature={configInfoMap["Distribution Configuration"]}
+                />
               )}
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2">
-                  <Label
-                    htmlFor="memory"
-                    className="text-gray-700 dark:text-gray-300"
-                  >
-                    Memory (GB)
-                  </Label>
-                  {configInfoMap.Memory && (
-                    <InfoPopup feature={configInfoMap.Memory} />
-                  )}
-                </div>
-                <Input
-                  type="number"
-                  id="memory"
-                  value={capacity.memory}
-                  onChange={(e) =>
-                    setCapacity({ ...capacity, memory: Number(e.target.value) })
-                  }
-                  className={cn(
-                    "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
-                    "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
-                  )}
-                  min={1}
-                />
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2">
-                  <Label
-                    htmlFor="max-items"
-                    className="text-gray-700 dark:text-gray-300"
-                  >
-                    Max Items
-                  </Label>
-                  {configInfoMap["Max Items"] && (
-                    <InfoPopup feature={configInfoMap["Max Items"]} />
-                  )}
-                </div>
-                <Input
-                  type="number"
-                  id="max-items"
-                  value={capacity.maxItems}
-                  onChange={(e) =>
-                    setCapacity({
-                      ...capacity,
-                      maxItems: Number(e.target.value),
-                    })
-                  }
-                  className={cn(
-                    "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
-                    "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
-                  )}
-                  min={1000}
-                  step={1000}
-                />
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2">
-                  <Label
-                    htmlFor="max-item-size"
-                    className="text-gray-700 dark:text-gray-300"
-                  >
-                    Max Item Size (MB)
-                  </Label>
-                  {configInfoMap["Max Item Size"] && (
-                    <InfoPopup feature={configInfoMap["Max Item Size"]} />
-                  )}
-                </div>
-                <Input
-                  type="number"
-                  id="max-item-size"
-                  value={capacity.maxItemSize}
-                  onChange={(e) =>
-                    setCapacity({
-                      ...capacity,
-                      maxItemSize: Number(e.target.value),
-                    })
-                  }
-                  className={cn(
-                    "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
-                    "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
-                  )}
-                  min={1}
-                />
-              </div>
+            <div className="mb-2 flex items-center gap-2">
+              <Checkbox
+                id="distribution-enabled"
+                checked={distribution.enabled}
+                onCheckedChange={(checked) => {
+                  setDistribution({ ...distribution, enabled: !!checked });
+                }}
+                className="border-gray-400 dark:border-gray-600"
+              />
+              <Label
+                htmlFor="distribution-enabled"
+                className="text-sm text-gray-700 dark:text-gray-300"
+              >
+                Enable Distributed Cache
+              </Label>
             </div>
 
-              {/* 
+            {distribution.enabled && (
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center gap-2">
+                    <Label
+                      htmlFor="nodes"
+                      className="text-gray-700 dark:text-gray-300"
+                    >
+                      Number of Nodes
+                    </Label>
+                    {configInfoMap["Number of Nodes"] && (
+                      <InfoPopup feature={configInfoMap["Number of Nodes"]} />
+                    )}
+                  </div>
+                  <Input
+                    type="number"
+                    id="nodes"
+                    value={distribution.nodes}
+                    onChange={(e) =>
+                      setDistribution({
+                        ...distribution,
+                        nodes: Number(e.target.value),
+                      })
+                    }
+                    className={cn(
+                      "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                      "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+                    )}
+                    min={1}
+                  />
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center gap-2">
+                    <Label
+                      htmlFor="replication-factor"
+                      className="text-gray-700 dark:text-gray-300"
+                    >
+                      Replication Factor
+                    </Label>
+                    {configInfoMap["Replication Factor"] && (
+                      <InfoPopup
+                        feature={configInfoMap["Replication Factor"]}
+                      />
+                    )}
+                  </div>
+                  <Input
+                    type="number"
+                    id="replication-factor"
+                    value={distribution.replicationFactor}
+                    onChange={(e) =>
+                      setDistribution({
+                        ...distribution,
+                        replicationFactor: Number(e.target.value),
+                      })
+                    }
+                    className={cn(
+                      "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                      "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+                    )}
+                    min={1}
+                    max={distribution.nodes}
+                  />
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center gap-2">
+                    <Label
+                      htmlFor="partitioning-strategy"
+                      className="text-gray-700 dark:text-gray-300"
+                    >
+                      Partitioning Strategy
+                    </Label>
+                    {configInfoMap["Partitioning Strategy"] && (
+                      <InfoPopup
+                        feature={configInfoMap["Partitioning Strategy"]}
+                      />
+                    )}
+                  </div>
+                  <Select
+                    value={distribution.partitioningStrategy}
+                    onValueChange={(value) =>
+                      setDistribution({
+                        ...distribution,
+                        partitioningStrategy: value,
+                      })
+                    }
+                  >
+                    <SelectTrigger
+                      className={cn(
+                        "w-full border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                        "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+                      )}
+                    >
+                      <SelectValue placeholder="Select partitioning strategy" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="consistent-hashing">
+                        Consistent Hashing
+                      </SelectItem>
+                      <SelectItem value="range">Range Based</SelectItem>
+                      <SelectItem value="modulo">Modulo Based</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center gap-2">
+                    <Label
+                      htmlFor="consistency-level"
+                      className="text-gray-700 dark:text-gray-300"
+                    >
+                      Consistency Level
+                    </Label>
+                    {configInfoMap["Consistency Level"] && (
+                      <InfoPopup feature={configInfoMap["Consistency Level"]} />
+                    )}
+                  </div>
+                  <Select
+                    value={distribution.consistencyLevel}
+                    onValueChange={(value) =>
+                      setDistribution({
+                        ...distribution,
+                        consistencyLevel: value,
+                      })
+                    }
+                  >
+                    <SelectTrigger
+                      className={cn(
+                        "w-full border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                        "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+                      )}
+                    >
+                      <SelectValue placeholder="Select consistency level" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="one">ONE</SelectItem>
+                      <SelectItem value="quorum">QUORUM</SelectItem>
+                      <SelectItem value="all">ALL</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="grid grid-cols-3 gap-4">
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <Label
+                  htmlFor="memory"
+                  className="text-gray-700 dark:text-gray-300"
+                >
+                  Memory (GB)
+                </Label>
+                {configInfoMap.Memory && (
+                  <InfoPopup feature={configInfoMap.Memory} />
+                )}
+              </div>
+              <Input
+                type="number"
+                id="memory"
+                value={capacity.memory}
+                onChange={(e) =>
+                  setCapacity({ ...capacity, memory: Number(e.target.value) })
+                }
+                className={cn(
+                  "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                  "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+                )}
+                min={1}
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <Label
+                  htmlFor="max-items"
+                  className="text-gray-700 dark:text-gray-300"
+                >
+                  Max Items
+                </Label>
+                {configInfoMap["Max Items"] && (
+                  <InfoPopup feature={configInfoMap["Max Items"]} />
+                )}
+              </div>
+              <Input
+                type="number"
+                id="max-items"
+                value={capacity.maxItems}
+                onChange={(e) =>
+                  setCapacity({
+                    ...capacity,
+                    maxItems: Number(e.target.value),
+                  })
+                }
+                className={cn(
+                  "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                  "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+                )}
+                min={1000}
+                step={1000}
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <Label
+                  htmlFor="max-item-size"
+                  className="text-gray-700 dark:text-gray-300"
+                >
+                  Max Item Size (MB)
+                </Label>
+                {configInfoMap["Max Item Size"] && (
+                  <InfoPopup feature={configInfoMap["Max Item Size"]} />
+                )}
+              </div>
+              <Input
+                type="number"
+                id="max-item-size"
+                value={capacity.maxItemSize}
+                onChange={(e) =>
+                  setCapacity({
+                    ...capacity,
+                    maxItemSize: Number(e.target.value),
+                  })
+                }
+                className={cn(
+                  "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                  "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+                )}
+                min={1}
+              />
+            </div>
+          </div>
+
+          {/* 
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
                 <Label className="text-gray-700 dark:text-gray-300">
@@ -627,52 +625,52 @@ const CacheSettings = ({
             </div>
                */}
 
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-2">
-                <Label
-                  htmlFor="cache-details"
-                  className="text-gray-700 dark:text-gray-300"
-                >
-                  Additional Configuration
-                </Label>
-                {configInfoMap["Additional Configuration"] && (
-                  <InfoPopup
-                    feature={configInfoMap["Additional Configuration"]}
-                  />
-                )}
-              </div>
-              <Textarea
-                name="cache-details"
-                id="cache-details"
-                rows={6}
-                placeholder={`Example:
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <Label
+                htmlFor="cache-details"
+                className="text-gray-700 dark:text-gray-300"
+              >
+                Additional Configuration
+              </Label>
+              {configInfoMap["Additional Configuration"] && (
+                <InfoPopup
+                  feature={configInfoMap["Additional Configuration"]}
+                />
+              )}
+            </div>
+            <Textarea
+              name="cache-details"
+              id="cache-details"
+              rows={6}
+              placeholder={`Example:
 - Cache invalidation strategy
 - TTL configuration
 - Replication settings
 - Backup policies
 - Monitoring requirements`}
-                className={cn(
-                  "text-md border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
-                  "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
-                  "placeholder:text-gray-500 dark:placeholder:text-gray-400",
-                )}
-                value={details}
-                onChange={(e) => setDetails(e.target.value)}
-              />
-            </div>
+              className={cn(
+                "text-md border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+                "placeholder:text-gray-500 dark:placeholder:text-gray-400",
+              )}
+              value={details}
+              onChange={(e) => setDetails(e.target.value)}
+            />
           </div>
-        ) : (
-          <div className="flex flex-col gap-2">
-            <Label
-              htmlFor="free-form"
-              className="text-gray-700 dark:text-gray-300"
-            >
-              Cache Configuration
-            </Label>
-            <Textarea
-              id="free-form"
-              rows={20}
-              placeholder={`Describe your cache configuration here. Example:
+        </div>
+      ) : (
+        <div className="flex flex-col gap-2">
+          <Label
+            htmlFor="free-form"
+            className="text-gray-700 dark:text-gray-300"
+          >
+            Cache Configuration
+          </Label>
+          <Textarea
+            id="free-form"
+            rows={20}
+            placeholder={`Describe your cache configuration here. Example:
 
 Cache Type: In-Memory Cache
 Capacity:
@@ -697,17 +695,18 @@ Additional Requirements:
 - Eviction policy: LRU
 - Backup strategy
 - Security configurations`}
-              className={cn(
-                "text-md border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
-                "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
-                "placeholder:text-gray-500 dark:placeholder:text-gray-400",
-              )}
-              value={freeFormText}
-              onChange={(e) => setFreeFormText(e.target.value)}
-            />
-          </div>
-        )}
-      </div>
-    </WithSettings>
+            className={cn(
+              "text-md border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+              "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+              "placeholder:text-gray-500 dark:placeholder:text-gray-400",
+            )}
+            value={freeFormText}
+            onChange={(e) => setFreeFormText(e.target.value)}
+          />
+        </div>
+      )}
+    </div>
   );
 };
+
+export { CacheSettings };

@@ -95,7 +95,12 @@ const InfoPopup = ({ feature }: { feature: FeatureInfo }) => {
   );
 };
 
-export const CDN = ({ name, Icon, nodeSettingsRef, subtitle }: ComponentNodeProps) => {
+export const CDN = ({
+  name,
+  Icon,
+  nodeSettingsRef,
+  subtitle,
+}: ComponentNodeProps) => {
   return (
     <div className="group flex flex-col items-center text-gray-800 dark:text-gray-200">
       <div className="flex flex-col items-center gap-1">
@@ -105,7 +110,7 @@ export const CDN = ({ name, Icon, nodeSettingsRef, subtitle }: ComponentNodeProp
         <Small>{name}</Small>
         {subtitle && <Muted>{subtitle}</Muted>}
       </div>
-      <CDNSettings name={name} nodeSettingsRef={nodeSettingsRef} />
+      {/* <CDNSettings name={name} nodeSettingsRef={nodeSettingsRef} /> */}
     </div>
   );
 };
@@ -115,7 +120,7 @@ const CDNSettings = ({
   nodeSettingsRef,
 }: {
   name: string;
-  nodeSettingsRef: NodeSettingsRefObject;
+  nodeSettingsRef?: NodeSettingsRefObject;
 }) => {
   const { useSystemComponentConfigSlice } = useSystemDesigner();
   const [isFreeText, setIsFreeText] = useState<boolean>(true);
@@ -149,162 +154,161 @@ const CDNSettings = ({
   );
 
   return (
-    <WithSettings id={id} name={id} nodeSettingsRef={nodeSettingsRef}>
-      <div className="flex w-full flex-col gap-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Label
-              htmlFor="free-text-mode"
-              className="text-gray-700 dark:text-gray-300"
-            >
-              Free-form Text
-            </Label>
-            {configInfoMap["Free-form Text Mode"] && (
-              <InfoPopup feature={configInfoMap["Free-form Text Mode"]} />
-            )}
-          </div>
-          <Switch
-            id="free-text-mode"
-            checked={isFreeText}
-            onCheckedChange={setIsFreeText}
-          />
+    <div className="flex w-full flex-col gap-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Label
+            htmlFor="free-text-mode"
+            className="text-gray-700 dark:text-gray-300"
+          >
+            Free-form Text
+          </Label>
+          {configInfoMap["Free-form Text Mode"] && (
+            <InfoPopup feature={configInfoMap["Free-form Text Mode"]} />
+          )}
         </div>
+        <Switch
+          id="free-text-mode"
+          checked={isFreeText}
+          onCheckedChange={setIsFreeText}
+        />
+      </div>
 
-        {!isFreeText ? (
-          <div className="grid w-full grid-flow-row grid-cols-1 gap-4 text-gray-800 dark:text-gray-200">
-            <div className="rounded-md border border-yellow-200 bg-yellow-50 p-3 dark:border-yellow-900/50 dark:bg-yellow-900/20">
-              <div className="flex items-center gap-2 text-sm text-yellow-800 dark:text-yellow-200">
-                <Small>
-                  Note: Detailed configuration options are still a work in
-                  progress. Options might get added or deleted.
-                </Small>
-              </div>
+      {!isFreeText ? (
+        <div className="grid w-full grid-flow-row grid-cols-1 gap-4 text-gray-800 dark:text-gray-200">
+          <div className="rounded-md border border-yellow-200 bg-yellow-50 p-3 dark:border-yellow-900/50 dark:bg-yellow-900/20">
+            <div className="flex items-center gap-2 text-sm text-yellow-800 dark:text-yellow-200">
+              <Small>
+                Note: Detailed configuration options are still a work in
+                progress. Options might get added or deleted.
+              </Small>
             </div>
+          </div>
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <Label
+                htmlFor="cdn-type"
+                className="text-gray-700 dark:text-gray-300"
+              >
+                CDN Type
+              </Label>
+              {configInfoMap["CDN Type"] && (
+                <InfoPopup feature={configInfoMap["CDN Type"]} />
+              )}
+            </div>
+            <Select value={cdnType} onValueChange={setCdnType}>
+              <SelectTrigger
+                className={cn(
+                  "w-full border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                  "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+                )}
+              >
+                <SelectValue placeholder="Select CDN type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="public">Public CDN</SelectItem>
+                <SelectItem value="private">Private CDN</SelectItem>
+                <SelectItem value="hybrid">Hybrid CDN</SelectItem>
+                <SelectItem value="p2p">P2P CDN</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="grid grid-cols-3 gap-4">
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
                 <Label
-                  htmlFor="cdn-type"
+                  htmlFor="storage"
                   className="text-gray-700 dark:text-gray-300"
                 >
-                  CDN Type
+                  Storage (TB)
                 </Label>
-                {configInfoMap["CDN Type"] && (
-                  <InfoPopup feature={configInfoMap["CDN Type"]} />
+                {configInfoMap.Storage && (
+                  <InfoPopup feature={configInfoMap.Storage} />
                 )}
               </div>
-              <Select value={cdnType} onValueChange={setCdnType}>
-                <SelectTrigger
-                  className={cn(
-                    "w-full border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
-                    "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
-                  )}
+              <Input
+                type="number"
+                id="storage"
+                value={capacity.storage}
+                onChange={(e) =>
+                  setCapacity({
+                    ...capacity,
+                    storage: Number(e.target.value),
+                  })
+                }
+                className={cn(
+                  "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                  "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+                )}
+                min={100}
+                step={100}
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <Label
+                  htmlFor="bandwidth"
+                  className="text-gray-700 dark:text-gray-300"
                 >
-                  <SelectValue placeholder="Select CDN type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="public">Public CDN</SelectItem>
-                  <SelectItem value="private">Private CDN</SelectItem>
-                  <SelectItem value="hybrid">Hybrid CDN</SelectItem>
-                  <SelectItem value="p2p">P2P CDN</SelectItem>
-                </SelectContent>
-              </Select>
+                  Bandwidth (Gbps)
+                </Label>
+                {configInfoMap.Bandwidth && (
+                  <InfoPopup feature={configInfoMap.Bandwidth} />
+                )}
+              </div>
+              <Input
+                type="number"
+                id="bandwidth"
+                value={capacity.bandwidth}
+                onChange={(e) =>
+                  setCapacity({
+                    ...capacity,
+                    bandwidth: Number(e.target.value),
+                  })
+                }
+                className={cn(
+                  "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                  "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+                )}
+                min={100}
+                step={100}
+              />
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2">
-                  <Label
-                    htmlFor="storage"
-                    className="text-gray-700 dark:text-gray-300"
-                  >
-                    Storage (TB)
-                  </Label>
-                  {configInfoMap.Storage && (
-                    <InfoPopup feature={configInfoMap.Storage} />
-                  )}
-                </div>
-                <Input
-                  type="number"
-                  id="storage"
-                  value={capacity.storage}
-                  onChange={(e) =>
-                    setCapacity({
-                      ...capacity,
-                      storage: Number(e.target.value),
-                    })
-                  }
-                  className={cn(
-                    "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
-                    "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
-                  )}
-                  min={100}
-                  step={100}
-                />
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <Label
+                  htmlFor="edge-locations"
+                  className="text-gray-700 dark:text-gray-300"
+                >
+                  Edge Locations
+                </Label>
+                {configInfoMap["Edge Locations"] && (
+                  <InfoPopup feature={configInfoMap["Edge Locations"]} />
+                )}
               </div>
-
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2">
-                  <Label
-                    htmlFor="bandwidth"
-                    className="text-gray-700 dark:text-gray-300"
-                  >
-                    Bandwidth (Gbps)
-                  </Label>
-                  {configInfoMap.Bandwidth && (
-                    <InfoPopup feature={configInfoMap.Bandwidth} />
-                  )}
-                </div>
-                <Input
-                  type="number"
-                  id="bandwidth"
-                  value={capacity.bandwidth}
-                  onChange={(e) =>
-                    setCapacity({
-                      ...capacity,
-                      bandwidth: Number(e.target.value),
-                    })
-                  }
-                  className={cn(
-                    "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
-                    "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
-                  )}
-                  min={100}
-                  step={100}
-                />
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2">
-                  <Label
-                    htmlFor="edge-locations"
-                    className="text-gray-700 dark:text-gray-300"
-                  >
-                    Edge Locations
-                  </Label>
-                  {configInfoMap["Edge Locations"] && (
-                    <InfoPopup feature={configInfoMap["Edge Locations"]} />
-                  )}
-                </div>
-                <Input
-                  type="number"
-                  id="edge-locations"
-                  value={capacity.edgeLocations}
-                  onChange={(e) =>
-                    setCapacity({
-                      ...capacity,
-                      edgeLocations: Number(e.target.value),
-                    })
-                  }
-                  className={cn(
-                    "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
-                    "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
-                  )}
-                  min={1}
-                />
-              </div>
+              <Input
+                type="number"
+                id="edge-locations"
+                value={capacity.edgeLocations}
+                onChange={(e) =>
+                  setCapacity({
+                    ...capacity,
+                    edgeLocations: Number(e.target.value),
+                  })
+                }
+                className={cn(
+                  "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                  "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+                )}
+                min={1}
+              />
             </div>
+          </div>
 
-            {/* 
+          {/* 
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
                 <Label className="text-gray-700 dark:text-gray-300">
@@ -344,53 +348,53 @@ const CDNSettings = ({
             </div>
                */}
 
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-2">
-                <Label
-                  htmlFor="cdn-details"
-                  className="text-gray-700 dark:text-gray-300"
-                >
-                  Additional Configuration
-                </Label>
-                {configInfoMap["Additional Configuration"] && (
-                  <InfoPopup
-                    feature={configInfoMap["Additional Configuration"]}
-                  />
-                )}
-              </div>
-              <Textarea
-                name="cdn-details"
-                id="cdn-details"
-                rows={6}
-                placeholder={`Example:
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <Label
+                htmlFor="cdn-details"
+                className="text-gray-700 dark:text-gray-300"
+              >
+                Additional Configuration
+              </Label>
+              {configInfoMap["Additional Configuration"] && (
+                <InfoPopup
+                  feature={configInfoMap["Additional Configuration"]}
+                />
+              )}
+            </div>
+            <Textarea
+              name="cdn-details"
+              id="cdn-details"
+              rows={6}
+              placeholder={`Example:
 - Cache control policies
 - Origin server settings
 - Security configurations
 - Custom routing rules
 - Content optimization settings
 - Geographic restrictions`}
-                className={cn(
-                  "text-md border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
-                  "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
-                  "placeholder:text-gray-500 dark:placeholder:text-gray-400",
-                )}
-                value={details}
-                onChange={(e) => setDetails(e.target.value)}
-              />
-            </div>
+              className={cn(
+                "text-md border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+                "placeholder:text-gray-500 dark:placeholder:text-gray-400",
+              )}
+              value={details}
+              onChange={(e) => setDetails(e.target.value)}
+            />
           </div>
-        ) : (
-          <div className="flex flex-col gap-2">
-            <Label
-              htmlFor="free-form"
-              className="text-gray-700 dark:text-gray-300"
-            >
-              CDN Configuration
-            </Label>
-            <Textarea
-              id="free-form"
-              rows={20}
-              placeholder={`Describe your CDN configuration here. Example:
+        </div>
+      ) : (
+        <div className="flex flex-col gap-2">
+          <Label
+            htmlFor="free-form"
+            className="text-gray-700 dark:text-gray-300"
+          >
+            CDN Configuration
+          </Label>
+          <Textarea
+            id="free-form"
+            rows={20}
+            placeholder={`Describe your CDN configuration here. Example:
 
 CDN Type: Public CDN
 
@@ -416,17 +420,19 @@ Additional Requirements:
 - Custom routing rules
 - Content optimization settings
 - Geographic restrictions`}
-              className={cn(
-                "text-md border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
-                "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
-                "placeholder:text-gray-500 dark:placeholder:text-gray-400",
-              )}
-              value={freeFormText}
-              onChange={(e) => setFreeFormText(e.target.value)}
-            />
-          </div>
-        )}
-      </div>
-    </WithSettings>
+            className={cn(
+              "text-md border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+              "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+              "placeholder:text-gray-500 dark:placeholder:text-gray-400",
+            )}
+            value={freeFormText}
+            onChange={(e) => setFreeFormText(e.target.value)}
+          />
+        </div>
+      )}
+    </div>
   );
 };
+
+// Export the CDNSettings component
+export { CDNSettings };

@@ -140,6 +140,17 @@ export default function Navbar() {
           {/* Navigation Links - Desktop */}
           <div className="hidden md:flex items-center space-x-4">
             <Link
+              href="/playground"
+              className={cn(
+                "text-sm font-medium hover:text-primary",
+                pathname === "/playground"
+                  ? "text-primary font-semibold"
+                  : "text-muted-foreground",
+              )}
+            >
+              Playground
+            </Link>
+            <Link
               href="/challenges"
               className={cn(
                 "text-sm font-medium hover:text-primary",
@@ -149,17 +160,6 @@ export default function Navbar() {
               )}
             >
               Challenges
-            </Link>
-            <Link
-              href="/playground"
-              className={cn(
-                "text-sm font-medium hover:text-primary",
-                pathname === "/playground"
-                  ? "text-primary"
-                  : "text-muted-foreground",
-              )}
-            >
-              Playground
             </Link>
           </div>
         </div>
@@ -214,6 +214,17 @@ export default function Navbar() {
             {/* Navigation Links - Mobile */}
             <div className="space-y-2 mb-4">
               <Link
+                href="/playground"
+                className={cn(
+                  "block py-2 text-sm hover:text-primary",
+                  pathname === "/playground"
+                    ? "text-primary font-semibold"
+                    : "text-muted-foreground",
+                )}
+              >
+                Playground
+              </Link>
+              <Link
                 href="/challenges"
                 className={cn(
                   "block py-2 text-sm hover:text-primary",
@@ -223,17 +234,6 @@ export default function Navbar() {
                 )}
               >
                 Challenges
-              </Link>
-              <Link
-                href="/playground"
-                className={cn(
-                  "block py-2 text-sm hover:text-primary",
-                  pathname === "/playground"
-                    ? "text-primary"
-                    : "text-muted-foreground",
-                )}
-              >
-                Playground
               </Link>
             </div>
             

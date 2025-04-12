@@ -17,13 +17,16 @@ import {
   X,
   Zap,
   Lightbulb,
+  Layers,
+  Save,
+  Share2,
 } from "lucide-react";
 import Link from "next/link";
 
 export const metadata = {
-  title: "Pricing - 10×arch | System Design Learning Platform",
+  title: "Pricing - System Design Playground",
   description:
-    "Learn system design with our flexible, affordable token-based pricing system.",
+    "Access our system design playground with flexible, affordable token-based pricing.",
 };
 
 export default function PricingPage() {
@@ -33,14 +36,14 @@ export default function PricingPage() {
       <div className="mb-12 text-center">
         <div className="mb-2">
           <span className="rounded-full bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-1 text-sm font-medium text-white">
-            Learn System Design Effectively
+            Design Better Systems
           </span>
         </div>
         <h1 className="mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-4xl font-bold text-transparent md:text-5xl">
-          Invest In Your Engineering Career
+          Unleash Your Design Potential
         </h1>
         <p className="mx-auto mb-6 max-w-2xl text-xl text-gray-600 dark:text-gray-400">
-          Master system design with our affordable token-based system
+          Get unlimited access to our system design playground with flexible pricing
         </p>
       </div>
 
@@ -57,13 +60,13 @@ export default function PricingPage() {
               </span>
             </CardTitle>
             <CardDescription>
-              Perfect for beginners exploring system design
+              Start designing systems with basic features
             </CardDescription>
             <div className="mt-4">
               <span className="text-3xl font-bold">$0</span>
               <span className="text-gray-500 dark:text-gray-400">
                 {" "}
-                / forever
+                / limited access
               </span>
             </div>
           </CardHeader>
@@ -71,38 +74,29 @@ export default function PricingPage() {
             <ul className="space-y-3">
               <li className="flex items-start">
                 <CheckCircle className="mr-2 mt-0.5 h-5 w-5 shrink-0 text-green-500" />
-                <span>Few challenges access</span>
+                <span>Basic access to the design playground</span>
               </li>
-              {/* <li className="flex items-start">
-                <CheckCircle className="h-5 w-5 text-green-500 mr-2 shrink-0 mt-0.5" />
-                <span>Playground with limited features</span>
-              </li> */}
-              {/* <li className="flex items-start text-gray-400 dark:text-gray-500">
-                <X className="h-5 w-5 text-gray-300 dark:text-gray-600 mr-2 shrink-0 mt-0.5" />
-                <span>Advanced AI feedback</span>
-              </li> */}
               <li className="flex items-start">
                 <CheckCircle className="mr-2 mt-0.5 h-5 w-5 shrink-0 text-green-500" />
                 <span>
-                  3 prompts per hour to chat with our Context-aware AI to
-                  discuss your system design
+                  Rate-limited AI feedback (3 prompts per hour)
                 </span>
               </li>
               <li className="flex items-start">
                 <CheckCircle className="mr-2 mt-0.5 h-5 w-5 shrink-0 text-green-500" />
-                <span>5 free submissions per day</span>
+                <span>Access to basic component library</span>
               </li>
-              {/* <li className="flex items-start text-gray-400 dark:text-gray-500">
+              <li className="flex items-start text-gray-400 dark:text-gray-500">
                 <X className="h-5 w-5 text-gray-300 dark:text-gray-600 mr-2 shrink-0 mt-0.5" />
-                <span>System design templates</span>
-              </li> */}
+                <span>Advanced component library</span>
+              </li>
             </ul>
           </CardContent>
           <CardFooter className="mt-auto">
-            <Link href="/signup" className="w-full">
+            <Link href="/playground" className="w-full">
               <Button variant="outline" className="w-full">
-                Start For Free
-                <ArrowRight className="ml-2 h-4 w-4" />
+                Start Designing
+                <Layers className="ml-2 h-4 w-4" />
               </Button>
             </Link>
           </CardFooter>
@@ -119,7 +113,7 @@ export default function PricingPage() {
           <CardHeader>
             <CardTitle className="text-2xl">Pro Access</CardTitle>
             <CardDescription>
-              Fast-track your system design expertise
+              Pay-as-you-go for advanced design capabilities
             </CardDescription>
             <div className="mt-4">
               <span className="mr-2 text-sm text-gray-500 dark:text-gray-400">
@@ -128,7 +122,7 @@ export default function PricingPage() {
               <span className="text-3xl font-bold">$5</span>
               <span className="text-gray-500 dark:text-gray-400">
                 {" "}
-                / 1000 tokens
+                / 1000 AI credits
               </span>
             </div>
           </CardHeader>
@@ -137,39 +131,52 @@ export default function PricingPage() {
               <li className="flex items-start">
                 <CheckCircle className="mr-2 mt-0.5 h-5 w-5 shrink-0 text-green-500" />
                 <div>
-                  <span className="font-medium">Full access</span>
-                  <span> to all system design challenges</span>
-                </div>
-              </li>
-              {/* <li className="flex items-start">
-                <CheckCircle className="h-5 w-5 text-green-500 mr-2 shrink-0 mt-0.5" />
-                <div>
-                  <span className="font-medium">In-depth AI feedback</span>
-                  <span> on your designs</span>
-                </div>
-              </li> */}
-              {/* <li className="flex items-start">
-                <CheckCircle className="h-5 w-5 text-green-500 mr-2 shrink-0 mt-0.5" />
-                <span>Full playground capabilities with templates</span>
-              </li> */}
-              <li className="flex items-start">
-                <CheckCircle className="mr-2 mt-0.5 h-5 w-5 shrink-0 text-green-500" />
-                <div>
-                  <span className="font-medium">Full access</span>
-                  <span> to our Context-aware AI chat</span>
+                  <span className="font-medium">Full playground access</span>
+                  <span> with all available features</span>
                 </div>
               </li>
               <li className="flex items-start">
                 <CheckCircle className="mr-2 mt-0.5 h-5 w-5 shrink-0 text-green-500" />
                 <div>
-                  <span className="font-medium">Tokens never expire</span>
-                  <span> - buy once, use anytime</span>
+                  <span className="font-medium">Unlimited AI feedback</span>
+                  <span> using your purchased credits</span>
                 </div>
               </li>
-              {/* <li className="flex items-start">
-                <CheckCircle className="h-5 w-5 text-green-500 mr-2 shrink-0 mt-0.5" />
-                <span>Priority access to new challenges</span>
-              </li> */}
+              <li className="flex items-start">
+                <CheckCircle className="mr-2 mt-0.5 h-5 w-5 shrink-0 text-green-500" />
+                <span>Unlimited system design saves
+                  <span className="ml-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-800 dark:bg-amber-900/30 dark:text-amber-500">
+                    Coming Soon
+                  </span>
+                </span>
+              </li>
+              <li className="flex items-start">
+                <CheckCircle className="mr-2 mt-0.5 h-5 w-5 shrink-0 text-green-500" />
+                <div>
+                  <span className="font-medium">Export options</span>
+                  <span> including PNG, PDF, and more</span>
+                  <span className="ml-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-800 dark:bg-amber-900/30 dark:text-amber-500">
+                    Coming Soon
+                  </span>
+                </div>
+              </li>
+              <li className="flex items-start">
+                <CheckCircle className="mr-2 mt-0.5 h-5 w-5 shrink-0 text-green-500" />
+                <div>
+                  <span className="font-medium">Advanced component library</span>
+                  <span> with specialized templates</span>
+                </div>
+              </li>
+              <li className="flex items-start">
+                <CheckCircle className="mr-2 mt-0.5 h-5 w-5 shrink-0 text-green-500" />
+                <div>
+                  <span className="font-medium">Design sharing</span>
+                  <span> with team collaboration features</span>
+                  <span className="ml-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-800 dark:bg-amber-900/30 dark:text-amber-500">
+                    Coming Soon
+                  </span>
+                </div>
+              </li>
             </ul>
             <div className="mt-4 rounded-md border border-purple-100 bg-purple-50 p-3 dark:border-purple-800/30 dark:bg-purple-900/20">
               <div className="flex items-center text-sm text-purple-700 dark:text-purple-300">
@@ -212,35 +219,21 @@ export default function PricingPage() {
             <tbody>
               <tr className="border-b border-gray-200 dark:border-gray-700">
                 <td className="p-4 text-gray-700 dark:text-gray-300">
-                  Available Challenges
-                </td>
-                <td className="p-4 text-center text-gray-600 dark:text-gray-400">
-                  Limited access
-                </td>
-                <td className="p-4 text-center font-semibold text-gray-600 dark:text-gray-400">
-                  All Challenges
-                </td>
-              </tr>
-              {/* <tr className="border-b border-gray-200 dark:border-gray-700">
-                <td className="p-4 text-gray-700 dark:text-gray-300">AI Feedback Quality</td>
-                <td className="p-4 text-center text-gray-600 dark:text-gray-400">Basic</td>
-                <td className="p-4 text-center text-gray-600 dark:text-gray-400 font-semibold">Advanced</td>
-              </tr> */}
-              {/* <tr className="border-b border-gray-200 dark:border-gray-700">
-                <td className="p-4 text-gray-700 dark:text-gray-300">System Design Templates</td>
-                <td className="p-4 text-center">
-                  <X className="h-5 w-5 text-gray-400 dark:text-gray-500 mx-auto" />
+                  Basic Playground Access
                 </td>
                 <td className="p-4 text-center">
                   <CheckCircle className="h-5 w-5 text-green-500 mx-auto" />
                 </td>
-              </tr> */}
+                <td className="p-4 text-center">
+                  <CheckCircle className="h-5 w-5 text-green-500 mx-auto" />
+                </td>
+              </tr>
               <tr className="border-b border-gray-200 dark:border-gray-700">
                 <td className="p-4 text-gray-700 dark:text-gray-300">
-                  Daily Submissions
+                  AI Design Feedback
                 </td>
                 <td className="p-4 text-center text-gray-600 dark:text-gray-400">
-                  5/day
+                  Limited (3/hour)
                 </td>
                 <td className="p-4 text-center font-semibold text-gray-600 dark:text-gray-400">
                   Unlimited (token-based)
@@ -248,24 +241,77 @@ export default function PricingPage() {
               </tr>
               <tr className="border-b border-gray-200 dark:border-gray-700">
                 <td className="p-4 text-gray-700 dark:text-gray-300">
-                  Context-Aware AI Chat
+                  Design Saves
+                  <span className="ml-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-800 dark:bg-amber-900/30 dark:text-amber-500">
+                    Coming Soon
+                  </span>
                 </td>
                 <td className="p-4 text-center text-gray-600 dark:text-gray-400">
-                  Limited to 3 prompts per hour
+                  5 designs
                 </td>
-                <td className="p-4 text-center">
-                  <CheckCircle className="mx-auto h-5 w-5 text-green-500" />
+                <td className="p-4 text-center font-semibold text-gray-600 dark:text-gray-400">
+                  Unlimited
                 </td>
               </tr>
               <tr className="border-b border-gray-200 dark:border-gray-700">
                 <td className="p-4 text-gray-700 dark:text-gray-300">
-                  Early Access to New Features
+                  Export Options
+                  <span className="ml-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-800 dark:bg-amber-900/30 dark:text-amber-500">
+                    Coming Soon
+                  </span>
                 </td>
                 <td className="p-4 text-center">
-                  <X className="mx-auto h-5 w-5 text-gray-400 dark:text-gray-500" />
+                  <X className="h-5 w-5 text-gray-400 dark:text-gray-500 mx-auto" />
                 </td>
                 <td className="p-4 text-center">
-                  <CheckCircle className="mx-auto h-5 w-5 text-green-500" />
+                  <CheckCircle className="h-5 w-5 text-green-500 mx-auto" />
+                </td>
+              </tr>
+              <tr className="border-b border-gray-200 dark:border-gray-700">
+                <td className="p-4 text-gray-700 dark:text-gray-300">
+                  Advanced Component Library
+                </td>
+                <td className="p-4 text-center">
+                  <X className="h-5 w-5 text-gray-400 dark:text-gray-500 mx-auto" />
+                </td>
+                <td className="p-4 text-center">
+                  <CheckCircle className="h-5 w-5 text-green-500 mx-auto" />
+                </td>
+              </tr>
+              <tr className="border-b border-gray-200 dark:border-gray-700">
+                <td className="p-4 text-gray-700 dark:text-gray-300">
+                  Team Collaboration
+                  <span className="ml-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-800 dark:bg-amber-900/30 dark:text-amber-500">
+                    Coming Soon
+                  </span>
+                </td>
+                <td className="p-4 text-center">
+                  <X className="h-5 w-5 text-gray-400 dark:text-gray-500 mx-auto" />
+                </td>
+                <td className="p-4 text-center">
+                  <CheckCircle className="h-5 w-5 text-green-500 mx-auto" />
+                </td>
+              </tr>
+              <tr className="border-b border-gray-200 dark:border-gray-700">
+                <td className="p-4 text-gray-700 dark:text-gray-300">
+                  Access to Challenges
+                </td>
+                <td className="p-4 text-center text-gray-600 dark:text-gray-400">
+                  Basic challenges
+                </td>
+                <td className="p-4 text-center font-semibold text-gray-600 dark:text-gray-400">
+                  All challenges
+                </td>
+              </tr>
+              <tr className="border-b border-gray-200 dark:border-gray-700">
+                <td className="p-4 text-gray-700 dark:text-gray-300">
+                  AI Chat Quality
+                </td>
+                <td className="p-4 text-center text-gray-600 dark:text-gray-400">
+                  Standard
+                </td>
+                <td className="p-4 text-center font-semibold text-gray-600 dark:text-gray-400">
+                  Enhanced
                 </td>
               </tr>
             </tbody>
@@ -273,291 +319,153 @@ export default function PricingPage() {
         </div>
       </div>
 
-      {/* Benefits Section */}
-      <div className="mx-auto mb-16 max-w-4xl rounded-xl bg-gradient-to-r from-blue-50 to-purple-50 p-8 dark:from-blue-900/20 dark:to-purple-900/20">
-        <div className="flex flex-col items-center gap-6 md:flex-row">
-          <div className="text-center md:w-1/3">
-            <div className="mb-4 inline-flex h-20 w-20 items-center justify-center rounded-full bg-blue-600 text-white">
-              <CreditCard className="h-10 w-10" />
-            </div>
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
-              Flexible Pricing
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400">
-              Pay only for the tokens you use
-            </p>
-          </div>
-          <div className="text-center md:w-1/3">
-            <div className="mb-4 inline-flex h-20 w-20 items-center justify-center rounded-full bg-purple-600 text-white">
-              <Brain className="h-10 w-10" />
-            </div>
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
-              AI-Powered
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400">
-              Get detailed feedback on your designs
-            </p>
-          </div>
-          <div className="text-center md:w-1/3">
-            <div className="mb-4 inline-flex h-20 w-20 items-center justify-center rounded-full bg-pink-600 text-white">
-              <Lightbulb className="h-10 w-10" />
-            </div>
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
-              Learn Effectively
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400">
-              Practice with real-world system design challenges
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* How Pricing Works */}
-      <div className="mb-16">
-        <h2 className="mb-8 text-center text-3xl font-bold">
-          How Our Token System Works
+      {/* Features Section */}
+      <section className="mb-16">
+        <h2 className="mb-8 text-center text-2xl font-bold">
+          Playground Features
         </h2>
-        <div className="grid gap-8 md:grid-cols-2">
-          <div className="rounded-lg border border-gray-100 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800/50">
-            <h3 className="mb-4 flex items-center text-xl font-semibold">
-              <Brain className="mr-2 h-5 w-5 text-blue-500" />
-              Simple Pay-As-You-Go
-            </h3>
-            <p className="mb-4 text-gray-600 dark:text-gray-400">
-              Our platform uses tokens to process your designs through our AI
-              system. Token consumption depends on:
+        <div className="grid gap-6 md:grid-cols-3">
+          <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+            <div className="mb-4 rounded-full bg-blue-100 p-2 w-12 h-12 flex items-center justify-center dark:bg-blue-900/30">
+              <Layers className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+            </div>
+            <h3 className="mb-2 text-xl font-bold">Visual Designer</h3>
+            <p className="text-gray-600 dark:text-gray-400">
+              Drag-and-drop interface for creating system architectures with ease
             </p>
-            <ul className="space-y-2">
-              <li className="flex items-start">
-                <CheckCircle className="mr-2 mt-0.5 h-5 w-5 shrink-0 text-green-500" />
-                <span>
-                  <strong>Challenge complexity</strong> - more advanced
-                  challenges use more tokens
-                </span>
-              </li>
-              <li className="flex items-start">
-                <CheckCircle className="mr-2 mt-0.5 h-5 w-5 shrink-0 text-green-500" />
-                <span>
-                  <strong>Solution size</strong> - comprehensive solutions need
-                  more processing
-                </span>
-              </li>
-              <li className="flex items-start">
-                <CheckCircle className="mr-2 mt-0.5 h-5 w-5 shrink-0 text-green-500" />
-                <span>
-                  <strong>AI feedback detail</strong> - more in-depth feedback
-                  uses more tokens
-                </span>
-              </li>
-            </ul>
           </div>
-
-          <div className="rounded-lg border border-gray-100 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800/50">
-            <h3 className="mb-4 flex items-center text-xl font-semibold">
-              <Shield className="mr-2 h-5 w-5 text-blue-500" />
-              Designed With Engineers In Mind
-            </h3>
-            <p className="mb-4 text-gray-600 dark:text-gray-400">
-              Our token system is built for software engineers who value
-              flexibility and efficiency:
+          <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+            <div className="mb-4 rounded-full bg-purple-100 p-2 w-12 h-12 flex items-center justify-center dark:bg-purple-900/30">
+              <Brain className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+            </div>
+            <h3 className="mb-2 text-xl font-bold">AI Feedback</h3>
+            <p className="text-gray-600 dark:text-gray-400">
+              Get intelligent suggestions and improvements for your system designs
             </p>
-            <ul className="space-y-2">
-              <li className="flex items-start">
-                <CheckCircle className="mr-2 mt-0.5 h-5 w-5 shrink-0 text-green-500" />
-                <span>
-                  <strong>No subscriptions</strong> - avoid recurring charges
-                  you might forget
-                </span>
-              </li>
-              <li className="flex items-start">
-                <CheckCircle className="mr-2 mt-0.5 h-5 w-5 shrink-0 text-green-500" />
-                <span>
-                  <strong>Tokens never expire</strong> - learn at your own pace
-                </span>
-              </li>
-              <li className="flex items-start">
-                <CheckCircle className="mr-2 mt-0.5 h-5 w-5 shrink-0 text-green-500" />
-                <span>
-                  <strong>Volume discounts</strong> - save more when you buy in
-                  bulk
-                </span>
-              </li>
-            </ul>
+          </div>
+          <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+            <div className="mb-4 rounded-full bg-green-100 p-2 w-12 h-12 flex items-center justify-center dark:bg-green-900/30">
+              <Save className="h-6 w-6 text-green-600 dark:text-green-400" />
+            </div>
+            <h3 className="mb-2 text-xl font-bold">Save & Export</h3>
+            <p className="text-gray-600 dark:text-gray-400">
+              Store your designs and export them in various formats
+              <span className="ml-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-800 dark:bg-amber-900/30 dark:text-amber-500">
+                Coming Soon
+              </span>
+            </p>
+          </div>
+          <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+            <div className="mb-4 rounded-full bg-amber-100 p-2 w-12 h-12 flex items-center justify-center dark:bg-amber-900/30">
+              <Share2 className="h-6 w-6 text-amber-600 dark:text-amber-400" />
+            </div>
+            <h3 className="mb-2 text-xl font-bold">Share & Collaborate</h3>
+            <p className="text-gray-600 dark:text-gray-400">
+              Invite teammates to view or edit your system designs
+              <span className="ml-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-800 dark:bg-amber-900/30 dark:text-amber-500">
+                Coming Soon
+              </span>
+            </p>
+          </div>
+          <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+            <div className="mb-4 rounded-full bg-red-100 p-2 w-12 h-12 flex items-center justify-center dark:bg-red-900/30">
+              <MessageSquareText className="h-6 w-6 text-red-600 dark:text-red-400" />
+            </div>
+            <h3 className="mb-2 text-xl font-bold">Component Documentation</h3>
+            <p className="text-gray-600 dark:text-gray-400">
+              Add notes, context, and documentation to each component
+            </p>
+          </div>
+          <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+            <div className="mb-4 rounded-full bg-indigo-100 p-2 w-12 h-12 flex items-center justify-center dark:bg-indigo-900/30">
+              <Lightbulb className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
+            </div>
+            <h3 className="mb-2 text-xl font-bold">Design Templates</h3>
+            <p className="text-gray-600 dark:text-gray-400">
+              Start with pre-built templates for common system architectures
+            </p>
           </div>
         </div>
-      </div>
-
-      {/* Token Usage Explanation */}
-      <div className="mx-auto mb-16 max-w-4xl">
-        <h2 className="mb-8 text-center text-3xl font-bold">
-          Understanding Token Usage
-        </h2>
-        <div className="rounded-lg border bg-white p-6 shadow-sm dark:bg-gray-800/50">
-          <div className="mb-6 flex items-start space-x-4">
-            <MessageSquareText className="mt-1 h-8 w-8 shrink-0 text-blue-500" />
-            <div>
-              <h3 className="mb-2 text-xl font-semibold">What Are Tokens?</h3>
-              <p className="text-gray-600 dark:text-gray-400">
-                Tokens are the basic units of text processed by our AI system.
-                Each word typically consists of 1-3 tokens, depending on its
-                length. When you submit a system design challenge for review, we
-                process both your solution and the challenge complexity to
-                provide personalized feedback.
-              </p>
-            </div>
-          </div>
-
-          <div className="mb-6 grid gap-6 md:grid-cols-2">
-            <div className="rounded-lg border border-gray-200 p-4 dark:border-gray-700">
-              <h4 className="mb-2 font-semibold">
-                Factors Affecting Token Usage:
-              </h4>
-              <ul className="space-y-2">
-                <li className="flex items-start">
-                  <CheckCircle className="mr-2 mt-0.5 h-5 w-5 shrink-0 text-green-500" />
-                  <span>
-                    <strong>Solution Length:</strong> Longer, more detailed
-                    solutions require more tokens to process
-                  </span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircle className="mr-2 mt-0.5 h-5 w-5 shrink-0 text-green-500" />
-                  <span>
-                    <strong>Challenge Type:</strong> Different challenges have
-                    varying complexity levels
-                  </span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircle className="mr-2 mt-0.5 h-5 w-5 shrink-0 text-green-500" />
-                  <span>
-                    <strong>Feedback Detail:</strong> More comprehensive
-                    feedback requires additional processing
-                  </span>
-                </li>
-              </ul>
-            </div>
-
-            <div className="rounded-lg border border-gray-200 p-4 dark:border-gray-700">
-              <h4 className="mb-2 font-semibold">Approximate Token Usage:</h4>
-              <ul className="space-y-2">
-                <li className="flex items-start">
-                  <CheckCircle className="mr-2 mt-0.5 h-5 w-5 shrink-0 text-green-500" />
-                  <span>
-                    <strong>Small challenge:</strong> ~5-15 tokens (~$0.03)
-                  </span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircle className="mr-2 mt-0.5 h-5 w-5 shrink-0 text-green-500" />
-                  <span>
-                    <strong>Medium challenge:</strong> ~15-30 tokens (~$0.08)
-                  </span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircle className="mr-2 mt-0.5 h-5 w-5 shrink-0 text-green-500" />
-                  <span>
-                    <strong>Complex challenge:</strong> ~30-50+ tokens
-                    (~$0.15-0.25)
-                  </span>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <p className="text-gray-600 dark:text-gray-400">
-            The token system is designed to be fair and transparent. You&apos;ll
-            always see how many tokens remain in your account, and you&apos;ll
-            only be charged for the tokens you actually use when processing your
-            challenges.
-          </p>
-        </div>
-      </div>
+      </section>
 
       {/* FAQ Section */}
-      <div className="mx-auto mb-16 max-w-3xl">
-        <h2 className="mb-8 text-center text-3xl font-bold">
+      <section className="mx-auto mb-16 max-w-4xl py-12">
+        <h2 className="mb-8 text-center text-2xl font-bold">
           Frequently Asked Questions
         </h2>
         <div className="space-y-4">
-          <div className="rounded-lg border bg-white p-5 shadow-sm dark:bg-gray-800/50">
-            <h3 className="mb-2 text-lg font-semibold">Do tokens expire?</h3>
-            <p className="text-gray-600 dark:text-gray-400">
-              No, tokens never expire. Once purchased, they remain in your
-              account until used. Learn at your own pace without the pressure of
-              time limits.
-            </p>
-          </div>
-          <div className="rounded-lg border bg-white p-5 shadow-sm dark:bg-gray-800/50">
-            <h3 className="mb-2 text-lg font-semibold">
-              Can I try before buying tokens?
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400">
-              Absolutely! Our free tier includes 3 challenges and limited daily
-              submissions, letting you experience the platform before
-              purchasing.
-            </p>
-          </div>
-          <div className="rounded-lg border bg-white p-5 shadow-sm dark:bg-gray-800/50">
-            <h3 className="mb-2 text-lg font-semibold">
-              Are there volume discounts?
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400">
-              Yes! The more tokens you purchase, the better the value. Check our{" "}
-              <Link
-                href="/credits"
-                className="text-blue-600 hover:underline dark:text-blue-400"
-              >
-                Tokens page
-              </Link>{" "}
-              for bulk pricing options.
-            </p>
-          </div>
-          <div className="rounded-lg border bg-white p-5 shadow-sm dark:bg-gray-800/50">
-            <h3 className="mb-2 text-lg font-semibold">
-              How do I purchase tokens?
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400">
-              Simply navigate to the{" "}
-              <Link
-                href="/credits"
-                className="text-blue-600 hover:underline dark:text-blue-400"
-              >
-                Tokens page
-              </Link>
-              , select the package you want, and complete the secure checkout
-              process. Tokens are instantly added to your account for immediate
-              use.
-            </p>
-          </div>
+          {[
+            {
+              question: "What is the System Design Playground?",
+              answer:
+                "The System Design Playground is an interactive environment where you can create, visualize, and document your system architecture designs. It provides a drag-and-drop interface and AI feedback to help you build better systems.",
+            },
+            {
+              question: "Can I use the playground for free?",
+              answer:
+                "You can access basic playground functionality with limitations. Free users get 3 AI prompts per hour but advanced features and unlimited AI feedback require purchasing credits through our Pro plan."
+            },
+            {
+              question: "What do AI credits get used for?",
+              answer:
+                "AI credits are consumed when you request feedback on your designs, use AI-powered features, or access premium functionality. Each interaction costs a certain number of credits based on complexity and processing required."
+            },
+            {
+              question: "What do tokens get used for in the Pro plan?",
+              answer:
+                "Tokens are primarily used for AI feedback on your designs, exporting in premium formats, and accessing advanced features. The token system allows you to pay only for what you actually use.",
+            },
+            {
+              question: "Can I share my designs with others?",
+              answer:
+                "This feature is coming soon! Free users will be able to view their own designs, while Pro users will be able to share designs with teammates and collaborate on them in real-time.",
+            },
+            {
+              question: "Do tokens expire?",
+              answer:
+                "No, your tokens never expire. You can purchase them once and use them whenever you need them.",
+            },
+          ].map((faq, i) => (
+            <div
+              key={i}
+              className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900"
+            >
+              <h3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">
+                {faq.question}
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400">{faq.answer}</p>
+            </div>
+          ))}
         </div>
-      </div>
+      </section>
 
       {/* CTA */}
-      <div className="mx-auto mb-8 mt-16 max-w-4xl rounded-2xl border border-gray-100 bg-gradient-to-r from-blue-50 to-purple-50 p-10 text-center shadow-sm dark:border-gray-800 dark:from-blue-900/30 dark:to-purple-900/30">
-        <h2 className="mb-4 text-3xl font-bold">
-          Ready to level up your system design skills?
-        </h2>
-        <p className="mx-auto mb-6 max-w-2xl text-gray-600 dark:text-gray-400">
-          Improve your system design skills with 10×arch&apos;s interactive
-          learning platform. Start for free or go Pro today!
-        </p>
-        <div className="flex flex-wrap justify-center gap-4">
-          <Link href="/credits">
-            <Button className="h-auto bg-gradient-to-r from-purple-500 to-pink-500 px-8 py-6 text-lg shadow-md transition-all hover:from-purple-600 hover:to-pink-600 hover:shadow-lg hover:shadow-purple-200 dark:hover:shadow-purple-900/20">
-              Get 1000 Tokens for $5
-              <CreditCard className="ml-2 h-5 w-5" />
-            </Button>
-          </Link>
-          <Link href="/challenges">
-            <Button variant="outline" className="h-auto px-8 py-6 text-lg">
-              Explore Challenges First
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-          </Link>
+      <section className="mb-16">
+        <div className="mx-auto max-w-4xl rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 p-8 md:p-12 text-white shadow-xl">
+          <div className="text-center">
+            <h2 className="mb-4 text-3xl font-bold md:text-4xl">
+              Start Designing Your Systems Today
+            </h2>
+            <p className="mb-8 text-lg opacity-90">
+              Join thousands of engineers creating beautiful and functional system designs
+            </p>
+            <div className="flex flex-col sm:flex-row justify-center gap-4">
+              <Link href="/playground">
+                <Button className="w-full sm:w-auto bg-white text-blue-600 hover:bg-gray-100">
+                  Try For Free
+                  <Layers className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+              <Link href="/credits">
+                <Button className="w-full sm:w-auto bg-purple-500 text-white hover:bg-purple-600 border border-white/20">
+                  Get Pro Access
+                  <CreditCard className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+            </div>
+          </div>
         </div>
-        <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">
-          🔒 Secure payment processing
-        </p>
-      </div>
+      </section>
     </div>
   );
 }

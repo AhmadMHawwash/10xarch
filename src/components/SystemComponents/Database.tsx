@@ -29,7 +29,12 @@ import { Textarea } from "../ui/textarea";
 import { H6, Muted, Small } from "../ui/typography";
 import { WithSettings } from "./Wrappers/WithSettings";
 
-export const Database = ({ name, Icon, nodeSettingsRef, subtitle }: ComponentNodeProps) => {
+export const Database = ({
+  name,
+  Icon,
+  nodeSettingsRef,
+  subtitle,
+}: ComponentNodeProps) => {
   return (
     <div className="group flex flex-col items-center text-gray-800 dark:text-gray-200">
       <div className="flex flex-col items-center gap-1">
@@ -39,7 +44,7 @@ export const Database = ({ name, Icon, nodeSettingsRef, subtitle }: ComponentNod
         <Small>{name}</Small>
         {subtitle && <Muted>{subtitle}</Muted>}
       </div>
-      <DatabaseSettings name={name} nodeSettingsRef={nodeSettingsRef} />
+      {/* <DatabaseSettings name={name} nodeSettingsRef={nodeSettingsRef} /> */}
     </div>
   );
 };
@@ -130,7 +135,7 @@ const DatabaseSettings = ({
   nodeSettingsRef,
 }: {
   name: string;
-  nodeSettingsRef: NodeSettingsRefObject;
+  nodeSettingsRef?: NodeSettingsRefObject;
 }) => {
   const { useSystemComponentConfigSlice } = useSystemDesigner();
   const [isFreeText, setIsFreeText] = useState<boolean>(true);
@@ -233,383 +238,369 @@ const DatabaseSettings = ({
   const currentEngineOptions = engineOptions[dbConfig.type] ?? [];
 
   return (
-    <WithSettings id={id} name={id} nodeSettingsRef={nodeSettingsRef}>
-      <div className="flex w-full flex-col gap-4">
-        <Tabs defaultValue="config" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="config">Configuration</TabsTrigger>
-            <TabsTrigger value="schema">Schema Design</TabsTrigger>
-          </TabsList>
+    <div className="flex w-full flex-col gap-4">
+      <Tabs defaultValue="config" className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="config">Configuration</TabsTrigger>
+          <TabsTrigger value="schema">Schema Design</TabsTrigger>
+        </TabsList>
 
-          <TabsContent value="config" className="mt-4">
-            <div className="flex flex-col gap-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Label
-                    htmlFor="free-text-mode"
-                    className="text-gray-700 dark:text-gray-300"
-                  >
-                    Free-form Text
-                  </Label>
-                  {configInfoMap["Free-form Text Mode"] && (
-                    <InfoPopup feature={configInfoMap["Free-form Text Mode"]} />
-                  )}
-                </div>
-                <Switch
-                  id="free-text-mode"
-                  checked={isFreeText}
-                  onCheckedChange={setIsFreeText}
-                />
+        <TabsContent value="config" className="mt-4">
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Label
+                  htmlFor="free-text-mode"
+                  className="text-gray-700 dark:text-gray-300"
+                >
+                  Free-form Text
+                </Label>
+                {configInfoMap["Free-form Text Mode"] && (
+                  <InfoPopup feature={configInfoMap["Free-form Text Mode"]} />
+                )}
               </div>
+              <Switch
+                id="free-text-mode"
+                checked={isFreeText}
+                onCheckedChange={setIsFreeText}
+              />
+            </div>
 
-              {!isFreeText ? (
-                <div className="grid w-full grid-flow-row grid-cols-1 gap-4 text-gray-800 dark:text-gray-200">
-                  <div className="rounded-md border border-yellow-200 bg-yellow-50 p-3 dark:border-yellow-900/50 dark:bg-yellow-900/20">
-                    <div className="flex items-center gap-2 text-sm text-yellow-800 dark:text-yellow-200">
-                      <Small>
-                        Note: Detailed configuration options are still a work in
-                        progress. Options might get added or deleted.
-                      </Small>
-                    </div>
+            {!isFreeText ? (
+              <div className="grid w-full grid-flow-row grid-cols-1 gap-4 text-gray-800 dark:text-gray-200">
+                <div className="rounded-md border border-yellow-200 bg-yellow-50 p-3 dark:border-yellow-900/50 dark:bg-yellow-900/20">
+                  <div className="flex items-center gap-2 text-sm text-yellow-800 dark:text-yellow-200">
+                    <Small>
+                      Note: Detailed configuration options are still a work in
+                      progress. Options might get added or deleted.
+                    </Small>
                   </div>
+                </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="flex flex-col gap-2">
-                      <div className="flex items-center gap-2">
-                        <Label
-                          htmlFor="db-type"
-                          className="text-gray-700 dark:text-gray-300"
-                        >
-                          {configInfoMap["Database Type"] && (
-                            <InfoPopup
-                              feature={configInfoMap["Database Type"]}
-                            />
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                      <Label
+                        htmlFor="db-type"
+                        className="text-gray-700 dark:text-gray-300"
+                      >
+                        {configInfoMap["Database Type"] && (
+                          <InfoPopup feature={configInfoMap["Database Type"]} />
+                        )}
+                      </Label>
+                      <Select
+                        value={dbConfig.type}
+                        onValueChange={handleDbTypeChange}
+                      >
+                        <SelectTrigger
+                          className={cn(
+                            "w-full border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                            "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
                           )}
-                        </Label>
-                        <Select
-                          value={dbConfig.type}
-                          onValueChange={handleDbTypeChange}
                         >
-                          <SelectTrigger
-                            className={cn(
-                              "w-full border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
-                              "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
-                            )}
-                          >
-                            <SelectValue placeholder="Select database type" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="relational">
-                              Relational
-                            </SelectItem>
-                            <SelectItem value="document">Document</SelectItem>
-                            <SelectItem value="keyvalue">Key-Value</SelectItem>
-                            <SelectItem value="graph">Graph</SelectItem>
-                            <SelectItem value="search">Search</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col gap-2">
-                      <div className="flex items-center gap-2">
-                        <Label
-                          htmlFor="engine"
-                          className="text-gray-700 dark:text-gray-300"
-                        >
-                          {configInfoMap["Database Engine"] && (
-                            <InfoPopup
-                              feature={configInfoMap["Database Engine"]}
-                            />
-                          )}
-                        </Label>
-                        <Select
-                          value={dbConfig.engine}
-                          onValueChange={handleEngineChange}
-                        >
-                          <SelectTrigger
-                            className={cn(
-                              "w-full border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
-                              "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
-                            )}
-                          >
-                            <SelectValue placeholder="Select database engine" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {currentEngineOptions.map((option) => (
-                              <SelectItem
-                                key={option.value}
-                                value={option.value}
-                              >
-                                {option.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
+                          <SelectValue placeholder="Select database type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="relational">Relational</SelectItem>
+                          <SelectItem value="document">Document</SelectItem>
+                          <SelectItem value="keyvalue">Key-Value</SelectItem>
+                          <SelectItem value="graph">Graph</SelectItem>
+                          <SelectItem value="search">Search</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
 
                   <div className="flex flex-col gap-2">
                     <div className="flex items-center gap-2">
-                      <Label className="text-gray-700 dark:text-gray-300">
-                        Clustering
-                      </Label>
-                      {configInfoMap.Clustering && (
-                        <InfoPopup feature={configInfoMap.Clustering} />
-                      )}
-                    </div>
-
-                    <div className="mb-2 flex items-center gap-2">
-                      <Checkbox
-                        id="clustering-enabled"
-                        checked={clustering.enabled}
-                        onCheckedChange={(checked) => {
-                          setClustering({ ...clustering, enabled: !!checked });
-                        }}
-                        className="border-gray-400 dark:border-gray-600"
-                      />
                       <Label
-                        htmlFor="clustering-enabled"
-                        className="text-sm text-gray-700 dark:text-gray-300"
+                        htmlFor="engine"
+                        className="text-gray-700 dark:text-gray-300"
                       >
-                        Enable High Availability Cluster
+                        {configInfoMap["Database Engine"] && (
+                          <InfoPopup
+                            feature={configInfoMap["Database Engine"]}
+                          />
+                        )}
                       </Label>
+                      <Select
+                        value={dbConfig.engine}
+                        onValueChange={handleEngineChange}
+                      >
+                        <SelectTrigger
+                          className={cn(
+                            "w-full border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                            "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+                          )}
+                        >
+                          <SelectValue placeholder="Select database engine" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {currentEngineOptions.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
+                  </div>
+                </div>
 
-                    {clustering.enabled && (
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="flex flex-col gap-2">
-                          <div className="flex items-center gap-2">
-                            <Label
-                              htmlFor="replication-strategy"
-                              className="text-gray-700 dark:text-gray-300"
-                            >
-                              {configInfoMap["Replication Strategy"] && (
-                                <InfoPopup
-                                  feature={
-                                    configInfoMap["Replication Strategy"]
-                                  }
-                                />
-                              )}
-                            </Label>
-                            <Select
-                              value={clustering.replicationStrategy}
-                              onValueChange={(value) =>
-                                setClustering({
-                                  ...clustering,
-                                  replicationStrategy: value,
-                                })
-                              }
-                            >
-                              <SelectTrigger
-                                className={cn(
-                                  "w-full border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
-                                  "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
-                                )}
-                              >
-                                <SelectValue placeholder="Select replication strategy" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="async">
-                                  Asynchronous
-                                </SelectItem>
-                                <SelectItem value="sync">
-                                  Synchronous
-                                </SelectItem>
-                                <SelectItem value="semi-sync">
-                                  Semi-Synchronous
-                                </SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        </div>
-
-                        <div className="flex flex-col gap-2">
-                          <div className="flex items-center gap-2">
-                            <div className="cursor-help rounded-full p-1 transition-colors duration-200 hover:bg-gray-200 dark:hover:bg-gray-700">
-                              <Checkbox
-                                id="sharding-enabled"
-                                checked={clustering.shardingEnabled}
-                                onCheckedChange={(checked) => {
-                                  setClustering({
-                                    ...clustering,
-                                    shardingEnabled: !!checked,
-                                  });
-                                }}
-                                className="border-gray-400 dark:border-gray-600"
-                              />
-                            </div>
-                            <Label
-                              htmlFor="sharding-enabled"
-                              className="text-sm text-gray-700 dark:text-gray-300"
-                            >
-                              Enable Sharding
-                            </Label>
-                          </div>
-                        </div>
-
-                        <div className="flex flex-col gap-2">
-                          <div className="flex items-center gap-2">
-                            <Label
-                              htmlFor="primary-nodes"
-                              className="text-gray-700 dark:text-gray-300"
-                            >
-                              {configInfoMap["Primary Nodes"] && (
-                                <InfoPopup
-                                  feature={configInfoMap["Primary Nodes"]}
-                                />
-                              )}
-                            </Label>
-                            <Input
-                              type="number"
-                              id="primary-nodes"
-                              value={clustering.primaryNodes}
-                              onChange={(e) =>
-                                setClustering({
-                                  ...clustering,
-                                  primaryNodes: Number(e.target.value),
-                                })
-                              }
-                              className={cn(
-                                "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
-                                "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
-                              )}
-                              min={1}
-                            />
-                          </div>
-                        </div>
-
-                        <div className="flex flex-col gap-2">
-                          <div className="flex items-center gap-2">
-                            <Label
-                              htmlFor="replica-nodes"
-                              className="text-gray-700 dark:text-gray-300"
-                            >
-                              {configInfoMap["Replica Nodes"] && (
-                                <InfoPopup
-                                  feature={configInfoMap["Replica Nodes"]}
-                                />
-                              )}
-                            </Label>
-                            <Input
-                              type="number"
-                              id="replica-nodes"
-                              value={clustering.replicaNodes}
-                              onChange={(e) =>
-                                setClustering({
-                                  ...clustering,
-                                  replicaNodes: Number(e.target.value),
-                                })
-                              }
-                              className={cn(
-                                "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
-                                "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
-                              )}
-                              min={0}
-                            />
-                          </div>
-                        </div>
-                      </div>
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center gap-2">
+                    <Label className="text-gray-700 dark:text-gray-300">
+                      Clustering
+                    </Label>
+                    {configInfoMap.Clustering && (
+                      <InfoPopup feature={configInfoMap.Clustering} />
                     )}
                   </div>
 
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="flex flex-col gap-2">
-                      <div className="flex items-center gap-2">
-                        <Label
-                          htmlFor="storage"
-                          className="text-gray-700 dark:text-gray-300"
-                        >
-                          {configInfoMap["Storage (GB)"] && (
-                            <InfoPopup
-                              feature={configInfoMap["Storage (GB)"]}
+                  <div className="mb-2 flex items-center gap-2">
+                    <Checkbox
+                      id="clustering-enabled"
+                      checked={clustering.enabled}
+                      onCheckedChange={(checked) => {
+                        setClustering({ ...clustering, enabled: !!checked });
+                      }}
+                      className="border-gray-400 dark:border-gray-600"
+                    />
+                    <Label
+                      htmlFor="clustering-enabled"
+                      className="text-sm text-gray-700 dark:text-gray-300"
+                    >
+                      Enable High Availability Cluster
+                    </Label>
+                  </div>
+
+                  {clustering.enabled && (
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="flex flex-col gap-2">
+                        <div className="flex items-center gap-2">
+                          <Label
+                            htmlFor="replication-strategy"
+                            className="text-gray-700 dark:text-gray-300"
+                          >
+                            {configInfoMap["Replication Strategy"] && (
+                              <InfoPopup
+                                feature={configInfoMap["Replication Strategy"]}
+                              />
+                            )}
+                          </Label>
+                          <Select
+                            value={clustering.replicationStrategy}
+                            onValueChange={(value) =>
+                              setClustering({
+                                ...clustering,
+                                replicationStrategy: value,
+                              })
+                            }
+                          >
+                            <SelectTrigger
+                              className={cn(
+                                "w-full border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                                "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+                              )}
+                            >
+                              <SelectValue placeholder="Select replication strategy" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="async">
+                                Asynchronous
+                              </SelectItem>
+                              <SelectItem value="sync">Synchronous</SelectItem>
+                              <SelectItem value="semi-sync">
+                                Semi-Synchronous
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col gap-2">
+                        <div className="flex items-center gap-2">
+                          <div className="cursor-help rounded-full p-1 transition-colors duration-200 hover:bg-gray-200 dark:hover:bg-gray-700">
+                            <Checkbox
+                              id="sharding-enabled"
+                              checked={clustering.shardingEnabled}
+                              onCheckedChange={(checked) => {
+                                setClustering({
+                                  ...clustering,
+                                  shardingEnabled: !!checked,
+                                });
+                              }}
+                              className="border-gray-400 dark:border-gray-600"
                             />
-                          )}
-                        </Label>
-                        <Input
-                          type="number"
-                          id="storage"
-                          value={capacity.storage}
-                          onChange={(e) =>
-                            setCapacity({
-                              ...capacity,
-                              storage: Number(e.target.value),
-                            })
-                          }
-                          className={cn(
-                            "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
-                            "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
-                          )}
-                          min={1}
-                        />
+                          </div>
+                          <Label
+                            htmlFor="sharding-enabled"
+                            className="text-sm text-gray-700 dark:text-gray-300"
+                          >
+                            Enable Sharding
+                          </Label>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col gap-2">
+                        <div className="flex items-center gap-2">
+                          <Label
+                            htmlFor="primary-nodes"
+                            className="text-gray-700 dark:text-gray-300"
+                          >
+                            {configInfoMap["Primary Nodes"] && (
+                              <InfoPopup
+                                feature={configInfoMap["Primary Nodes"]}
+                              />
+                            )}
+                          </Label>
+                          <Input
+                            type="number"
+                            id="primary-nodes"
+                            value={clustering.primaryNodes}
+                            onChange={(e) =>
+                              setClustering({
+                                ...clustering,
+                                primaryNodes: Number(e.target.value),
+                              })
+                            }
+                            className={cn(
+                              "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                              "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+                            )}
+                            min={1}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col gap-2">
+                        <div className="flex items-center gap-2">
+                          <Label
+                            htmlFor="replica-nodes"
+                            className="text-gray-700 dark:text-gray-300"
+                          >
+                            {configInfoMap["Replica Nodes"] && (
+                              <InfoPopup
+                                feature={configInfoMap["Replica Nodes"]}
+                              />
+                            )}
+                          </Label>
+                          <Input
+                            type="number"
+                            id="replica-nodes"
+                            value={clustering.replicaNodes}
+                            onChange={(e) =>
+                              setClustering({
+                                ...clustering,
+                                replicaNodes: Number(e.target.value),
+                              })
+                            }
+                            className={cn(
+                              "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                              "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+                            )}
+                            min={0}
+                          />
+                        </div>
                       </div>
                     </div>
+                  )}
+                </div>
 
-                    <div className="flex flex-col gap-2">
-                      <div className="flex items-center gap-2">
-                        <Label
-                          htmlFor="iops"
-                          className="text-gray-700 dark:text-gray-300"
-                        >
-                          IOPS
-                        </Label>
-                        {configInfoMap.IOPS && (
-                          <InfoPopup feature={configInfoMap.IOPS} />
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                      <Label
+                        htmlFor="storage"
+                        className="text-gray-700 dark:text-gray-300"
+                      >
+                        {configInfoMap["Storage (GB)"] && (
+                          <InfoPopup feature={configInfoMap["Storage (GB)"]} />
                         )}
-                        <Input
-                          type="number"
-                          id="iops"
-                          value={capacity.iops}
-                          onChange={(e) =>
-                            setCapacity({
-                              ...capacity,
-                              iops: Number(e.target.value),
-                            })
-                          }
-                          className={cn(
-                            "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
-                            "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
-                          )}
-                          min={100}
-                          step={100}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col gap-2">
-                      <div className="flex items-center gap-2">
-                        <Label
-                          htmlFor="connections"
-                          className="text-gray-700 dark:text-gray-300"
-                        >
-                          {configInfoMap["Max Connections"] && (
-                            <InfoPopup
-                              feature={configInfoMap["Max Connections"]}
-                            />
-                          )}
-                        </Label>
-                        <Input
-                          type="number"
-                          id="connections"
-                          value={capacity.connections}
-                          onChange={(e) =>
-                            setCapacity({
-                              ...capacity,
-                              connections: Number(e.target.value),
-                            })
-                          }
-                          className={cn(
-                            "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
-                            "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
-                          )}
-                          min={1}
-                        />
-                      </div>
+                      </Label>
+                      <Input
+                        type="number"
+                        id="storage"
+                        value={capacity.storage}
+                        onChange={(e) =>
+                          setCapacity({
+                            ...capacity,
+                            storage: Number(e.target.value),
+                          })
+                        }
+                        className={cn(
+                          "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                          "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+                        )}
+                        min={1}
+                      />
                     </div>
                   </div>
 
-                  {/* 
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                      <Label
+                        htmlFor="iops"
+                        className="text-gray-700 dark:text-gray-300"
+                      >
+                        IOPS
+                      </Label>
+                      {configInfoMap.IOPS && (
+                        <InfoPopup feature={configInfoMap.IOPS} />
+                      )}
+                      <Input
+                        type="number"
+                        id="iops"
+                        value={capacity.iops}
+                        onChange={(e) =>
+                          setCapacity({
+                            ...capacity,
+                            iops: Number(e.target.value),
+                          })
+                        }
+                        className={cn(
+                          "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                          "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+                        )}
+                        min={100}
+                        step={100}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                      <Label
+                        htmlFor="connections"
+                        className="text-gray-700 dark:text-gray-300"
+                      >
+                        {configInfoMap["Max Connections"] && (
+                          <InfoPopup
+                            feature={configInfoMap["Max Connections"]}
+                          />
+                        )}
+                      </Label>
+                      <Input
+                        type="number"
+                        id="connections"
+                        value={capacity.connections}
+                        onChange={(e) =>
+                          setCapacity({
+                            ...capacity,
+                            connections: Number(e.target.value),
+                          })
+                        }
+                        className={cn(
+                          "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                          "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+                        )}
+                        min={1}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* 
                   <div className="flex flex-col gap-2">
                     <div className="flex items-center gap-2">
                       <Label className="text-gray-700 dark:text-gray-300">
@@ -646,50 +637,50 @@ const DatabaseSettings = ({
                   </div> 
                     */}
 
-                  <div className="flex flex-col gap-2">
-                    <div className="flex items-center gap-2">
-                      <Label
-                        htmlFor="database-details"
-                        className="text-gray-700 dark:text-gray-300"
-                      >
-                        {configInfoMap["Additional Configuration"] && (
-                          <InfoPopup
-                            feature={configInfoMap["Additional Configuration"]}
-                          />
-                        )}
-                      </Label>
-                    </div>
-                    <Textarea
-                      name="database-details"
-                      id="database-details"
-                      rows={6}
-                      placeholder={`Example:
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center gap-2">
+                    <Label
+                      htmlFor="database-details"
+                      className="text-gray-700 dark:text-gray-300"
+                    >
+                      {configInfoMap["Additional Configuration"] && (
+                        <InfoPopup
+                          feature={configInfoMap["Additional Configuration"]}
+                        />
+                      )}
+                    </Label>
+                  </div>
+                  <Textarea
+                    name="database-details"
+                    id="database-details"
+                    rows={6}
+                    placeholder={`Example:
 - Specific configuration parameters
 - Security requirements
 - Backup strategy
 - Performance requirements`}
-                      className={cn(
-                        "text-md border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
-                        "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
-                        "placeholder:text-gray-500 dark:placeholder:text-gray-400",
-                      )}
-                      value={details}
-                      onChange={(e) => setDetails(e.target.value)}
-                    />
-                  </div>
+                    className={cn(
+                      "text-md border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                      "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+                      "placeholder:text-gray-500 dark:placeholder:text-gray-400",
+                    )}
+                    value={details}
+                    onChange={(e) => setDetails(e.target.value)}
+                  />
                 </div>
-              ) : (
-                <div className="flex flex-col gap-2">
-                  <Label
-                    htmlFor="free-form"
-                    className="text-gray-700 dark:text-gray-300"
-                  >
-                    Database Configuration
-                  </Label>
-                  <Textarea
-                    id="free-form"
-                    rows={20}
-                    placeholder={`Describe your database configuration here. Example:
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2">
+                <Label
+                  htmlFor="free-form"
+                  className="text-gray-700 dark:text-gray-300"
+                >
+                  Database Configuration
+                </Label>
+                <Textarea
+                  id="free-form"
+                  rows={20}
+                  placeholder={`Describe your database configuration here. Example:
 
 Database Type: PostgreSQL
 Capacity: 100GB storage, 1000 IOPS
@@ -704,53 +695,53 @@ Additional Requirements:
 - Monthly backup retention: 1 year
 - Monitoring requirements
 - Security configurations`}
-                    className={cn(
-                      "text-md border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
-                      "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
-                      "placeholder:text-gray-500 dark:placeholder:text-gray-400",
-                    )}
-                    value={freeFormText}
-                    onChange={(e) => setFreeFormText(e.target.value)}
-                  />
-                </div>
-              )}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="schema" className="mt-4">
-            <div className="flex w-full flex-col gap-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Label
-                    htmlFor="database-design"
-                    className="text-lg font-semibold text-gray-700 dark:text-gray-300"
-                  >
-                    {configInfoMap["Schema Design"] && (
-                      <InfoPopup feature={configInfoMap["Schema Design"]} />
-                    )}
-                  </Label>
-                </div>
-                <Small className="text-gray-500 dark:text-gray-400">
-                  {dbConfig.type === "relational"
-                    ? "Tables"
-                    : dbConfig.type === "document"
-                      ? "Collections"
-                      : "Models"}
-                </Small>
+                  className={cn(
+                    "text-md border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                    "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+                    "placeholder:text-gray-500 dark:placeholder:text-gray-400",
+                  )}
+                  value={freeFormText}
+                  onChange={(e) => setFreeFormText(e.target.value)}
+                />
               </div>
-              <div className="rounded-md border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800/50">
-                <ListAndDetails
-                  textareaRowsCount={25}
-                  items={models}
-                  onChange={setModels}
-                  onDelete={(index: number) => {
-                    const newModels = models.filter((_, i) => i !== index);
-                    setModels(newModels);
-                  }}
-                  onAdd={() => setModels([...models, ["new model", ""]])}
-                  textareaPlaceholder={
-                    dbConfig.type === "relational"
-                      ? `Example: Users Table
+            )}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="schema" className="mt-4">
+          <div className="flex w-full flex-col gap-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Label
+                  htmlFor="database-design"
+                  className="text-lg font-semibold text-gray-700 dark:text-gray-300"
+                >
+                  {configInfoMap["Schema Design"] && (
+                    <InfoPopup feature={configInfoMap["Schema Design"]} />
+                  )}
+                </Label>
+              </div>
+              <Small className="text-gray-500 dark:text-gray-400">
+                {dbConfig.type === "relational"
+                  ? "Tables"
+                  : dbConfig.type === "document"
+                    ? "Collections"
+                    : "Models"}
+              </Small>
+            </div>
+            <div className="rounded-md border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800/50">
+              <ListAndDetails
+                textareaRowsCount={25}
+                items={models}
+                onChange={setModels}
+                onDelete={(index: number) => {
+                  const newModels = models.filter((_, i) => i !== index);
+                  setModels(newModels);
+                }}
+                onAdd={() => setModels([...models, ["new model", ""]])}
+                textareaPlaceholder={
+                  dbConfig.type === "relational"
+                    ? `Example: Users Table
 - id (Primary Key, UUID)
 - username (Unique, VARCHAR(50))
 - email (Unique, VARCHAR(255))
@@ -762,8 +753,8 @@ Constraints:
 - username: NOT NULL
 - email: NOT NULL
 - password_hash: NOT NULL`
-                      : dbConfig.type === "document"
-                        ? `Example: Users Collection
+                    : dbConfig.type === "document"
+                      ? `Example: Users Collection
 {
   _id: ObjectId,
   username: string,
@@ -780,7 +771,7 @@ Constraints:
   createdAt: Date,
   lastLogin: Date
 }`
-                        : `Example: Model Structure
+                      : `Example: Model Structure
 Name: User
 Type: Entity
 Properties:
@@ -788,16 +779,17 @@ Properties:
 - name: string
 - attributes: key-value pairs
 - metadata: object`
-                  }
-                />
-              </div>
+                }
+              />
             </div>
-          </TabsContent>
-        </Tabs>
-      </div>
-    </WithSettings>
+          </div>
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 };
+
+export { DatabaseSettings };
 
 export const ListAndDetails = ({
   items,

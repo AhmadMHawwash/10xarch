@@ -14,7 +14,13 @@ import {
 } from "../ui/dialog";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 import { Switch } from "../ui/switch";
 import { Textarea } from "../ui/textarea";
 import { Muted, Small } from "../ui/typography";
@@ -29,51 +35,57 @@ interface FeatureInfo {
 const configInfoMap: Record<string, FeatureInfo> = {
   "Free-form Text Mode": {
     name: "Free-form Text Mode",
-    description: "Toggle between detailed configuration and free-form text input. Free-form text allows you to describe your message queue configuration in a more natural way.",
-    learnMoreUrl: "https://docs.example.com/mq-configuration"
+    description:
+      "Toggle between detailed configuration and free-form text input. Free-form text allows you to describe your message queue configuration in a more natural way.",
+    learnMoreUrl: "https://docs.example.com/mq-configuration",
   },
   "Queue Type": {
     name: "Queue Type",
-    description: "The type of message queue to use. Different types provide different delivery guarantees and features.",
-    learnMoreUrl: "https://docs.example.com/mq-types"
+    description:
+      "The type of message queue to use. Different types provide different delivery guarantees and features.",
+    learnMoreUrl: "https://docs.example.com/mq-types",
   },
   "Delivery Guarantee": {
     name: "Delivery Guarantee",
-    description: "The level of guarantee for message delivery. Choose based on your reliability requirements.",
-    learnMoreUrl: "https://docs.example.com/mq-delivery"
+    description:
+      "The level of guarantee for message delivery. Choose based on your reliability requirements.",
+    learnMoreUrl: "https://docs.example.com/mq-delivery",
   },
   "Max Message Size": {
     name: "Max Message Size",
     description: "Maximum size allowed for individual messages in the queue.",
-    learnMoreUrl: "https://docs.example.com/mq-limits#size"
+    learnMoreUrl: "https://docs.example.com/mq-limits#size",
   },
-  "Throughput": {
+  Throughput: {
     name: "Throughput",
     description: "Number of messages that can be processed per second.",
-    learnMoreUrl: "https://docs.example.com/mq-throughput"
+    learnMoreUrl: "https://docs.example.com/mq-throughput",
   },
-  "Retention": {
+  Retention: {
     name: "Retention",
-    description: "How long messages are kept in the queue before being automatically deleted.",
-    learnMoreUrl: "https://docs.example.com/mq-retention"
+    description:
+      "How long messages are kept in the queue before being automatically deleted.",
+    learnMoreUrl: "https://docs.example.com/mq-retention",
   },
-  "Features": {
+  Features: {
     name: "Features",
-    description: "Additional capabilities and features that can be enabled for this message queue. These may include persistence, routing, filtering, and more.",
-    learnMoreUrl: "https://docs.example.com/message-queue/features"
+    description:
+      "Additional capabilities and features that can be enabled for this message queue. These may include persistence, routing, filtering, and more.",
+    learnMoreUrl: "https://docs.example.com/message-queue/features",
   },
   "Additional Configuration": {
     name: "Additional Configuration",
-    description: "Additional message queue configuration, requirements, or constraints specific to your use case.",
-    learnMoreUrl: "https://docs.example.com/message-queue/additional-config"
-  }
+    description:
+      "Additional message queue configuration, requirements, or constraints specific to your use case.",
+    learnMoreUrl: "https://docs.example.com/message-queue/additional-config",
+  },
 };
 
 const InfoPopup = ({ feature }: { feature: FeatureInfo }) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <div className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 cursor-help">
+        <div className="cursor-help rounded-full p-1 transition-colors duration-200 hover:bg-gray-200 dark:hover:bg-gray-700">
           <HelpCircle className="h-4 w-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
         </div>
       </DialogTrigger>
@@ -99,7 +111,12 @@ const InfoPopup = ({ feature }: { feature: FeatureInfo }) => {
   );
 };
 
-export const MessageQueue = ({ name, Icon, nodeSettingsRef, subtitle }: ComponentNodeProps) => {
+export const MessageQueue = ({
+  name,
+  Icon,
+  nodeSettingsRef,
+  subtitle,
+}: ComponentNodeProps) => {
   return (
     <div className="group flex flex-col items-center text-gray-800 dark:text-gray-200">
       <div className="flex flex-col items-center gap-1">
@@ -109,7 +126,7 @@ export const MessageQueue = ({ name, Icon, nodeSettingsRef, subtitle }: Componen
         <Small>{name}</Small>
         {subtitle && <Muted>{subtitle}</Muted>}
       </div>
-      <MessageQueueSettings name={name} nodeSettingsRef={nodeSettingsRef} />
+      {/* <MessageQueueSettings name={name} nodeSettingsRef={nodeSettingsRef} /> */}
     </div>
   );
 };
@@ -119,7 +136,7 @@ const MessageQueueSettings = ({
   nodeSettingsRef,
 }: {
   name: string;
-  nodeSettingsRef: NodeSettingsRefObject;
+  nodeSettingsRef?: NodeSettingsRefObject;
 }) => {
   const { useSystemComponentConfigSlice } = useSystemDesigner();
   const [isFreeText, setIsFreeText] = useState<boolean>(true);
@@ -127,13 +144,13 @@ const MessageQueueSettings = ({
   const [queueType, setQueueType] = useSystemComponentConfigSlice<string>(
     id,
     "queue_type",
-    "standard"
+    "standard",
   );
 
   const [deliveryType, setDeliveryType] = useSystemComponentConfigSlice<string>(
     id,
     "delivery_type",
-    "at-least-once"
+    "at-least-once",
   );
 
   const [capacity, setCapacity] = useSystemComponentConfigSlice<{
@@ -143,171 +160,210 @@ const MessageQueueSettings = ({
   }>(id, "capacity", {
     messageSize: 256,
     throughput: 1000,
-    retention: 7
+    retention: 7,
   });
 
   const [details, setDetails] = useSystemComponentConfigSlice<string>(
     id,
     "details",
-    ""
+    "",
   );
 
   const [freeFormText, setFreeFormText] = useSystemComponentConfigSlice<string>(
     id,
     "free_form_text",
-    ""
+    "",
   );
 
   return (
-    <WithSettings id={id} name={id} nodeSettingsRef={nodeSettingsRef}>
-      <div className="flex flex-col gap-4 w-full">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Label htmlFor="free-text-mode" className="text-gray-700 dark:text-gray-300">
-              Free-form Text
-            </Label>
-            {configInfoMap["Free-form Text Mode"] && (
-              <InfoPopup feature={configInfoMap["Free-form Text Mode"]} />
-            )}
-          </div>
-          <Switch
-            id="free-text-mode"
-            checked={isFreeText}
-            onCheckedChange={setIsFreeText}
-          />
+    <div className="flex w-full flex-col gap-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Label
+            htmlFor="free-text-mode"
+            className="text-gray-700 dark:text-gray-300"
+          >
+            Free-form Text
+          </Label>
+          {configInfoMap["Free-form Text Mode"] && (
+            <InfoPopup feature={configInfoMap["Free-form Text Mode"]} />
+          )}
         </div>
+        <Switch
+          id="free-text-mode"
+          checked={isFreeText}
+          onCheckedChange={setIsFreeText}
+        />
+      </div>
 
-        {!isFreeText ? (
-          <div className="grid w-full grid-flow-row grid-cols-1 gap-4 text-gray-800 dark:text-gray-200">
-            <div className="rounded-md border border-yellow-200 bg-yellow-50 p-3 dark:border-yellow-900/50 dark:bg-yellow-900/20">
-              <div className="flex items-center gap-2 text-sm text-yellow-800 dark:text-yellow-200">
-                <Small>Note: Detailed configuration options are still a work in progress. Options might get added or deleted.</Small>
+      {!isFreeText ? (
+        <div className="grid w-full grid-flow-row grid-cols-1 gap-4 text-gray-800 dark:text-gray-200">
+          <div className="rounded-md border border-yellow-200 bg-yellow-50 p-3 dark:border-yellow-900/50 dark:bg-yellow-900/20">
+            <div className="flex items-center gap-2 text-sm text-yellow-800 dark:text-yellow-200">
+              <Small>
+                Note: Detailed configuration options are still a work in
+                progress. Options might get added or deleted.
+              </Small>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <Label
+                  htmlFor="queue-type"
+                  className="text-gray-700 dark:text-gray-300"
+                >
+                  Queue Type
+                </Label>
+                {configInfoMap["Queue Type"] && (
+                  <InfoPopup feature={configInfoMap["Queue Type"]} />
+                )}
               </div>
+              <Select value={queueType} onValueChange={setQueueType}>
+                <SelectTrigger
+                  className={cn(
+                    "w-full border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                    "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+                  )}
+                >
+                  <SelectValue placeholder="Select queue type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="standard">Standard Queue</SelectItem>
+                  <SelectItem value="fifo">FIFO Queue</SelectItem>
+                  <SelectItem value="priority">Priority Queue</SelectItem>
+                  <SelectItem value="topic">Topic</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2">
-                  <Label htmlFor="queue-type" className="text-gray-700 dark:text-gray-300">
-                    Queue Type
-                  </Label>
-                  {configInfoMap["Queue Type"] && (
-                    <InfoPopup feature={configInfoMap["Queue Type"]} />
-                  )}
-                </div>
-                <Select value={queueType} onValueChange={setQueueType}>
-                  <SelectTrigger className={cn(
-                    "w-full bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
-                    "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
-                  )}>
-                    <SelectValue placeholder="Select queue type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="standard">Standard Queue</SelectItem>
-                    <SelectItem value="fifo">FIFO Queue</SelectItem>
-                    <SelectItem value="priority">Priority Queue</SelectItem>
-                    <SelectItem value="topic">Topic</SelectItem>
-                  </SelectContent>
-                </Select>
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <Label
+                  htmlFor="delivery-type"
+                  className="text-gray-700 dark:text-gray-300"
+                >
+                  Delivery Guarantee
+                </Label>
+                {configInfoMap["Delivery Guarantee"] && (
+                  <InfoPopup feature={configInfoMap["Delivery Guarantee"]} />
+                )}
               </div>
+              <Select value={deliveryType} onValueChange={setDeliveryType}>
+                <SelectTrigger
+                  className={cn(
+                    "w-full border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                    "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+                  )}
+                >
+                  <SelectValue placeholder="Select delivery type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="at-least-once">At Least Once</SelectItem>
+                  <SelectItem value="exactly-once">Exactly Once</SelectItem>
+                  <SelectItem value="at-most-once">At Most Once</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
 
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2">
-                  <Label htmlFor="delivery-type" className="text-gray-700 dark:text-gray-300">
-                    Delivery Guarantee
-                  </Label>
-                  {configInfoMap["Delivery Guarantee"] && (
-                    <InfoPopup feature={configInfoMap["Delivery Guarantee"]} />
-                  )}
-                </div>
-                <Select value={deliveryType} onValueChange={setDeliveryType}>
-                  <SelectTrigger className={cn(
-                    "w-full bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
-                    "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
-                  )}>
-                    <SelectValue placeholder="Select delivery type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="at-least-once">At Least Once</SelectItem>
-                    <SelectItem value="exactly-once">Exactly Once</SelectItem>
-                    <SelectItem value="at-most-once">At Most Once</SelectItem>
-                  </SelectContent>
-                </Select>
+          <div className="grid grid-cols-3 gap-4">
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <Label
+                  htmlFor="message-size"
+                  className="text-gray-700 dark:text-gray-300"
+                >
+                  Max Message Size (KB)
+                </Label>
+                {configInfoMap["Max Message Size"] && (
+                  <InfoPopup feature={configInfoMap["Max Message Size"]} />
+                )}
               </div>
+              <Input
+                type="number"
+                id="message-size"
+                value={capacity.messageSize}
+                onChange={(e) =>
+                  setCapacity({
+                    ...capacity,
+                    messageSize: Number(e.target.value),
+                  })
+                }
+                className={cn(
+                  "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                  "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+                )}
+                min={1}
+                step={64}
+              />
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2">
-                  <Label htmlFor="message-size" className="text-gray-700 dark:text-gray-300">
-                    Max Message Size (KB)
-                  </Label>
-                  {configInfoMap["Max Message Size"] && (
-                    <InfoPopup feature={configInfoMap["Max Message Size"]} />
-                  )}
-                </div>
-                <Input
-                  type="number"
-                  id="message-size"
-                  value={capacity.messageSize}
-                  onChange={(e) => setCapacity({ ...capacity, messageSize: Number(e.target.value) })}
-                  className={cn(
-                    "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
-                    "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
-                  )}
-                  min={1}
-                  step={64}
-                />
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <Label
+                  htmlFor="throughput"
+                  className="text-gray-700 dark:text-gray-300"
+                >
+                  Throughput (msg/s)
+                </Label>
+                {configInfoMap.Throughput && (
+                  <InfoPopup feature={configInfoMap.Throughput} />
+                )}
               </div>
-
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2">
-                  <Label htmlFor="throughput" className="text-gray-700 dark:text-gray-300">
-                    Throughput (msg/s)
-                  </Label>
-                  {configInfoMap.Throughput && (
-                    <InfoPopup feature={configInfoMap.Throughput} />
-                  )}
-                </div>
-                <Input
-                  type="number"
-                  id="throughput"
-                  value={capacity.throughput}
-                  onChange={(e) => setCapacity({ ...capacity, throughput: Number(e.target.value) })}
-                  className={cn(
-                    "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
-                    "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
-                  )}
-                  min={100}
-                  step={100}
-                />
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2">
-                  <Label htmlFor="retention" className="text-gray-700 dark:text-gray-300">
-                    Retention (days)
-                  </Label>
-                  {configInfoMap.Retention && (
-                    <InfoPopup feature={configInfoMap.Retention} />
-                  )}
-                </div>
-                <Input
-                  type="number"
-                  id="retention"
-                  value={capacity.retention}
-                  onChange={(e) => setCapacity({ ...capacity, retention: Number(e.target.value) })}
-                  className={cn(
-                    "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
-                    "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600"
-                  )}
-                  min={1}
-                  max={14}
-                />
-              </div>
+              <Input
+                type="number"
+                id="throughput"
+                value={capacity.throughput}
+                onChange={(e) =>
+                  setCapacity({
+                    ...capacity,
+                    throughput: Number(e.target.value),
+                  })
+                }
+                className={cn(
+                  "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                  "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+                )}
+                min={100}
+                step={100}
+              />
             </div>
 
-              {/* 
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <Label
+                  htmlFor="retention"
+                  className="text-gray-700 dark:text-gray-300"
+                >
+                  Retention (days)
+                </Label>
+                {configInfoMap.Retention && (
+                  <InfoPopup feature={configInfoMap.Retention} />
+                )}
+              </div>
+              <Input
+                type="number"
+                id="retention"
+                value={capacity.retention}
+                onChange={(e) =>
+                  setCapacity({
+                    ...capacity,
+                    retention: Number(e.target.value),
+                  })
+                }
+                className={cn(
+                  "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                  "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+                )}
+                min={1}
+                max={14}
+              />
+            </div>
+          </div>
+
+          {/* 
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
                 <Label className="text-gray-700 dark:text-gray-300">
@@ -347,45 +403,53 @@ const MessageQueueSettings = ({
             </div> 
               */}
 
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-2">
-                <Label htmlFor="queue-details" className="text-gray-700 dark:text-gray-300">
-                  Additional Configuration
-                </Label>
-                {configInfoMap["Additional Configuration"] && (
-                  <InfoPopup feature={configInfoMap["Additional Configuration"]} />
-                )}
-              </div>
-              <Textarea
-                name="queue-details"
-                id="queue-details"
-                rows={6}
-                placeholder={`Example:
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <Label
+                htmlFor="queue-details"
+                className="text-gray-700 dark:text-gray-300"
+              >
+                Additional Configuration
+              </Label>
+              {configInfoMap["Additional Configuration"] && (
+                <InfoPopup
+                  feature={configInfoMap["Additional Configuration"]}
+                />
+              )}
+            </div>
+            <Textarea
+              name="queue-details"
+              id="queue-details"
+              rows={6}
+              placeholder={`Example:
 - Consumer group configuration
 - Dead letter queue settings
 - Message routing rules
 - Retry policies
 - Monitoring requirements
 - Security settings`}
-                className={cn(
-                  "text-md bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
-                  "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600",
-                  "placeholder:text-gray-500 dark:placeholder:text-gray-400"
-                )}
-                value={details}
-                onChange={(e) => setDetails(e.target.value)}
-              />
-            </div>
+              className={cn(
+                "text-md border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+                "placeholder:text-gray-500 dark:placeholder:text-gray-400",
+              )}
+              value={details}
+              onChange={(e) => setDetails(e.target.value)}
+            />
           </div>
-        ) : (
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="free-form" className="text-gray-700 dark:text-gray-300">
-              Message Queue Configuration
-            </Label>
-            <Textarea
-              id="free-form"
-              rows={20}
-              placeholder={`Describe your message queue configuration here. Example:
+        </div>
+      ) : (
+        <div className="flex flex-col gap-2">
+          <Label
+            htmlFor="free-form"
+            className="text-gray-700 dark:text-gray-300"
+          >
+            Message Queue Configuration
+          </Label>
+          <Textarea
+            id="free-form"
+            rows={20}
+            placeholder={`Describe your message queue configuration here. Example:
 
 Queue Type: Standard Queue
 Delivery Guarantee: At Least Once
@@ -410,17 +474,18 @@ Additional Requirements:
 - Retry policies
 - Monitoring requirements
 - Security settings`}
-              className={cn(
-                "text-md bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700",
-                "text-gray-900 dark:text-gray-100 focus:ring-gray-400 dark:focus:ring-gray-600",
-                "placeholder:text-gray-500 dark:placeholder:text-gray-400"
-              )}
-              value={freeFormText}
-              onChange={(e) => setFreeFormText(e.target.value)}
-            />
-          </div>
-        )}
-      </div>
-    </WithSettings>
+            className={cn(
+              "text-md border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+              "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
+              "placeholder:text-gray-500 dark:placeholder:text-gray-400",
+            )}
+            value={freeFormText}
+            onChange={(e) => setFreeFormText(e.target.value)}
+          />
+        </div>
+      )}
+    </div>
   );
 };
+
+export { MessageQueueSettings };

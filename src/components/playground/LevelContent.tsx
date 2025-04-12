@@ -25,6 +25,8 @@ import {
 } from "@/components/ui/tooltip";
 import { H5, List, Muted, P } from "@/components/ui/typography";
 import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
+import { useSystemDesigner } from "@/lib/hooks/_useSystemDesigner";
+import { ComponentSettings } from "@/components/playground/ComponentSettings";
 import {
   ArrowLeft,
   ArrowRight,
@@ -41,11 +43,13 @@ import {
   LayoutPanelTop,
   Link2,
   MessageSquareHeart,
-  Server
+  Server,
 } from "lucide-react";
 import { useParams } from "next/navigation";
 import { type ReactNode } from "react";
 import { Onboarding } from "../Onboarding";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
 
 // Custom collapsible component that can handle React elements
 interface CollapsibleSectionProps {
@@ -407,11 +411,29 @@ const EnhancedLearningResources: React.FC<EnhancedLearningResourcesProps> = ({
 export const LevelContent = () => {
   const { stage, toNextStage, toPreviousStage, challenge, currentStageIndex } =
     useChallengeManager();
+  const { selectedNode, useSystemComponentConfigSlice } = useSystemDesigner();
   const params = useParams<{ id: string }>();
+
+  const nodeId = selectedNode?.data.id ?? "";
+  const [title, setTitle] = useSystemComponentConfigSlice<string>(
+    nodeId,
+    "title",
+    selectedNode?.data.title ?? "",
+  );
+
+  const [subtitle, setSubtitle] = useSystemComponentConfigSlice<string>(
+    nodeId,
+    "subtitle",
+    selectedNode?.data.subtitle ?? "",
+  );
 
   const oldRequirements = challenge.stages
     .slice(0, currentStageIndex)
     .reduce<string[]>((acc, stage) => acc.concat(stage.requirements), []);
+
+  // Check if the selected node is a whiteboard or if nothing is selected
+  const isWhiteboardOrNoSelection =
+    !selectedNode || selectedNode.type === "Whiteboard";
 
   return (
     <div
@@ -423,102 +445,134 @@ export const LevelContent = () => {
           <div className="sticky z-10 w-full bg-white pt-[17px] dark:bg-gray-900">
             <div className="flex items-center justify-between">
               <H5 className="text-gray-900 dark:text-gray-100">
-                {challenge.title}
+                {isWhiteboardOrNoSelection
+                  ? challenge.title
+                  : `Configuring ${selectedNode.data.name}`}
               </H5>
-              <Badge
-                variant="outline"
-                className="stage-badge border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400"
-              >
-                Stage {currentStageIndex + 1} of {challenge.stages.length}
-              </Badge>
+              {isWhiteboardOrNoSelection && (
+                <Badge
+                  variant="outline"
+                  className="stage-badge border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400"
+                >
+                  Stage {currentStageIndex + 1} of {challenge.stages.length}
+                </Badge>
+              )}
             </div>
             <Separator className="mb-5 mt-4 bg-gray-300 dark:bg-gray-700" />
           </div>
-          <div className="flex flex-col gap-6">
-            {/* Main challenge context (remains at the top) */}
-            <EnhancedSection
-              title="Challenge Context"
-              content={
-                <div className="space-y-4 challenge-description">
-                  <div className="space-y-2">
-                    <P className="!mt-0 font-medium">{stage?.problem}</P>
-                    <div className="border-l-2 border-blue-500 pl-4 dark:border-blue-400">
-                      <P className="!mt-0 text-sm italic text-gray-600 dark:text-gray-400">
-                        As the Technical Lead, you&apos;ve been tasked with
-                        addressing this challenge. The CTO and CPO have outlined
-                        the following requirements:
-                      </P>
-                      <List className="!ml-2">
-                        {oldRequirements.map((requirement, index) => (
-                          <P
-                            key={index}
-                            className="!mt-0 ml-4 list-item list-decimal text-gray-600 line-through opacity-50 dark:text-gray-400"
-                          >
-                            {requirement}
-                          </P>
-                        ))}
-                        {stage?.requirements.map((requirement, index) => (
-                          <P
-                            key={index}
-                            className="!mt-0 ml-4 list-item list-decimal font-medium text-gray-700 dark:text-gray-300"
-                          >
-                            {requirement}
-                          </P>
-                        ))}
-                      </List>
+
+          {isWhiteboardOrNoSelection ? (
+            // Show the regular challenge content if whiteboard is selected or nothing is selected
+            <div className="flex flex-col gap-6">
+              {/* Main challenge context (remains at the top) */}
+              <EnhancedSection
+                title="Challenge Context"
+                content={
+                  <div className="challenge-description space-y-4">
+                    <div className="space-y-2">
+                      <P className="!mt-0 font-medium">{stage?.problem}</P>
+                      <div className="border-l-2 border-blue-500 pl-4 dark:border-blue-400">
+                        <P className="!mt-0 text-sm italic text-gray-600 dark:text-gray-400">
+                          As the Technical Lead, you&apos;ve been tasked with
+                          addressing this challenge. The CTO and CPO have
+                          outlined the following requirements:
+                        </P>
+                        <List className="!ml-2">
+                          {oldRequirements.map((requirement, index) => (
+                            <P
+                              key={index}
+                              className="!mt-0 ml-4 list-item list-decimal text-gray-600 line-through opacity-50 dark:text-gray-400"
+                            >
+                              {requirement}
+                            </P>
+                          ))}
+                          {stage?.requirements.map((requirement, index) => (
+                            <P
+                              key={index}
+                              className="!mt-0 ml-4 list-item list-decimal font-medium text-gray-700 dark:text-gray-300"
+                            >
+                              {requirement}
+                            </P>
+                          ))}
+                        </List>
+                      </div>
                     </div>
                   </div>
-                </div>
-              }
-            />
+                }
+              />
 
-            {/* Add a spacer */}
-            <div className="my-4"></div>
+              {/* Add a spacer */}
+              <div className="my-4"></div>
 
-            {/* Reference sections moved to the bottom */}
-            <Section
-              title="References & Resources"
-              content={
-                <div className="references-section mt-2 space-y-4">
-                  {/* Resources section - collapsible */}
-                  {stage?.resources && (
+              {/* Reference sections moved to the bottom */}
+              <Section
+                title="References & Resources"
+                content={
+                  <div className="references-section mt-2 space-y-4">
+                    {/* Resources section - collapsible */}
+                    {stage?.resources && (
+                      <CollapsibleSection
+                        Icon={BookOpen}
+                        trigger={
+                          <div className="flex cursor-pointer items-center gap-2 rounded-md p-2 text-gray-600 transition-colors hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800">
+                            <BookOpen size="18" />
+                            <span className="font-medium">
+                              Learning Resources
+                            </span>
+                          </div>
+                        }
+                        content={
+                          <EnhancedLearningResources
+                            documentation={stage.resources.documentation}
+                            realWorldCases={stage.resources.realWorldCases}
+                            bestPractices={stage.resources.bestPractices}
+                          />
+                        }
+                      />
+                    )}
+
+                    {/* Key System Design Components - collapsible with better content */}
                     <CollapsibleSection
-                      Icon={BookOpen}
+                      Icon={InfoIcon}
                       trigger={
                         <div className="flex cursor-pointer items-center gap-2 rounded-md p-2 text-gray-600 transition-colors hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800">
-                          <BookOpen size="18" />
+                          <InfoIcon size="18" />
                           <span className="font-medium">
-                            Learning Resources
+                            Key System Design Components
                           </span>
                         </div>
                       }
-                      content={
-                        <EnhancedLearningResources
-                          documentation={stage.resources.documentation}
-                          realWorldCases={stage.resources.realWorldCases}
-                          bestPractices={stage.resources.bestPractices}
-                        />
-                      }
+                      content={<EnhancedKeySystemDesign />}
                     />
-                  )}
-
-                  {/* Key System Design Components - collapsible with better content */}
-                  <CollapsibleSection
-                    Icon={InfoIcon}
-                    trigger={
-                      <div className="flex cursor-pointer items-center gap-2 rounded-md p-2 text-gray-600 transition-colors hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800">
-                        <InfoIcon size="18" />
-                        <span className="font-medium">
-                          Key System Design Components
-                        </span>
-                      </div>
-                    }
-                    content={<EnhancedKeySystemDesign />}
+                  </div>
+                }
+              />
+            </div>
+          ) : (
+            <div className="flex flex-col gap-6">
+              {nodeId !== "Custom Component" && (
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="title">Title</Label>
+                  <Input
+                    id="title"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    placeholder="Enter component title"
                   />
                 </div>
-              }
-            />
-          </div>
+              )}
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="subtitle">Subtitle</Label>
+                <Input
+                  id="subtitle"
+                  value={subtitle}
+                  onChange={(e) => setSubtitle(e.target.value)}
+                  placeholder="Enter a subtitle"
+                />
+              </div>
+              <ComponentSettings node={selectedNode} className="w-full" />
+            </div>
+          )}
         </div>
       </div>
 
@@ -562,9 +616,9 @@ export const LevelContent = () => {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <div>
-                      <Onboarding 
-                        isFirstVisit={true} 
-                        className="inline-block" 
+                      <Onboarding
+                        isFirstVisit={true}
+                        className="inline-block"
                         buttonClassName="flex h-9 w-9 items-center justify-center rounded-md text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
                         icon={HelpCircle}
                       />
@@ -583,8 +637,8 @@ export const LevelContent = () => {
         </div>
       </div>
 
-      <div className="fixed bottom-4 right-4 z-50 ai-chat-container">
-        <PanelChat 
+      <div className="ai-chat-container fixed bottom-4 right-4 z-50">
+        <PanelChat
           isPlayground={true}
           playgroundId={params.id}
           playgroundTitle={challenge.title}

@@ -87,7 +87,7 @@ function Level() {
           <LevelContent />
         </ResizablePanel>
         <ResizableHandle className="w-1 bg-gray-300 transition-colors hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600" />
-        <ResizablePanel defaultSize={75} minSize={60}>
+        <ResizablePanel defaultSize={75} minSize={40}>
           <SystemBuilder
             PassedFlowManager={() => (
               <FlowManager

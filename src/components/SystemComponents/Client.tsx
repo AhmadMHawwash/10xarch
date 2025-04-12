@@ -105,24 +105,18 @@ export const Client = ({
   return (
     <div className="group flex flex-col items-center text-gray-800 dark:text-gray-200">
       <div className="flex flex-col items-center gap-1">
-          {Icon && (
-            <Icon size={20} className="text-gray-700 dark:text-gray-300" />
-          )}
-          <Small>{name}</Small>
+        {Icon && (
+          <Icon size={20} className="text-gray-700 dark:text-gray-300" />
+        )}
+        <Small>{name}</Small>
         {subtitle && <Muted>{subtitle}</Muted>}
       </div>
-      <ClientSettings name={name} nodeSettingsRef={nodeSettingsRef} />
+      {/* <ClientSettings name={name} nodeSettingsRef={nodeSettingsRef} /> */}
     </div>
   );
 };
 
-const ClientSettings = ({
-  name: id,
-  nodeSettingsRef,
-}: {
-  name: string;
-  nodeSettingsRef: NodeSettingsRefObject;
-}) => {
+const ClientSettings = ({ name: id }: { name: string }) => {
   const { useSystemComponentConfigSlice } = useSystemDesigner();
   const [isFreeText, setIsFreeText] = useState<boolean>(true);
 
@@ -154,124 +148,103 @@ const ClientSettings = ({
   );
 
   return (
-    <WithSettings id={id} name={id} nodeSettingsRef={nodeSettingsRef}>
-      <div className="flex w-full flex-col gap-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Label
-              htmlFor="free-text-mode"
-              className="text-gray-700 dark:text-gray-300"
-            >
-              Free-form Text
-            </Label>
-            {configInfoMap["Free-form Text Mode"] && (
-              <InfoPopup feature={configInfoMap["Free-form Text Mode"]} />
-            )}
-          </div>
-          <Switch
-            id="free-text-mode"
-            checked={isFreeText}
-            onCheckedChange={setIsFreeText}
-          />
+    <div className="flex w-full flex-col gap-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Label htmlFor="free-text-mode">Free-form Text</Label>
+          {configInfoMap["Free-form Text Mode"] && (
+            <InfoPopup feature={configInfoMap["Free-form Text Mode"]} />
+          )}
         </div>
+        <Switch
+          id="free-text-mode"
+          checked={isFreeText}
+          onCheckedChange={setIsFreeText}
+        />
+      </div>
 
-        {!isFreeText ? (
-          <div className="grid w-full grid-flow-row grid-cols-1 gap-4 text-gray-800 dark:text-gray-200">
-            <div className="rounded-md border border-yellow-200 bg-yellow-50 p-3 dark:border-yellow-900/50 dark:bg-yellow-900/20">
-              <div className="flex items-center gap-2 text-sm text-yellow-800 dark:text-yellow-200">
-                <Small>
-                  Note: Detailed configuration options are still a work in
-                  progress. Options might get added or deleted.
-                </Small>
-              </div>
+      {!isFreeText ? (
+        <div className="grid w-full grid-flow-row grid-cols-1 gap-4 ">
+          <div className="rounded-md border border-yellow-200 bg-yellow-50 p-3 dark:border-yellow-900/50 dark:bg-yellow-900/20">
+            <div className="flex items-center gap-2 text-sm text-yellow-800 dark:text-yellow-200">
+              <Small>
+                Note: Detailed configuration options are still a work in
+                progress. Options might get added or deleted.
+              </Small>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2">
-                  <Label
-                    htmlFor="client-type"
-                    className="text-gray-700 dark:text-gray-300"
-                  >
-                    Client Type
-                  </Label>
-                  {configInfoMap["Client Type"] && (
-                    <InfoPopup feature={configInfoMap["Client Type"]} />
-                  )}
-                </div>
-                <Select value={clientType} onValueChange={setClientType}>
-                  <SelectTrigger
-                    className={cn(
-                      "w-full border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
-                      "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
-                    )}
-                  >
-                    <SelectValue placeholder="Select client type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="web">Web Client</SelectItem>
-                    <SelectItem value="mobile">Mobile Client</SelectItem>
-                    <SelectItem value="iot">IoT Device</SelectItem>
-                    <SelectItem value="desktop">Desktop Application</SelectItem>
-                  </SelectContent>
-                </Select>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <Label htmlFor="client-type">Client Type</Label>
+                {configInfoMap["Client Type"] && (
+                  <InfoPopup feature={configInfoMap["Client Type"]} />
+                )}
               </div>
-
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2">
-                  <Label
-                    htmlFor="location"
-                    className="text-gray-700 dark:text-gray-300"
-                  >
-                    Client Location
-                  </Label>
-                  {configInfoMap["Client Location"] && (
-                    <InfoPopup feature={configInfoMap["Client Location"]} />
+              <Select value={clientType} onValueChange={setClientType}>
+                <SelectTrigger
+                  className={cn(
+                    "w-full border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                    "focus:ring-gray-400 dark:focus:ring-gray-600",
                   )}
-                </div>
-                <Select value={location} onValueChange={setLocation}>
-                  <SelectTrigger
-                    className={cn(
-                      "w-full border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
-                      "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
-                    )}
-                  >
-                    <SelectValue placeholder="Select location" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="global">Global</SelectItem>
-                    <SelectItem value="regional">Regional</SelectItem>
-                    <SelectItem value="local">Local</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+                >
+                  <SelectValue placeholder="Select client type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="web">Web Client</SelectItem>
+                  <SelectItem value="mobile">Mobile Client</SelectItem>
+                  <SelectItem value="iot">IoT Device</SelectItem>
+                  <SelectItem value="desktop">Desktop Application</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
-                <Label
-                  htmlFor="concurrent-users"
-                  className="text-gray-700 dark:text-gray-300"
-                >
-                  Concurrent Users
-                </Label>
-                {configInfoMap["Concurrent Users"] && (
-                  <InfoPopup feature={configInfoMap["Concurrent Users"]} />
+                <Label htmlFor="location">Client Location</Label>
+                {configInfoMap["Client Location"] && (
+                  <InfoPopup feature={configInfoMap["Client Location"]} />
                 )}
               </div>
-              <Input
-                type="number"
-                id="concurrent-users"
-                value={concurrentUsers}
-                onChange={(e) => setConcurrentUsers(Number(e.target.value))}
-                className={cn(
-                  "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
-                  "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
-                )}
-                min={1}
-              />
+              <Select value={location} onValueChange={setLocation}>
+                <SelectTrigger
+                  className={cn(
+                    "w-full border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                    "focus:ring-gray-400 dark:focus:ring-gray-600",
+                  )}
+                >
+                  <SelectValue placeholder="Select location" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="global">Global</SelectItem>
+                  <SelectItem value="regional">Regional</SelectItem>
+                  <SelectItem value="local">Local</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
+          </div>
 
-            {/* 
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <Label htmlFor="concurrent-users">Concurrent Users</Label>
+              {configInfoMap["Concurrent Users"] && (
+                <InfoPopup feature={configInfoMap["Concurrent Users"]} />
+              )}
+            </div>
+            <Input
+              type="number"
+              id="concurrent-users"
+              value={concurrentUsers}
+              onChange={(e) => setConcurrentUsers(Number(e.target.value))}
+              className={cn(
+                "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                " focus:ring-gray-400 dark:focus:ring-gray-600",
+              )}
+              min={1}
+            />
+          </div>
+
+          {/* 
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
                 <Label className="text-gray-700 dark:text-gray-300">
@@ -311,51 +284,40 @@ const ClientSettings = ({
             </div>
               */}
 
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-2">
-                <Label
-                  htmlFor="client-details"
-                  className="text-gray-700 dark:text-gray-300"
-                >
-                  Additional Configuration
-                </Label>
-                {configInfoMap["Additional Configuration"] && (
-                  <InfoPopup
-                    feature={configInfoMap["Additional Configuration"]}
-                  />
-                )}
-              </div>
-              <Textarea
-                name="client-details"
-                id="client-details"
-                rows={6}
-                placeholder={`Example:
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <Label htmlFor="client-details">Additional Configuration</Label>
+              {configInfoMap["Additional Configuration"] && (
+                <InfoPopup
+                  feature={configInfoMap["Additional Configuration"]}
+                />
+              )}
+            </div>
+            <Textarea
+              name="client-details"
+              id="client-details"
+              rows={6}
+              placeholder={`Example:
 - Client-side requirements
 - Network constraints
 - Security requirements
 - Performance targets`}
-                className={cn(
-                  "text-md border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
-                  "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
-                  "placeholder:text-gray-500 dark:placeholder:text-gray-400",
-                )}
-                value={details}
-                onChange={(e) => setDetails(e.target.value)}
-              />
-            </div>
+              className={cn(
+                "text-md border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                " focus:ring-gray-400 dark:focus:ring-gray-600",
+              )}
+              value={details}
+              onChange={(e) => setDetails(e.target.value)}
+            />
           </div>
-        ) : (
-          <div className="flex flex-col gap-2">
-            <Label
-              htmlFor="free-form"
-              className="text-gray-700 dark:text-gray-300"
-            >
-              Client Configuration
-            </Label>
-            <Textarea
-              id="free-form"
-              rows={20}
-              placeholder={`Describe your client configuration here. Example:
+        </div>
+      ) : (
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="free-form">Client Configuration</Label>
+          <Textarea
+            id="free-form"
+            rows={20}
+            placeholder={`Describe your client configuration here. Example:
 
 Client Type: Web Client
 Location: Global
@@ -376,17 +338,18 @@ Additional Requirements:
 - Network constraints
 - Security requirements
 - Performance targets`}
-              className={cn(
-                "text-md border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
-                "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
-                "placeholder:text-gray-500 dark:placeholder:text-gray-400",
-              )}
-              value={freeFormText}
-              onChange={(e) => setFreeFormText(e.target.value)}
-            />
-          </div>
-        )}
-      </div>
-    </WithSettings>
+            className={cn(
+              "text-md border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+              " focus:ring-gray-400 dark:focus:ring-gray-600",
+            )}
+            value={freeFormText}
+            onChange={(e) => setFreeFormText(e.target.value)}
+          />
+        </div>
+      )}
+    </div>
   );
 };
+
+// Export the ClientSettings component
+export { ClientSettings };

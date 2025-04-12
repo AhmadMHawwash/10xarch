@@ -328,7 +328,7 @@ describe('systemDesignerUtils', () => {
       
       expect(result).toHaveLength(1);
       const newNode = result[0];
-      expect(newNode?.data.configs).toEqual({ 'display name': 'Custom Component' });
+      expect(newNode?.data.configs).toEqual({ 'title': 'Custom Component' });
     });
   });
 

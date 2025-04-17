@@ -6314,10 +6314,10 @@ onetime@^7.0.0:
   dependencies:
     mimic-function "^5.0.0"
 
-openai@^4.80.1:
-  version "4.80.1"
-  resolved "https://registry.npmjs.org/openai/-/openai-4.80.1.tgz"
-  integrity sha512-+6+bbXFwbIE88foZsBEt36bPkgZPdyFN82clAXG61gnHb2gXdZApDyRrcAHqEtpYICywpqaNo57kOm9dtnb7Cw==
+openai@^4.95.0:
+  version "4.95.0"
+  resolved "https://registry.yarnpkg.com/openai/-/openai-4.95.0.tgz#e391f02561874b7cd5e8becd56feec77d88be32f"
+  integrity sha512-tWHLTA+/HHyWlP8qg0mQLDSpI2NQLhk6zHLJL8yb59qn2pEI8rbEiAGSDPViLvi3BRDoQZIX5scaJ3xYGr2nhw==
   dependencies:
     "@types/node" "^18.11.18"
     "@types/node-fetch" "^2.6.4"
@@ -7225,6 +7225,7 @@ string-argv@~0.3.2:
   integrity sha512-aqD2Q0144Z+/RqG52NeHEkZauTAUWJO8c6yTftGJKO3Tja5tUgIfmIl6kExvhtxSDP7fXB6DvzkfMpCd/F3G+Q==
 
 "string-width-cjs@npm:string-width@^4.2.0", string-width@^4.1.0:
+  name string-width-cjs
   version "4.2.3"
   resolved "https://registry.npmjs.org/string-width/-/string-width-4.2.3.tgz"
   integrity sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==
@@ -7306,6 +7307,7 @@ stringify-entities@^4.0.0:
     character-entities-legacy "^3.0.0"
 
 "strip-ansi-cjs@npm:strip-ansi@^6.0.1", strip-ansi@^6.0.0, strip-ansi@^6.0.1:
+  name strip-ansi-cjs
   version "6.0.1"
   resolved "https://registry.npmjs.org/strip-ansi/-/strip-ansi-6.0.1.tgz"
   integrity sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==

@@ -1,6 +1,11 @@
 import { Footer } from "@/components/Footer";
 import HeroSystemDesigner from "@/components/HeroSystemDesigner";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import {
   ArrowRight,
   BookOpen,
@@ -8,27 +13,29 @@ import {
   Code,
   CreditCard,
   IterationCcw,
-  Layers,
-  MessageSquareHeartIcon
+  Layers
 } from "lucide-react";
 import Link from "next/link";
 
 export default async function Home() {
   return (
     <div className="container mx-auto px-4 py-12">
-      <header className="mb-14 flex flex-col md:flex-row items-center justify-between">
-        <div className="md:w-1/2 text-left md:pr-8">
+      <header className="mb-14 flex flex-col items-center justify-between md:flex-row">
+        <div className="text-left md:w-1/2 md:pr-8">
           <h1 className="mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-4xl font-bold text-transparent md:text-6xl">
-            10xarch
+            10×arch
           </h1>
           <p className="mb-4 text-xl text-gray-600 dark:text-gray-400">
-            Your space to design, visualize, and document your system architecture.
+            Your space to design, visualize, and document your system
+            architecture.
           </p>
           <p className="mb-8 text-lg text-gray-500 dark:text-gray-400">
-            Design systems, get AI feedback, and use it as interactive documentation. Bring your ideas to life through our intuitive drag-and-drop interface.
+            Design systems, get AI feedback, and use it as interactive
+            documentation. Bring your ideas to life through our intuitive
+            drag-and-drop interface.
           </p>
-          
-          <div className="flex flex-wrap gap-4 mb-8">
+
+          <div className="mb-8 flex flex-wrap gap-4">
             <Link
               href="/playground"
               className="group inline-flex items-center overflow-hidden rounded-full bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-3 text-white transition-all hover:from-blue-700 hover:to-purple-700"
@@ -38,7 +45,7 @@ export default async function Home() {
             </Link>
             <Link
               href="/challenges/url-shortener"
-              className="group inline-flex items-center overflow-hidden rounded-full bg-white/5 px-8 py-3 text-gray-700 ring-1 ring-gray-900/5 transition-all hover:bg-white/10 dark:text-gray-200 dark:ring-white/10 backdrop-blur-sm"
+              className="group inline-flex items-center overflow-hidden rounded-full bg-white/5 px-8 py-3 text-gray-700 ring-1 ring-gray-900/5 backdrop-blur-sm transition-all hover:bg-white/10 dark:text-gray-200 dark:ring-white/10"
             >
               <span className="mr-2">Try a challenge</span>
               <ArrowRight className="transition-transform group-hover:translate-x-1" />
@@ -54,15 +61,15 @@ export default async function Home() {
 
           <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
             <div className="flex items-center">
-              <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
+              <CheckCircle className="mr-2 h-5 w-5 text-green-500" />
               Playground
             </div>
             <div className="flex items-center">
-              <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
+              <CheckCircle className="mr-2 h-5 w-5 text-green-500" />
               AI-Powered Feedback
             </div>
             <div className="flex items-center">
-              <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
+              <CheckCircle className="mr-2 h-5 w-5 text-green-500" />
               Save & Share Designs
               <span className="ml-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-800 dark:bg-amber-900/30 dark:text-amber-500">
                 Coming Soon
@@ -71,7 +78,7 @@ export default async function Home() {
           </div>
         </div>
 
-        <div className="md:w-1/2 relative mt-8 md:mt-0 h-[500px] w-full rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm">
+        <div className="relative mt-8 h-[500px] w-full overflow-hidden rounded-lg border border-gray-200 bg-white/50 backdrop-blur-sm dark:border-gray-700 dark:bg-gray-800/50 md:mt-0 md:w-1/2">
           <HeroSystemDesigner />
         </div>
       </header>
@@ -88,8 +95,8 @@ export default async function Home() {
               Playground
             </h2>
             <p className="mb-6 text-lg text-gray-600 dark:text-gray-300">
-              Design systems freely, get AI feedback, and document your architecture
-              in one place.
+              Design systems freely, get AI feedback, and document your
+              architecture in one place.
             </p>
             <Link
               href="/playground"
@@ -127,59 +134,71 @@ export default async function Home() {
       </section>
 
       {/* Steps to Value Section */}
-      <section className="mb-20 py-12 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+      <section className="mb-20 bg-gradient-to-br from-gray-50 to-white py-12 dark:from-gray-900 dark:to-gray-800">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <h2 className="mb-12 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-center text-3xl font-bold text-transparent">
             Design Your Systems with Ease
           </h2>
-          
-          <div className="grid md:grid-cols-4 gap-8">
+
+          <div className="grid gap-8 md:grid-cols-4">
             {[
               {
                 step: 1,
                 title: "Create a New Design",
-                description: "Start with a blank canvas and add your first system components",
-                icon: Layers
+                description:
+                  "Start with a blank canvas and add your first system components",
+                icon: Layers,
               },
               {
                 step: 2,
                 title: "Drag & Connect Components",
-                description: "Build your architecture by adding and connecting components visually",
-                icon: Code
+                description:
+                  "Build your architecture by adding and connecting components visually",
+                icon: Code,
               },
               {
                 step: 3,
                 title: "Add Context & Documentation",
-                description: "Document your design decisions and add context to each component",
-                icon: BookOpen
+                description:
+                  "Document your design decisions and add context to each component",
+                icon: BookOpen,
               },
               {
                 step: 4,
                 title: "Get AI Feedback",
-                description: "Receive insights and suggestions on your system design from our AI",
+                description:
+                  "Receive insights and suggestions on your system design from our AI",
                 icon: IterationCcw,
-                isGolden: true
-              }
+                isGolden: true,
+              },
             ].map((item, index) => (
               <div key={index} className="relative">
-                <div className={`bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg h-full ${
-                  item.isGolden ? 'border-2 border-amber-400/50 dark:border-amber-500/50' : ''
-                }`}>
-                  <div className={`absolute -top-4 left-4 w-8 h-8 rounded-full flex items-center justify-center text-white font-bold ${
-                    item.isGolden 
-                      ? 'bg-gradient-to-r from-amber-400 to-amber-500 dark:from-amber-500 dark:to-amber-600'
-                      : 'bg-gradient-to-r from-blue-600 to-purple-600'
-                  }`}>
+                <div
+                  className={`h-full rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800 ${
+                    item.isGolden
+                      ? "border-2 border-amber-400/50 dark:border-amber-500/50"
+                      : ""
+                  }`}
+                >
+                  <div
+                    className={`absolute -top-4 left-4 flex h-8 w-8 items-center justify-center rounded-full font-bold text-white ${
+                      item.isGolden
+                        ? "bg-gradient-to-r from-amber-400 to-amber-500 dark:from-amber-500 dark:to-amber-600"
+                        : "bg-gradient-to-r from-blue-600 to-purple-600"
+                    }`}
+                  >
                     {item.step}
                   </div>
                   <div className="mb-4 mt-2">
-                    <item.icon className={`h-8 w-8 ${
-                      item.isGolden 
-                        ? 'text-amber-500 dark:text-amber-400'
-                        : 'text-blue-600 dark:text-blue-400'
-                    }`} />
+                    <item.icon
+                      className={`h-8 w-8 ${
+                        item.isGolden
+                          ? "text-amber-500 dark:text-amber-400"
+                          : "text-blue-600 dark:text-blue-400"
+                      }`}
+                    />
                   </div>
-                  <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">
+                  <h3 className="mb-2 text-xl font-semibold text-gray-900 dark:text-white">
                     {item.title}
                   </h3>
                   <p className="text-gray-600 dark:text-gray-400">
@@ -187,7 +206,7 @@ export default async function Home() {
                   </p>
                 </div>
                 {index < 3 && (
-                  <div className="hidden md:block absolute top-1/2 -right-8 w-8 h-0.5 bg-gradient-to-r from-blue-600 to-purple-600"></div>
+                  <div className="absolute -right-8 top-1/2 hidden h-0.5 w-8 bg-gradient-to-r from-blue-600 to-purple-600 md:block"></div>
                 )}
               </div>
             ))}
@@ -198,33 +217,38 @@ export default async function Home() {
       {/* FAQ Section */}
       <section className="mb-20 py-12">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <h2 className="mb-12 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-center text-3xl font-bold text-transparent">
             Frequently Asked Questions
           </h2>
-          
+
           <div className="mx-auto max-w-3xl">
             <Accordion type="single" collapsible className="w-full">
               {[
                 {
                   question: "What is the 10×arch?",
-                  answer: "The 10×arch is a free, interactive environment where you can create, visualize, and document your system architecture designs. It provides a drag-and-drop interface, component library, and AI feedback to help you build better systems."
+                  answer:
+                    "The 10×arch is a free, interactive environment where you can create, visualize, and document your system architecture designs. It provides a drag-and-drop interface, component library, and AI feedback to help you build better systems.",
                 },
                 {
                   question: "Is the playground completely free to use?",
-                  answer: "The basic playground functionality is available with limitations. Free users can access the design interface with rate-limited AI feedback (3 prompts per hour). For unlimited AI feedback and advanced features, users need to purchase AI credits through our Pro plan."
+                  answer:
+                    "The basic playground functionality is available with limitations. Free users can access the design interface with rate-limited AI feedback (3 prompts per hour). For unlimited AI feedback and advanced features, users need to purchase AI credits through our Pro plan.",
                 },
                 {
                   question: "Can I save and share my designs?",
-                  answer: "This feature is coming soon! Soon you'll be able to save your designs to your account and share them with others. This will make the playground great for documentation, collaboration, or showing off your system design skills."
+                  answer:
+                    "This feature is coming soon! Soon you'll be able to save your designs to your account and share them with others. This will make the playground great for documentation, collaboration, or showing off your system design skills.",
                 },
                 {
                   question: "How does the AI feedback work?",
-                  answer: "Our AI analyzes your system design and provides feedback on architectural decisions, potential bottlenecks, scalability concerns, and suggestions for improvement. Free users get limited AI feedback, while Pro users have unlimited access."
+                  answer:
+                    "Our AI analyzes your system design and provides feedback on architectural decisions, potential bottlenecks, scalability concerns, and suggestions for improvement. Free users get limited AI feedback, while Pro users have unlimited access.",
                 },
                 {
                   question: "What system components are available?",
-                  answer: "We provide a comprehensive library of system components including databases, servers, load balancers, caches, message queues, and more. You can also create custom components to represent specific technologies in your stack."
-                }
+                  answer:
+                    "We provide a comprehensive library of system components including databases, servers, load balancers, caches, message queues, and more. You can also create custom components to represent specific technologies in your stack.",
+                },
               ].map((faq, index) => (
                 <AccordionItem key={index} value={`item-${index}`}>
                   <AccordionTrigger className="text-left font-medium">
@@ -243,13 +267,14 @@ export default async function Home() {
       {/* CTA Section */}
       <section className="mb-20 py-12">
         <div className="container mx-auto px-4">
-          <div className="mx-auto max-w-4xl rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 p-8 md:p-12 text-white shadow-xl">
+          <div className="mx-auto max-w-4xl rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 p-8 text-white shadow-xl md:p-12">
             <div className="text-center">
               <h2 className="mb-4 text-3xl font-bold md:text-4xl">
                 Start Designing Your Systems Today
               </h2>
               <p className="mb-8 text-lg opacity-90">
-                Join thousands of engineers creating beautiful and functional system designs
+                Join thousands of engineers creating beautiful and functional
+                system designs
               </p>
               <Link href="/playground">
                 <button className="rounded-full bg-white px-8 py-3 font-medium text-blue-600 shadow-md transition-all hover:bg-gray-100 hover:shadow-lg">

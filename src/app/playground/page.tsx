@@ -179,7 +179,9 @@ function PageContent() {
                 <Tabs defaultValue="context" className="w-full">
                   <TabsList className={`grid w-full grid-cols-3 gap-1`}>
                     <TabsTrigger value="context" className="text-sm">
-                      Context
+                      {!selectedNode || selectedNode?.data.name === "Whiteboard"
+                        ? "Context"
+                        : "Configuration"}
                     </TabsTrigger>
                     <TabsTrigger value="todo" className="text-sm">
                       Todo

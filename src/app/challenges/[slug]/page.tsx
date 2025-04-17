@@ -27,12 +27,16 @@ import { notFound } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useMount, usePrevious } from "react-use";
 import { ReactFlowProvider } from "reactflow";
+import { PanelChat } from "@/components/ai-chat/PanelChat";
+import { ChatMessagesProvider } from "@/lib/hooks/useChatMessages_";
 
 export default function LevelPage() {
   return (
     <ReactFlowProvider>
       <SystemDesignerProvider>
-        <Level />
+        <ChatMessagesProvider>
+          <Level />
+        </ChatMessagesProvider>
       </SystemDesignerProvider>
     </ReactFlowProvider>
   );
@@ -110,6 +114,15 @@ function Level() {
           />
         </ResizablePanel>
       </ResizablePanelGroup>
+
+      {/* Add the chat component */}
+      <div className="ai-chat-container fixed bottom-4 right-4 z-50">
+        <PanelChat
+          isPlayground={false}
+          playgroundId={challenge.slug}
+          playgroundTitle={challenge.title}
+        />
+      </div>
     </>
   );
 }

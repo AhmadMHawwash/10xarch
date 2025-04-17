@@ -125,7 +125,7 @@ export const checkSolution = createTRPCRouter({
 
       try {
         const response = await openai.chat.completions.create({
-          model: "gpt-4o-mini",
+          model: "gpt-4.1-mini",
           messages,
           temperature: 0.2,
           max_tokens: 512,
@@ -146,9 +146,9 @@ export const checkSolution = createTRPCRouter({
             const outputTokens = calculateTextTokens(content);
 
             const inputCost =
-              (inputTokens / 1000) * GPT_TOKEN_COSTS["gpt-4o-mini"].input;
+              (inputTokens / 1000) * GPT_TOKEN_COSTS["gpt-4.1-mini"].input;
             const outputCost =
-              (outputTokens / 1000) * GPT_TOKEN_COSTS["gpt-4o-mini"].output;
+              (outputTokens / 1000) * GPT_TOKEN_COSTS["gpt-4.1-mini"].output;
             const totalCredits = costToCredits(inputCost + outputCost);
 
             try {
@@ -250,9 +250,9 @@ export const checkSolution = createTRPCRouter({
 
         // Calculate required credits
         const inputCost =
-          (inputTokens / 1000) * GPT_TOKEN_COSTS["gpt-4o-mini"].input;
+          (inputTokens / 1000) * GPT_TOKEN_COSTS["gpt-4.1-mini"].input;
         const outputCost =
-          (estimatedOutputTokens / 1000) * GPT_TOKEN_COSTS["gpt-4o-mini"].output;
+          (estimatedOutputTokens / 1000) * GPT_TOKEN_COSTS["gpt-4.1-mini"].output;
         const totalCredits = costToCredits(inputCost + outputCost);
 
         try {
@@ -282,7 +282,7 @@ export const checkSolution = createTRPCRouter({
 
       try {
         const response = await openai.chat.completions.create({
-          model: "gpt-4o-mini",
+          model: "gpt-4.1-mini",
           messages: [
             {
               role: "system",

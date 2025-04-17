@@ -166,7 +166,7 @@ export const challengesRouter = createTRPCRouter({
       const estimatedCost = calculateGPTCost(
         promptTokens,
         estimatedOutputTokens,
-        "gpt-4o-mini",
+        "gpt-4.1-mini",
       );
       const estimatedCredits = costToCredits(estimatedCost);
 
@@ -210,7 +210,7 @@ export const challengesRouter = createTRPCRouter({
         const actualCost = calculateGPTCost(
           promptTokens,
           outputTokens,
-          "gpt-4o-mini",
+          "gpt-4.1-mini",
         );
         const actualCredits = costToCredits(actualCost);
 

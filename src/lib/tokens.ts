@@ -20,6 +20,10 @@ export const GPT_TOKEN_COSTS = {
     input: 0.01,
     output: 0.03,
   },
+  "gpt-4.1-mini": {
+    input: 0.015,
+    output: 0.04,
+  },
 } as const;
 
 // Types

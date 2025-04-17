@@ -291,7 +291,7 @@ Keep these requirements in mind when providing assistance. Guide the user withou
           });
           
           // Calculate estimated cost
-          const estimatedCost = calculateGPTCost(inputTokens, 400, 'gpt-4o-mini');
+          const estimatedCost = calculateGPTCost(inputTokens, 400, 'gpt-4.1-mini');
           const requiredCredits = costToCredits(estimatedCost);
           
           if (!userCredits || userCredits.balance < requiredCredits) {
@@ -308,7 +308,7 @@ Keep these requirements in mind when providing assistance. Guide the user withou
       
       // Using free prompts or credits based on rate limit
       const completion = await openai.chat.completions.create({
-        model: 'gpt-4o-mini',
+        model: 'gpt-4.1-mini',
         messages: messageArray,
         temperature: 0.1,
         max_tokens: 400,
@@ -318,7 +318,7 @@ Keep these requirements in mind when providing assistance. Guide the user withou
       const outputTokens = calculateTextTokens(response);
 
       // Calculate the actual cost for this API call
-      const totalCost = calculateGPTCost(inputTokens, outputTokens, 'gpt-4o-mini');
+      const totalCost = calculateGPTCost(inputTokens, outputTokens, 'gpt-4.1-mini');
       const actualCredits = costToCredits(totalCost);
 
       // Deduct credits only if we're using them (rate limit was exceeded)

@@ -486,7 +486,7 @@ export const handleEdgesChange = (
   nodesToUpdateUI: string[]
 } => {
   let nodesToUpdateUI: string[] = [];
-  const updatedNodes = [...nodes];
+  let updatedNodes = [...nodes];
   const edgeDeletions = changes.filter((change) => change.type === "remove");
   
   if (edgeDeletions.length > 0) {
@@ -513,7 +513,7 @@ export const handleEdgesChange = (
         nodesToUpdate.add(targetId);
         
         // Update source and target nodes
-        updateNodeHandlesForEdgeDeletion(
+        updatedNodes = updateNodeHandlesForEdgeDeletion(
           updatedNodes, 
           sourceId, 
           sourceHandleId, 
@@ -535,7 +535,7 @@ export const handleEdgesChange = (
         nodesToUpdate.add(targetId);
         
         // Update source and target nodes
-        updateNodeHandlesForEdgeDeletion(
+        updatedNodes = updateNodeHandlesForEdgeDeletion(
           updatedNodes, 
           sourceId, 
           sourceHandleId, 
@@ -559,7 +559,7 @@ export const handleEdgesChange = (
 };
 
 // Helper function to update node handles when an edge is deleted
-const updateNodeHandlesForEdgeDeletion = (
+export const updateNodeHandlesForEdgeDeletion = (
   nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[],
   sourceId: string,
   sourceHandleId: string | null | undefined,
@@ -570,11 +570,11 @@ const updateNodeHandlesForEdgeDeletion = (
   const sourceNodeIndex = nodes.findIndex((node) => node.id === sourceId);
   const targetNodeIndex = nodes.findIndex((node) => node.id === targetId);
   
-  if (sourceNodeIndex === -1 || targetNodeIndex === -1) return;
+  if (sourceNodeIndex === -1 || targetNodeIndex === -1) return nodes;
   
   // Update source node's source handles
   const sourceNode = nodes[sourceNodeIndex];
-  if (!sourceNode || !sourceHandleId) return;
+  if (!sourceNode || !sourceHandleId) return nodes;
   
   const sourceHandles = sourceNode.data.sourceHandles ?? [];
   
@@ -596,7 +596,9 @@ const updateNodeHandlesForEdgeDeletion = (
     });
   }
   
-  nodes[sourceNodeIndex] = {
+  const updatedNodes = [...nodes];
+  
+  updatedNodes[sourceNodeIndex] = {
     ...sourceNode,
     data: {
       ...sourceNode.data,
@@ -605,8 +607,8 @@ const updateNodeHandlesForEdgeDeletion = (
   };
   
   // Update target node's target handles
-  const targetNode = nodes[targetNodeIndex];
-  if (!targetNode || !targetHandleId) return;
+  const targetNode = updatedNodes[targetNodeIndex];
+  if (!targetNode || !targetHandleId) return updatedNodes;
   
   const targetHandles = targetNode.data.targetHandles ?? [];
   
@@ -628,13 +630,15 @@ const updateNodeHandlesForEdgeDeletion = (
     });
   }
   
-  nodes[targetNodeIndex] = {
+  updatedNodes[targetNodeIndex] = {
     ...targetNode,
     data: {
       ...targetNode.data,
       targetHandles: updatedTargetHandles,
     },
   };
+  
+  return updatedNodes;
 };
 
 // Pure function to update edge label

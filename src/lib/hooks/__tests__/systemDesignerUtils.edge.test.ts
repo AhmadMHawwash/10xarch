@@ -124,6 +124,71 @@ describe('systemDesignerUtils edge cases', () => {
       const validEdge = result.updatedEdges[0];
       expect(validEdge?.id).toBe('valid-edge');
     });
+
+    it('should properly remove handles when deleting an edge', () => {
+      // Create test nodes with handles
+      const sourceNode = {
+        ...createMockNode('node-1') as Node<SystemComponentNodeDataProps>,
+        data: {
+          ...(createMockNode('node-1') as Node<SystemComponentNodeDataProps>).data,
+          sourceHandles: [
+            { id: 'source-handle-1', isConnected: true }, // This handle should be removed
+            { id: 'source-handle-2', isConnected: false } // This handle should remain
+          ]
+        }
+      };
+      
+      const targetNode = {
+        ...createMockNode('node-2') as Node<SystemComponentNodeDataProps>,
+        data: {
+          ...(createMockNode('node-2') as Node<SystemComponentNodeDataProps>).data,
+          targetHandles: [
+            { id: 'target-handle-1', isConnected: true }, // This handle should be removed
+            { id: 'target-handle-2', isConnected: false } // This handle should remain
+          ]
+        }
+      };
+      
+      const nodes: Node<SystemComponentNodeDataProps>[] = [sourceNode, targetNode];
+      
+      // Create an edge between the source and target handles
+      const edges: Edge[] = [
+        { 
+          id: 'edge-to-delete', 
+          source: 'node-1', 
+          target: 'node-2',
+          sourceHandle: 'source-handle-1',
+          targetHandle: 'target-handle-1'
+        }
+      ];
+      
+      // Change to delete the edge
+      const changes: EdgeChange[] = [
+        { type: 'remove', id: 'edge-to-delete' }
+      ];
+      
+      // Call handleEdgesChange with the delete change
+      const result = handleEdgesChange(changes, edges, nodes);
+      
+      // Verify that the edge was deleted
+      expect(result.updatedEdges.length).toBe(0);
+      
+      // Find the updated nodes
+      const updatedSourceNode = result.updatedNodes.find(n => n.id === 'node-1');
+      const updatedTargetNode = result.updatedNodes.find(n => n.id === 'node-2');
+      
+      // Verify that the used handles were removed
+      expect(updatedSourceNode?.data.sourceHandles?.find(h => h.id === 'source-handle-1')).toBeUndefined();
+      expect(updatedTargetNode?.data.targetHandles?.find(h => h.id === 'target-handle-1')).toBeUndefined();
+      
+      // Verify that the unused handles remain
+      expect(updatedSourceNode?.data.sourceHandles?.find(h => h.id === 'source-handle-2')).toBeDefined();
+      expect(updatedTargetNode?.data.targetHandles?.find(h => h.id === 'target-handle-2')).toBeDefined();
+      
+      // Verify that the nodes are in the nodesToUpdateUI array
+      expect(result.nodesToUpdateUI).toContain('node-1');
+      expect(result.nodesToUpdateUI).toContain('node-2');
+    });
   });
 
   describe('handleCopy edge cases', () => {

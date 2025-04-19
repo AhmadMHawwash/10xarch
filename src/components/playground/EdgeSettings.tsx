@@ -38,9 +38,7 @@ export const EdgeSettings = ({
 
   // Initialize state from edge data when edge changes
   useEffect(() => {
-    if (edge) {
-      console.log("Edge selected:", edge); // Debug log
-      
+    if (edge) {      
       // Check label in all possible locations
       const edgeLabel = 
         (typeof edge.label === "string" ? edge.label : "") || 
@@ -153,6 +151,7 @@ export const EdgeSettings = ({
                   onChange={handleApiDefinitionChange}
                   placeholder="Define API endpoints, request/response formats..."
                   rows={4}
+                  data-testid="api-definition-textarea"
                 />
               </div>
             </TabsContent>
@@ -163,7 +162,9 @@ export const EdgeSettings = ({
                   value={requestFlow}
                   onChange={handleRequestFlowChange}
                   placeholder="Describe how requests flow through this connection..."
+                  aria-label="Request Flow"
                   rows={4}
+                  data-testid="request-flow-textarea"
                 />
               </div>
             </TabsContent>

@@ -248,4 +248,34 @@ describe('SystemDesigner', () => {
     // We know mockNodes[2] is the whiteboard node based on the test setup
     expect(mockOnSelectNode).toHaveBeenCalledWith(mockNodes[2]);
   });
+
+  it('deselects all nodes when an edge is clicked', () => {
+    render(<SystemBuilder PassedFlowManager={MockPassedFlowManager} />);
+    
+    const props = window.mockReactFlowProps;
+    // Create a simple mock event with just the methods we need
+    const mockEvent: MockMouseEvent = { preventDefault: vi.fn() };
+    const mockEdge = mockEdges[0];
+    
+    // Directly call the onEdgeClick handler with type assertion
+    if (props?.onEdgeClick && mockEdge) {
+      // @ts-expect-error - Simplified mock event for testing
+      props.onEdgeClick(mockEvent, mockEdge);
+    }
+    
+    // Verify that setNodes was called with all nodes deselected
+    expect(mockSetNodes).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        expect.objectContaining({ id: 'node-1', selected: false }),
+        expect.objectContaining({ id: 'node-2', selected: false }),
+        expect.objectContaining({ id: 'node-3', selected: false })
+      ])
+    );
+    
+    // Verify onSelectEdge was called with the edge
+    expect(mockOnSelectEdge).toHaveBeenCalledWith(mockEdge);
+    
+    // Verify onSelectNode was called with null to clear node selection
+    expect(mockOnSelectNode).toHaveBeenCalledWith(null);
+  });
 });

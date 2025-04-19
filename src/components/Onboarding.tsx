@@ -14,7 +14,7 @@ interface OnboardingProps {
 }
 
 // Local storage key for tour preference
-const TOUR_PREFERENCE_KEY = "system-design-tour-preference";
+export const TOUR_PREFERENCE_KEY = "system-design-tour-preference";
 
 export function Onboarding({
   isFirstVisit = false,
@@ -289,12 +289,6 @@ export function Onboarding({
       // Always destroy the tour if they confirmed ending it
       driverObj.destroy();
     }
-  };
-
-  // Reset tour preference (for testing)
-  const resetTourPreference = () => {
-    localStorage.removeItem(TOUR_PREFERENCE_KEY);
-    setShowTourButton(true);
   };
 
   return (

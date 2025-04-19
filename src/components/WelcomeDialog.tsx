@@ -13,9 +13,7 @@ import { Play, SkipForward, X } from 'lucide-react';
 import Image from 'next/image';
 import { Checkbox } from './ui/checkbox';
 import { Label } from './ui/label';
-
-// Local storage key for tour preference (same as in Onboarding.tsx)
-const TOUR_PREFERENCE_KEY = "system-design-tour-preference";
+import { TOUR_PREFERENCE_KEY } from './Onboarding';
 
 interface WelcomeDialogProps {
   startTour: () => void;

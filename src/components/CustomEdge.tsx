@@ -1,22 +1,13 @@
 import { cn } from "@/lib/utils";
-import { useState, useEffect, useRef, type FC } from "react";
-import { getBezierPath, EdgeLabelRenderer, type EdgeProps } from "reactflow";
+import { useState, type FC } from "react";
+import { getBezierPath, EdgeLabelRenderer, type EdgeProps, type Edge } from "reactflow";
 import { useSystemDesigner } from "@/lib/hooks/_useSystemDesigner";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Settings } from "lucide-react";
-import { Textarea } from "@/components/ui/textarea";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface EdgeData {
+  apiDefinition?: string;
+  requestFlow?: string;
   label?: string;
-  definition?: string;
-  flow?: string;
+  [key: string]: unknown;
 }
 
 export const CustomEdge: FC<EdgeProps<EdgeData>> = ({
@@ -30,10 +21,12 @@ export const CustomEdge: FC<EdgeProps<EdgeData>> = ({
   id,
   data,
   selected,
+  source,
+  target,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const { updateEdgeLabel } = useSystemDesigner();
+  const { updateEdgeLabel, onSelectEdge, onSelectNode } = useSystemDesigner();
   const [edgePath, labelX, labelY] = getBezierPath({
     sourceX,
     sourceY,
@@ -42,41 +35,6 @@ export const CustomEdge: FC<EdgeProps<EdgeData>> = ({
     targetY,
     targetPosition,
   });
-  
-  const definitionRef = useRef<HTMLTextAreaElement>(null);
-  const flowRef = useRef<HTMLTextAreaElement>(null);
-  
-  // Local state to preserve textarea values when switching tabs
-  const [localDefinition, setLocalDefinition] = useState(data?.definition ?? '');
-  const [localFlow, setLocalFlow] = useState(data?.flow ?? '');
-
-  // Keep local state in sync with props when not editing
-  useEffect(() => {
-    setLocalDefinition(data?.definition ?? '');
-  }, [data?.definition]);
-
-  useEffect(() => {
-    setLocalFlow(data?.flow ?? '');
-  }, [data?.flow]);
-  
-  // Local state to track if we're currently editing the textareas
-  const [isEditingDefinition, setIsEditingDefinition] = useState(false);
-  const [isEditingFlow, setIsEditingFlow] = useState(false);
-  
-  // Current active tab
-  const [activeTab, setActiveTab] = useState<string>("definition");
-  
-  // Handle tab switching - save current tab's content before switching
-  const handleTabChange = (newTab: string) => {
-    // Save current tab's content
-    if (activeTab === "definition" && definitionRef.current) {
-      setLocalDefinition(definitionRef.current.value);
-    } else if (activeTab === "flow" && flowRef.current) {
-      setLocalFlow(flowRef.current.value);
-    }
-    
-    setActiveTab(newTab);
-  };
 
   const handleDoubleClick = () => {
     setIsEditing(true);
@@ -94,48 +52,6 @@ export const CustomEdge: FC<EdgeProps<EdgeData>> = ({
     }
   };
 
-  // Save local state and update parent when textarea loses focus
-  const handleDefinitionBlur = () => {
-    setIsEditingDefinition(false);
-    if (definitionRef.current) {
-      const newValue = definitionRef.current.value;
-      setLocalDefinition(newValue);
-      handleApiChange('definition', newValue);
-    }
-  };
-  
-  // Save local state and update parent when textarea loses focus
-  const handleFlowBlur = () => {
-    setIsEditingFlow(false);
-    if (flowRef.current) {
-      const newValue = flowRef.current.value;
-      setLocalFlow(newValue);
-      handleApiChange('flow', newValue);
-    }
-  };
-
-  // Track manual changes in textareas
-  const handleDefinitionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    // We don't set state on every keystroke to avoid cursor jumping
-    // Just manually tracking when the dialog is about to close or tabs switch
-    if (!isEditingDefinition) {
-      setLocalDefinition(e.target.value);
-    }
-  };
-
-  const handleFlowChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    // We don't set state on every keystroke to avoid cursor jumping
-    // Just manually tracking when the dialog is about to close or tabs switch
-    if (!isEditingFlow) {
-      setLocalFlow(e.target.value);
-    }
-  };
-
-  const handleApiChange = (field: keyof EdgeData, value: string) => {
-    const newData = { ...data, [field]: value };
-    updateEdgeLabel(id, data?.label ?? '', newData);
-  };
-
   const handleEdgeMouseEnter = () => {
     setIsHovered(true);
   };
@@ -144,8 +60,19 @@ export const CustomEdge: FC<EdgeProps<EdgeData>> = ({
     setIsHovered(false);
   };
 
-  const handleEdgeDoubleClick = () => {
-    setIsEditing(true);
+  const handleEdgeClick = (e: React.MouseEvent) => {
+    // Open the edge settings panel
+    e.stopPropagation();
+    const edge: Edge<EdgeData> = { 
+      id, 
+      data: data ?? {}, 
+      source: source ?? '', 
+      target: target ?? '', 
+      // We don't include sourceHandle/targetHandle as they might not be necessary
+      // and we're just creating a temporary object for selection
+    };
+    onSelectEdge(edge);
+    onSelectNode(null);
   };
 
   return (
@@ -157,7 +84,7 @@ export const CustomEdge: FC<EdgeProps<EdgeData>> = ({
         className="react-flow__edge-interaction"
         onMouseEnter={handleEdgeMouseEnter}
         onMouseLeave={handleEdgeMouseLeave}
-        onDoubleClick={handleEdgeDoubleClick}
+        onClick={handleEdgeClick}
         style={{
           strokeWidth: "12px",
           stroke: "transparent",
@@ -176,13 +103,13 @@ export const CustomEdge: FC<EdgeProps<EdgeData>> = ({
         }}
         className={cn(
           "react-flow__edge-path",
-          selected  && "!stroke-blue-500 dark:!stroke-blue-400",
+          selected && "!stroke-blue-500 dark:!stroke-blue-400",
         )}
         d={edgePath}
         markerEnd={markerEnd}
         onMouseEnter={handleEdgeMouseEnter}
         onMouseLeave={handleEdgeMouseLeave}
-        onDoubleClick={handleEdgeDoubleClick}
+        onClick={handleEdgeClick}
       />
       <EdgeLabelRenderer>
         <div
@@ -194,6 +121,7 @@ export const CustomEdge: FC<EdgeProps<EdgeData>> = ({
           className="nodrag nopan relative group"
           onMouseEnter={handleEdgeMouseEnter}
           onMouseLeave={handleEdgeMouseLeave}
+          onClick={handleEdgeClick}
         >
           {isEditing ? (
             <input
@@ -204,6 +132,7 @@ export const CustomEdge: FC<EdgeProps<EdgeData>> = ({
               autoFocus
               onBlur={handleBlur}
               onKeyDown={handleKeyDown}
+              onClick={(e) => e.stopPropagation()}
             />
           ) : (
             <div
@@ -216,93 +145,13 @@ export const CustomEdge: FC<EdgeProps<EdgeData>> = ({
                     ? "bg-gray-100/90 dark:bg-gray-700/90"
                     : "bg-gray-100/50 dark:bg-gray-700/50",
                 "border border-transparent",
-                isHovered && !data?.label && "border-dashed border-gray-400 dark:border-gray-500"
+                isHovered && !data?.label && "border-dashed border-gray-400 dark:border-gray-500",
+                selected && "ring-2 ring-blue-500 dark:ring-blue-400"
               )}
             >
-              {data?.label ?? (isHovered ? 'Add connection title' : '•••')}
+              {data?.label ?? (isHovered ? 'Click to configure' : '•••')}
             </div>
           )}
-          
-          {/* Settings Icon */}
-          <Dialog>
-            <DialogTrigger asChild>
-              <button 
-                className={cn(
-                  "absolute right-[-20px] top-[50%] translate-y-[-50%] rounded-full bg-gray-200 p-1 opacity-0 transition-opacity dark:bg-gray-700",
-                  isHovered && "opacity-100"
-                )}
-              >
-                <Settings size={12} className="text-gray-700 dark:text-gray-300" />
-              </button>
-            </DialogTrigger>
-            <DialogContent className="max-w-4xl bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100">
-              <DialogHeader>
-                <DialogTitle>API Definition</DialogTitle>
-              </DialogHeader>
-              <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-                <TabsList className="w-full bg-gray-200 dark:bg-gray-700">
-                  <TabsTrigger value="definition" className="w-full">
-                    Definition
-                  </TabsTrigger>
-                  <TabsTrigger value="flow" className="w-full">
-                    Request flow
-                  </TabsTrigger>
-                </TabsList>
-                <TabsContent value="definition">
-                  <Textarea
-                    ref={definitionRef}
-                    defaultValue={localDefinition}
-                    onFocus={() => setIsEditingDefinition(true)}
-                    onBlur={handleDefinitionBlur}
-                    onChange={handleDefinitionChange}
-                    placeholder={`Example: URL Shortening Service API
-
-Endpoint: POST /shorten
-Description: This API generates a short URL for a given long URL.
-Parameters:
-- original_url (string): The original long URL that needs to be shortened.
-Response:
-- short_url (string): The generated short URL.
-
-Example Request:
-POST /shorten {
-  "original_url": "http://example.com/some/very/long/url"
-}
-Example Response:
-{
-  "short_url": "http://short.url/xyz"
-}`}
-                    className="text-md h-[60vh] border-gray-300 bg-gray-100 text-gray-900 focus:border-gray-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-gray-600"
-                  />
-                </TabsContent>
-                <TabsContent value="flow">
-                  <Textarea
-                    ref={flowRef}
-                    defaultValue={localFlow}
-                    onFocus={() => setIsEditingFlow(true)}
-                    onBlur={handleFlowBlur}
-                    onChange={handleFlowChange}
-                    placeholder={`Describe how the API request flows through the system...
-
-Example:
-1. Client sends POST request to /shorten with the original_url
-2. Load balancer receives request and routes to available API server
-3. API server:
-   - Validates the URL format
-   - Generates a unique short code
-   - Checks if URL already exists in cache
-4. If URL in cache:
-   - Return existing short URL
-5. If URL not in cache:
-   - Store mapping in database
-   - Add to cache for future requests
-6. Return generated short URL to client`}
-                    className="text-md h-[60vh] border-gray-300 bg-gray-100 text-gray-900 focus:border-gray-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-gray-600"
-                  />
-                </TabsContent>
-              </Tabs>
-            </DialogContent>
-          </Dialog>
         </div>
       </EdgeLabelRenderer>
     </>

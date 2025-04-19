@@ -50,6 +50,7 @@ const SystemDesigner = ({
     onConnectStart,
     onConnectEnd,
     onSelectNode,
+    onSelectEdge,
     setNodes,
   } = useSystemDesigner();
 
@@ -69,12 +70,12 @@ const SystemDesigner = ({
   // Handler to deselect all nodes when starting a connection
   const handleConnectStart: OnConnectStart = (event, params) => {
     // Deselect all nodes
-    const deselectedNodes = nodes.map(node => ({
+    const deselectedNodes = nodes.map((node) => ({
       ...node,
-      selected: false
+      selected: false,
     }));
     setNodes(deselectedNodes);
-    
+
     // Call the original handler
     onConnectStart(event, params);
   };
@@ -82,19 +83,19 @@ const SystemDesigner = ({
   // Handler to deselect all nodes when ending a connection
   const handleConnectEnd: OnConnectEnd = (event) => {
     // Deselect all nodes
-    const deselectedNodes = nodes.map(node => ({
+    const deselectedNodes = nodes.map((node) => ({
       ...node,
-      selected: false
+      selected: false,
     }));
     setNodes(deselectedNodes);
-    
+
     // Call the original handler
     onConnectEnd(event);
   };
 
   return (
     <div
-      className="relative flex h-full flex-grow flex-col bg-white dark:bg-gray-900 design-canvas"
+      className="design-canvas relative flex h-full flex-grow flex-col bg-white dark:bg-gray-900"
       ref={initWrapper}
       id="system-designer"
     >
@@ -111,11 +112,28 @@ const SystemDesigner = ({
         onDragOver={onDragOver}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
-        onNodeClick={(_, node) => onSelectNode(node)}
-        onNodeDragStart={(_, node) => onSelectNode(node)}
-        onSelectionStart={() => onSelectNode(whiteboardNode)}
+        onNodeClick={(_, node) => {
+          onSelectNode(node);
+          onSelectEdge(null);
+        }}
+        onEdgeClick={(_, edge) => {
+          onSelectEdge(edge);
+          onSelectNode(null);
+        }}
+        onNodeDragStart={(_, node) => {
+          onSelectNode(node);
+          onSelectEdge(null);
+        }}
+        onSelectionStart={() => {
+          onSelectNode(whiteboardNode);
+          onSelectEdge(null);
+        }}
         onNodesDelete={() => onSelectNode(whiteboardNode)}
-        onPaneClick={() => onSelectNode(whiteboardNode)}
+        onEdgesDelete={() => onSelectEdge(null)}
+        onPaneClick={() => {
+          onSelectNode(whiteboardNode);
+          onSelectEdge(null);
+        }}
         defaultEdgeOptions={{
           markerEnd: { type: MarkerType.ArrowClosed },
           animated: false,

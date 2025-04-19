@@ -184,7 +184,7 @@ const ClientSettings = ({ name: id }: { name: string }) => {
               <Select value={clientType} onValueChange={setClientType}>
                 <SelectTrigger
                   className={cn(
-                    "w-full border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                    "w-full border-gray-300 dark:border-gray-700",
                     "focus:ring-gray-400 dark:focus:ring-gray-600",
                   )}
                 >
@@ -209,7 +209,7 @@ const ClientSettings = ({ name: id }: { name: string }) => {
               <Select value={location} onValueChange={setLocation}>
                 <SelectTrigger
                   className={cn(
-                    "w-full border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                    "w-full border-gray-300 dark:border-gray-700",
                     "focus:ring-gray-400 dark:focus:ring-gray-600",
                   )}
                 >
@@ -303,7 +303,7 @@ const ClientSettings = ({ name: id }: { name: string }) => {
 - Security requirements
 - Performance targets`}
               className={cn(
-                "text-md border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                "text-md border-gray-300 dark:border-gray-700",
                 " focus:ring-gray-400 dark:focus:ring-gray-600",
               )}
               value={details}
@@ -339,7 +339,7 @@ Additional Requirements:
 - Security requirements
 - Performance targets`}
             className={cn(
-              "text-md border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+              "text-md border-gray-300 dark:border-gray-700",
               " focus:ring-gray-400 dark:focus:ring-gray-600",
             )}
             value={freeFormText}

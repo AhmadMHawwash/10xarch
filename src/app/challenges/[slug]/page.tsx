@@ -19,9 +19,15 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
 import { SystemDesignerProvider } from "@/lib/hooks/_useSystemDesigner";
-import { Award, Lightbulb, TrendingUp } from "lucide-react";
+import { Award, HelpCircle, Lightbulb, TrendingUp } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -29,6 +35,7 @@ import { useMount, usePrevious } from "react-use";
 import { ReactFlowProvider } from "reactflow";
 import { PanelChat } from "@/components/ai-chat/PanelChat";
 import { ChatMessagesProvider } from "@/lib/hooks/useChatMessages_";
+import { Onboarding, TOUR_PREFERENCE_KEY } from "@/components/Onboarding";
 
 export default function LevelPage() {
   return (
@@ -114,7 +121,6 @@ function Level() {
           />
         </ResizablePanel>
       </ResizablePanelGroup>
-
       {/* Add the chat component */}
       <div className="ai-chat-container fixed bottom-4 right-4 z-50">
         <PanelChat

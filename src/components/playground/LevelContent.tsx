@@ -47,9 +47,10 @@ import {
 } from "lucide-react";
 import { useParams } from "next/navigation";
 import { type ReactNode } from "react";
-import { Onboarding } from "../Onboarding";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
+import { EdgeSettings } from "@/components/playground/EdgeSettings";
+import { Onboarding } from "../Onboarding";
 
 // Custom collapsible component that can handle React elements
 interface CollapsibleSectionProps {
@@ -411,7 +412,7 @@ const EnhancedLearningResources: React.FC<EnhancedLearningResourcesProps> = ({
 export const LevelContent = () => {
   const { stage, toNextStage, toPreviousStage, challenge, currentStageIndex } =
     useChallengeManager();
-  const { selectedNode, useSystemComponentConfigSlice } = useSystemDesigner();
+  const { selectedNode, selectedEdge, useSystemComponentConfigSlice } = useSystemDesigner();
   const params = useParams<{ id: string }>();
 
   const nodeId = selectedNode?.data.id ?? "";
@@ -445,11 +446,13 @@ export const LevelContent = () => {
           <div className="sticky z-10 w-full bg-white pt-[17px] dark:bg-gray-900">
             <div className="flex items-center justify-between">
               <H5 className="text-gray-900 dark:text-gray-100">
-                {isWhiteboardOrNoSelection
+                {selectedEdge
+                  ? "Connection Settings"
+                  : isWhiteboardOrNoSelection
                   ? challenge.title
                   : `Configuring ${selectedNode.data.name}`}
               </H5>
-              {isWhiteboardOrNoSelection && (
+              {isWhiteboardOrNoSelection && !selectedEdge && (
                 <Badge
                   variant="outline"
                   className="stage-badge border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400"
@@ -461,7 +464,12 @@ export const LevelContent = () => {
             <Separator className="mb-5 mt-4 bg-gray-300 dark:bg-gray-700" />
           </div>
 
-          {isWhiteboardOrNoSelection ? (
+          {selectedEdge ? (
+            // Render edge settings when an edge is selected
+            <div className="p-0">
+              <EdgeSettings edge={selectedEdge} />
+            </div>
+          ) : isWhiteboardOrNoSelection ? (
             // Show the regular challenge content if whiteboard is selected or nothing is selected
             <div className="flex flex-col gap-6">
               {/* Main challenge context (remains at the top) */}
@@ -621,7 +629,7 @@ export const LevelContent = () => {
                         className="inline-block"
                         buttonClassName="flex h-9 w-9 items-center justify-center rounded-md text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
                         icon={HelpCircle}
-                      />
+                      /> 
                     </div>
                   </TooltipTrigger>
                   <TooltipContent
@@ -632,6 +640,7 @@ export const LevelContent = () => {
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
+
             </div>
           </div>
         </div>

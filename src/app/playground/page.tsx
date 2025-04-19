@@ -1,5 +1,8 @@
 "use client";
+import { PanelChat } from "@/components/ai-chat/PanelChat";
 import { getSystemComponent } from "@/components/Gallery";
+import { ComponentSettings } from "@/components/playground/ComponentSettings";
+import { EdgeSettings } from "@/components/playground/EdgeSettings";
 import Notes, { type Note } from "@/components/playground/Notes";
 import SystemContext from "@/components/playground/SystemContext";
 import TodoList, { type TodoItem } from "@/components/playground/TodoList";
@@ -7,6 +10,7 @@ import { FlowManager } from "@/components/SolutionFlowManager";
 import SystemBuilder from "@/components/SystemDesigner";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -19,16 +23,13 @@ import {
   SystemDesignerProvider,
   useSystemDesigner,
 } from "@/lib/hooks/_useSystemDesigner";
+import { ChatMessagesProvider } from "@/lib/hooks/useChatMessages_";
 import { usePlaygroundManager } from "@/lib/hooks/usePlaygroundManager";
 import { type SystemComponentType } from "@/lib/levels/type";
+import { Info, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import { usePrevious, useLocalStorage } from "react-use";
+import { useLocalStorage, usePrevious } from "react-use";
 import { ReactFlowProvider } from "reactflow";
-import { PanelChat } from "@/components/ai-chat/PanelChat";
-import { ChatMessagesProvider } from "@/lib/hooks/useChatMessages_";
-import { Info, Plus, X } from "lucide-react";
-import { Checkbox } from "@/components/ui/checkbox";
-import { ComponentSettings } from "@/components/playground/ComponentSettings";
 
 export default function Page() {
   return (
@@ -43,7 +44,7 @@ export default function Page() {
 }
 
 function PageContent() {
-  const { selectedNode, useSystemComponentConfigSlice } = useSystemDesigner();
+  const { selectedNode, selectedEdge, useSystemComponentConfigSlice } = useSystemDesigner();
   const {
     checkSolution,
     answer: feedback,
@@ -120,6 +121,9 @@ function PageContent() {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const Icon = comp?.icon ?? (() => null);
   const isSystem = !selectedNode?.data.id || selectedNode.type === "Whiteboard";
+  
+  const showEdgeSettings = selectedEdge !== null;
+  const showNodeSettings = selectedNode !== null && !isSystem;
 
   return (
     <>
@@ -133,15 +137,21 @@ function PageContent() {
             <Card className="h-full border-gray-200 dark:border-gray-800">
               <div className="flex items-center border-b border-gray-200 p-4 dark:border-gray-800">
                 <div className="flex items-center gap-2">
-                  <Icon className="h-4 w-4 text-gray-700 dark:text-gray-300" />
-                  <span className="text-base font-medium">
-                    {isSystem ? "System" : selectedNode?.data.name}
-                  </span>
+                  {showEdgeSettings ? (
+                    <span className="text-base font-medium">Connection</span>
+                  ) : (
+                    <>
+                      <Icon className="h-4 w-4 text-gray-700 dark:text-gray-300" />
+                      <span className="text-base font-medium">
+                        {isSystem ? "System" : selectedNode?.data.name}
+                      </span>
+                    </>
+                  )}
                 </div>
               </div>
 
               <div className="space-y-4 p-4">
-                {selectedNode && !isSystem && (
+                {showNodeSettings && (
                   <>
                     <div className="space-y-2">
                       <Label htmlFor="title" className="text-sm font-medium">
@@ -176,39 +186,43 @@ function PageContent() {
                   </>
                 )}
 
-                <Tabs defaultValue="context" className="w-full">
-                  <TabsList className={`grid w-full grid-cols-3 gap-1`}>
-                    <TabsTrigger value="context" className="text-sm">
-                      {!selectedNode || selectedNode?.data.name === "Whiteboard"
-                        ? "Context"
-                        : "Configuration"}
-                    </TabsTrigger>
-                    <TabsTrigger value="todo" className="text-sm">
-                      Todo
-                    </TabsTrigger>
-                    <TabsTrigger value="notes" className="text-sm">
-                      Notes
-                    </TabsTrigger>
-                  </TabsList>
-                  <div className="mt-4 h-[calc(100vh-280px)]">
-                    <TabsContent value="context" className="m-0 h-full">
-                      {selectedNode && !isSystem ? (
-                        <ComponentSettings node={selectedNode} />
-                      ) : (
-                        <SystemContext
-                          context={context}
-                          setContext={setContext}
-                        />
-                      )}
-                    </TabsContent>
-                    <TabsContent value="todo" className="m-0 h-full">
-                      <TodoList todos={todos} setTodos={setTodos} />
-                    </TabsContent>
-                    <TabsContent value="notes" className="m-0 h-full">
-                      <Notes notes={notes} setNotes={setNotes} />
-                    </TabsContent>
-                  </div>
-                </Tabs>
+                {showEdgeSettings ? (
+                  <EdgeSettings edge={selectedEdge} />
+                ) : (
+                  <Tabs defaultValue="context" className="w-full">
+                    <TabsList className={`grid w-full grid-cols-3 gap-1`}>
+                      <TabsTrigger value="context" className="text-sm">
+                        {!selectedNode || selectedNode?.data.name === "Whiteboard"
+                          ? "Context"
+                          : "Configuration"}
+                      </TabsTrigger>
+                      <TabsTrigger value="todo" className="text-sm">
+                        Todo
+                      </TabsTrigger>
+                      <TabsTrigger value="notes" className="text-sm">
+                        Notes
+                      </TabsTrigger>
+                    </TabsList>
+                    <div className="mt-4 h-[calc(100vh-280px)]">
+                      <TabsContent value="context" className="m-0 h-full">
+                        {showNodeSettings ? (
+                          <ComponentSettings node={selectedNode} />
+                        ) : (
+                          <SystemContext
+                            context={context}
+                            setContext={setContext}
+                          />
+                        )}
+                      </TabsContent>
+                      <TabsContent value="todo" className="m-0 h-full">
+                        <TodoList todos={todos} setTodos={setTodos} />
+                      </TabsContent>
+                      <TabsContent value="notes" className="m-0 h-full">
+                        <Notes notes={notes} setNotes={setNotes} />
+                      </TabsContent>
+                    </div>
+                  </Tabs>
+                )}
               </div>
             </Card>
           </div>

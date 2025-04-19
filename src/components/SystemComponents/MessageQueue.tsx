@@ -429,7 +429,7 @@ const MessageQueueSettings = ({
 - Monitoring requirements
 - Security settings`}
               className={cn(
-                "text-md border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                "text-md border-gray-300 dark:border-gray-700",
                 "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
                 "placeholder:text-gray-500 dark:placeholder:text-gray-400",
               )}
@@ -475,7 +475,7 @@ Additional Requirements:
 - Monitoring requirements
 - Security settings`}
             className={cn(
-              "text-md border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+              "text-md border-gray-300 dark:border-gray-700",
               "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
               "placeholder:text-gray-500 dark:placeholder:text-gray-400",
             )}

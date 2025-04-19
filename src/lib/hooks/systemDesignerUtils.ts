@@ -115,6 +115,9 @@ export const handleConnect = (
     return { updatedNodes: nodes, updatedEdges: edges, nodesToUpdate: [] };
   }
 
+  // Check if this is a self-connection (edge connecting a node to itself)
+  const isSelfConnection = source === target;
+
   // to exclude OtherNodeDataProps
   const typedSourceNode = sourceNode as Node<SystemComponentNodeDataProps>;
   // to exclude OtherNodeDataProps
@@ -142,6 +145,30 @@ export const handleConnect = (
         isConnected: false,
       };
 
+      // If this is a self-connection, we need to update sourceHandles too
+      if (isSelfConnection) {
+        const updatedSourceHandles =
+          node.data.sourceHandles?.map((handle) => ({
+            ...handle,
+            isConnected: handle.isConnected || handle.id === sourceHandle,
+          })) ?? [];
+
+        // Generate a unique handle ID for source
+        const newSourceHandle = {
+          id: `${source}-source-handle-${timestamp + 1}`,
+          isConnected: false,
+        };
+
+        return {
+          ...node,
+          data: {
+            ...node.data,
+            targetHandles: [...updatedTargetHandles, newTargetHandle],
+            sourceHandles: [...updatedSourceHandles, newSourceHandle],
+          },
+        };
+      }
+
       return {
         ...node,
         data: {
@@ -151,8 +178,8 @@ export const handleConnect = (
       };
     }
     
-    if (node.id === source) {
-      // Update source node's sourceHandles
+    if (node.id === source && !isSelfConnection) {
+      // Update source node's sourceHandles (only if not a self-connection, which was handled above)
       const updatedSourceHandles =
         node.data.sourceHandles?.map((handle) => ({
           ...handle,

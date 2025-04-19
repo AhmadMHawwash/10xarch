@@ -136,8 +136,8 @@ export const CustomEdge: FC<EdgeProps<EdgeData>> = ({
       data: data ?? {},
       source: source ?? "",
       target: target ?? "",
-      // We don't include sourceHandle/targetHandle as they might not be necessary
-      // and we're just creating a temporary object for selection
+      sourceHandle: sourceHandleId,
+      targetHandle: targetHandleId,
     };
     onSelectEdge(edge);
     onSelectNode(null);

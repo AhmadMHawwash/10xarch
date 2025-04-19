@@ -76,7 +76,7 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
           <span className="absolute -left-[104px] -top-0 rounded-md bg-gray-200 p-4 dark:bg-gray-700">
             <Icon className="stroke-gray-600 text-gray-300 dark:stroke-gray-100 dark:text-gray-600" />
           </span>
-          <div className="h-[90vh] overflow-scroll px-8 text-gray-200">
+          <div className="h-[90vh] overflow-y-auto px-8 text-gray-200">
             {content}
           </div>
         </DialogHeader>
@@ -441,9 +441,9 @@ export const LevelContent = () => {
       id="challenge-content"
       className="flex h-full max-h-[100vh] flex-col justify-between bg-white text-gray-800 dark:bg-gray-900 dark:text-gray-200"
     >
-      <div className="overflow-y-auto p-4 pb-8 pt-0">
+      <div className="overflow-y-auto p-4 pb-8 pt-0 max-h-[calc(100vh-120px)]">
         <div className="min-w-[17vw]">
-          <div className="sticky z-10 w-full bg-white pt-[17px] dark:bg-gray-900">
+          <div className="sticky top-0 z-10 w-full bg-white pt-[17px] dark:bg-gray-900">
             <div className="flex items-center justify-between">
               <H5 className="text-gray-900 dark:text-gray-100">
                 {selectedEdge
@@ -566,6 +566,7 @@ export const LevelContent = () => {
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="Enter component title"
+                    className="bg-gray-50 dark:bg-gray-800"
                   />
                 </div>
               )}
@@ -576,6 +577,7 @@ export const LevelContent = () => {
                   value={subtitle}
                   onChange={(e) => setSubtitle(e.target.value)}
                   placeholder="Enter a subtitle"
+                  className="bg-gray-50 dark:bg-gray-800"
                 />
               </div>
               <ComponentSettings node={selectedNode} className="w-full" />

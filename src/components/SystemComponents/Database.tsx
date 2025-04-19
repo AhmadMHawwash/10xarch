@@ -663,6 +663,7 @@ const DatabaseSettings = ({
                       "text-md border-gray-300 dark:border-gray-700",
                       "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
                       "placeholder:text-gray-500 dark:placeholder:text-gray-400",
+                      "bg-gray-50 dark:bg-gray-800"
                     )}
                     value={details}
                     onChange={(e) => setDetails(e.target.value)}
@@ -699,6 +700,7 @@ Additional Requirements:
                     "text-md border-gray-300 dark:border-gray-700",
                     "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
                     "placeholder:text-gray-500 dark:placeholder:text-gray-400",
+                    "bg-gray-50 dark:bg-gray-800"
                   )}
                   value={freeFormText}
                   onChange={(e) => setFreeFormText(e.target.value)}
@@ -858,7 +860,7 @@ export const ListAndDetails = ({
         <div className="flex w-full flex-col">
           <Input
             type="text"
-            className="mb-2 h-8 border-gray-300 bg-gray-100 text-gray-800 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
+            className="mb-2 h-8 border-gray-300 bg-gray-50 text-gray-800 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
             value={inputValue}
             onChange={(e) => {
               setInputValue(e.target.value);
@@ -888,7 +890,7 @@ export const ListAndDetails = ({
             onChange={(e) => setTextareaValue(e.target.value)}
             placeholder={textareaPlaceholder}
             className={cn(
-              "text-md border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+              "text-md border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800",
               "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
               "placeholder:text-gray-500 dark:placeholder:text-gray-400",
             )}

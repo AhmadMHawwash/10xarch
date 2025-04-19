@@ -131,6 +131,7 @@ export const EdgeSettings = ({
               value={label}
               onChange={handleLabelChange}
               placeholder="e.g., API Request, Database Query"
+              className="bg-gray-50 dark:bg-gray-800"
             />
           </div>
 
@@ -152,6 +153,7 @@ export const EdgeSettings = ({
                   placeholder="Define API endpoints, request/response formats..."
                   rows={4}
                   data-testid="api-definition-textarea"
+                  className="bg-gray-50 dark:bg-gray-800"
                 />
               </div>
             </TabsContent>
@@ -165,6 +167,7 @@ export const EdgeSettings = ({
                   aria-label="Request Flow"
                   rows={4}
                   data-testid="request-flow-textarea"
+                  className="bg-gray-50 dark:bg-gray-800"
                 />
               </div>
             </TabsContent>

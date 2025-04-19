@@ -65,11 +65,6 @@ export function WelcomeDialog({ startTour, isFirstVisit = false }: WelcomeDialog
           <DialogDescription className="text-center pt-2">
             Learn system design through interactive challenges
           </DialogDescription>
-          <DialogClose className="absolute right-0 top-0">
-            <Button variant="ghost" size="icon">
-              <X className="h-4 w-4" />
-            </Button>
-          </DialogClose>
         </DialogHeader>
 
         <div className="flex flex-col items-center py-6">

@@ -1,6 +1,12 @@
 import { cn } from "@/lib/utils";
-import { useState, type FC } from "react";
-import { getBezierPath, EdgeLabelRenderer, type EdgeProps, type Edge } from "reactflow";
+import { useState, type FC, useMemo } from "react";
+import {
+  getBezierPath,
+  EdgeLabelRenderer,
+  type EdgeProps,
+  type Edge,
+  Position,
+} from "reactflow";
 import { useSystemDesigner } from "@/lib/hooks/_useSystemDesigner";
 
 interface EdgeData {
@@ -23,18 +29,80 @@ export const CustomEdge: FC<EdgeProps<EdgeData>> = ({
   selected,
   source,
   target,
+  sourceHandleId,
+  targetHandleId,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const { updateEdgeLabel, onSelectEdge, onSelectNode } = useSystemDesigner();
-  const [edgePath, labelX, labelY] = getBezierPath({
+  const { updateEdgeLabel, onSelectEdge, onSelectNode, onEdgesChange } =
+    useSystemDesigner();
+
+  // Check if this is a self-connection (edge connecting a node to itself)
+  const isSelfConnection = source === target;
+
+  // Create path and label positions based on connection type
+  const { edgePath, labelX, labelY } = useMemo(() => {
+    if (isSelfConnection) {
+      // Calculate the distance between the connection points
+      const distanceX = Math.abs(sourceX - targetX);
+      const distanceY = Math.abs(sourceY - targetY);
+
+      // Create a more compact arc based on the node dimensions
+      // Use a smaller base size for the arc - this controls the overall loop size
+      const baseSize = Math.min(Math.max(distanceX, distanceY, 30), 80);
+
+      // Scale down the arc dimensions significantly for a more compact look
+      const radiusX = baseSize * 0.8;
+      const radiusY = baseSize * 0.7;
+
+      let selfPath;
+      let selfLabelX, selfLabelY;
+
+      const isHorizontalHandle =
+        sourcePosition === Position.Left || sourcePosition === Position.Right;
+
+      if (isHorizontalHandle) {
+        // For horizontal handles, create a smaller vertical arc
+        selfPath = `M ${sourceX} ${sourceY - 3} A ${radiusX} ${radiusY} 0 1 0 ${targetX} ${targetY + 3}`;
+        selfLabelX = sourceX;
+        selfLabelY = sourceY - radiusY * 0.6; // Position label closer to the edge
+      } else {
+        // For vertical handles, create a smaller horizontal arc
+        selfPath = `M ${sourceX - 3} ${sourceY} A ${radiusX} ${radiusY} 0 1 0 ${targetX + 3} ${targetY}`;
+        selfLabelX = sourceX - radiusX * 0.6; // Position label closer to the edge
+        selfLabelY = sourceY;
+      }
+
+      return {
+        edgePath: selfPath,
+        labelX: selfLabelX,
+        labelY: selfLabelY,
+      };
+    } else {
+      // Use the standard bezier path for normal connections
+      const [bezierPath, x, y] = getBezierPath({
+        sourceX,
+        sourceY,
+        sourcePosition,
+        targetX,
+        targetY,
+        targetPosition,
+      });
+      return {
+        edgePath: bezierPath,
+        labelX: x,
+        labelY: y,
+      };
+    }
+  }, [
     sourceX,
     sourceY,
-    sourcePosition,
     targetX,
     targetY,
+    sourcePosition,
     targetPosition,
-  });
+    isSelfConnection,
+  ]);
 
   const handleDoubleClick = () => {
     setIsEditing(true);
@@ -46,7 +114,7 @@ export const CustomEdge: FC<EdgeProps<EdgeData>> = ({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       setIsEditing(false);
       updateEdgeLabel(id, e.currentTarget.value);
     }
@@ -63,11 +131,11 @@ export const CustomEdge: FC<EdgeProps<EdgeData>> = ({
   const handleEdgeClick = (e: React.MouseEvent) => {
     // Open the edge settings panel
     e.stopPropagation();
-    const edge: Edge<EdgeData> = { 
-      id, 
-      data: data ?? {}, 
-      source: source ?? '', 
-      target: target ?? '', 
+    const edge: Edge<EdgeData> = {
+      id,
+      data: data ?? {},
+      source: source ?? "",
+      target: target ?? "",
       // We don't include sourceHandle/targetHandle as they might not be necessary
       // and we're just creating a temporary object for selection
     };
@@ -92,21 +160,23 @@ export const CustomEdge: FC<EdgeProps<EdgeData>> = ({
           cursor: "pointer",
         }}
       />
-      
+
       {/* Actual visible path */}
       <path
         id={id}
         style={{
-          strokeWidth: selected ? "6px" : (isHovered ? "4px" : "3px"),
+          strokeWidth: selected ? "6px" : isHovered ? "4px" : "3px",
           transition: "stroke-width 0.2s, stroke 0.2s",
           cursor: "pointer",
-          filter: selected ? "drop-shadow(0 0 6px rgba(37, 99, 235, 0.8))" : "none",
+          filter: selected
+            ? "drop-shadow(0 0 6px rgba(37, 99, 235, 0.8))"
+            : "none",
           stroke: selected ? "#2563eb" : undefined, // Blue-600
         }}
         className={cn(
           "react-flow__edge-path",
           selected ? "!stroke-blue-600 dark:!stroke-blue-400" : "",
-          selected && "selected-edge"
+          selected && "selected-edge",
         )}
         d={edgePath}
         markerEnd={markerEnd}
@@ -117,11 +187,11 @@ export const CustomEdge: FC<EdgeProps<EdgeData>> = ({
       <EdgeLabelRenderer>
         <div
           style={{
-            position: 'absolute',
+            position: "absolute",
             transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
-            pointerEvents: 'all',
+            pointerEvents: "all",
           }}
-          className="nodrag nopan relative group"
+          className="nodrag nopan group relative"
           onMouseEnter={handleEdgeMouseEnter}
           onMouseLeave={handleEdgeMouseLeave}
           onClick={handleEdgeClick}
@@ -142,17 +212,19 @@ export const CustomEdge: FC<EdgeProps<EdgeData>> = ({
               onDoubleClick={handleDoubleClick}
               className={cn(
                 "min-w-[30px] cursor-pointer rounded px-2 py-1 text-center text-sm transition-all",
-                data?.label 
-                  ? "bg-white/90 shadow-sm hover:bg-white dark:bg-gray-800/90 dark:hover:bg-gray-800" 
-                  : isHovered 
+                data?.label
+                  ? "bg-white/90 shadow-sm hover:bg-white dark:bg-gray-800/90 dark:hover:bg-gray-800"
+                  : isHovered
                     ? "bg-gray-100/90 dark:bg-gray-700/90"
                     : "bg-gray-100/50 dark:bg-gray-700/50",
                 "border border-transparent",
-                isHovered && !data?.label && "border-dashed border-gray-400 dark:border-gray-500",
-                selected && "ring-2 ring-blue-500 dark:ring-blue-400 shadow-md"
+                isHovered &&
+                  !data?.label &&
+                  "border-dashed border-gray-400 dark:border-gray-500",
+                selected && "shadow-md ring-2 ring-blue-500 dark:ring-blue-400",
               )}
             >
-              {data?.label ?? (isHovered ? 'Click to configure' : '•••')}
+              {data?.label ?? (isHovered ? "Click to configure" : "•••")}
             </div>
           )}
         </div>

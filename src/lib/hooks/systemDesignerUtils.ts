@@ -470,88 +470,52 @@ export const handleEdgesChange = (
     for (const deletion of edgeDeletions) {
       const edgeId = deletion.id;
       if (!edgeId) continue;
+      
+      // Find the edge we're deleting to get source and target information
+      const edgeToDelete = edges.find(e => e.id === edgeId);
+      
+      if (edgeToDelete) {
+        // We found the edge directly, use its source and target info
+        const sourceId = edgeToDelete.source;
+        const targetId = edgeToDelete.target;
+        const sourceHandleId = edgeToDelete.sourceHandle;
+        const targetHandleId = edgeToDelete.targetHandle;
+        
+        // Add nodes to update set
+        nodesToUpdate.add(sourceId);
+        nodesToUpdate.add(targetId);
+        
+        // Update source and target nodes
+        updateNodeHandlesForEdgeDeletion(
+          updatedNodes, 
+          sourceId, 
+          sourceHandleId, 
+          targetId, 
+          targetHandleId
+        );
+      } else {
+        // Try the old parsing method for backward compatibility
+        // Edge ID format is "sourceId:sourceHandleId -> targetId:targetHandleId"
+        const [sourceWithHandle, targetWithHandle] = edgeId.split(" -> ");
+        if (!sourceWithHandle || !targetWithHandle) continue;
 
-      // Edge ID format is "sourceId:sourceHandleId -> targetId:targetHandleId"
-      const [sourceWithHandle, targetWithHandle] = edgeId.split(" -> ");
-      if (!sourceWithHandle || !targetWithHandle) continue;
+        const [sourceId, sourceHandleId] = sourceWithHandle.split(":");
+        const [targetId, targetHandleId] = targetWithHandle.split(":");
+        if (!sourceId || !sourceHandleId || !targetId || !targetHandleId) continue;
 
-      const [sourceId, sourceHandleId] = sourceWithHandle.split(":");
-      const [targetId, targetHandleId] = targetWithHandle.split(":");
-      if (!sourceId || !sourceHandleId || !targetId || !targetHandleId) continue;
-
-      // Add nodes to update set
-      nodesToUpdate.add(sourceId);
-      nodesToUpdate.add(targetId);
-      
-      // Find the source and target nodes
-      const sourceNodeIndex = updatedNodes.findIndex((node) => node.id === sourceId);
-      const targetNodeIndex = updatedNodes.findIndex((node) => node.id === targetId);
-      
-      if (sourceNodeIndex === -1 || targetNodeIndex === -1) continue;
-      
-      // Update source node's source handles
-      const sourceNode = updatedNodes[sourceNodeIndex];
-      if (!sourceNode) continue;
-      
-      const sourceHandles = sourceNode.data.sourceHandles ?? [];
-      
-      // Only remove the handle if it's not the last one
-      const updatedSourceHandles = sourceHandles.length > 1
-        ? sourceHandles.filter(handle => handle.id !== sourceHandleId)
-        : sourceHandles.map(handle => ({
-            ...handle,
-            isConnected: false // Set existing handle to disconnected if it's the last one
-          }));
-      
-      // Always ensure at least one handle exists
-      if (updatedSourceHandles.length === 0) {
-        const timestamp = Date.now();
-        const randomId = Math.floor(Math.random() * 10000);
-        updatedSourceHandles.push({
-          id: `${sourceId}-source-handle-${timestamp}-${randomId}`,
-          isConnected: false
-        });
+        // Add nodes to update set
+        nodesToUpdate.add(sourceId);
+        nodesToUpdate.add(targetId);
+        
+        // Update source and target nodes
+        updateNodeHandlesForEdgeDeletion(
+          updatedNodes, 
+          sourceId, 
+          sourceHandleId, 
+          targetId, 
+          targetHandleId
+        );
       }
-      
-      updatedNodes[sourceNodeIndex] = {
-        ...sourceNode,
-        data: {
-          ...sourceNode.data,
-          sourceHandles: updatedSourceHandles,
-        },
-      };
-      
-      // Update target node's target handles
-      const targetNode = updatedNodes[targetNodeIndex];
-      if (!targetNode) continue;
-      
-      const targetHandles = targetNode.data.targetHandles ?? [];
-      
-      // Only remove the handle if it's not the last one
-      const updatedTargetHandles = targetHandles.length > 1
-        ? targetHandles.filter(handle => handle.id !== targetHandleId)
-        : targetHandles.map(handle => ({
-            ...handle,
-            isConnected: false // Set existing handle to disconnected if it's the last one
-          }));
-      
-      // Always ensure at least one handle exists
-      if (updatedTargetHandles.length === 0) {
-        const timestamp = Date.now();
-        const randomId = Math.floor(Math.random() * 10000);
-        updatedTargetHandles.push({
-          id: `${targetId}-target-handle-${timestamp}-${randomId}`,
-          isConnected: false
-        });
-      }
-      
-      updatedNodes[targetNodeIndex] = {
-        ...targetNode,
-        data: {
-          ...targetNode.data,
-          targetHandles: updatedTargetHandles,
-        },
-      };
     }
     
     // Convert nodesToUpdate set to array
@@ -564,6 +528,85 @@ export const handleEdgesChange = (
     updatedNodes, 
     updatedEdges, 
     nodesToUpdateUI 
+  };
+};
+
+// Helper function to update node handles when an edge is deleted
+const updateNodeHandlesForEdgeDeletion = (
+  nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[],
+  sourceId: string,
+  sourceHandleId: string | null | undefined,
+  targetId: string,
+  targetHandleId: string | null | undefined
+) => {
+  // Find the source and target nodes
+  const sourceNodeIndex = nodes.findIndex((node) => node.id === sourceId);
+  const targetNodeIndex = nodes.findIndex((node) => node.id === targetId);
+  
+  if (sourceNodeIndex === -1 || targetNodeIndex === -1) return;
+  
+  // Update source node's source handles
+  const sourceNode = nodes[sourceNodeIndex];
+  if (!sourceNode || !sourceHandleId) return;
+  
+  const sourceHandles = sourceNode.data.sourceHandles ?? [];
+  
+  // Only remove the handle if it's not the last one
+  const updatedSourceHandles = sourceHandles.length > 1
+    ? sourceHandles.filter(handle => handle.id !== sourceHandleId)
+    : sourceHandles.map(handle => ({
+        ...handle,
+        isConnected: false // Set existing handle to disconnected if it's the last one
+      }));
+  
+  // Always ensure at least one handle exists
+  if (updatedSourceHandles.length === 0) {
+    const timestamp = Date.now();
+    const randomId = Math.floor(Math.random() * 10000);
+    updatedSourceHandles.push({
+      id: `${sourceId}-source-handle-${timestamp}-${randomId}`,
+      isConnected: false
+    });
+  }
+  
+  nodes[sourceNodeIndex] = {
+    ...sourceNode,
+    data: {
+      ...sourceNode.data,
+      sourceHandles: updatedSourceHandles,
+    },
+  };
+  
+  // Update target node's target handles
+  const targetNode = nodes[targetNodeIndex];
+  if (!targetNode || !targetHandleId) return;
+  
+  const targetHandles = targetNode.data.targetHandles ?? [];
+  
+  // Only remove the handle if it's not the last one
+  const updatedTargetHandles = targetHandles.length > 1
+    ? targetHandles.filter(handle => handle.id !== targetHandleId)
+    : targetHandles.map(handle => ({
+        ...handle,
+        isConnected: false // Set existing handle to disconnected if it's the last one
+      }));
+  
+  // Always ensure at least one handle exists
+  if (updatedTargetHandles.length === 0) {
+    const timestamp = Date.now();
+    const randomId = Math.floor(Math.random() * 10000);
+    updatedTargetHandles.push({
+      id: `${targetId}-target-handle-${timestamp}-${randomId}`,
+      isConnected: false
+    });
+  }
+  
+  nodes[targetNodeIndex] = {
+    ...targetNode,
+    data: {
+      ...targetNode.data,
+      targetHandles: updatedTargetHandles,
+    },
   };
 };
 

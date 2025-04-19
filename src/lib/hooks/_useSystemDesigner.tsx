@@ -17,6 +17,7 @@ import {
   type PropsWithChildren,
 } from "react";
 import {
+  type EdgeChange,
   useReactFlow,
   useUpdateNodeInternals,
   type Edge,
@@ -290,7 +291,7 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
         result.nodesToUpdateUI.forEach((nodeId) => {
           updateNodeInternals(nodeId);
         });
-      }, 200);
+      }, 100);
     }
   }, [nodes, edges, updateNodeInternals]);
 
@@ -373,13 +374,23 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
       if ((event.ctrlKey || event.metaKey) && event.key === "v") {
         handlePaste();
       }
+      
+      // Handle edge deletion with Delete or Backspace key
+      if ((event.key === "Delete" || event.key === "Backspace") && selectedEdge) {
+        const edgeChange: EdgeChange = {
+          id: selectedEdge.id,
+          type: "remove",
+        };
+        onEdgesChange([edgeChange]);
+        setSelectedEdge(null);
+      }
     };
 
     document.addEventListener("keydown", handleKeyDown);
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [handleCopy, handlePaste]);
+  }, [handleCopy, handlePaste, selectedEdge, onEdgesChange]);
 
   return (
     <SystemDesignerContext.Provider

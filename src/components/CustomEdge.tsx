@@ -34,7 +34,7 @@ export const CustomEdge: FC<EdgeProps<EdgeData>> = ({
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const { updateEdgeLabel, onSelectEdge, onSelectNode, onEdgesChange } =
+  const { updateEdgeLabel, onSelectEdge, onSelectNode, onEdgesChange, nodes, setNodes } =
     useSystemDesigner();
 
   // Check if this is a self-connection (edge connecting a node to itself)
@@ -139,6 +139,14 @@ export const CustomEdge: FC<EdgeProps<EdgeData>> = ({
       sourceHandle: sourceHandleId,
       targetHandle: targetHandleId,
     };
+    
+    // Deselect all nodes
+    const deselectedNodes = nodes.map((node) => ({
+      ...node,
+      selected: false,
+    }));
+    setNodes(deselectedNodes);
+    
     onSelectEdge(edge);
     onSelectNode(null);
   };

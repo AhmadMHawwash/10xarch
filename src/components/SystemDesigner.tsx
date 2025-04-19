@@ -117,6 +117,13 @@ const SystemDesigner = ({
           onSelectEdge(null);
         }}
         onEdgeClick={(_, edge) => {
+          // Deselect all nodes by updating their selected property
+          const deselectedNodes = nodes.map((node) => ({
+            ...node,
+            selected: false,
+          }));
+          setNodes(deselectedNodes);
+          
           onSelectEdge(edge);
           onSelectNode(null);
         }}

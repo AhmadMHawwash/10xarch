@@ -270,7 +270,7 @@ const CacheSettings = ({
               <Select value={cacheType} onValueChange={setCacheType}>
                 <SelectTrigger
                   className={cn(
-                    "w-full border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                    "w-full border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800",
                     "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
                   )}
                 >
@@ -300,7 +300,7 @@ const CacheSettings = ({
               <Select value={policy} onValueChange={setPolicy}>
                 <SelectTrigger
                   className={cn(
-                    "w-full border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                    "w-full border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800",
                     "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
                   )}
                 >
@@ -374,7 +374,7 @@ const CacheSettings = ({
                       })
                     }
                     className={cn(
-                      "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                      "border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800",
                       "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
                     )}
                     min={1}
@@ -406,7 +406,7 @@ const CacheSettings = ({
                       })
                     }
                     className={cn(
-                      "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                      "border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800",
                       "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
                     )}
                     min={1}
@@ -439,7 +439,7 @@ const CacheSettings = ({
                   >
                     <SelectTrigger
                       className={cn(
-                        "w-full border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                        "w-full border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800",
                         "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
                       )}
                     >
@@ -478,7 +478,7 @@ const CacheSettings = ({
                   >
                     <SelectTrigger
                       className={cn(
-                        "w-full border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                        "w-full border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800",
                         "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
                       )}
                     >
@@ -516,7 +516,7 @@ const CacheSettings = ({
                   setCapacity({ ...capacity, memory: Number(e.target.value) })
                 }
                 className={cn(
-                  "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                  "border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800",
                   "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
                 )}
                 min={1}
@@ -546,7 +546,7 @@ const CacheSettings = ({
                   })
                 }
                 className={cn(
-                  "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                  "border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800",
                   "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
                 )}
                 min={1000}
@@ -577,7 +577,7 @@ const CacheSettings = ({
                   })
                 }
                 className={cn(
-                  "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                  "border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800",
                   "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
                 )}
                 min={1}
@@ -653,6 +653,7 @@ const CacheSettings = ({
                 "text-md border-gray-300 dark:border-gray-700",
                 "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
                 "placeholder:text-gray-500 dark:placeholder:text-gray-400",
+                "bg-gray-50 dark:bg-gray-800"
               )}
               value={details}
               onChange={(e) => setDetails(e.target.value)}
@@ -699,6 +700,7 @@ Additional Requirements:
               "text-md border-gray-300 dark:border-gray-700",
               "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
               "placeholder:text-gray-500 dark:placeholder:text-gray-400",
+              "bg-gray-50 dark:bg-gray-800"
             )}
             value={freeFormText}
             onChange={(e) => setFreeFormText(e.target.value)}

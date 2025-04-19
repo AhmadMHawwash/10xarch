@@ -223,7 +223,7 @@ const MessageQueueSettings = ({
               <Select value={queueType} onValueChange={setQueueType}>
                 <SelectTrigger
                   className={cn(
-                    "w-full border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                    "w-full border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800",
                     "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
                   )}
                 >
@@ -253,7 +253,7 @@ const MessageQueueSettings = ({
               <Select value={deliveryType} onValueChange={setDeliveryType}>
                 <SelectTrigger
                   className={cn(
-                    "w-full border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                    "w-full border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800",
                     "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
                   )}
                 >
@@ -292,7 +292,7 @@ const MessageQueueSettings = ({
                   })
                 }
                 className={cn(
-                  "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                  "border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800",
                   "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
                 )}
                 min={1}
@@ -323,7 +323,7 @@ const MessageQueueSettings = ({
                   })
                 }
                 className={cn(
-                  "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                  "border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800",
                   "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
                 )}
                 min={100}
@@ -354,7 +354,7 @@ const MessageQueueSettings = ({
                   })
                 }
                 className={cn(
-                  "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                  "border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800",
                   "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
                 )}
                 min={1}
@@ -432,6 +432,7 @@ const MessageQueueSettings = ({
                 "text-md border-gray-300 dark:border-gray-700",
                 "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
                 "placeholder:text-gray-500 dark:placeholder:text-gray-400",
+                "bg-gray-50 dark:bg-gray-800"
               )}
               value={details}
               onChange={(e) => setDetails(e.target.value)}
@@ -478,6 +479,7 @@ Additional Requirements:
               "text-md border-gray-300 dark:border-gray-700",
               "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
               "placeholder:text-gray-500 dark:placeholder:text-gray-400",
+              "bg-gray-50 dark:bg-gray-800"
             )}
             value={freeFormText}
             onChange={(e) => setFreeFormText(e.target.value)}

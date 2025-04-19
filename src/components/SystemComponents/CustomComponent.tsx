@@ -48,7 +48,7 @@ export const CustomComponentSettings = ({
           value={freeFormText}
           onChange={(e) => setFreeFormText(e.target.value)}
           placeholder="Describe your component in detail..."
-          className="min-h-[300px] w-full flex-grow text-black placeholder:text-gray-500 dark:text-white dark:placeholder:text-gray-400"
+          className="min-h-[300px] w-full flex-grow text-black placeholder:text-gray-500 dark:text-white dark:placeholder:text-gray-400 bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-700"
         />
       </div>
     </div>

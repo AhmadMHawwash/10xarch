@@ -12,7 +12,7 @@ export const Whiteboard = ({ selected }: NodeProps) => {
     <div
       className={cn(
         "group flex h-full w-full flex-col rounded-md border border-gray-400 dark:border-gray-600 p-2 text-gray-800 dark:text-gray-200",
-        selected ? "bg-gray-200 dark:bg-gray-700" : "bg-gray-100 dark:bg-gray-800",
+        selected ? "bg-gray-200 dark:bg-gray-700" : "bg-gray-50 dark:bg-gray-800",
       )}
     >
       <Small className="mb-2">System definitions</Small>

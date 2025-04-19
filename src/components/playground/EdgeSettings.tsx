@@ -38,14 +38,14 @@ export const EdgeSettings = ({
 
   // Initialize state from edge data when edge changes
   useEffect(() => {
-    if (edge) {      
+    if (edge) {
       // Check label in all possible locations
-      const edgeLabel = 
-        (typeof edge.label === "string" ? edge.label : "") || 
+      const edgeLabel =
+        (typeof edge.label === "string" ? edge.label : "") ||
         ((edge.data as EdgeData)?.label ?? "");
-      
+
       setLabel(edgeLabel);
-      
+
       const data = edge.data as EdgeData | undefined;
       setApiDefinition(data?.apiDefinition ?? "");
       setRequestFlow(data?.requestFlow ?? "");
@@ -58,7 +58,7 @@ export const EdgeSettings = ({
   const updateEdgeData = (
     newLabel: string = label,
     newApiDefinition: string = apiDefinition,
-    newRequestFlow: string = requestFlow
+    newRequestFlow: string = requestFlow,
   ) => {
     updateEdgeLabel(edge.id, newLabel, {
       label: newLabel, // Store in data as well for consistency
@@ -88,21 +88,19 @@ export const EdgeSettings = ({
     setRequestFlow(newRequestFlow);
     updateEdgeData(label, apiDefinition, newRequestFlow);
   };
-  
+
   // Get source and target node names
-  const sourceNode = nodes.find(node => node.id === edge.source);
-  const targetNode = nodes.find(node => node.id === edge.target);
-  
+  const sourceNode = nodes.find((node) => node.id === edge.source);
+  const targetNode = nodes.find((node) => node.id === edge.target);
+
   // Extract node names with proper type checking
   const getNodeName = (node: Node | undefined, fallback: string): string => {
     if (!node) return fallback;
     const nodeData = node.data as NodeData;
-    return nodeData.configs?.title ?? 
-           nodeData.name ?? 
-           nodeData.id ?? 
-           fallback;
+
+    return nodeData.configs?.title ?? nodeData.id ?? nodeData.name ?? "";
   };
-  
+
   const sourceName = getNodeName(sourceNode, edge.source);
   const targetName = getNodeName(targetNode, edge.target);
 
@@ -111,14 +109,14 @@ export const EdgeSettings = ({
       <div className="connection-settings-container overflow-auto">
         <div className="connection-inner-content w-full space-y-4">
           <div className="connection-info rounded-md bg-gray-100 p-3 dark:bg-gray-800">
-            <div className="flex items-center justify-center space-x-3 font-medium">
-              <span className="rounded bg-gray-200 px-2 py-1 text-gray-700 dark:bg-gray-700 dark:text-gray-300">
+            <div className="flex items-center justify-center space-x-4">
+              <span className="max-w-[45%] truncate rounded bg-gray-200 px-2 py-1 text-sm text-gray-700 dark:bg-gray-700 dark:text-gray-300">
                 {sourceName}
               </span>
               <span className="flex items-center text-blue-500 dark:text-blue-400">
                 <ArrowRight className="h-4 w-5" />
               </span>
-              <span className="rounded bg-gray-200 px-2 py-1 text-gray-700 dark:bg-gray-700 dark:text-gray-300">
+              <span className="max-w-[45%] truncate rounded bg-gray-200 px-2 py-1 text-sm text-gray-700 dark:bg-gray-700 dark:text-gray-300">
                 {targetName}
               </span>
             </div>

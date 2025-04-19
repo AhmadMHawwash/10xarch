@@ -294,7 +294,7 @@ const DatabaseSettings = ({
                       >
                         <SelectTrigger
                           className={cn(
-                            "w-full border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                            "w-full border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800",
                             "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
                           )}
                         >
@@ -329,7 +329,7 @@ const DatabaseSettings = ({
                       >
                         <SelectTrigger
                           className={cn(
-                            "w-full border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                            "w-full border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800",
                             "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
                           )}
                         >
@@ -399,7 +399,7 @@ const DatabaseSettings = ({
                           >
                             <SelectTrigger
                               className={cn(
-                                "w-full border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                                "w-full border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800",
                                 "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
                               )}
                             >
@@ -465,7 +465,7 @@ const DatabaseSettings = ({
                               })
                             }
                             className={cn(
-                              "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                              "border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800",
                               "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
                             )}
                             min={1}
@@ -496,7 +496,7 @@ const DatabaseSettings = ({
                               })
                             }
                             className={cn(
-                              "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                              "border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800",
                               "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
                             )}
                             min={0}
@@ -529,7 +529,7 @@ const DatabaseSettings = ({
                           })
                         }
                         className={cn(
-                          "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                          "border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800",
                           "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
                         )}
                         min={1}
@@ -559,7 +559,7 @@ const DatabaseSettings = ({
                           })
                         }
                         className={cn(
-                          "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                          "border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800",
                           "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
                         )}
                         min={100}
@@ -591,7 +591,7 @@ const DatabaseSettings = ({
                           })
                         }
                         className={cn(
-                          "border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800",
+                          "border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800",
                           "text-gray-900 focus:ring-gray-400 dark:text-gray-100 dark:focus:ring-gray-600",
                         )}
                         min={1}

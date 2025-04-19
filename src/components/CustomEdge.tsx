@@ -97,13 +97,16 @@ export const CustomEdge: FC<EdgeProps<EdgeData>> = ({
       <path
         id={id}
         style={{
-          strokeWidth: isHovered || selected ? "4px" : "3px",
-          transition: "stroke-width 0.2s",
+          strokeWidth: selected ? "6px" : (isHovered ? "4px" : "3px"),
+          transition: "stroke-width 0.2s, stroke 0.2s",
           cursor: "pointer",
+          filter: selected ? "drop-shadow(0 0 6px rgba(37, 99, 235, 0.8))" : "none",
+          stroke: selected ? "#2563eb" : undefined, // Blue-600
         }}
         className={cn(
           "react-flow__edge-path",
-          selected && "!stroke-blue-500 dark:!stroke-blue-400",
+          selected ? "!stroke-blue-600 dark:!stroke-blue-400" : "",
+          selected && "selected-edge"
         )}
         d={edgePath}
         markerEnd={markerEnd}
@@ -146,7 +149,7 @@ export const CustomEdge: FC<EdgeProps<EdgeData>> = ({
                     : "bg-gray-100/50 dark:bg-gray-700/50",
                 "border border-transparent",
                 isHovered && !data?.label && "border-dashed border-gray-400 dark:border-gray-500",
-                selected && "ring-2 ring-blue-500 dark:ring-blue-400"
+                selected && "ring-2 ring-blue-500 dark:ring-blue-400 shadow-md"
               )}
             >
               {data?.label ?? (isHovered ? 'Click to configure' : '•••')}

@@ -132,6 +132,26 @@
   @apply rounded-md ring-2 ring-blue-500 dark:ring-blue-400;
 }
 
+/* Enhance edge selection visibility */
+.react-flow__edge.selected .react-flow__edge-path,
+.react-flow__edge:focus .react-flow__edge-path,
+.react-flow__edge:focus-visible .react-flow__edge-path {
+  @apply stroke-blue-600 dark:stroke-blue-400;
+  stroke-width: 5px !important;
+  filter: drop-shadow(0 0 4px rgba(59, 130, 246, 0.7));
+}
+
+/* Custom selected edge class with highest specificity */
+.react-flow__edge-path.selected-edge {
+  stroke: #2563eb !important; /* Blue-600 */
+  stroke-width: 6px !important;
+  filter: drop-shadow(0 0 6px rgba(37, 99, 235, 0.8)) !important;
+}
+
+.dark .react-flow__edge-path.selected-edge {
+  stroke: #60a5fa !important; /* Blue-400 */
+}
+
 /* Hover states for nodes */
 .react-flow__node:hover {
   @apply bg-gray-200 dark:bg-gray-700;

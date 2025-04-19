@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { type Edge, type Node } from "reactflow";
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
+import { ArrowRight } from "lucide-react";
 
 interface EdgeData {
   apiDefinition?: string;
@@ -111,10 +112,16 @@ export const EdgeSettings = ({
     <div className={className}>
       <div className="connection-settings-container overflow-auto">
         <div className="connection-inner-content w-full space-y-4">
-          <div className="connection-info text-sm text-gray-500">
-            <div className="m-auto text-center">
-              <span>
-                {sourceName} <span className="mx-1">--&gt;</span> {targetName}
+          <div className="connection-info rounded-md bg-gray-100 p-3 dark:bg-gray-800">
+            <div className="flex items-center justify-center space-x-3 font-medium">
+              <span className="rounded bg-gray-200 px-2 py-1 text-gray-700 dark:bg-gray-700 dark:text-gray-300">
+                {sourceName}
+              </span>
+              <span className="flex items-center text-blue-500 dark:text-blue-400">
+                <ArrowRight className="h-4 w-5" />
+              </span>
+              <span className="rounded bg-gray-200 px-2 py-1 text-gray-700 dark:bg-gray-700 dark:text-gray-300">
+                {targetName}
               </span>
             </div>
           </div>

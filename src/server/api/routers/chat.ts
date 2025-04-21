@@ -32,7 +32,11 @@ interface Edge {
 
 export const chatRouter = createTRPCRouter({
   getRemainingPrompts: publicProcedure
-    .input(z.object({ challengeId: z.string() }))
+    .input(z.object({ 
+      challengeId: z.string(),
+      isPlayground: z.boolean().optional(),
+      playgroundId: z.string().optional()
+     }))
     .query(async ({ input, ctx }) => {
       const { userId } = await auth();
       const ipAddress = ctx.headers.get("x-forwarded-for") ?? "127.0.0.1";
@@ -40,11 +44,14 @@ export const chatRouter = createTRPCRouter({
       // Create identifier using the shared utility function
       const identifier = getRateLimitIdentifier(ipAddress, userId);
       
+      // Use the same rate limit key construction as sendMessage
+      const rateLimitKey = input.isPlayground
+        ? `${identifier}:playground:${input.playgroundId ?? 'default'}`
+        : `${identifier}:${input.challengeId}`;
+      
       // Get remaining free prompts (for both authenticated and unauthenticated users)
       const limiter = userId ? authenticatedFreeChatMessagesLimiter : chatMessagesLimiter;
-      const { remaining, reset } = await limiter.getRemaining(
-        `${identifier}:${input.challengeId}`
-      );
+      const { remaining, reset } = await limiter.getRemaining(rateLimitKey);
       
       // If user is signed in, also check their credits
       let creditsBalance = 0;

@@ -52,7 +52,7 @@ export function ChatUI({
 }: ChatUIProps) {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [remainingMessages, setRemainingMessages] = useState(3);
+  const [remainingMessages, setRemainingMessages] = useState(0);
   const { balance: credits, refetch: refetchCredits } = useCredits();
   const { getMessages, addMessage, clearSession } = useChatMessages();
   const [mounted, setMounted] = useState(false);
@@ -78,8 +78,10 @@ export function ChatUI({
   const { nodes } = useSystemDesigner();
 
   // Get remaining prompts on load
-  const { data: rateLimitInfo } = api.chat.getRemainingPrompts.useQuery({
+  const { data: rateLimitInfo, refetch: refetchRateLimit } = api.chat.getRemainingPrompts.useQuery({
     challengeId: isPlayground ? playgroundId ?? '' : challengeId ?? '',
+    isPlayground,
+    playgroundId
   });
 
   // Update remaining messages when rate limit info changes
@@ -89,7 +91,8 @@ export function ChatUI({
     }
   }, [rateLimitInfo]);
 
-  const hasAvailablePrompts = remainingMessages > 0 || credits > 0;
+  const hasRemainingFreePrompts = rateLimitInfo ? remainingMessages > 0 : false;
+  const hasAvailablePrompts = hasRemainingFreePrompts || (credits ?? 0) > 0;
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -126,8 +129,10 @@ export function ChatUI({
 
       addMessage(chatSessionId, assistantMessage);
       setRemainingMessages(data.remainingMessages);
-      // Refetch credits to update the navbar
-      await refetchCredits();
+      await Promise.all([
+        refetchCredits(),
+        refetchRateLimit()
+      ]);
     },
     onError: (error) => {
       // Immediately set isLoading to false when we get an error
@@ -190,6 +195,10 @@ export function ChatUI({
     addMessage(chatSessionId, userMessage);
     setInput("");
     setIsLoading(true);
+    
+    if (remainingMessages > 0) {
+      setRemainingMessages(prev => prev - 1);
+    }
 
     sendMessage.mutate({
       message: input,
@@ -352,8 +361,14 @@ export function ChatUI({
         <div className="flex items-center justify-between px-4 py-2 text-xs text-muted-foreground">
           <div className="flex items-center gap-2">
             <MessageSquare className="h-3.5 w-3.5" />
-            <span>{remainingMessages}/3 free</span>
-            {remainingMessages === 0 && <span>(resets in 1h)</span>}
+            {rateLimitInfo ? (
+              <>
+                <span>{remainingMessages}/3 free</span>
+                {remainingMessages === 0 && <span>(resets in 1h)</span>}
+              </>
+            ) : (
+              <span>Loading free prompts...</span>
+            )}
           </div>
           {credits > 0 && (
             <div className="flex items-center gap-2 text-yellow-500">
@@ -367,18 +382,20 @@ export function ChatUI({
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder={
-              hasAvailablePrompts
-                ? "Type your message..."
-                : "No prompts remaining. Please wait for reset or purchase credits."
+              !rateLimitInfo
+                ? "Loading available prompts..."
+                : hasAvailablePrompts
+                  ? "Type your message..."
+                  : "No prompts remaining. Please wait for reset or purchase credits."
             }
-            disabled={isLoading || !hasAvailablePrompts}
+            disabled={isLoading || !hasAvailablePrompts || !rateLimitInfo}
             className="flex-1 bg-muted/50"
           />
           <Button 
             type="submit" 
             size="icon" 
             variant="secondary"
-            disabled={isLoading || !hasAvailablePrompts}
+            disabled={isLoading || !hasAvailablePrompts || !rateLimitInfo}
             className="shrink-0"
           >
             <Send className="h-4 w-4" />

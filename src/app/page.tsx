@@ -22,8 +22,8 @@ export default async function Home() {
     <div className="container mx-auto px-4 py-12">
       <header className="mb-14 flex flex-col items-center justify-between md:flex-row">
         <div className="text-left md:w-1/2 md:pr-8">
-          <h1 className="mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-4xl font-bold text-transparent md:text-6xl">
-            10×arch
+          <h1 className="bg-gradient-to-r from-blue-500 to-indigo-500 bg-clip-text text-6xl font-bold text-transparent md:text-7xl">
+            System Design Playground
           </h1>
           <p className="mb-4 text-xl text-gray-600 dark:text-gray-400">
             Your space to design, visualize, and document your system

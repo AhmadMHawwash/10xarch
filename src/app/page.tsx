@@ -183,7 +183,11 @@ export default function Home() {
         </div>
 
         <div className="relative mt-8 h-[500px] w-full overflow-hidden rounded-lg border border-gray-200 bg-white/50 backdrop-blur-sm dark:border-gray-700 dark:bg-gray-800/50 md:mt-0 md:w-1/2">
-          <HeroSystemDesigner />
+          {activeTab === 'design' ? (
+            <HeroSystemDesigner mode="playground" />
+          ) : (
+            <HeroSystemDesigner mode="challenge" />
+          )}
         </div>
       </header>
 

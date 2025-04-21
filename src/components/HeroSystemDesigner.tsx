@@ -79,7 +79,7 @@ function HeroAIFeedback() {
   );
 }
 
-export default function HeroSystemDesigner() {
+export default function HeroSystemDesigner({ mode = "challenge" }: { mode?: "challenge" | "playground" }) {
   const { nodes, edges, onNodesChange, onEdgesChange, onConnect, onInit } =
     useHeroSystemDesigner();
 
@@ -126,17 +126,31 @@ export default function HeroSystemDesigner() {
         <Panel position="top-center" className="left-0 right-0 top-0 w-full">
           <div className="w-full bg-white/5 px-4 py-3 backdrop-blur-lg dark:bg-gray-800/50">
             <div className="mx-auto flex max-w-screen-xl items-center gap-2 text-sm">
-              <span className="font-medium text-gray-700 dark:text-gray-200">
-                Challenges
-              </span>
-              <span className="text-gray-400">/</span>
-              <span className="font-medium text-gray-700 dark:text-gray-200">
-                URL Shortener
-              </span>
-              <span className="text-gray-400">/</span>
-              <span className="text-blue-600 dark:text-blue-400">
-                High-Level Design
-              </span>
+              {mode === "challenge" ? (
+                <>
+                  <span className="font-medium text-gray-700 dark:text-gray-200">
+                    Challenges
+                  </span>
+                  <span className="text-gray-400">/</span>
+                  <span className="font-medium text-gray-700 dark:text-gray-200">
+                    URL Shortener
+                  </span>
+                  <span className="text-gray-400">/</span>
+                  <span className="text-blue-600 dark:text-blue-400">
+                    High-Level Design
+                  </span>
+                </>
+              ) : (
+                <>
+                  <span className="font-medium text-gray-700 dark:text-gray-200">
+                    Playgrounds
+                  </span>
+                  <span className="text-gray-400">/</span>
+                  <span className="text-blue-600 dark:text-blue-400">
+                    e-commerce order flow system
+                  </span>
+                </>
+              )}
             </div>
           </div>
         </Panel>

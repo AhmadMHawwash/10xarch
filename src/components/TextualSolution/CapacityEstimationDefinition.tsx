@@ -30,7 +30,7 @@ export const CapacityEstimationDefinition = () => {
           Capacity Estimations
         </>
       </DialogTrigger>
-      <DialogContent className="h-[90vh] max-w-4xl overflow-scroll bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100">
+      <DialogContent className="flex h-[90vh] max-w-4xl flex-col overflow-scroll bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100">
         <DialogHeader>
           <DialogTitle className="mb-4 text-2xl font-bold">
             Capacity Estimation

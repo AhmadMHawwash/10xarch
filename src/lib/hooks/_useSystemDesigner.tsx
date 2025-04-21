@@ -377,6 +377,16 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
       
       // Handle edge deletion with Delete or Backspace key
       if ((event.key === "Delete" || event.key === "Backspace") && selectedEdge) {
+        // Don't delete the edge if the user is editing text in an input or textarea
+        const activeElement = document.activeElement;
+        if (
+          activeElement instanceof HTMLInputElement ||
+          activeElement instanceof HTMLTextAreaElement ||
+          (activeElement instanceof HTMLElement && activeElement.isContentEditable)
+        ) {
+          return;
+        }
+        
         const edgeChange: EdgeChange = {
           id: selectedEdge.id,
           type: "remove",

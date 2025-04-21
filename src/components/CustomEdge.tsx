@@ -114,6 +114,9 @@ export const CustomEdge: FC<EdgeProps<EdgeData>> = ({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // Stop propagation for all keys to prevent ReactFlow from handling them
+    e.stopPropagation();
+    
     if (e.key === "Enter") {
       setIsEditing(false);
       updateEdgeLabel(id, e.currentTarget.value);

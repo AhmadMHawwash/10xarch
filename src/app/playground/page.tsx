@@ -44,7 +44,8 @@ export default function Page() {
 }
 
 function PageContent() {
-  const { selectedNode, selectedEdge, useSystemComponentConfigSlice } = useSystemDesigner();
+  const { selectedNode, selectedEdge, useSystemComponentConfigSlice } =
+    useSystemDesigner();
   const {
     checkSolution,
     answer: feedback,
@@ -87,16 +88,6 @@ function PageContent() {
     }
   };
 
-  const [todos, setTodos] = useSystemComponentConfigSlice<TodoItem[]>(
-    selectedNode?.id ?? "",
-    "todos",
-    [],
-  );
-  const [notes, setNotes] = useSystemComponentConfigSlice<Note[]>(
-    selectedNode?.id ?? "",
-    "notes",
-    [],
-  );
   const [context, setContext] = useSystemComponentConfigSlice<string>(
     selectedNode?.id ?? "",
     "context",
@@ -121,7 +112,7 @@ function PageContent() {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const Icon = comp?.icon ?? (() => null);
   const isSystem = !selectedNode?.data.id || selectedNode.type === "Whiteboard";
-  
+
   const showEdgeSettings = selectedEdge !== null;
   const showNodeSettings = selectedNode !== null && !isSystem;
 
@@ -189,39 +180,23 @@ function PageContent() {
                 {showEdgeSettings ? (
                   <EdgeSettings edge={selectedEdge} />
                 ) : (
-                  <Tabs defaultValue="context" className="w-full">
-                    <TabsList className={`grid w-full grid-cols-3 gap-1`}>
-                      <TabsTrigger value="context" className="text-sm">
-                        {!selectedNode || selectedNode?.data.name === "Whiteboard"
-                          ? "Context"
-                          : "Configuration"}
-                      </TabsTrigger>
-                      <TabsTrigger value="todo" className="text-sm">
-                        Todo
-                      </TabsTrigger>
-                      <TabsTrigger value="notes" className="text-sm">
-                        Notes
-                      </TabsTrigger>
-                    </TabsList>
-                    <div className="mt-4 h-[calc(100vh-280px)]">
-                      <TabsContent value="context" className="m-0 h-full">
-                        {showNodeSettings ? (
-                          <ComponentSettings node={selectedNode} />
-                        ) : (
-                          <SystemContext
-                            context={context}
-                            setContext={setContext}
-                          />
-                        )}
-                      </TabsContent>
-                      <TabsContent value="todo" className="m-0 h-full">
-                        <TodoList todos={todos} setTodos={setTodos} />
-                      </TabsContent>
-                      <TabsContent value="notes" className="m-0 h-full">
-                        <Notes notes={notes} setNotes={setNotes} />
-                      </TabsContent>
+                  <>
+                    <div>
+                      {!selectedNode || selectedNode?.data.name === "Whiteboard"
+                        ? "Context"
+                        : "Configuration"}
                     </div>
-                  </Tabs>
+                    <div className="mt-4 h-[calc(100vh-280px)]">
+                      {showNodeSettings ? (
+                        <ComponentSettings node={selectedNode} />
+                      ) : (
+                        <SystemContext
+                          context={context}
+                          setContext={setContext}
+                        />
+                      )}
+                    </div>
+                  </>
                 )}
               </div>
             </Card>

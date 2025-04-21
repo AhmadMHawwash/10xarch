@@ -130,6 +130,7 @@ export const EdgeSettings = ({
               onChange={handleLabelChange}
               placeholder="e.g., API Request, Database Query"
               className="bg-gray-50 dark:bg-gray-800"
+              onKeyDown={(e) => e.stopPropagation()}
             />
           </div>
 
@@ -152,6 +153,7 @@ export const EdgeSettings = ({
                   rows={4}
                   data-testid="api-definition-textarea"
                   className="bg-gray-50 dark:bg-gray-800"
+                  onKeyDown={(e) => e.stopPropagation()}
                 />
               </div>
             </TabsContent>
@@ -166,6 +168,7 @@ export const EdgeSettings = ({
                   rows={4}
                   data-testid="request-flow-textarea"
                   className="bg-gray-50 dark:bg-gray-800"
+                  onKeyDown={(e) => e.stopPropagation()}
                 />
               </div>
             </TabsContent>

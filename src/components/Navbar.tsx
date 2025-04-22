@@ -16,7 +16,7 @@ import { useParams, usePathname } from "next/navigation";
 import { useCallback, useState } from "react";
 import { ThemeToggle } from "./ThemeToggle";
 import { Logo } from "./icons/logo";
-import { Button } from "./ui/button";
+import { Button, buttonVariants } from "./ui/button";
 import { CreditAlert } from "@/components/credits/CreditAlert";
 import { useCurrentUser } from "@/lib/hooks/useCurrentUser";
 
@@ -201,9 +201,18 @@ export default function Navbar() {
               <UserButton afterSignOutUrl="/" />
             </div>
           ) : (
-            <SignInButton mode="modal">
-              <Button>Sign In</Button>
-            </SignInButton>
+            <div className="flex items-center space-x-3">
+              <SignInButton mode="modal">
+                <Button variant="ghost" size="sm" className="rounded-full">
+                  Sign in
+                </Button>
+              </SignInButton>
+              <SignInButton mode="modal">
+                <Button variant="default" size="sm" className="rounded-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium">
+                  Sign up
+                </Button>
+              </SignInButton>
+            </div>
           )}
           <ThemeToggle />
         </div>
@@ -268,11 +277,18 @@ export default function Navbar() {
               ) : isSignedIn ? (
                 <UserButton afterSignOutUrl="/" />
               ) : (
-                <SignInButton>
-                  <Button variant="outline" className="w-full">
-                    Sign In
-                  </Button>
-                </SignInButton>
+                <div className="flex flex-col w-full space-y-2">
+                  <SignInButton mode="modal">
+                    <Button variant="ghost" size="sm" className="w-full rounded-full">
+                      Sign in
+                    </Button>
+                  </SignInButton>
+                  <SignInButton mode="modal">
+                    <Button variant="default" size="sm" className="w-full rounded-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium">
+                      Sign up
+                    </Button>
+                  </SignInButton>
+                </div>
               )}
             </div>
           </div>

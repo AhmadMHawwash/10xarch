@@ -31,12 +31,12 @@
 [ ] Abstract concepts challenges (ie load balancing, clustering challenges)
 [ ] in the prompt, try without hints from AI (hints are now provided by AI, the hints might be misleading)
 [ ] collect feedback from users
-## Arch:
+## Infra:
 [ ] Use Coolify instead of vercel
-[ ] Rate limitting
+[x] Rate limitting
 
 ## In game stage ideas:
-[ ] Having lots of databases? And lots of servers? Use clusters instead
+[x] Having lots of databases? And lots of servers? Use clusters instead
 [ ] Your servers are under utilised? And at peak time you need more servers? Use "Pay as you go" arch (Same for replicas)
 [ ] Cache replica (For high availability)
 [ ] Clusters
@@ -44,7 +44,7 @@
 [ ] 
 
 ## Explaining components:
-[ ] Explain it like I'm (5, 15, 25, 40) years old
+[ ] Explain it like I'm (5, 15) years old
 [ ] Explain in detail stage (shallow, medium, deep)
 [ ] Explain the What, Who, Where, When, Why
 

@@ -10,7 +10,7 @@ import { useCredits } from "@/hooks/useCredits";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
 import { SignInButton, UserButton } from "@clerk/nextjs";
-import { Menu, X, Coins, Loader2 } from "lucide-react";
+import { Menu, X, Coins, Loader2, Github } from "lucide-react";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import { useCallback, useState } from "react";
@@ -24,7 +24,7 @@ function RateLimitInfo() {
   const rateLimitQuery = api.challenges.getRateLimitInfo.useQuery(undefined, {
     refetchInterval: 1000 * 60, // Refresh every minute
   });
-  
+
   const { balance: credits } = useCredits();
 
   if (rateLimitQuery.isLoading) {
@@ -73,7 +73,11 @@ function RateLimitInfo() {
           ) : (
             <p className="text-xs text-amber-600 dark:text-amber-400">
               You&apos;ve used all free submissions.{" "}
-              <Link href="/credits" className="underline font-medium" prefetch={false}>
+              <Link
+                href="/credits"
+                className="font-medium underline"
+                prefetch={false}
+              >
                 Purchase credits
               </Link>{" "}
               to continue.
@@ -136,19 +140,23 @@ export default function Navbar() {
       >
         {/* Left section - Logo and Navigation Links */}
         <div className="flex items-center space-x-6">
-          <Link href="/" className="flex items-center space-x-2" prefetch={false}>
+          <Link
+            href="/"
+            className="flex items-center space-x-2"
+            prefetch={false}
+          >
             <Logo className="h-8 w-8" />
             <span className="text-xl font-bold">10×arch</span>
           </Link>
-          
+
           {/* Navigation Links - Desktop */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden items-center space-x-4 md:flex">
             <Link
               href="/playground"
               className={cn(
                 "text-sm font-medium hover:text-primary",
                 pathname === "/playground"
-                  ? "text-primary font-semibold"
+                  ? "font-semibold text-primary"
                   : "text-muted-foreground",
               )}
               prefetch={false}
@@ -180,9 +188,9 @@ export default function Navbar() {
         </button>
 
         {/* Right section - User info, Credits, Theme Toggle */}
-        <div className="hidden md:flex items-center space-x-6">
+        <div className="hidden items-center space-x-4 md:flex">
           <FreeChallengeBadge />
-          
+
           {isUserLoading ? (
             <div className="flex items-center space-x-2">
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -215,26 +223,41 @@ export default function Navbar() {
                 </Button>
               </SignInButton>
               <SignInButton mode="modal">
-                <Button variant="default" size="sm" className="rounded-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium">
+                <Button
+                  variant="default"
+                  size="sm"
+                  className="rounded-full bg-gradient-to-r from-blue-600 to-purple-600 font-medium text-white hover:from-blue-700 hover:to-purple-700"
+                >
                   Sign up
                 </Button>
               </SignInButton>
             </div>
           )}
-          <ThemeToggle />
+          <div className="flex items-center space-x-1">
+            <Link
+              href="https://github.com/AhmadMHawwash/system-design-playground"
+              className="rounded-md p-2 text-sm font-medium text-muted-foreground hover:bg-gray-200 hover:text-primary dark:hover:bg-gray-700"
+              target="_blank"
+              rel="noopener noreferrer"
+              prefetch={false}
+            >
+              <Github className="h-5 w-5 text-gray-800 dark:text-white" />
+            </Link>
+            <ThemeToggle />
+          </div>
         </div>
 
         {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="absolute left-0 right-0 top-[7vh] z-50 bg-slate-100 p-4 shadow-md dark:bg-gray-800 md:hidden">
             {/* Navigation Links - Mobile */}
-            <div className="space-y-2 mb-4">
+            <div className="mb-4 space-y-2">
               <Link
                 href="/playground"
                 className={cn(
                   "block py-2 text-sm hover:text-primary",
                   pathname === "/playground"
-                    ? "text-primary font-semibold"
+                    ? "font-semibold text-primary"
                     : "text-muted-foreground",
                 )}
                 prefetch={false}
@@ -254,47 +277,68 @@ export default function Navbar() {
                 Challenges
               </Link>
             </div>
-            
+
             {/* Challenge & Credits Info - Mobile */}
             <FreeChallengeBadge />
             {isUserLoading ? (
               <div className="flex items-center space-x-2 py-2">
                 <Loader2 className="h-4 w-4 animate-spin" />
-                <span className="text-sm text-muted-foreground">Loading...</span>
+                <span className="text-sm text-muted-foreground">
+                  Loading...
+                </span>
               </div>
-            ) : isSignedIn && (
-              <Link
-                href="/credits"
-                className={cn(
-                  "block py-2 text-sm text-muted-foreground hover:text-foreground",
-                  isLoadingCredits && "animate-pulse",
-                )}
-                prefetch={false}
-              >
-                {isLoadingCredits ? (
-                  "Loading credits..."
-                ) : (
-                  <>Credits: {credits}</>
-                )}
-              </Link>
+            ) : (
+              isSignedIn && (
+                <Link
+                  href="/credits"
+                  className={cn(
+                    "block py-2 text-sm text-muted-foreground hover:text-foreground",
+                    isLoadingCredits && "animate-pulse",
+                  )}
+                  prefetch={false}
+                >
+                  {isLoadingCredits ? (
+                    "Loading credits..."
+                  ) : (
+                    <>Credits: {credits}</>
+                  )}
+                </Link>
+              )
             )}
-            
+
             {/* User & Theme - Mobile */}
             <div className="flex items-center justify-between py-2">
               <ThemeToggle />
+              <Link
+                href="https://github.com/AhmadMHawwash/system-design-playground"
+                className="rounded-md p-2 text-sm font-medium text-muted-foreground hover:bg-gray-200 hover:text-primary dark:hover:bg-gray-700"
+                target="_blank"
+                rel="noopener noreferrer"
+                prefetch={false}
+              >
+                <Github className="h-5 w-5" />
+              </Link>
               {isUserLoading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : isSignedIn ? (
                 <UserButton afterSignOutUrl="/" />
               ) : (
-                <div className="flex flex-col w-full space-y-2">
+                <div className="flex w-full flex-col space-y-2">
                   <SignInButton mode="modal">
-                    <Button variant="ghost" size="sm" className="w-full rounded-full">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="w-full rounded-full"
+                    >
                       Sign in
                     </Button>
                   </SignInButton>
                   <SignInButton mode="modal">
-                    <Button variant="default" size="sm" className="w-full rounded-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium">
+                    <Button
+                      variant="default"
+                      size="sm"
+                      className="w-full rounded-full bg-gradient-to-r from-blue-600 to-purple-600 font-medium text-white hover:from-blue-700 hover:to-purple-700"
+                    >
                       Sign up
                     </Button>
                   </SignInButton>

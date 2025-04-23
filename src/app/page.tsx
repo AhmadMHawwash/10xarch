@@ -101,6 +101,7 @@ export default function Home() {
                 <Link
                   href="/challenges/url-shortener"
                   className="group inline-flex items-center overflow-hidden rounded-full bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-3 text-white transition-all hover:from-blue-700 hover:to-purple-700"
+                  prefetch={false}
                 >
                   <span className="mr-2">Try URL Shortener Challenge</span>
                   <ArrowRight className="transition-transform group-hover:translate-x-1" />
@@ -108,6 +109,7 @@ export default function Home() {
                 <Link
                   href="/challenges"
                   className="group inline-flex items-center overflow-hidden rounded-full bg-white/5 px-8 py-3 text-gray-700 ring-1 ring-gray-900/5 backdrop-blur-sm transition-all hover:bg-white/10 dark:text-gray-200 dark:ring-white/10"
+                  prefetch={false}
                 >
                   <span className="mr-2">Browse Challenges</span>
                   <ArrowRight className="transition-transform group-hover:translate-x-1" />
@@ -118,6 +120,7 @@ export default function Home() {
                 <Link
                   href="/playground"
                   className="group inline-flex items-center overflow-hidden rounded-full bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-3 text-white transition-all hover:from-blue-700 hover:to-purple-700"
+                  prefetch={false}
                 >
                   <span className="mr-2">Start Designing</span>
                   <ArrowRight className="transition-transform group-hover:translate-x-1" />
@@ -214,6 +217,7 @@ export default function Home() {
                 <Link
                   href="/challenges"
                   className="group relative inline-flex items-center overflow-hidden rounded-full bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-3 text-white transition-all hover:from-blue-700 hover:to-purple-700"
+                  prefetch={false}
                 >
                   <span className="mr-2">Browse Challenges</span>
                   <ArrowRight className="transition-transform group-hover:translate-x-1" />
@@ -237,6 +241,7 @@ export default function Home() {
                 <Link
                   href="/challenges/url-shortener"
                   className="group relative inline-flex items-center overflow-hidden rounded-full bg-white/10 px-8 py-3 text-gray-700 ring-1 ring-gray-900/5 transition-all hover:bg-white/20 dark:text-gray-200 dark:ring-white/10"
+                  prefetch={false}
                 >
                   <span className="mr-2">Try a Challenge</span>
                   <ArrowRight className="transition-transform group-hover:translate-x-1" />
@@ -263,6 +268,7 @@ export default function Home() {
                 <Link
                   href="/playground"
                   className="group relative inline-flex items-center overflow-hidden rounded-full bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-3 text-white transition-all hover:from-blue-700 hover:to-purple-700"
+                  prefetch={false}
                 >
                   <span className="mr-2">Start Designing</span>
                   <ArrowRight className="transition-transform group-hover:translate-x-1" />
@@ -517,7 +523,7 @@ export default function Home() {
                   ? 'Join thousands of engineers improving their system design skills'
                   : 'Join thousands of engineers creating beautiful and functional system designs'}
               </p>
-              <Link href={activeTab === 'learn' ? '/challenges' : '/playground'}>
+              <Link href={activeTab === 'learn' ? '/challenges' : '/playground'} prefetch={false}>
                 <button className="rounded-full bg-white px-8 py-3 font-medium text-blue-600 shadow-md transition-all hover:bg-gray-100 hover:shadow-lg">
                   {activeTab === 'learn' ? 'Browse Challenges' : 'Launch Playground'}
                 </button>

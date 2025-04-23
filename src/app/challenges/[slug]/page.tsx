@@ -272,6 +272,7 @@ const ChallengeClosureDialog = ({
         <Link
           href="/challenges"
           className="group inline-flex items-center justify-center rounded-full bg-blue-600 px-6 py-3 font-bold text-white hover:bg-blue-700"
+          prefetch={false}
         >
           Go to Challenges list
         </Link>

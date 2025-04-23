@@ -85,6 +85,7 @@ export function SignIn() {
                   <Link
                     href="#"
                     className="ml-auto inline-block text-sm underline"
+                    prefetch={false}
                   >
                     Forgot your password?
                   </Link>
@@ -104,9 +105,9 @@ export function SignIn() {
             Login with Google
           </Button> */}
             </div>
-            <div className="mt-4 text-center text-sm">
+            <div className="mt-6 text-center text-sm">
               Don&apos;t have an account?{" "}
-              <Link href="/signup" className="underline">
+              <Link href="/signup" className="underline" prefetch={false}>
                 Sign up
               </Link>
             </div>

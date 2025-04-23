@@ -43,6 +43,7 @@ export function Resources({ documentation, realWorldCases, bestPractices }: Reso
                 <Card key={index} className="border-none shadow-none">
                   <CardHeader className="p-0">
                     <Link 
+                      prefetch={false}
                       href={doc.url} 
                       target="_blank" 
                       className="flex items-center gap-2 text-sm font-medium hover:text-primary"
@@ -63,6 +64,7 @@ export function Resources({ documentation, realWorldCases, bestPractices }: Reso
                 <Card key={index} className="border-none shadow-none">
                   <CardHeader className="p-0">
                     <Link 
+                      prefetch={false}
                       href={example.url} 
                       target="_blank" 
                       className="flex items-center gap-2 text-sm font-medium hover:text-primary"

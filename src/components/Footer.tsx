@@ -12,6 +12,7 @@ export function Footer() {
         </div>
         <div className="flex items-center gap-4">
           <Link
+            prefetch={false}
             href="https://tenxarch.userjot.com/"
             target="_blank"
             rel="noopener noreferrer"

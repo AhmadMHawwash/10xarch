@@ -35,7 +35,7 @@ export function CreditAlert({ className, variant = "inline", hasNoFreePrompts = 
           </p>
         </div>
         <Button asChild size="sm" className="flex-shrink-0">
-          <Link href="/credits">
+          <Link href="/credits" prefetch={false}>
             <CreditCard className="mr-2 h-4 w-4" />
             Buy Credits
           </Link>
@@ -47,6 +47,7 @@ export function CreditAlert({ className, variant = "inline", hasNoFreePrompts = 
   return (
     <Link 
       href="/credits"
+      prefetch={false}
       className={cn(
         "inline-flex items-center gap-1.5 text-xs font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300",
         className

@@ -8,7 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Challenge } from "@/content/challenges/types";
+import { type Challenge } from "@/content/challenges/types";
 import { ArrowRight, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -122,6 +122,7 @@ export function ChallengesList({ challenges }: ChallengesListProps) {
             <Link
               key={challenge.title}
               href={`/challenges/${challenge.slug}`}
+              prefetch={false}
               className={`animate-fade-in-fast animation-delay-${(index + 1) * 50}`}
             >
               <Card className="group flex h-full flex-col justify-between border border-gray-200 bg-white transition-all duration-200 ease-in-out hover:border-blue-400 hover:shadow-lg hover:shadow-blue-400/20 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-blue-600">

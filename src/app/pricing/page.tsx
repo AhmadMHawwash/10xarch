@@ -93,7 +93,7 @@ export default function PricingPage() {
             </ul>
           </CardContent>
           <CardFooter className="mt-auto">
-            <Link href="/playground" className="w-full">
+            <Link href="/playground" className="w-full" prefetch={false}>
               <Button variant="outline" className="w-full">
                 Start Designing
                 <Layers className="ml-2 h-4 w-4" />
@@ -186,7 +186,7 @@ export default function PricingPage() {
             </div>
           </CardContent>
           <CardFooter className="mt-auto">
-            <Link href="/credits" className="w-full">
+            <Link href="/credits" className="w-full" prefetch={false}>
               <Button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 shadow-md transition-all hover:from-purple-600 hover:to-pink-600 hover:shadow-lg">
                 Get Pro Access
                 <CreditCard className="ml-2 h-4 w-4" />
@@ -450,13 +450,13 @@ export default function PricingPage() {
               Join thousands of engineers creating beautiful and functional system designs
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Link href="/playground">
+              <Link href="/playground" prefetch={false}>
                 <Button className="w-full sm:w-auto bg-white text-blue-600 hover:bg-gray-100">
                   Try For Free
                   <Layers className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
-              <Link href="/credits">
+              <Link href="/credits" prefetch={false}>
                 <Button className="w-full sm:w-auto bg-purple-500 text-white hover:bg-purple-600 border border-white/20">
                   Get Pro Access
                   <CreditCard className="ml-2 h-4 w-4" />

@@ -72,7 +72,11 @@ function RateLimitInfo() {
             </p>
           ) : (
             <p className="text-xs text-amber-600 dark:text-amber-400">
-              You&apos;ve used all free submissions. <Link href="/credits" className="underline font-medium">Purchase credits</Link> to continue.
+              You&apos;ve used all free submissions.{" "}
+              <Link href="/credits" className="underline font-medium" prefetch={false}>
+                Purchase credits
+              </Link>{" "}
+              to continue.
             </p>
           )}
         </div>
@@ -132,7 +136,7 @@ export default function Navbar() {
       >
         {/* Left section - Logo and Navigation Links */}
         <div className="flex items-center space-x-6">
-          <Link href="/" className="flex items-center space-x-2">
+          <Link href="/" className="flex items-center space-x-2" prefetch={false}>
             <Logo className="h-8 w-8" />
             <span className="text-xl font-bold">10×arch</span>
           </Link>
@@ -147,6 +151,7 @@ export default function Navbar() {
                   ? "text-primary font-semibold"
                   : "text-muted-foreground",
               )}
+              prefetch={false}
             >
               Playground
             </Link>
@@ -158,6 +163,7 @@ export default function Navbar() {
                   ? "text-primary"
                   : "text-muted-foreground",
               )}
+              prefetch={false}
             >
               Challenges
             </Link>
@@ -187,6 +193,7 @@ export default function Navbar() {
               <Link
                 href="/credits"
                 className="flex items-center gap-1.5 text-sm font-medium"
+                prefetch={false}
               >
                 <Coins className="h-4 w-4" />
                 {isLoadingCredits ? (
@@ -230,6 +237,7 @@ export default function Navbar() {
                     ? "text-primary font-semibold"
                     : "text-muted-foreground",
                 )}
+                prefetch={false}
               >
                 Playground
               </Link>
@@ -241,6 +249,7 @@ export default function Navbar() {
                     ? "text-primary"
                     : "text-muted-foreground",
                 )}
+                prefetch={false}
               >
                 Challenges
               </Link>
@@ -260,6 +269,7 @@ export default function Navbar() {
                   "block py-2 text-sm text-muted-foreground hover:text-foreground",
                   isLoadingCredits && "animate-pulse",
                 )}
+                prefetch={false}
               >
                 {isLoadingCredits ? (
                   "Loading credits..."

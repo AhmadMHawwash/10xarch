@@ -602,7 +602,7 @@ export const LevelContent = () => {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <a
-                      href="https://tenxarch.userjot.com/"
+                      href="https://github.com/AhmadMHawwash/system-design-playground/issues/new/choose"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex h-9 w-9 items-center justify-center rounded-md text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
@@ -646,14 +646,6 @@ export const LevelContent = () => {
             </div>
           </div>
         </div>
-      </div>
-
-      <div className="ai-chat-container fixed bottom-4 right-4 z-50">
-        <PanelChat
-          isPlayground={true}
-          playgroundId={params.id}
-          playgroundTitle={challenge.title}
-        />
       </div>
     </div>
   );

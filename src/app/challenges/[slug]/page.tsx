@@ -1,4 +1,5 @@
 "use client";
+import { PanelChat } from "@/components/ai-chat/PanelChat";
 import { LevelContent } from "@/components/playground/LevelContent";
 import { FeedbackList, ScoreDisplay } from "@/components/SolutionFeedback";
 import { FlowManager } from "@/components/SolutionFlowManager";
@@ -19,23 +20,15 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
 import { SystemDesignerProvider } from "@/lib/hooks/_useSystemDesigner";
-import { Award, HelpCircle, Lightbulb, TrendingUp } from "lucide-react";
+import { useChallengeManager } from "@/lib/hooks/useChallengeManager";
+import { ChatMessagesProvider } from "@/lib/hooks/useChatMessages_";
+import { Award, Bot, Lightbulb, TrendingUp, X } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useMount, usePrevious } from "react-use";
 import { ReactFlowProvider } from "reactflow";
-import { PanelChat } from "@/components/ai-chat/PanelChat";
-import { ChatMessagesProvider } from "@/lib/hooks/useChatMessages_";
-import { Onboarding, TOUR_PREFERENCE_KEY } from "@/components/Onboarding";
 
 export default function LevelPage() {
   return (
@@ -60,6 +53,7 @@ function Level() {
   } = useChallengeManager();
   const [isFeedbackExpanded, setIsFeedbackExpanded] = useState(false);
   const [isOpenClosure, setIsOpenClosure] = useState(false);
+  const [isChatPanelOpen, setIsChatPanelOpen] = useState(false);
 
   const prevFeedback = usePrevious(feedback);
 
@@ -120,15 +114,49 @@ function Level() {
             )}
           />
         </ResizablePanel>
+        {isChatPanelOpen && (
+          <>
+            <ResizableHandle className="w-1 bg-gray-300 transition-colors hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600" />
+            <ResizablePanel defaultSize={25} minSize={5}>
+              <div className="flex h-full flex-col">
+                <div className="flex h-12 items-center justify-between border-b border-gray-200 px-4 dark:border-gray-800">
+                  <div className="flex items-center gap-2">
+                    <Bot className="h-5 w-5" />
+                    <span className="font-medium">AI Assistant</span>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setIsChatPanelOpen(false)}
+                    className="h-8 w-8"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+                <div className="flex-1 overflow-hidden">
+                  <PanelChat
+                    isPlayground={false}
+                    playgroundId={challenge.slug}
+                    playgroundTitle={challenge.title}
+                    inSidePanel={true}
+                  />
+                </div>
+              </div>
+            </ResizablePanel>
+          </>
+        )}
       </ResizablePanelGroup>
-      {/* Add the chat component */}
-      <div className="ai-chat-container fixed bottom-4 right-4 z-50">
-        <PanelChat
-          isPlayground={false}
-          playgroundId={challenge.slug}
-          playgroundTitle={challenge.title}
-        />
-      </div>
+      {/* Add the chat button (only when side panel is closed) */}
+      {!isChatPanelOpen && (
+        <div className="ai-chat-container fixed bottom-4 -right-2 z-50">
+          <PanelChat
+            isPlayground={false}
+            playgroundId={challenge.slug}
+            playgroundTitle={challenge.title}
+            onOpenSidePanel={() => setIsChatPanelOpen(true)}
+          />
+        </div>
+      )}
     </>
   );
 }

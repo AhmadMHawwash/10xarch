@@ -13,7 +13,7 @@ export function Footer() {
         <div className="flex items-center gap-4">
           <Link
             prefetch={false}
-            href="https://tenxarch.userjot.com/"
+            href="https://github.com/AhmadMHawwash/system-design-playground/issues/new/choose"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-blue-500"

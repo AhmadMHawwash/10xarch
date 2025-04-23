@@ -3,9 +3,7 @@ import { PanelChat } from "@/components/ai-chat/PanelChat";
 import { getSystemComponent } from "@/components/Gallery";
 import { ComponentSettings } from "@/components/playground/ComponentSettings";
 import { EdgeSettings } from "@/components/playground/EdgeSettings";
-import Notes, { type Note } from "@/components/playground/Notes";
 import SystemContext from "@/components/playground/SystemContext";
-import TodoList, { type TodoItem } from "@/components/playground/TodoList";
 import { FlowManager } from "@/components/SolutionFlowManager";
 import SystemBuilder from "@/components/SystemDesigner";
 import { Button } from "@/components/ui/button";
@@ -18,7 +16,6 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   SystemDesignerProvider,
   useSystemDesigner,
@@ -26,7 +23,7 @@ import {
 import { ChatMessagesProvider } from "@/lib/hooks/useChatMessages_";
 import { usePlaygroundManager } from "@/lib/hooks/usePlaygroundManager";
 import { type SystemComponentType } from "@/lib/levels/type";
-import { Info, X } from "lucide-react";
+import { Bot, Info, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useLocalStorage, usePrevious } from "react-use";
 import { ReactFlowProvider } from "reactflow";
@@ -58,6 +55,7 @@ function PageContent() {
   );
   const [showWelcomeGuide, setShowWelcomeGuide] = useState(false);
   const [isClient, setIsClient] = useState(false);
+  const [isChatPanelOpen, setIsChatPanelOpen] = useState(false);
   const prevFeedback = usePrevious(feedback);
 
   // Handle client-side initialization
@@ -217,16 +215,50 @@ function PageContent() {
             )}
           />
         </ResizablePanel>
+        {isChatPanelOpen && (
+          <>
+            <ResizableHandle className="w-1 bg-gray-300 transition-colors hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600" />
+            <ResizablePanel defaultSize={25} minSize={5}>
+              <div className="flex h-full flex-col">
+                <div className="flex h-12 items-center justify-between border-b border-gray-200 px-4 dark:border-gray-800">
+                  <div className="flex items-center gap-2">
+                    <Bot className="h-5 w-5" />
+                    <span className="font-medium">AI Assistant</span>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setIsChatPanelOpen(false)}
+                    className="h-8 w-8"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+                <div className="flex-1 overflow-hidden">
+                  <PanelChat
+                    isPlayground={true}
+                    playgroundId="default"
+                    playgroundTitle="10×arch"
+                    inSidePanel={true}
+                  />
+                </div>
+              </div>
+            </ResizablePanel>
+          </>
+        )}
       </ResizablePanelGroup>
 
-      {/* Add the chat component */}
-      <div className="ai-chat-container fixed bottom-4 right-4 z-50">
-        <PanelChat
-          isPlayground={true}
-          playgroundId="default"
-          playgroundTitle="10×arch"
-        />
-      </div>
+      {/* Add the chat button (only when side panel is closed) */}
+      {!isChatPanelOpen && (
+        <div className="ai-chat-container fixed bottom-4 -right-2 z-50">
+          <PanelChat
+            isPlayground={true}
+            playgroundId="default"
+            playgroundTitle="10×arch"
+            onOpenSidePanel={() => setIsChatPanelOpen(true)}
+          />
+        </div>
+      )}
     </>
   );
 }

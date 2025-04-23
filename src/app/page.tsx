@@ -37,7 +37,7 @@ export default function Home() {
           <div className="relative flex w-full z-10">
             <button
               onClick={() => setActiveTab('learn')}
-              className={`flex-1 flex items-center justify-center gap-1 md:gap-2 py-3 px-3 md:px-5 text-sm md:text-base transition-all duration-200 ${
+              className={`hover:cursor-pointer flex-1 flex items-center justify-center gap-1 md:gap-2 py-3 px-3 md:px-5 text-sm md:text-base transition-all duration-200 ${
                 activeTab === 'learn'
                   ? 'bg-white/15 backdrop-blur-sm text-white'
                   : 'text-white/80 hover:text-white hover:bg-white/5'
@@ -49,14 +49,14 @@ export default function Home() {
             
             <button
               onClick={() => setActiveTab('design')}
-              className={`flex-1 flex items-center justify-center gap-1 md:gap-2 py-3 px-3 md:px-5 text-sm md:text-base transition-all duration-200 ${
+              className={`hover:cursor-pointer flex-1 flex items-center justify-center gap-1 md:gap-2 py-3 px-3 md:px-5 text-sm md:text-base transition-all duration-200 ${
                 activeTab === 'design'
                   ? 'bg-white/15 backdrop-blur-sm text-white'
                   : 'text-white/80 hover:text-white hover:bg-white/5'
               }`}
             >
               <PenTool className={`h-4 w-4 md:h-5 md:w-5 flex-shrink-0 ${activeTab === 'design' ? 'text-white' : 'text-white/80'}`} />
-              <span>Design Systems</span>
+              <span>Design Your System</span>
             </button>
           </div>
         </div>

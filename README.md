@@ -1,19 +1,19 @@
-# 10×arch
+# 10×arch 🏗️
 
 A modern web application for learning and practicing system design concepts. Built with the T3 Stack.
 
-## Our Mission
+## Our Mission 🌟
 
-This project is part of a charitable initiative. All profits generated from commercial use of this software will be donated to charitable causes. We believe in making technology education accessible while giving back to society.
+This project is part of a charitable initiative. All profits generated from commercial use of this software will be donated to Children of Palestine through trusted organisations.
 
-## Features
+## Features ✨
 
 - Interactive system design learning environment
 - Modern tech stack with Next.js, Drizzle, and Tailwind CSS
 - Type-safe API with tRPC
 - Comprehensive testing setup with Vitest
 
-## Tech Stack
+## Tech Stack 💻
 
 - [Next.js](https://nextjs.org) - React framework
 - [Drizzle](https://orm.drizzle.team) - TypeScript ORM
@@ -21,12 +21,12 @@ This project is part of a charitable initiative. All profits generated from comm
 - [tRPC](https://trpc.io) - End-to-end typesafe APIs
 - [Vitest](https://vitest.dev) - Unit testing framework
 
-## Getting Started
+## Getting Started 🚀
 
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/system-design-playground.git
+git clone https://github.com/AhmadMHawwash/system-design-playground.git
 cd system-design-playground
 ```
 
@@ -50,7 +50,7 @@ Then edit `.env.local` with your configuration.
 yarn dev
 ```
 
-## Contributing
+## Contributing 🤝
 
 We welcome contributions! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
 
@@ -59,12 +59,6 @@ We welcome contributions! Please feel free to submit a Pull Request. For major c
 3. Push to the branch (`git push origin feature/AmazingFeature`)
 4. Open a Pull Request
 
-## License
+## License ⚖️
 
 This project is licensed under the GNU General Public License v3.0 (GPL-3.0) - see the [LICENSE](LICENSE) file for details. This strong copyleft license ensures that all modifications and derivative works are also open source. While the software is free to use, any commercial use of this software by the original author will result in profits being donated to charitable causes.
-
-## Acknowledgments
-
-- [T3 Stack](https://create.t3.gg/) - The foundation of this project
-- All contributors who have helped shape this project
-- The open source community for their continued support

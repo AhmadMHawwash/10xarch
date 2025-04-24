@@ -1,6 +1,15 @@
 import challenges from "@/content/challenges";
 import { ChallengesList } from "./ChallengesList";
 
+// Add revalidation period - 1 day (in seconds)
+export const revalidate = 86400;
+
+// Add metadata for SEO
+export const metadata = {
+  title: "System Design Challenges - Master Architecture Skills",
+  description: "Browse our interactive system design challenges that help you learn architecture and system design concepts through hands-on practice."
+};
+
 export default async function Challenges() {
   return (
     <div className="container mx-auto px-4 py-12">

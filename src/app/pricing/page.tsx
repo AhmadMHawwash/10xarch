@@ -29,6 +29,9 @@ export const metadata = {
     "Access our 10×arch with flexible, affordable token-based pricing.",
 };
 
+// Add revalidation period - 24 hours (in seconds)
+export const revalidate = 86400;
+
 export default function PricingPage() {
   return (
     <div className="container mx-auto px-4 py-12">

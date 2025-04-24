@@ -193,13 +193,13 @@ const ChallengeOverviewDialog = ({ challenge }: ChallengeOverviewDialogProps) =>
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 sm:max-w-[525px]">
+      <DialogContent className="max-h-[80%] overflow-scroll bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 sm:max-w-[525px]">
         <DialogHeader>
           <DialogTitle className="mb-4 text-center text-2xl font-bold">
             {challenge.title} Challenge
           </DialogTitle>
         </DialogHeader>
-        <ScrollArea className="h-max-[60vh] pr-4">
+        <ScrollArea className="h-max-[70%] pr-4">
           <Card className="mb-6 bg-white/50 backdrop-blur-sm dark:bg-gray-800/50">
             <CardContent className="pt-6">
               <h3 className="mb-2 text-lg font-semibold">
@@ -261,13 +261,13 @@ const ChallengeClosureDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-h-[85%] overflow-scroll bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 sm:max-w-[1025px]">
+      <DialogContent className="max-h-[70%] overflow-scroll bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 sm:max-w-[1025px]">
         <DialogHeader>
           <DialogTitle className="mb-4 text-center text-2xl font-bold">
             {challenge.title} Challenge
           </DialogTitle>
         </DialogHeader>
-        <ScrollArea className="h-max-[60vh] overflow-scroll pr-4">
+        <ScrollArea className="h-max-[60%] pr-4">
           <Card className="mb-6 bg-white/50 backdrop-blur-sm dark:bg-gray-800/50">
             <CardContent className="pt-6">
               <h3 className="mb-2 text-lg font-semibold">

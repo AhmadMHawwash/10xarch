@@ -10,11 +10,12 @@ export function useCredits() {
     refetch,
   } = api.credits.getBalance.useQuery(undefined, { enabled: !!userId });
 
-  // Check if the user has low or zero credits
-  const hasLowCredits = (credits?.credits?.balance ?? 0) === 0;
+  // Check if the user has low or zero credits, safely handle undefined cases
+  const balance = credits?.credits?.balance ?? 0;
+  const hasLowCredits = balance === 0;
 
   return {
-    balance: credits?.credits?.balance ?? 0,
+    balance,
     isLoading,
     error,
     refetch,

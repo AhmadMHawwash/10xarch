@@ -23,6 +23,9 @@ import { useCurrentUser } from "@/lib/hooks/useCurrentUser";
 function RateLimitInfo() {
   const rateLimitQuery = api.challenges.getRateLimitInfo.useQuery(undefined, {
     refetchInterval: 1000 * 60, // Refresh every minute
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
+    staleTime: 0, // Consider data stale immediately so it refreshes on mount
   });
 
   const { balance: credits } = useCredits();
@@ -55,7 +58,7 @@ function RateLimitInfo() {
             remaining === 0 ? "text-destructive" : "text-primary",
           )}
         >
-          {remaining} of {limit} free submissions available
+          {remaining > 0 ? `${remaining} of ${limit} free submissions available` : `0 of ${limit} free submissions available`}
         </span>
       </div>
       {remaining < limit && (

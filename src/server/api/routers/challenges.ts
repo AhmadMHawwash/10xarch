@@ -1,11 +1,16 @@
 import challenges from "@/content/challenges";
 import {
-  freeChallengesLimiter,
-  getRateLimitIdentifier,
   authenticatedChallengesLimiter,
   enforceRateLimit,
+  freeChallengesLimiter,
+  getRateLimitIdentifier,
 } from "@/lib/rate-limit";
 import { logSecurityEvent } from "@/lib/security-logger";
+import {
+  calculateGPTCost,
+  calculateTextTokens,
+  costToCredits,
+} from "@/lib/tokens";
 import {
   challengeSolutionSchema,
   sanitizePrompt,
@@ -14,30 +19,28 @@ import {
   createCallerFactory,
   createTRPCRouter,
   publicProcedure,
-  protectedProcedure,
 } from "@/server/api/trpc";
 import { credits } from "@/server/db/schema";
 import { auth } from "@clerk/nextjs/server";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { checkSolution } from "./checkAnswer";
-import {
-  calculateGPTCost,
-  calculateTextTokens,
-  costToCredits,
-} from "@/lib/tokens";
 
 const createAICaller = createCallerFactory(checkSolution);
 
 export const challengesRouter = createTRPCRouter({
   getRateLimitInfo: publicProcedure.query(async ({ ctx }) => {
     const { userId } = await auth();
-    const identifier =
-      userId ?? ctx.headers.get("x-forwarded-for") ?? "127.0.0.1";
 
+    const ipAddress = ctx.headers.get("x-forwarded-for") ?? null;
+
+    const identifier = getRateLimitIdentifier(ipAddress, userId);
+
+    const limiter = userId
+      ? authenticatedChallengesLimiter
+      : freeChallengesLimiter;
     // Use peek() to check rate limit info without consuming a submission
-    const { remaining, reset } =
-      await freeChallengesLimiter.getRemaining(identifier);
+    const { remaining, reset } = await limiter.getRemaining(identifier);
 
     return {
       remaining,

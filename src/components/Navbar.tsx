@@ -11,7 +11,7 @@ import { useCredits } from "@/hooks/useCredits";
 import { useCurrentUser } from "@/lib/hooks/useCurrentUser";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
-import { SignInButton, useAuth, UserButton } from "@clerk/nextjs";
+import { SignInButton, UserButton } from "@clerk/nextjs";
 import { Coins, Github, Loader2, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
@@ -21,9 +21,7 @@ import { Logo } from "./icons/logo";
 import { Button } from "./ui/button";
 
 function RateLimitInfo() {
-  const { userId } = useAuth();
   const rateLimitQuery = api.challenges.getChallengesSubmitRateLimitInfo.useQuery(undefined, {
-    queryKeyHashFn: () => userId ?? "",
     refetchInterval: 1000 * 60, // Refresh every minute
     refetchOnMount: true,
     refetchOnWindowFocus: true,

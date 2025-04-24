@@ -145,7 +145,7 @@ export function CreditManagement() {
 
   const { data: transactionData, isLoading: isLoadingTransactions } =
     api.credits.getTransactions.useQuery(undefined, {
-      queryKeyHashFn: () => userId ?? "",
+      enabled: !!userId,
       staleTime: 0, // Consider data stale immediately so it refreshes on mount
     });
 

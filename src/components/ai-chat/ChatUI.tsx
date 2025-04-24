@@ -91,7 +91,6 @@ export function ChatUI({
         playgroundId,
       },
       {
-        queryKeyHashFn: () => userId ?? "",
         staleTime: 0, // Consider data stale immediately so it refreshes on mount
       },
     );
@@ -142,7 +141,7 @@ export function ChatUI({
       addMessage(chatSessionId, assistantMessage);
       setRemainingMessages(data.remainingMessages);
       void queryClient.invalidateQueries({
-        queryKey: ["chat.getRemainingPrompts"],
+        queryKey: ["chat", "getRemainingPrompts"],
       });
     },
     onError: (error) => {
@@ -216,7 +215,10 @@ export function ChatUI({
     setIsLoading(true);
 
     if (remainingMessages > 0) {
-      await Promise.all([refetchCredits(), refetchRemainingMessages()]);
+      await Promise.all([
+        userId ? refetchCredits() : Promise.resolve(),
+        refetchRemainingMessages(),
+      ]);
     }
 
     sendMessage.mutate({

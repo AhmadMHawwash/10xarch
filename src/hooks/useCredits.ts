@@ -9,9 +9,16 @@ export function useCredits() {
     error,
     refetch,
   } = api.credits.getBalance.useQuery(undefined, {
-    queryKeyHashFn: () => userId ?? "",
     enabled: !!userId,
     staleTime: 0, // Consider data stale immediately so it refreshes on mount
+    initialData: {
+      credits: {
+        balance: 0,
+        userId: userId ?? "",
+        id: "",
+        updatedAt: new Date(),
+      },
+    },
   });
 
   // Check if the user has low or zero credits, safely handle undefined cases

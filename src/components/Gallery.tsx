@@ -15,11 +15,14 @@ import {
   Network,
   Search,
   Server,
-  Box
+  Box,
+  ChevronUp,
+  ChevronDown
 } from "lucide-react";
 import type { DragEvent } from "react";
 import { useState } from "react";
 import { Lead } from "./ui/typography";
+import { cn } from "@/lib/utils";
 
 const components: Record<SystemComponentType, SystemComponent> = {
   Client: {
@@ -101,6 +104,7 @@ const componentCategories = {
 
 const Gallery = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [collapsed, setCollapsed] = useState(false);
 
   const onDragStart = (event: DragEvent, nodeType: SystemComponentType) => {
     event.dataTransfer.setData("application/reactflow", nodeType);
@@ -111,32 +115,57 @@ const Gallery = () => {
     name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const toggleCollapsed = () => {
+    setCollapsed(!collapsed);
+  };
+
   return (
-    <div className="m-2 h-fit w-48 flex-col rounded-md border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 bg-opacity-70 p-2">
-      <Lead className="h-fit text-gray-800 dark:text-gray-200 mb-2 text-sm">Components</Lead>
-      <div className="relative mb-2 component-search">
-        <input
-          type="text"
-          placeholder="Search..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full px-2 py-1 text-xs bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-md pr-6"
-        />
-        <Search className="absolute right-1 top-1 text-gray-600 dark:text-gray-400" size={14} />
+    <div className={cn(
+      "transition-all duration-300 ease-in-out m-2 w-48 flex flex-col rounded-md border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 bg-opacity-70",
+      collapsed ? "h-10" : "h-fit"
+    )}>
+      <div 
+        className="flex items-center justify-between cursor-pointer p-2 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+        onClick={toggleCollapsed}
+      >
+        <Lead className={cn(
+          "h-fit text-gray-800 dark:text-gray-200 text-sm",
+          collapsed ? "" : "mb-0" 
+        )}>Components</Lead>
+        {collapsed ? (
+          <ChevronDown className="text-gray-700 dark:text-gray-300" size={16} />
+        ) : (
+          <ChevronUp className="text-gray-700 dark:text-gray-300" size={16} />
+        )}
       </div>
-      <div className="max-h-64 overflow-y-auto component-list">
-        {filteredComponents.map(([name, { icon: Icon, description }]) => (
-          <div
-            key={name}
-            className="component-item my-1 flex cursor-grab items-center rounded-md border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 bg-opacity-70 p-1 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
-            onDragStart={(event) => onDragStart(event, name as SystemComponentType)}
-            draggable
-            title={description}
-          >
-            {Icon && <Icon size={16} className="text-gray-700 dark:text-gray-300 mr-1" />}
-            <div className="text-xs">{name}</div>
-          </div>
-        ))}
+      <div className={cn(
+        "transition-all duration-300 overflow-hidden px-2 pb-2",
+        collapsed ? "h-0 opacity-0" : "opacity-100"
+      )}>
+        <div className="relative mb-2 component-search">
+          <input
+            type="text"
+            placeholder="Search..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full px-2 py-1 text-xs bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-md pr-6"
+          />
+          <Search className="absolute right-1 top-1 text-gray-600 dark:text-gray-400" size={14} />
+        </div>
+        <div className="max-h-64 overflow-y-auto component-list">
+          {filteredComponents.map(([name, { icon: Icon, description }]) => (
+            <div
+              key={name}
+              className="component-item my-1 flex cursor-grab items-center rounded-md border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 bg-opacity-70 p-1 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
+              onDragStart={(event) => onDragStart(event, name as SystemComponentType)}
+              draggable
+              title={description}
+            >
+              {Icon && <Icon size={16} className="text-gray-700 dark:text-gray-300 mr-1" />}
+              <div className="text-xs">{name}</div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

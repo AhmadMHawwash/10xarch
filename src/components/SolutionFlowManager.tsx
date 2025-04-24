@@ -65,11 +65,11 @@ export const FlowManager: React.FC<FlowManagerProps> = ({
   return (
     <div
       id="flow-manager"
-      className={`flow-manager flex flex-col items-center rounded-lg border border-gray-300 bg-gray-100 p-4 shadow-lg dark:border-gray-700 dark:bg-gray-800 ${
+      className={`flow-manager flex flex-col items-center rounded-lg border border-gray-300 bg-gray-100 p-2 sm:p-4 shadow-lg dark:border-gray-700 dark:bg-gray-800 ${
         isFeedbackExpanded ? "w-full max-w-4xl" : "w-fit"
-      } transition-all duration-300`}
+      } transition-all duration-300 fixed bottom-0 left-0 right-0 sm:static z-10`}
     >
-      <div className="flex items-center space-x-3">
+      <div className="flex w-full flex-wrap justify-center gap-2 sm:flex-nowrap sm:items-center sm:space-x-3 sm:gap-0">
         <ResetFlowButton resetDone={resetDone} onReset={resetFlow} />
         <div className="relative">
           {!canRunSolution && (
@@ -110,7 +110,7 @@ const ResetFlowButton: React.FC<{
 }> = ({ resetDone, onReset }) => (
   <ShouldResetFlowModal
     trigger={
-      <Button variant="outline" size="sm" className="reset-flow-button flex items-center gap-2">
+      <Button variant="outline" size="sm" className="reset-flow-button flex items-center gap-2 w-full sm:w-auto">
         {resetDone ? (
           <Check className="h-4 w-4 text-green-600 dark:text-green-400" />
         ) : (
@@ -133,7 +133,7 @@ const RunSolutionButton: React.FC<{
     size="sm"
     onClick={onClick}
     disabled={isLoading || disabled}
-    className="check-solution-button bg-blue-600 text-white transition-colors hover:bg-blue-700"
+    className="check-solution-button bg-blue-600 text-white transition-colors hover:bg-blue-700 w-full sm:w-auto"
   >
     {isLoading ? (
       <Loader2 className="mr-2 h-4 w-4 animate-spin" />

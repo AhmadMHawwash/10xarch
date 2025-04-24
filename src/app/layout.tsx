@@ -65,7 +65,7 @@ export default async function RootLayout({
                 <Analytics />
                 <Toaster />
                 <Navbar />
-                <main className="h-[93vh]">{children}</main>
+                <main className="h-[93svh] md:h-[93vh]">{children}</main>
               </TooltipProvider>
             </ThemeProvider>
           </TRPCReactProvider>

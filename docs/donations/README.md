@@ -33,4 +33,4 @@ Historical reports are maintained in their respective year directories for trans
 
 ## Contact
 
-For questions about our donation process or to verify reports, please contact <ahmad.m.hawwash@gmail.com>
+For questions about our donation process or to verify reports, please contact <19759214+AhmadMHawwash@users.noreply.github.com>

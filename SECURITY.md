@@ -5,7 +5,7 @@
 We take the security of our project seriously. If you discover a security vulnerability, please follow these steps:
 
 1. **Do Not** open a public issue for the vulnerability
-2. Email your findings to <ahmad.m.hawwash@gmail.com>
+2. Email your findings to <19759214+AhmadMHawwash@users.noreply.github.com>
 3. Provide detailed information about the vulnerability:
    - Description of the issue
    - Steps to reproduce

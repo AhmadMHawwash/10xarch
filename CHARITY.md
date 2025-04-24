@@ -2,7 +2,7 @@
 
 ## Our Commitment
 
-This project is part of a charitable initiative where all profits generated from commercial use will be donated to charitable causes. We believe in making technology education accessible while giving back to society.
+This project is part of a charitable initiative where all profits generated from commercial use will be donated to Children of Palestine delivered by trusted organisations.
 
 ## How It Works
 
@@ -19,15 +19,6 @@ We commit to:
 - Providing updates on the impact of these donations
 - Being transparent about how profits are calculated
 
-## Current Focus Areas
-
-Our charitable donations will focus on:
-
-- Technology education for underprivileged communities
-- Supporting open source initiatives
-- Environmental causes
-- Other charitable organizations aligned with our mission
-
 ## Get Involved
 
 You can support our mission by:
@@ -39,4 +30,4 @@ You can support our mission by:
 
 ## Contact
 
-For questions about our charitable mission or to suggest charitable organizations, please contact <ahmad.m.hawwash@gmail.com>.
+For questions about our charitable mission or to suggest charitable organizations, please contact <19759214+AhmadMHawwash@users.noreply.github.com>.

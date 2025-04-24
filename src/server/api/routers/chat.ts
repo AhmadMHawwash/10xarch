@@ -80,7 +80,7 @@ export const chatRouter = createTRPCRouter({
       
       // Get IP address for security logging and rate limiting
       const ipAddress = ctx.headers.get("x-forwarded-for") ?? null;
-      
+            
       // Sanitize user message to prevent XSS and other attacks  
       const sanitizedMessage = sanitizeInput(rawMessage);
       

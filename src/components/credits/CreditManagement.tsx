@@ -8,7 +8,7 @@ import {
   calculatePurchaseTokens,
   isValidAmount,
   MAX_AMOUNT,
-  MIN_AMOUNT
+  MIN_AMOUNT,
 } from "@/lib/tokens";
 import { api } from "@/trpc/react";
 import { loadStripe } from "@stripe/stripe-js";
@@ -21,6 +21,7 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
+import { useAuth } from "@clerk/nextjs";
 
 if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
   throw new Error("Missing NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY");
@@ -50,6 +51,7 @@ export function CreditManagement() {
   const { toast } = useToast();
   const [amount, setAmount] = useState("5");
   const [sessionId, setSessionId] = useState<string | null>(null);
+  const { userId } = useAuth();
 
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
@@ -142,7 +144,10 @@ export function CreditManagement() {
   };
 
   const { data: transactionData, isLoading: isLoadingTransactions } =
-    api.credits.getTransactions.useQuery();
+    api.credits.getTransactions.useQuery(undefined, {
+      queryKeyHashFn: () => userId ?? "",
+      staleTime: 0, // Consider data stale immediately so it refreshes on mount
+    });
 
   if (!credits && isLoadingCredits) {
     return <div>Loading...</div>;

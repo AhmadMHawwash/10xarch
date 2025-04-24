@@ -8,7 +8,11 @@ export function useCredits() {
     isLoading,
     error,
     refetch,
-  } = api.credits.getBalance.useQuery(undefined, { enabled: !!userId });
+  } = api.credits.getBalance.useQuery(undefined, {
+    queryKeyHashFn: () => userId ?? "",
+    enabled: !!userId,
+    staleTime: 0, // Consider data stale immediately so it refreshes on mount
+  });
 
   // Check if the user has low or zero credits, safely handle undefined cases
   const balance = credits?.credits?.balance ?? 0;

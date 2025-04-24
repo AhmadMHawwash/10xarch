@@ -82,7 +82,11 @@ export const useChallengeManager = () => {
   const { mutate, data, isPending } = api.challenges.submit.useMutation({
     async onSuccess() {
       await queryClient.refetchQueries({
-        queryKey: [["credits", "getBalance"], { type: "query" }],
+        queryKey: [
+          ["credits", "getBalance"],
+          ["challenges", "getChallengesSubmitRateLimitInfo"],
+          { type: "query" },
+        ],
       });
     },
     onError: (error) => {

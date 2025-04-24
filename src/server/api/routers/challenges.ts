@@ -29,7 +29,7 @@ import { checkSolution } from "./checkAnswer";
 const createAICaller = createCallerFactory(checkSolution);
 
 export const challengesRouter = createTRPCRouter({
-  getRateLimitInfo: publicProcedure.query(async ({ ctx }) => {
+  getChallengesSubmitRateLimitInfo: publicProcedure.query(async ({ ctx }) => {
     const { userId } = await auth();
 
     const ipAddress = ctx.headers.get("x-forwarded-for") ?? null;

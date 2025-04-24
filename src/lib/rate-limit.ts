@@ -69,7 +69,7 @@ export const unauthenticatedPlaygroundLimiter = new Ratelimit({
 // Create a new ratelimiter for general API requests
 export const apiRequestsLimiter = new Ratelimit({
   redis,
-  limiter: Ratelimit.slidingWindow(100, ONE_HOUR),
+  limiter: Ratelimit.slidingWindow(300, ONE_HOUR),
   analytics: true,
   prefix: '@upstash/ratelimit/api-requests',
 });

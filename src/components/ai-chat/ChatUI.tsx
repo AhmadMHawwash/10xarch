@@ -12,6 +12,8 @@ import ReactMarkdown from "react-markdown";
 import { cn } from "@/lib/utils";
 import { useChatMessages } from "@/lib/hooks/useChatMessages_";
 import { CreditAlert } from "@/components/credits/CreditAlert";
+import { useAuth } from "@clerk/nextjs";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface Message {
   role: "user" | "assistant" | "system";
@@ -43,12 +45,12 @@ interface WhiteboardConfigs {
   "non-functional requirements"?: string;
 }
 
-export function ChatUI({ 
-  challengeId, 
-  stageIndex = 0, 
+export function ChatUI({
+  challengeId,
+  stageIndex = 0,
   isPlayground = false,
   playgroundId,
-  playgroundTitle 
+  playgroundTitle,
 }: ChatUIProps) {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -56,33 +58,43 @@ export function ChatUI({
   const { balance: credits, refetch: refetchCredits } = useCredits();
   const { getMessages, addMessage, clearSession } = useChatMessages();
   const [mounted, setMounted] = useState(false);
-  
+  const { userId } = useAuth();
+
   // Create a stable chat session ID that persists across component mounts
-  const chatSessionId = useMemo(() => 
-    isPlayground ? `playground:${playgroundId}` : `chat:${challengeId}`, 
-    [isPlayground, playgroundId, challengeId]
+  const chatSessionId = useMemo(
+    () => (isPlayground ? `playground:${playgroundId}` : `chat:${challengeId}`),
+    [isPlayground, playgroundId, challengeId],
   );
-  
+
   // Only get messages after component is mounted to avoid hydration issues
   useEffect(() => {
     setMounted(true);
   }, []);
-  
-  const messages = useMemo(() => 
-    mounted ? getMessages(chatSessionId) : [],
-    [mounted, getMessages, chatSessionId]
+
+  const messages = useMemo(
+    () => (mounted ? getMessages(chatSessionId) : []),
+    [mounted, getMessages, chatSessionId],
   );
-  
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { nodes } = useSystemDesigner();
 
+  const queryClient = useQueryClient();
+
   // Get remaining prompts on load
-  const { data: rateLimitInfo, refetch: refetchRateLimit } = api.chat.getRemainingPrompts.useQuery({
-    challengeId: isPlayground ? playgroundId ?? '' : challengeId ?? '',
-    isPlayground,
-    playgroundId
-  });
+  const { data: rateLimitInfo, refetch: refetchRemainingMessages } =
+    api.chat.getRemainingPrompts.useQuery(
+      {
+        challengeId: isPlayground ? playgroundId ?? "" : challengeId ?? "",
+        isPlayground,
+        playgroundId,
+      },
+      {
+        queryKeyHashFn: () => userId ?? "",
+        staleTime: 0, // Consider data stale immediately so it refreshes on mount
+      },
+    );
 
   // Update remaining messages when rate limit info changes
   useEffect(() => {
@@ -105,11 +117,11 @@ export function ChatUI({
     onSuccess: async (data) => {
       // Immediately set isLoading to false when we get a response
       setIsLoading(false);
-      
+
       const assistantMessage: Message = {
         role: "assistant",
         content: data.message,
-        isSystemDesignRelated: data.isSystemDesignRelated ?? false
+        isSystemDesignRelated: data.isSystemDesignRelated ?? false,
       };
 
       // If the assistant's response contains the disclaimer, update the last user message
@@ -121,40 +133,42 @@ export function ChatUI({
           }
           return msg;
         });
-        
+
         // Clear and re-add all messages to maintain the updated state
         clearSession(chatSessionId);
-        updatedMessages.forEach(msg => addMessage(chatSessionId, msg));
+        updatedMessages.forEach((msg) => addMessage(chatSessionId, msg));
       }
 
       addMessage(chatSessionId, assistantMessage);
       setRemainingMessages(data.remainingMessages);
-      await Promise.all([
-        refetchCredits(),
-        refetchRateLimit()
-      ]);
+      void queryClient.invalidateQueries({
+        queryKey: ["chat.getRemainingPrompts"],
+      });
     },
     onError: (error) => {
       // Immediately set isLoading to false when we get an error
       setIsLoading(false);
-      
+
       console.error("Chat error:", error);
-      
+
       // Create a user-friendly error message based on the error type
       let errorContent = error.message;
-      
+
       // Check for specific error messages like "stream closed"
-      if (error.message.toLowerCase().includes("stream closed") || 
-          error.message.toLowerCase().includes("network") ||
-          error.message.toLowerCase().includes("connection")) {
-        errorContent = "The connection to the AI service was interrupted. Please try again.";
+      if (
+        error.message.toLowerCase().includes("stream closed") ||
+        error.message.toLowerCase().includes("network") ||
+        error.message.toLowerCase().includes("connection")
+      ) {
+        errorContent =
+          "The connection to the AI service was interrupted. Please try again.";
       }
-      
+
       // Display error message to user
       const errorMessage: Message = {
         role: "system",
         content: errorContent,
-        isSystemDesignRelated: false
+        isSystemDesignRelated: false,
       };
       addMessage(chatSessionId, errorMessage);
     },
@@ -163,7 +177,8 @@ export function ChatUI({
   // Extract solution data
   const extractSolutionData = useCallback(() => {
     const whiteboardNode = nodes.find((node) => node.type === "Whiteboard");
-    const configs = whiteboardNode?.data.configs as WhiteboardConfigs | undefined ?? {};
+    const configs =
+      (whiteboardNode?.data.configs as WhiteboardConfigs | undefined) ?? {};
 
     const cleanedNodes = nodes
       .filter((node) => node.type !== "Whiteboard")
@@ -191,13 +206,17 @@ export function ChatUI({
     e.preventDefault();
     if (!input.trim() || isLoading) return;
 
-    const userMessage: Message = { role: "user", content: input, isSystemDesignRelated: true };
+    const userMessage: Message = {
+      role: "user",
+      content: input,
+      isSystemDesignRelated: true,
+    };
     addMessage(chatSessionId, userMessage);
     setInput("");
     setIsLoading(true);
-    
+
     if (remainingMessages > 0) {
-      setRemainingMessages(prev => prev - 1);
+      await Promise.all([refetchCredits(), refetchRemainingMessages()]);
     }
 
     sendMessage.mutate({
@@ -212,129 +231,138 @@ export function ChatUI({
     });
   }
 
-  const renderMessage = useCallback((message: Message) => {
-    const isUser = message.role === "user";
-    const isSystem = message.role === "system";
+  const renderMessage = useCallback(
+    (message: Message) => {
+      const isUser = message.role === "user";
+      const isSystem = message.role === "system";
 
-    return (
-      <div
-        className={cn(
-          "flex",
-          isUser ? "justify-end" : "justify-start"
-        )}
-      >
-        <div
-          className={cn(
-            "max-w-[80%] rounded-lg px-4 py-2",
-            isUser
-              ? "bg-primary text-primary-foreground"
-              : isSystem
-                ? "bg-destructive text-destructive-foreground"
-                : "bg-muted"
-          )}
-        >
-          {isUser ? (
-            <div className="whitespace-pre-wrap">{message.content}</div>
-          ) : (
-            <>
-              <ReactMarkdown
-                className={cn(
-                  "prose prose-sm max-w-none dark:prose-invert",
-                  isSystem
-                    ? "prose-invert"
-                    : "prose-neutral",
-                  "break-words [&_p:last-child]:mb-0",
-                  "[&_pre]:bg-secondary/50 [&_pre]:p-2 [&_pre]:rounded",
-                  "[&_code]:bg-secondary/50 [&_code]:px-1 [&_code]:py-0.5 [&_code]:rounded",
-                  "[&_table]:border-collapse [&_td]:border [&_th]:border [&_td]:px-2 [&_th]:px-2",
-                  "[&_blockquote]:border-l-4 [&_blockquote]:border-primary/20 [&_blockquote]:pl-4 [&_blockquote]:italic"
+      return (
+        <div className={cn("flex", isUser ? "justify-end" : "justify-start")}>
+          <div
+            className={cn(
+              "max-w-[80%] rounded-lg px-4 py-2",
+              isUser
+                ? "bg-primary text-primary-foreground"
+                : isSystem
+                  ? "bg-destructive text-destructive-foreground"
+                  : "bg-muted",
+            )}
+          >
+            {isUser ? (
+              <div className="whitespace-pre-wrap">{message.content}</div>
+            ) : (
+              <>
+                <ReactMarkdown
+                  className={cn(
+                    "prose prose-sm max-w-none dark:prose-invert",
+                    isSystem ? "prose-invert" : "prose-neutral",
+                    "break-words [&_p:last-child]:mb-0",
+                    "[&_pre]:rounded [&_pre]:bg-secondary/50 [&_pre]:p-2",
+                    "[&_code]:rounded [&_code]:bg-secondary/50 [&_code]:px-1 [&_code]:py-0.5",
+                    "[&_table]:border-collapse [&_td]:border [&_td]:px-2 [&_th]:border [&_th]:px-2",
+                    "[&_blockquote]:border-l-4 [&_blockquote]:border-primary/20 [&_blockquote]:pl-4 [&_blockquote]:italic",
+                  )}
+                >
+                  {message.content}
+                </ReactMarkdown>
+
+                {/* Add retry button for system error messages */}
+                {isSystem && !isLoading && (
+                  <div className="mt-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleRetry()}
+                      className="text-xs"
+                    >
+                      Retry
+                    </Button>
+                  </div>
                 )}
-              >
-                {message.content}
-              </ReactMarkdown>
-              
-              {/* Add retry button for system error messages */}
-              {isSystem && !isLoading && (
-                <div className="mt-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => handleRetry()}
-                    className="text-xs"
-                  >
-                    Retry
-                  </Button>
-                </div>
-              )}
-            </>
-          )}
+              </>
+            )}
+          </div>
         </div>
-      </div>
-    );
-  }, [isLoading]);
+      );
+    },
+    [isLoading],
+  );
 
   // Add the retry handler function
   const handleRetry = useCallback(() => {
     // Get the last user message
-    const userMessages = messages.filter(msg => msg.role === "user");
+    const userMessages = messages.filter((msg) => msg.role === "user");
     if (userMessages.length === 0 || isLoading) {
       return;
     }
-    
+
     const lastUserMessage = userMessages[userMessages.length - 1];
     // Additional safety check
     if (!lastUserMessage?.content) {
       return;
     }
-    
+
     // Remove the error message from the chat
     const messagesWithoutLastError = [...messages];
     // If the last message is a system message, remove it
-    const lastMessage = messagesWithoutLastError.length > 0 
-      ? messagesWithoutLastError[messagesWithoutLastError.length - 1] 
-      : undefined;
-      
+    const lastMessage =
+      messagesWithoutLastError.length > 0
+        ? messagesWithoutLastError[messagesWithoutLastError.length - 1]
+        : undefined;
+
     if (lastMessage && lastMessage.role === "system") {
       messagesWithoutLastError.pop();
     }
-    
+
     // Update session messages
     clearSession(chatSessionId);
-    messagesWithoutLastError.forEach(msg => addMessage(chatSessionId, msg));
-    
+    messagesWithoutLastError.forEach((msg) => addMessage(chatSessionId, msg));
+
     // Set loading state
     setIsLoading(true);
-    
+
     // Retry the API call with the last user message
     sendMessage.mutate({
       message: lastUserMessage.content,
       challengeId: isPlayground ? undefined : challengeId,
       stageIndex: isPlayground ? undefined : stageIndex,
-      history: messagesWithoutLastError.filter((msg) => msg.isSystemDesignRelated),
+      history: messagesWithoutLastError.filter(
+        (msg) => msg.isSystemDesignRelated,
+      ),
       solution: extractSolutionData(),
       isPlayground,
       playgroundId,
       playgroundTitle,
     });
-  }, [messages, isLoading, clearSession, chatSessionId, addMessage, sendMessage, challengeId, stageIndex, extractSolutionData, isPlayground, playgroundId, playgroundTitle]);
+  }, [
+    messages,
+    isLoading,
+    clearSession,
+    chatSessionId,
+    addMessage,
+    sendMessage,
+    challengeId,
+    stageIndex,
+    extractSolutionData,
+    isPlayground,
+    playgroundId,
+    playgroundTitle,
+  ]);
 
   const MessageList = useMemo(() => {
     return (
       <div className="space-y-4 p-4">
         {messages.length === 0 && (
           <div className="p-4 text-center text-muted-foreground">
-            Hi! I am your AI assistant. How can I help you with this
-            challenge?
+            Hi! I am your AI assistant. How can I help you with this challenge?
           </div>
         )}
         {messages.map((message, i) => (
-          <div key={i}>
-            {renderMessage(message)}
-          </div>
+          <div key={i}>{renderMessage(message)}</div>
         ))}
         {isLoading && (
           <div className="flex justify-start">
-            <div className="max-w-[80%] rounded-lg bg-muted px-4 py-2 min-h-[40px]">
+            <div className="min-h-[40px] max-w-[80%] rounded-lg bg-muted px-4 py-2">
               <span className="animate-pulse">Thinking...</span>
             </div>
           </div>
@@ -347,12 +375,12 @@ export function ChatUI({
   return (
     <div className="flex h-full flex-col bg-secondary/30">
       {/* Credit warning banner when user has no credits left AND no free prompts remaining */}
-      <CreditAlert 
-        variant="banner" 
-        className="mx-4 mt-3" 
-        hasNoFreePrompts={remainingMessages === 0} 
+      <CreditAlert
+        variant="banner"
+        className="mx-4 mt-3"
+        hasNoFreePrompts={remainingMessages === 0}
       />
-      
+
       {/* Chat messages area */}
       <ScrollArea ref={scrollAreaRef} className="flex-1 p-4">
         {MessageList}
@@ -391,9 +419,9 @@ export function ChatUI({
             disabled={isLoading || !hasAvailablePrompts || !rateLimitInfo}
             className="flex-1 bg-muted/50"
           />
-          <Button 
-            type="submit" 
-            size="icon" 
+          <Button
+            type="submit"
+            size="icon"
             variant="secondary"
             disabled={isLoading || !hasAvailablePrompts || !rateLimitInfo}
             className="shrink-0"

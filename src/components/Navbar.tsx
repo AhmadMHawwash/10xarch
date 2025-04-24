@@ -1,4 +1,5 @@
 "use client";
+import { CreditAlert } from "@/components/credits/CreditAlert";
 import {
   Tooltip,
   TooltipContent,
@@ -7,21 +8,22 @@ import {
 } from "@/components/ui/tooltip";
 import challenges from "@/content/challenges";
 import { useCredits } from "@/hooks/useCredits";
+import { useCurrentUser } from "@/lib/hooks/useCurrentUser";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
-import { SignInButton, UserButton } from "@clerk/nextjs";
-import { Menu, X, Coins, Loader2, Github } from "lucide-react";
+import { SignInButton, useAuth, UserButton } from "@clerk/nextjs";
+import { Coins, Github, Loader2, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import { useCallback, useState } from "react";
 import { ThemeToggle } from "./ThemeToggle";
 import { Logo } from "./icons/logo";
-import { Button, buttonVariants } from "./ui/button";
-import { CreditAlert } from "@/components/credits/CreditAlert";
-import { useCurrentUser } from "@/lib/hooks/useCurrentUser";
+import { Button } from "./ui/button";
 
 function RateLimitInfo() {
-  const rateLimitQuery = api.challenges.getRateLimitInfo.useQuery(undefined, {
+  const { userId } = useAuth();
+  const rateLimitQuery = api.challenges.getChallengesSubmitRateLimitInfo.useQuery(undefined, {
+    queryKeyHashFn: () => userId ?? "",
     refetchInterval: 1000 * 60, // Refresh every minute
     refetchOnMount: true,
     refetchOnWindowFocus: true,
@@ -58,7 +60,9 @@ function RateLimitInfo() {
             remaining === 0 ? "text-destructive" : "text-primary",
           )}
         >
-          {remaining > 0 ? `${remaining} of ${limit} free submissions available` : `0 of ${limit} free submissions available`}
+          {remaining > 0
+            ? `${remaining} of ${limit} free submissions available`
+            : `0 of ${limit} free submissions available`}
         </span>
       </div>
       {remaining < limit && (

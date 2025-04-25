@@ -214,12 +214,10 @@ export function ChatUI({
     setInput("");
     setIsLoading(true);
 
-    if (remainingMessages > 0) {
-      await Promise.all([
-        userId ? refetchCredits() : Promise.resolve(),
-        refetchRemainingMessages(),
-      ]);
-    }
+    await Promise.all([
+      userId ? refetchCredits() : Promise.resolve(),
+      refetchRemainingMessages(),
+    ]);
 
     sendMessage.mutate({
       message: input,

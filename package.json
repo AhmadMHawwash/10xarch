@@ -2,7 +2,7 @@
   "name": "system-design-playground",
   "version": "0.1.0",
   "private": true,
-  "license": "GPL-3.0",
+  "license": "Hippocratic-3.0-BDS",
   "type": "module",
   "scripts": {
     "build": "next build",

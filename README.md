@@ -61,4 +61,4 @@ We welcome contributions! Please feel free to submit a Pull Request. For major c
 
 ## License ⚖️
 
-This project is licensed under the GNU General Public License v3.0 (GPL-3.0) - see the [LICENSE](LICENSE) file for details. This strong copyleft license ensures that all modifications and derivative works are also open source. While the software is free to use, any commercial use of this software by the original author will result in profits being donated to charitable causes.
+This project is licensed under the Hippocratic License 3.0 with BDS module (HL3-BDS) - see the [LICENSE](LICENSE) file for details. This ethical license ensures that the software is used in ways that respect human rights and the environment. The Hippocratic License prohibits uses that violate human rights principles or cause harm to individuals and communities, including the Boycott, Divestment, Sanctions (BDS) clause. While the software is free to use, any commercial use of this software by the original author will result in profits being donated to charitable causes.

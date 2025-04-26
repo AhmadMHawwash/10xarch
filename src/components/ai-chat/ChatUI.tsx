@@ -55,7 +55,11 @@ export function ChatUI({
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [remainingMessages, setRemainingMessages] = useState(0);
-  const { balance: credits, refetch: refetchCredits } = useCredits();
+  const { 
+    balance: credits, 
+    hasValidData: hasValidCreditData,
+    refetch: refetchCredits 
+  } = useCredits();
   const { getMessages, addMessage, clearSession } = useChatMessages();
   const [mounted, setMounted] = useState(false);
   const { userId } = useAuth();
@@ -69,11 +73,11 @@ export function ChatUI({
   // Only get messages after component is mounted to avoid hydration issues
   useEffect(() => {
     setMounted(true);
-    // Force-refresh credits data when chat first loads
-    if (userId) {
+    // Only refresh credits once if we don't have valid data yet
+    if (userId && !hasValidCreditData) {
       void refetchCredits();
     }
-  }, [userId, refetchCredits]);
+  }, [userId, hasValidCreditData, refetchCredits]); // Intentionally omit refetchCredits from dependencies
 
   const messages = useMemo(
     () => (mounted ? getMessages(chatSessionId) : []),
@@ -146,25 +150,15 @@ export function ChatUI({
 
       addMessage(chatSessionId, assistantMessage);
       setRemainingMessages(data.remainingMessages);
-
-      // Update credits in the React Query cache with the value from the API response
+      
+      // Simple, single credits update if needed
       if (data.credits !== undefined) {
-        queryClient.setQueryData(["credits.getBalance"], {
-          credits: {
-            balance: data.credits,
-            userId: userId ?? "",
-            id: "",
-            updatedAt: new Date(),
-          },
-        });
-      }
-
-      if (userId) {
         void refetchCredits();
       }
-
+      
+      // Invalidate remaining prompts query
       void queryClient.invalidateQueries({
-        queryKey: ["chat", "getRemainingPrompts"],
+        queryKey: ['chat', 'getRemainingPrompts'],
       });
     },
     onError: (error) => {
@@ -236,11 +230,6 @@ export function ChatUI({
     addMessage(chatSessionId, userMessage);
     setInput("");
     setIsLoading(true);
-
-    await Promise.all([
-      userId ? refetchCredits() : Promise.resolve(),
-      refetchRemainingMessages(),
-    ]);
 
     sendMessage.mutate({
       message: input,
@@ -421,7 +410,7 @@ export function ChatUI({
               <span>Loading free prompts...</span>
             )}
           </div>
-          {credits > 0 && (
+          {(hasValidCreditData && credits > 0) && (
             <div className="flex items-center gap-2 text-yellow-500">
               <Coins className="h-3.5 w-3.5" />
               <span>{credits} credits</span>

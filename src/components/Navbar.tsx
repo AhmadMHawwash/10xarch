@@ -12,10 +12,11 @@ import { useCurrentUser } from "@/lib/hooks/useCurrentUser";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
 import { SignInButton, UserButton } from "@clerk/nextjs";
+import { useAuth } from "@clerk/nextjs";
 import { Coins, Github, Loader2, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { ThemeToggle } from "./ThemeToggle";
 import { Logo } from "./icons/logo";
 import { Button } from "./ui/button";
@@ -124,9 +125,22 @@ function FreeChallengeBadge() {
 
 export default function Navbar() {
   const { isSignedIn, isLoading: isUserLoading } = useCurrentUser();
+  const { userId } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { balance: credits, isLoading: isLoadingCredits } = useCredits();
+  const { 
+    balance: credits, 
+    isLoading: isLoadingCredits,
+    hasValidData,
+    refetch: refetchCredits 
+  } = useCredits();
   const pathname = usePathname();
+
+  // Only refresh credits once when the user is first identified
+  useEffect(() => {
+    if (userId && !isLoadingCredits) {
+      void refetchCredits();
+    }
+  }, [userId]); // Intentionally omit refetchCredits from dependencies to prevent re-runs
 
   const toggleMenu = useCallback(() => {
     setIsMenuOpen(!isMenuOpen);
@@ -209,7 +223,7 @@ export default function Navbar() {
                 prefetch={false}
               >
                 <Coins className="h-4 w-4" />
-                {isLoadingCredits ? (
+                {isLoadingCredits || !hasValidData ? (
                   <span className="text-muted-foreground">Loading...</span>
                 ) : (
                   <span className="text-muted-foreground">
@@ -302,7 +316,7 @@ export default function Navbar() {
                   )}
                   prefetch={false}
                 >
-                  {isLoadingCredits ? (
+                  {isLoadingCredits || !hasValidData ? (
                     "Loading credits..."
                   ) : (
                     <>Credits: {credits}</>

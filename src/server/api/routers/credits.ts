@@ -33,7 +33,7 @@ export const creditsRouter = createTRPCRouter({
         where: eq(credits.userId, userId),
       });
 
-    return { credits: userCredits };
+      return { credits: userCredits };
     }),
 
   getTransactions: protectedProcedure

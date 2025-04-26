@@ -314,51 +314,57 @@ Keep these requirements in mind when providing assistance. Guide the user withou
       }
       
       // Using free prompts or credits based on rate limit
-      const completion = await openai.chat.completions.create({
-        model: 'gpt-4.1-mini',
-        messages: messageArray,
-        temperature: 0.1,
-        max_tokens: 400,
-      });
+      // const completion = await openai.chat.completions.create({
+      //   model: 'gpt-4.1-mini',
+      //   messages: messageArray,
+      //   temperature: 0.1,
+      //   max_tokens: 400,
+      // });
 
-      const response = completion.choices[0]?.message?.content ?? 'No response generated.';
+      // const response = completion.choices[0]?.message?.content ?? 'No response generated.';
+      const response = 'No response generated.';
       const outputTokens = calculateTextTokens(response);
 
       // Calculate the actual cost for this API call
       const totalCost = calculateGPTCost(inputTokens, outputTokens, 'gpt-4.1-mini');
-      const actualCredits = costToCredits(totalCost);
+      const actualUsedCredits = costToCredits(totalCost);
 
+      const isSystemDesignRelated = !response.includes("Sorry, I can't help with that. I specialise in system design.");
+
+      
       // Deduct credits only if we're using them (rate limit was exceeded)
       if (useCredits && userId) {
         const userCredits = await ctx.db.query.credits.findFirst({
           where: eq(credits.userId, userId),
         });
+
+        const newBalance = userCredits?.balance ? userCredits.balance - actualUsedCredits : 0;
         
         if (userCredits) {
           await ctx.db.update(credits).set({
-            balance: userCredits.balance - actualCredits,
+            balance: newBalance,
             updatedAt: new Date()
           }).where(eq(credits.userId, userId));
         }
-      }
 
-      // Check if response is system design related by looking for the disclaimer
-      const isSystemDesignRelated = !response.includes("Sorry, I can't help with that. I specialise in system design.");
-
-      // Get updated credits if user is signed in
-      let creditsBalance = 0;
-      if (userId) {
-        const userCredits = await ctx.db.query.credits.findFirst({
-          where: eq(credits.userId, userId),
-        });
-        creditsBalance = userCredits?.balance ?? 0;
+        return {
+          message: response,
+          isSystemDesignRelated,
+          remainingMessages: rateLimit.remaining,
+          credits: newBalance,
+          tokensUsed: {
+            input: inputTokens,
+            output: outputTokens,
+            cost: totalCost // Use the calculated cost
+          }
+        };
       }
 
       return {
         message: response,
         isSystemDesignRelated,
         remainingMessages: rateLimit.remaining,
-        credits: creditsBalance,
+        credits: 0,
         tokensUsed: {
           input: inputTokens,
           output: outputTokens,

@@ -314,15 +314,14 @@ Keep these requirements in mind when providing assistance. Guide the user withou
       }
       
       // Using free prompts or credits based on rate limit
-      // const completion = await openai.chat.completions.create({
-      //   model: 'gpt-4.1-mini',
-      //   messages: messageArray,
-      //   temperature: 0.1,
-      //   max_tokens: 400,
-      // });
+      const completion = await openai.chat.completions.create({
+        model: 'gpt-4.1-mini',
+        messages: messageArray,
+        temperature: 0.1,
+        max_tokens: 400,
+      });
 
-      // const response = completion.choices[0]?.message?.content ?? 'No response generated.';
-      const response = 'No response generated.';
+      const response = completion.choices[0]?.message?.content ?? 'No response generated.';
       const outputTokens = calculateTextTokens(response);
 
       // Calculate the actual cost for this API call

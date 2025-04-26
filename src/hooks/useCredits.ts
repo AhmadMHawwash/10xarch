@@ -10,7 +10,7 @@ export function useCredits() {
     refetch,
   } = api.credits.getBalance.useQuery(undefined, {
     enabled: !!userId,
-    staleTime: 0, // Consider data stale immediately so it refreshes on mount
+    staleTime: 30 * 1000, // Consider data stale after 30 seconds
     initialData: {
       credits: {
         balance: 0,

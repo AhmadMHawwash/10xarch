@@ -69,7 +69,11 @@ export function ChatUI({
   // Only get messages after component is mounted to avoid hydration issues
   useEffect(() => {
     setMounted(true);
-  }, []);
+    // Force-refresh credits data when chat first loads
+    if (userId) {
+      void refetchCredits();
+    }
+  }, [userId, refetchCredits]);
 
   const messages = useMemo(
     () => (mounted ? getMessages(chatSessionId) : []),
@@ -91,7 +95,9 @@ export function ChatUI({
         playgroundId,
       },
       {
-        staleTime: 0, // Consider data stale immediately so it refreshes on mount
+        staleTime: 30 * 1000, // Consider data stale after 30 seconds instead of immediately
+        refetchOnMount: true, // Always refetch when component mounts
+        refetchOnWindowFocus: true, // Refetch when window regains focus
       },
     );
 
@@ -140,6 +146,23 @@ export function ChatUI({
 
       addMessage(chatSessionId, assistantMessage);
       setRemainingMessages(data.remainingMessages);
+
+      // Update credits in the React Query cache with the value from the API response
+      if (data.credits !== undefined) {
+        queryClient.setQueryData(["credits.getBalance"], {
+          credits: {
+            balance: data.credits,
+            userId: userId ?? "",
+            id: "",
+            updatedAt: new Date(),
+          },
+        });
+      }
+
+      if (userId) {
+        void refetchCredits();
+      }
+
       void queryClient.invalidateQueries({
         queryKey: ["chat", "getRemainingPrompts"],
       });

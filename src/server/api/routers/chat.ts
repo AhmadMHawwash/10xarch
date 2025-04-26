@@ -46,8 +46,8 @@ export const chatRouter = createTRPCRouter({
       
       // Use the same rate limit key construction as sendMessage
       const rateLimitKey = input.isPlayground
-        ? `${identifier}:playground:${input.playgroundId ?? 'default'}`
-        : `${identifier}:${input.challengeId}`;
+        ? `${identifier}:playground`
+        : `${identifier}`;
       
       // Get remaining free prompts (for both authenticated and unauthenticated users)
       const limiter = userId ? authenticatedFreeChatMessagesLimiter : chatMessagesLimiter;
@@ -230,8 +230,8 @@ Keep these requirements in mind when providing assistance. Guide the user withou
       
       // Define a rate limit key based on mode
       const rateLimitKey = isPlayground 
-        ? `${identifier}:playground:${playgroundId ?? 'default'}`
-        : `${identifier}:${challengeId}`;
+        ? `${identifier}:playground`
+        : `${identifier}`;
       
       // Pre-validate all history messages to prevent prompt injection
       const sanitizedHistory = history.map(msg => {

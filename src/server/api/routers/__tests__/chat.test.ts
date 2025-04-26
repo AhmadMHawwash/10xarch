@@ -580,9 +580,13 @@ describe('Chat Router Functions', () => {
     // Get the calls to enforceRateLimit
     const enforceCalls = vi.mocked(enforceRateLimit).mock.calls;
     
-    // Check that the identifiers include different challenge IDs
-    expect(enforceCalls[0]?.[0]?.identifier).toContain('test-challenge');
-    expect(enforceCalls[1]?.[0]?.identifier).toContain('chat-system');
+    // Check that the identifiers are correctly formed
+    expect(enforceCalls[0]?.[0]?.identifier).toBe('127.0.0.1-test-user');
+    expect(enforceCalls[1]?.[0]?.identifier).toBe('127.0.0.1-test-user');
+
+    // Check that metadata contains the challenge information
+    expect(enforceCalls[0]?.[0]?.metadata?.contextId).toBe('test-challenge');
+    expect(enforceCalls[1]?.[0]?.metadata?.contextId).toBe('chat-system');
   });
 
   test('should deduct exact credit amount based on token calculation', async () => {

@@ -64,13 +64,13 @@ export default function HomeClient() {
 
       <header className="mb-14 flex flex-col items-center justify-between gap-10 md:flex-row md:gap-0">
         <div className="text-center md:text-left md:w-1/2 md:pr-8">
-          <div className="relative flex flex-wrap items-center justify-center gap-3 md:justify-start">
+          <div className="md:relative flex flex-col flex-wrap items-center justify-center gap-3 md:justify-start">
+            <span className="md:absolute top-0 right-28 items-center rounded-md bg-amber-50 px-2 py-1 text-xs font-medium text-amber-700 ring-1 ring-inset ring-amber-600/20 dark:bg-amber-900/30 dark:text-amber-400 dark:ring-amber-800/30">
+              BETA
+            </span>
             <h1 className="bg-gradient-to-r from-blue-500 to-indigo-500 bg-clip-text text-4xl font-bold text-transparent leading-tight pb-2 sm:text-5xl md:text-6xl lg:text-7xl">
               System Design Playground
             </h1>
-            <span className="absolute top-0 right-28 items-center rounded-md bg-amber-50 px-2 py-1 text-xs font-medium text-amber-700 ring-1 ring-inset ring-amber-600/20 dark:bg-amber-900/30 dark:text-amber-400 dark:ring-amber-800/30">
-              BETA
-            </span>
           </div>
           {activeTab === 'learn' ? (
             <>

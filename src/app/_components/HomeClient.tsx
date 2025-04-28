@@ -24,6 +24,7 @@ import { useState } from "react";
 
 export default function HomeClient() {
   const [activeTab, setActiveTab] = useState<'learn' | 'design'>('learn');
+  const [aiFeedbackOpen, setAiFeedbackOpen] = useState<boolean>(true);
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -182,11 +183,11 @@ export default function HomeClient() {
           </div>
         </div>
 
-        <div className="relative w-full h-[400px] sm:h-[450px] md:h-[500px] overflow-hidden rounded-lg border border-gray-200 bg-white/50 backdrop-blur-sm dark:border-gray-700 dark:bg-gray-800/50 md:w-1/2">
+        <div className={`relative w-full h-[${aiFeedbackOpen ? "800px" : "400px"}] sm:h-[450px] md:h-[500px] overflow-hidden rounded-lg border border-gray-200 bg-white/50 backdrop-blur-sm dark:border-gray-700 dark:bg-gray-800/50 md:w-1/2`}>
           {activeTab === 'design' ? (
-            <HeroSystemDesigner mode="playground" />
+            <HeroSystemDesigner mode="playground" aiFeedbackOpen={aiFeedbackOpen} setAiFeedbackOpen={setAiFeedbackOpen} />
           ) : (
-            <HeroSystemDesigner mode="challenge" />
+            <HeroSystemDesigner mode="challenge" aiFeedbackOpen={aiFeedbackOpen} setAiFeedbackOpen={setAiFeedbackOpen} />
           )}
         </div>
       </header>

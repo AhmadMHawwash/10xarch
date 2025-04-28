@@ -26,13 +26,16 @@ const edgeTypes: Record<string, ComponentType<EdgeProps>> = {
   CustomEdge,
 };
 
-function HeroAIFeedback() {
+function HeroAIFeedback({ setAiFeedbackOpen, aiFeedbackOpen }: {  aiFeedbackOpen: boolean; setAiFeedbackOpen: (prevIsOpen: boolean) => void }) {
   const [isExpanded, setIsExpanded] = useState(true);
 
   return (
     <div className="animate-pulse-gentle rounded-lg bg-white/5 shadow-[0_0_0_2px_rgba(251,191,36,0.1)] ring-2 ring-amber-400/30 backdrop-blur-lg dark:bg-gray-800/50 dark:shadow-[0_0_0_2px_rgba(251,191,36,0.1)] dark:ring-amber-500/30">
       <button
-        onClick={() => setIsExpanded(!isExpanded)}
+        onClick={() => {
+          setIsExpanded(!isExpanded)
+          setAiFeedbackOpen(!aiFeedbackOpen)
+        }}
         className="flex w-full items-center justify-between p-4 text-left transition-colors hover:bg-white/5"
       >
         <div className="text-sm font-medium text-amber-500 dark:text-amber-400">
@@ -79,7 +82,13 @@ function HeroAIFeedback() {
   );
 }
 
-export default function HeroSystemDesigner({ mode = "challenge" }: { mode?: "challenge" | "playground" }) {
+interface HeroSystemDesignerProps { 
+  mode?: "challenge" | "playground"; 
+  aiFeedbackOpen: boolean; 
+  setAiFeedbackOpen: (prevIsOpen: boolean) => void 
+}
+
+export default function HeroSystemDesigner({ mode = "challenge", aiFeedbackOpen, setAiFeedbackOpen }: HeroSystemDesignerProps) {
   const { nodes, edges, onNodesChange, onEdgesChange, onConnect, onInit } =
     useHeroSystemDesigner();
 
@@ -154,8 +163,8 @@ export default function HeroSystemDesigner({ mode = "challenge" }: { mode?: "cha
             </div>
           </div>
         </Panel>
-        <Panel position="bottom-center">
-          <HeroAIFeedback />
+        <Panel position="bottom-center" className="hidden md:block">
+          <HeroAIFeedback  setAiFeedbackOpen={setAiFeedbackOpen} aiFeedbackOpen={aiFeedbackOpen}  />
         </Panel>
         <Panel position="bottom-right" className="p-4">
           <button className="group relative flex h-12 w-12 items-center justify-center rounded-full bg-blue-500 text-white shadow-lg transition-all hover:bg-blue-600">
@@ -167,6 +176,9 @@ export default function HeroSystemDesigner({ mode = "challenge" }: { mode?: "cha
         </Panel>
         <Controls />
       </ReactFlow>
+      <div className="md:hidden">
+        <HeroAIFeedback setAiFeedbackOpen={setAiFeedbackOpen} aiFeedbackOpen={aiFeedbackOpen}  />
+      </div>
     </div>
   );
 }

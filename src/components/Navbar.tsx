@@ -11,8 +11,7 @@ import { useCredits } from "@/hooks/useCredits";
 import { useCurrentUser } from "@/lib/hooks/useCurrentUser";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
-import { SignInButton, UserButton } from "@clerk/nextjs";
-import { useAuth } from "@clerk/nextjs";
+import { SignUpButton, useAuth, SignInButton, UserButton } from "@clerk/nextjs";
 import { Coins, Github, Loader2, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
@@ -241,7 +240,7 @@ export default function Navbar() {
                   Sign in
                 </Button>
               </SignInButton>
-              <SignInButton mode="modal">
+              <SignUpButton mode="modal">
                 <Button
                   variant="default"
                   size="sm"
@@ -249,7 +248,7 @@ export default function Navbar() {
                 >
                   Sign up
                 </Button>
-              </SignInButton>
+              </SignUpButton>
             </div>
           )}
           <div className="flex items-center space-x-1">

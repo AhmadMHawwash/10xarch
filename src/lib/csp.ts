@@ -21,7 +21,8 @@ export const cspDirectives = {
     "https://clerk.browser.com",
     "https://*.vercel-insights.com", 
     "https://*.stripe.com", 
-    "https://va.vercel-scripts.com"
+    "https://va.vercel-scripts.com",
+    "https://*.cloudflare.com",
   ],
   
   // Worker sources - allow blob URLs for web workers
@@ -63,7 +64,8 @@ export const cspDirectives = {
     "https://*.stripe.com", 
     "https://clerk.10xarch.com",
     "https://*.clerk.accounts.dev",
-    "https://*.clerk.com"
+    "https://*.clerk.com",
+    "https://*.cloudflare.com"
   ],
   
   // Block all plugins

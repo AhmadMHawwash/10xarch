@@ -6,82 +6,82 @@ await import("./src/env.js");
 
 /** @type {import("next").NextConfig} */
 const config = {
-  async rewrites() {
-    return [
-      {
-        // Prevent any redirection for webhook endpoints
-        source: '/api/webhook/clerk/:path*',
-        destination: '/api/webhook/clerk/:path*',
-      },
-    ];
-  },
+  // async rewrites() {
+  //   return [
+  //     {
+  //       // Prevent any redirection for webhook endpoints
+  //       source: '/api/webhook/clerk/:path*',
+  //       destination: '/api/webhook/clerk/:path*',
+  //     },
+  //   ];
+  // },
   
-  async headers() {
-    return [
-      {
-        // Static assets - maximize caching with immutable directive
-        source: '/:path*.(jpg|jpeg|gif|png|svg|ico|webp|woff|woff2)',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-        ],
-      },
-      {
-        // Webhook routes should never be cached
-        source: '/api/clerk-webhook',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'no-store, no-cache, must-revalidate, max-age=0',
-          },
-        ],
-      },
-      {
-        // New webhook routes should never be cached
-        source: '/api/webhook/clerk/:path*',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'no-store, no-cache, must-revalidate, max-age=0',
-          },
-        ],
-      },
-      {
-        // Next.js static files - these have content hashes, maximize caching
-        source: '/_next/static/:path*',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-        ],
-      },
-      {
-        // Next.js data files - maximize CDN caching with long stale-while-revalidate
-        source: '/_next/data/:path*',
-        headers: [
-          {
-            key: 'Cache-Control',
-            // Short browser cache (30 min) but very long CDN cache (1 week) with generous stale period
-            value: 'public, max-age=1800, s-maxage=604800, stale-while-revalidate=604800',
-          },
-        ],
-      },
-      {
-        // HTML/dynamic pages - longer CDN caching to reduce serverless function calls
-        source: '/:path*',
-        headers: [
-          {
-            key: 'Cache-Control',
-            // Short browser cache (5 min) but very long CDN cache (1 day) with generous stale period
-            value: 'public, max-age=300, s-maxage=86400, stale-while-revalidate=86400',
-          },
-        ],
-      },
-    ];
-  },
+  // async headers() {
+  //   return [
+  //     {
+  //       // Static assets - maximize caching with immutable directive
+  //       source: '/:path*.(jpg|jpeg|gif|png|svg|ico|webp|woff|woff2)',
+  //       headers: [
+  //         {
+  //           key: 'Cache-Control',
+  //           value: 'public, max-age=31536000, immutable',
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       // Webhook routes should never be cached
+  //       source: '/api/clerk-webhook',
+  //       headers: [
+  //         {
+  //           key: 'Cache-Control',
+  //           value: 'no-store, no-cache, must-revalidate, max-age=0',
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       // New webhook routes should never be cached
+  //       source: '/api/webhook/clerk/:path*',
+  //       headers: [
+  //         {
+  //           key: 'Cache-Control',
+  //           value: 'no-store, no-cache, must-revalidate, max-age=0',
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       // Next.js static files - these have content hashes, maximize caching
+  //       source: '/_next/static/:path*',
+  //       headers: [
+  //         {
+  //           key: 'Cache-Control',
+  //           value: 'public, max-age=31536000, immutable',
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       // Next.js data files - maximize CDN caching with long stale-while-revalidate
+  //       source: '/_next/data/:path*',
+  //       headers: [
+  //         {
+  //           key: 'Cache-Control',
+  //           // Short browser cache (30 min) but very long CDN cache (1 week) with generous stale period
+  //           value: 'public, max-age=1800, s-maxage=604800, stale-while-revalidate=604800',
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       // HTML/dynamic pages - longer CDN caching to reduce serverless function calls
+  //       source: '/:path*',
+  //       headers: [
+  //         {
+  //           key: 'Cache-Control',
+  //           // Short browser cache (5 min) but very long CDN cache (1 day) with generous stale period
+  //           value: 'public, max-age=300, s-maxage=86400, stale-while-revalidate=86400',
+  //         },
+  //       ],
+  //     },
+  //   ];
+  // },
 
   // Optimize build output
   swcMinify: true,

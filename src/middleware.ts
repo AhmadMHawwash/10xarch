@@ -3,11 +3,11 @@ import { NextResponse } from "next/server";
 import { getAllSecurityHeaders } from "@/lib/csp";
 
 const isProtectedFromSigninsRoute = createRouteMatcher(["/credits(.*)"]);
-const isWebhookRoute = createRouteMatcher(["/api/webhook/clerk"]);
 
 export default clerkMiddleware(async (auth, req) => {
   // Skip middleware processing for webhook routes
-  if (isWebhookRoute(req)) {
+  console.log("req.nextUrl.pathname", req.nextUrl);
+  if (req.nextUrl.pathname === "/api/webhook/clerk") {
     return NextResponse.next();
   }
 
@@ -41,10 +41,10 @@ export default clerkMiddleware(async (auth, req) => {
 export const config = {
   matcher: [
     "/challenges/:slug*",
-    // Skip Next.js internals, all static files, and webhook paths
+    // Skip Next.js internals, all static files
     "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-    // API routes except webhooks
-    "/api/(?!webhook/clerk).*",
+    // API routes (except webhook)
+    "/api/:path*",
     "/trpc/:path*",
   ],
 };

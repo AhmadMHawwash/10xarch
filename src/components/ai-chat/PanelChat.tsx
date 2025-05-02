@@ -22,14 +22,14 @@ export function PanelChat({
   const params = useParams<{ slug: string }>();
 
   if (isPlayground && !playgroundId) return null;
-  if (!isPlayground && !params.slug) return null;
+  if (!isPlayground && !params?.slug) return null;
 
   // If we're rendering inside a side panel, just return the ChatUI
   if (inSidePanel) {
     return (
       <div className="h-full flex-1 overflow-hidden">
         <ChatUI
-          challengeId={isPlayground ? undefined : params.slug}
+          challengeId={isPlayground ? undefined : params?.slug}
           stageIndex={isPlayground ? undefined : 0}
           isPlayground={isPlayground}
           playgroundId={playgroundId}

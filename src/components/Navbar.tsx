@@ -99,7 +99,7 @@ function FreeChallengeBadge() {
   const challenge = challenges.find((c) => c.slug === params?.slug);
 
   // Only show for free challenges
-  if (!params.slug || !challenge?.isFree) return null;
+  if (!params?.slug || !challenge?.isFree) return null;
 
   return (
     <TooltipProvider>

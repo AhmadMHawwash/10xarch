@@ -9,7 +9,7 @@ export function AIChatAssistant() {
   const { currentStageIndex, challenge } = useChallengeManager();
 
   // Wait for everything to be initialized
-  if (!params.slug || !challenge) return null;
+  if (!params?.slug || !challenge) return null;
 
   return (
     <ChatUI

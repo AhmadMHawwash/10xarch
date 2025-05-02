@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { getAllSecurityHeaders } from "@/lib/csp";
 
 const isProtectedFromSigninsRoute = createRouteMatcher(["/credits(.*)"]);
-const isWebhookRoute = createRouteMatcher(["/api/clerk-webhook"]);
+const isWebhookRoute = createRouteMatcher(["/api/webhook/clerk"]);
 
 export default clerkMiddleware(async (auth, req) => {
   // Skip middleware processing for webhook routes

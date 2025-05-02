@@ -3,8 +3,14 @@ import { NextResponse } from "next/server";
 import { getAllSecurityHeaders } from "@/lib/csp";
 
 const isProtectedFromSigninsRoute = createRouteMatcher(["/credits(.*)"]);
+const isWebhookRoute = createRouteMatcher(["/api/clerk-webhook"]);
 
 export default clerkMiddleware(async (auth, req) => {
+  // Skip middleware processing for webhook routes
+  if (isWebhookRoute(req)) {
+    return NextResponse.next();
+  }
+
   const { userId, redirectToSignIn } = await auth();
 
   // For protected routes, ensure user is authenticated
@@ -35,9 +41,10 @@ export default clerkMiddleware(async (auth, req) => {
 export const config = {
   matcher: [
     "/challenges/:slug*",
-    // Skip Next.js internals and all static files, unless found in search params
-    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-    // Always run for API routes
-    "/(api|trpc)(.*)",
+    // Skip Next.js internals, all static files, and webhook paths
+    "/((?!_next|api/webhook/clerk|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
+    // API routes except webhooks
+    "/api/:path*",
+    "/trpc/:path*",
   ],
 };

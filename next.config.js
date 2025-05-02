@@ -6,6 +6,16 @@ await import("./src/env.js");
 
 /** @type {import("next").NextConfig} */
 const config = {
+  async rewrites() {
+    return [
+      {
+        // Prevent any redirection for webhook endpoints
+        source: '/api/webhook/clerk/:path*',
+        destination: '/api/webhook/clerk/:path*',
+      },
+    ];
+  },
+  
   async headers() {
     return [
       {
@@ -15,6 +25,26 @@ const config = {
           {
             key: 'Cache-Control',
             value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        // Webhook routes should never be cached
+        source: '/api/clerk-webhook',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'no-store, no-cache, must-revalidate, max-age=0',
+          },
+        ],
+      },
+      {
+        // New webhook routes should never be cached
+        source: '/api/webhook/clerk/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'no-store, no-cache, must-revalidate, max-age=0',
           },
         ],
       },
@@ -36,17 +66,6 @@ const config = {
             key: 'Cache-Control',
             // Short browser cache (30 min) but very long CDN cache (1 week) with generous stale period
             value: 'public, max-age=1800, s-maxage=604800, stale-while-revalidate=604800',
-          },
-        ],
-      },
-      {
-        // API routes - balance freshness with caching to reduce function executions
-        source: '/api/:path*',
-        headers: [
-          {
-            key: 'Cache-Control',
-            // Short browser cache (1 min) but long CDN cache (1 day) with generous stale period
-            value: 'public, max-age=60, s-maxage=86400, stale-while-revalidate=86400',
           },
         ],
       },

@@ -14,7 +14,7 @@ export const cspDirectives = {
   'script-src': [
     "'self'", 
     "'unsafe-inline'",
-    "'unsafe-eval'", 
+    "strict-dynamic",
     "https://clerk.10xarch.com", 
     "https://*.clerk.accounts.dev",
     "https://*.clerk.com",
@@ -23,10 +23,11 @@ export const cspDirectives = {
     "https://*.stripe.com", 
     "https://va.vercel-scripts.com",
     "https://*.cloudflare.com",
+    "https://challenges.cloudflare.com",
   ],
   
   // Worker sources - allow blob URLs for web workers
-  'worker-src': ["'self'", "blob:"],
+  'worker-src': ["'self'", "blob:", "https:"],
   
   // Style sources - same origin and inline styles
   'style-src': ["'self'", "'unsafe-inline'"],
@@ -65,7 +66,8 @@ export const cspDirectives = {
     "https://clerk.10xarch.com",
     "https://*.clerk.accounts.dev",
     "https://*.clerk.com",
-    "https://*.cloudflare.com"
+    "https://*.cloudflare.com",
+    "https://challenges.cloudflare.com",
   ],
   
   // Block all plugins
@@ -86,8 +88,8 @@ export function buildCspPolicy(directives = cspDirectives, reportOnly = false): 
   const policy = Object.entries(directives)
     .map(([directive, sources]) => `${directive} ${sources.join(' ')}`);
     
-  // Only add upgrade-insecure-requests in enforce mode, not in report-only
-  if (!reportOnly) {
+  // Only add upgrade-insecure-requests in production
+  if (!reportOnly && process.env.NODE_ENV === 'production') {
     policy.push("upgrade-insecure-requests");
   }
 

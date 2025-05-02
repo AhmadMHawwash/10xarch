@@ -42,7 +42,7 @@ export const config = {
   matcher: [
     "/challenges/:slug*",
     // Skip Next.js internals, all static files, and webhook paths
-    "/((?!_next|api/webhook/clerk|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
+    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
     // API routes except webhooks
     "/api/:path*",
     "/trpc/:path*",

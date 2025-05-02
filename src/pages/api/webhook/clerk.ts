@@ -1,45 +1,41 @@
-import { type NextRequest, NextResponse } from "next/server";
-import { Webhook, type WebhookRequiredHeaders } from "svix";
+import { type NextApiRequest, type NextApiResponse } from "next";
+import { Webhook } from "svix";
 import { type WebhookEvent } from "@clerk/nextjs/server";
 import { db } from "@/server/db";
 import { eq } from "drizzle-orm";
-import { headers } from "next/headers";
 import { credits, creditTransactions, users } from "@/server/db/schema";
 
 const FREE_SIGNUP_CREDITS = 50;
 
-export async function POST(req: NextRequest) {
-  console.log("Received Clerk webhook");
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  console.log("Received Clerk webhook (pages router)");
   const webhookSecret = process.env.CLERK_WEBHOOK_SECRET;
 
   if (!webhookSecret) {
     console.error("Webhook secret not configured");
-    return NextResponse.json(
-      { error: "Webhook secret not configured" },
-      { status: 500 },
-    );
+    return res.status(500).json({ error: "Webhook secret not configured" });
   }
 
   // Get the headers
-  const headerPayload = headers();
-  const svix_id = headerPayload.get("svix-id");
-  const svix_timestamp = headerPayload.get("svix-timestamp");
-  const svix_signature = headerPayload.get("svix-signature");
+  const svix_id = req.headers["svix-id"] as string;
+  const svix_timestamp = req.headers["svix-timestamp"] as string;
+  const svix_signature = req.headers["svix-signature"] as string;
 
   console.log("svix_id", svix_id);
   console.log("svix_timestamp", svix_timestamp);
   console.log("svix_signature", svix_signature);
+  
   // If there are no headers, error out
   if (!svix_id || !svix_timestamp || !svix_signature) {
     console.error("Missing webhook headers");
-    return NextResponse.json(
-      { error: "Missing webhook headers" },
-      { status: 400 },
-    );
+    return res.status(400).json({ error: "Missing webhook headers" });
   }
 
   // Get the body
-  const payload = (await req.json()) as unknown;
+  const payload = req.body as Record<string, unknown>;
   const body = JSON.stringify(payload);
 
   console.log("body", body);
@@ -55,13 +51,10 @@ export async function POST(req: NextRequest) {
       "svix-id": svix_id,
       "svix-timestamp": svix_timestamp,
       "svix-signature": svix_signature,
-    } as WebhookRequiredHeaders) as WebhookEvent;
+    }) as WebhookEvent;
   } catch (err) {
     console.error("Error verifying webhook:", err);
-    return NextResponse.json(
-      { error: "Error verifying webhook" },
-      { status: 400 },
-    );
+    return res.status(400).json({ error: "Error verifying webhook" });
   }
 
   // Handle the webhook
@@ -101,5 +94,5 @@ export async function POST(req: NextRequest) {
       console.log("Unhandled webhook event type:", evt.type);
   }
 
-  return NextResponse.json({ message: "Webhook processed successfully" });
-}
+  return res.status(200).json({ message: "Webhook processed successfully" });
+} 

@@ -45,7 +45,7 @@ function HeroAIFeedback() {
         )}
       </button>
       {isExpanded && (
-        <div className="space-y-3 p-4 pt-0">
+        <div className="space-y-3 p-4 pt-0 max-h-[300px] overflow-y-auto">
           <div>
             <div className="mb-1 text-xs font-medium text-emerald-500 dark:text-emerald-400">
               ✓ Strengths
@@ -154,7 +154,7 @@ export default function HeroSystemDesigner({ mode = "challenge" }: { mode?: "cha
             </div>
           </div>
         </Panel>
-        <Panel position="bottom-center">
+        <Panel position="bottom-center" className="w-3/5 sm:w-1/2 md:w-auto">
           <HeroAIFeedback />
         </Panel>
         <Panel position="bottom-right" className="p-4">

@@ -96,3 +96,11 @@ export default async function handler(
 
   return res.status(200).json({ message: "Webhook processed successfully" });
 } 
+
+export const config = {
+  runtime: 'nodejs',
+  api: {
+    bodyParser: true,
+    externalResolver: true,
+  },
+};

@@ -40,9 +40,8 @@ export default clerkMiddleware(async (auth, req) => {
 
 export const config = {
   matcher: [
+    "/((?!api|_next|.*\\..*).*)",
     "/challenges/:slug*",
-    // Skip Next.js internals, all static files and API routes
-    "/((?!_next|api|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
     "/trpc/:path*",
   ],
 };

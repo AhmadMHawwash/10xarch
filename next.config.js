@@ -8,7 +8,14 @@ await import("./src/env.js");
 const config = {
   // Disable all redirects and rewrites
   async redirects() {
-    return [];
+    return [
+      {
+        source: "/(.*)",
+        has: [{ type: "host", value: "10xarch.com" }],
+        destination: "https://www.10xarch.com/:1",
+        permanent: true,
+      },
+    ];
   },
 
   async rewrites() {

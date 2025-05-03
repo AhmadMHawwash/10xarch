@@ -36,7 +36,7 @@ const config = {
       },
       {
         // Webhook routes should never be cached
-        source: '/api/webhook/clerk',
+        source: '/api/:path*',
         headers: [
           {
             key: 'Cache-Control',

@@ -1,10 +1,12 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { TRPCError } from "@trpc/server";
-import { eq } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import { credits, creditTransactions } from "@/server/db/schema";
-import { auth } from "@clerk/nextjs/server";
 import { creditTransactionSchema } from "@/lib/validations/credits";
+
+// Check if we're in a development environment
+const isDevelopmentMode = process.env.NEXT_PUBLIC_DEV_MODE === "true";
 
 const useCreditsSchema = z.object({
   amount: z.number(),
@@ -21,35 +23,25 @@ const getTransactionsOutputSchema = z.object({
 
 export const creditsRouter = createTRPCRouter({
   getBalance: protectedProcedure.query(async ({ ctx }) => {
-    const { userId } = await auth();
-      if (!userId) {
-      throw new TRPCError({
-        code: "UNAUTHORIZED",
-        message: "Not authenticated",
-      });
-      }
+    // In development mode, ctx.auth should already contain a userId
+    // The protectedProcedure middleware handles this
+    const userId = isDevelopmentMode ? "dev_user_123" : ctx.auth.userId;
 
-      const userCredits = await ctx.db.query.credits.findFirst({
-        where: eq(credits.userId, userId),
-      });
+    const userCredits = await ctx.db.query.credits.findFirst({
+      where: eq(credits.userId, userId),
+    });
 
-      return { credits: userCredits };
-    }),
+    return { credits: userCredits };
+  }),
 
   getTransactions: protectedProcedure
     .output(getTransactionsOutputSchema)
     .query(async ({ ctx }) => {
-      const { userId } = await auth();
-      if (!userId) {
-        throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message: "Not authenticated",
-        });
-      }
+      const userId = isDevelopmentMode ? "dev_user_123" : ctx.auth.userId;
 
       const transactions = await ctx.db.query.creditTransactions.findMany({
         where: eq(creditTransactions.userId, userId),
-        orderBy: (creditTransactions, { desc }) => [
+        orderBy: [
           desc(creditTransactions.createdAt),
         ],
         limit: 50,
@@ -68,13 +60,7 @@ export const creditsRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const { userId } = await auth();
-      if (!userId) {
-        throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message: "Not authenticated",
-        });
-      }
+      const userId = isDevelopmentMode ? "dev_user_123" : ctx.auth.userId;
 
       // Check if user has enough credits
       const userCredits = await ctx.db.query.credits.findFirst({
@@ -119,13 +105,7 @@ export const creditsRouter = createTRPCRouter({
   addCredits: protectedProcedure
     .input(addCreditsSchema)
     .mutation(async ({ ctx, input }) => {
-      const { userId } = await auth();
-      if (!userId) {
-        throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message: "Not authenticated",
-        });
-      }
+      const userId = isDevelopmentMode ? "dev_user_123" : ctx.auth.userId;
 
       // Get current credits
       const userCredits = await ctx.db.query.credits.findFirst({
@@ -160,9 +140,11 @@ export const creditsRouter = createTRPCRouter({
 
       await ctx.db
         .update(credits)
-        .set({ balance: userCredits.balance + input.amount })
+        .set({
+          balance: userCredits.balance + input.amount,
+        })
         .where(eq(credits.userId, userId));
 
-      return { success: true, transaction };
+      return { success: true };
     }),
 });

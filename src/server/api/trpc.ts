@@ -11,7 +11,7 @@ import superjson from "superjson";
 import { ZodError } from "zod";
 
 import { db } from "@/server/db";
-import { auth as clerkAuth } from "@clerk/nextjs/server";
+import { auth as clerkAuth } from "@/lib/clerk/server";
 import { apiRequestsLimiter, getRateLimitIdentifier } from "@/lib/rate-limit";
 import { logSecurityEvent } from "@/lib/security-logger";
 
@@ -66,8 +66,8 @@ export const createCallerFactory = t.createCallerFactory;
  * Rate limiting middleware for all API requests
  */
 const rateLimit = t.middleware(async ({ ctx, next }) => {
-  // Skip rate limiting for certain conditions
-  if (process.env.DISABLE_RATE_LIMIT === "true") {
+  // Skip rate limiting for development mode or certain conditions
+  if (isDevelopmentMode || process.env.DISABLE_RATE_LIMIT === "true") {
     return next();
   }
 
@@ -82,17 +82,18 @@ const rateLimit = t.middleware(async ({ ctx, next }) => {
 
   const userId = auth.userId;
   const ipAddress = ctx.headers.get("x-forwarded-for") ?? null;
-  
+
   // Create identifier that combines IP and user ID (if available)
   const identifier = getRateLimitIdentifier(ipAddress, userId);
-  
+
   // Apply rate limit
-  const { success, reset, remaining } = await apiRequestsLimiter.limit(identifier);
-  
+  const { success, reset, remaining } =
+    await apiRequestsLimiter.limit(identifier);
+
   if (!success) {
     // Calculate reset time in seconds
     const secondsUntilReset = Math.ceil((reset - Date.now()) / 1000);
-    
+
     // Log rate limit exceeded event
     logSecurityEvent({
       eventType: "rate-limit-exceeded",
@@ -103,22 +104,22 @@ const rateLimit = t.middleware(async ({ ctx, next }) => {
       metadata: {
         limitType: "api_requests",
         reset: reset,
-        secondsUntilReset
-      }
+        secondsUntilReset,
+      },
     });
-    
+
     // Throw rate limit error
     throw new TRPCError({
       code: "TOO_MANY_REQUESTS",
       message: `Rate limit exceeded. Try again in ${secondsUntilReset} seconds.`,
     });
   }
-  
+
   return next({
     ctx: {
       ...ctx,
-      rateLimit: { remaining }
-    }
+      rateLimit: { remaining },
+    },
   });
 });
 
@@ -160,9 +161,21 @@ export const publicProcedure = t.procedure
  * This is the base piece you use to build new queries and mutations on your tRPC API that require authentication.
  * It guarantees that a user querying is authorized by throwing an error if they are not logged in.
  */
+
+const isDevelopmentMode = process.env.NEXT_PUBLIC_DEV_MODE === "true";
+
 export const protectedProcedure = t.procedure
   .use(rateLimit)
   .use(async ({ next, ctx }) => {
+    if (isDevelopmentMode) {
+      return next({
+        ctx: {
+          db: ctx.db,
+          auth: { userId: "dev_user_123" },
+        },
+      });
+    }
+
     const auth = await clerkAuth();
     if (!auth.userId) {
       throw new TRPCError({ code: "UNAUTHORIZED" });
@@ -170,7 +183,7 @@ export const protectedProcedure = t.procedure
     return next({
       ctx: {
         db: ctx.db,
-        auth
+        auth,
       },
     });
   });

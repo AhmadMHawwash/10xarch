@@ -8,14 +8,14 @@ import {
 } from "@/components/ui/tooltip";
 import challenges from "@/content/challenges";
 import { useCredits } from "@/hooks/useCredits";
+import { useAuth, SignInButton, SignUpButton, UserButton } from "@/lib/clerk/client";
 import { useCurrentUser } from "@/lib/hooks/useCurrentUser";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
-import { SignUpButton, useAuth, SignInButton, UserButton } from "@clerk/nextjs";
 import { Coins, Github, Loader2, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
-import { useCallback, useState, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ThemeToggle } from "./ThemeToggle";
 import { Logo } from "./icons/logo";
 import { Button } from "./ui/button";
@@ -136,10 +136,16 @@ export default function Navbar() {
 
   // Only refresh credits once when the user is first identified
   useEffect(() => {
-    if (userId && !isLoadingCredits) {
+    // Guard against errors in case auth isn't fully initialized
+    if (userId && !isLoadingCredits && refetchCredits) {
+      try {
+        // Use void to properly handle the promise without awaiting
       void refetchCredits();
+      } catch (error) {
+        console.warn("[Navbar] Error fetching credits:", error);
+      }
     }
-  }, [userId]); // Intentionally omit refetchCredits from dependencies to prevent re-runs
+  }, [userId, isLoadingCredits]); // Add isLoadingCredits as a dependency to avoid errors
 
   const toggleMenu = useCallback(() => {
     setIsMenuOpen(!isMenuOpen);

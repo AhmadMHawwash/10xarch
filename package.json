@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "build": "next build",
-    "dev": "next dev",
+    "dev": "NODE_ENV=development NEXT_PUBLIC_DEV_MODE=true next dev",
     "lint": "next lint",
     "start": "next start",
     "test": "vitest run",
@@ -18,7 +18,8 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "tsx src/server/db/migrate.ts"
+    "db:migrate": "tsx src/server/db/migrate.ts",
+    "db:add-credits": "echo 'Running add-credits SQL script...' && docker-compose exec -T db psql -U postgres -d system_design_playground -f /app/scripts/add-credits.sql"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.9.6",

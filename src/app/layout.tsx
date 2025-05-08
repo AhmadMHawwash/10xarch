@@ -7,7 +7,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { TRPCReactProvider } from "@/trpc/react";
 import { dark } from "@clerk/themes";
-import { ClerkProvider } from "@clerk/nextjs";
+import { ClerkProvider } from "@/lib/clerk/client";
 import { GeistSans } from "geist/font/sans";
 import { Analytics } from "@vercel/analytics/react";
 import { type Metadata } from "next";

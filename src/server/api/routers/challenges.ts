@@ -21,7 +21,7 @@ import {
   publicProcedure,
 } from "@/server/api/trpc";
 import { credits } from "@/server/db/schema";
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/lib/clerk/server";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { checkSolution } from "./checkAnswer";

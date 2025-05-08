@@ -50,6 +50,43 @@ Then edit `.env.local` with your configuration.
 yarn dev
 ```
 
+## Docker Development Environment
+
+For contributors and maintainers, we've containerized the application to make setup easy without requiring API keys for third-party services.
+
+### Quick Start for Contributors
+
+1. **Prerequisites**: Install [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/)
+
+2. **Clone and start the application**:
+   ```bash
+   git clone https://github.com/yourusername/system-design-playground.git
+   cd system-design-playground
+   docker-compose up
+   ```
+
+3. **Access the application**: Visit http://localhost:3000
+
+That's it! The containers will automatically:
+- Set up the PostgreSQL database
+- Run migrations and seed data
+- Start the Next.js development server
+
+### Development Mode Features
+
+In development mode:
+- Authentication with Clerk is mocked - you'll be logged in automatically
+- A test user with 10,000 credits is created
+- Rate limiting is handled in-memory instead of using Upstash
+- Database persistence is maintained between restarts
+
+The only requirement is an OpenAI API key if you want to test AI features. Set it in a `.env` file:
+```
+OPENAI_API_KEY=your_key_here
+```
+
+For more information, see [README.docker.md](./README.docker.md) and [README.database.md](./README.database.md).
+
 ## Contributing 🤝
 
 We welcome contributions! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.

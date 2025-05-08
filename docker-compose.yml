@@ -1,0 +1,47 @@
+version: '3.8'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      # Database configuration
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/system_design_playground
+      # Application configuration 
+      - NODE_ENV=development
+      - NEXT_TELEMETRY_DISABLED=1
+      - NEXT_PUBLIC_APP_URL=http://localhost:3000
+      # Development mode settings
+      - NEXT_PUBLIC_DEV_MODE=true
+      - FORCE_DB_INIT=${FORCE_DB_INIT:-false}
+      # API Keys - only OpenAI is required, others will use mock implementations
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-sk-dummy-openai-key}
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./scripts:/app/scripts
+      - ./drizzle:/app/drizzle
+
+  db:
+    image: postgres:15-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=system_design_playground
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts:/app/scripts
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+    driver: local 

@@ -1,20 +1,42 @@
 import { api } from "@/trpc/react";
-import { useAuth } from "@clerk/nextjs";
-import { useCallback } from "react";
+import { useAuth } from "@/lib/clerk/client";
+import { useCallback, useEffect, useState } from "react";
 
 // Define a global state flag to track when updates are in progress
 let isUpdating = false;
 
+// Check if we're in a development environment
+const isDevelopmentMode = process.env.NEXT_PUBLIC_DEV_MODE === "true";
+
 export function useCredits() {
-  const { userId } = useAuth();
+  // Store auth state in hook's internal state to avoid ClerkProvider dependency issues
+  const [authState, setAuthState] = useState<{ userId: string | null }>({ userId: null });
+  const auth = useAuth();
+  
+  // Safe access to userId, ensuring it doesn't throw errors if called outside ClerkProvider
+  useEffect(() => {
+    try {
+      // In development mode, we default to a dev user ID
+      if (isDevelopmentMode) {
+        setAuthState({ userId: "dev_user_123" });
+      } else if (auth?.userId) {
+        setAuthState({ userId: auth.userId });
+      }
+    } catch (error) {
+      console.warn("[useCredits] Error accessing auth:", error);
+      if (isDevelopmentMode) {
+        setAuthState({ userId: "dev_user_123" });
+      }
+    }
+  }, [auth]);
   
   const {
     data: credits,
     isLoading,
     error,
     refetch,
-  } = api.credits.getBalance.useQuery(undefined, {
-    enabled: !!userId,
+  } = api.credits.getBalance.useQuery(void 0, {
+    enabled: !!authState.userId,
     // Use a longer staleTime to reduce unnecessary refetches
     staleTime: 60 * 1000, // 1 minute
     // Only trigger automatic refetch on mount, not on every window focus
@@ -36,6 +58,8 @@ export function useCredits() {
     try {
       isUpdating = true;
       await refetch();
+    } catch (error) {
+      console.warn("[useCredits] Error refetching credits:", error);
     } finally {
       // Reset after a short delay to prevent rapid consecutive calls
       setTimeout(() => {

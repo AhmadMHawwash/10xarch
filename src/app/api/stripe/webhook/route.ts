@@ -4,21 +4,62 @@ import { eq } from "drizzle-orm";
 import { buffer } from "node:stream/consumers";
 import Stripe from "stripe";
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error("Missing STRIPE_SECRET_KEY");
-}
+// Check if we're in a development environment
+const isDevelopmentMode = process.env.NEXT_PUBLIC_DEV_MODE === "true";
 
-if (!process.env.STRIPE_WEBHOOK_SECRET) {
-  throw new Error("Missing STRIPE_WEBHOOK_SECRET");
-}
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+// Only initialize Stripe in production mode
+const stripe = !isDevelopmentMode && process.env.STRIPE_SECRET_KEY
+  ? new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: "2024-12-18.acacia",
-});
+    })
+  : null;
 
 export async function POST(req: Request) {
   try {
     console.log(" Webhook received");
+
+    // For development mode, always return success
+    if (isDevelopmentMode) {
+      console.log(" [DEV MODE] Skipping webhook processing in development mode");
+      return new Response(JSON.stringify({ 
+        received: true, 
+        dev_mode: true,
+        message: "Stripe webhooks are not processed in development mode" 
+      }), {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+    }
+
+    // For production, we need Stripe configured
+    if (!stripe) {
+      console.error(" Stripe is not initialized");
+      return new Response(JSON.stringify({ 
+        error: "Stripe is not initialized",
+        message: "This endpoint is only available in production mode with valid Stripe credentials"
+      }), {
+        status: 501, // Not Implemented
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+    }
+
+    if (!process.env.STRIPE_WEBHOOK_SECRET) {
+      console.error(" Missing STRIPE_WEBHOOK_SECRET");
+      return new Response(JSON.stringify({
+        error: "Missing STRIPE_WEBHOOK_SECRET",
+        message: "Webhook secret is required for processing Stripe webhooks"
+      }), {
+        status: 500,
+        headers: {
+          "Content-Type": "application/json",
+        }
+      });
+    }
+
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error
     const body = await buffer(req.body!);
@@ -32,7 +73,7 @@ export async function POST(req: Request) {
     const event = stripe.webhooks.constructEvent(
       body,
       signature,
-      process.env.STRIPE_WEBHOOK_SECRET!
+      process.env.STRIPE_WEBHOOK_SECRET
     );
 
     console.log(" Event verified:", event.type);

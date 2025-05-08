@@ -48,7 +48,7 @@ vi.mock("@/lib/validations/challenge", () => ({
   sanitizePrompt: vi.fn(<T>(prompt: T): T => prompt),
 }));
 
-vi.mock("@clerk/nextjs/server", () => ({
+vi.mock("@/lib/clerk/server", () => ({
   auth: vi.fn().mockResolvedValue({
     userId: "test-user-id",
     sessionId: "test-session",

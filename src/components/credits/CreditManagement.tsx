@@ -21,7 +21,7 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@/lib/clerk/client";
 
 if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
   throw new Error("Missing NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY");

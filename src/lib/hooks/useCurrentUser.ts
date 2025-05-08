@@ -1,4 +1,4 @@
-import { useUser } from "@clerk/nextjs";
+import { useUser } from "@/lib/clerk/client";
 import { useQuery } from "@tanstack/react-query";
 import { db } from "@/server/db";
 import { eq } from "drizzle-orm";

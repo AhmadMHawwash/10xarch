@@ -5,7 +5,7 @@ import { calculateGPTCost, calculateTextTokens, costToCredits } from "@/lib/toke
 import { chatMessageSchema, checkAndLogPromptInjection, containsSensitiveContent, sanitizeInput } from "@/lib/validations/chat";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import { credits } from "@/server/db/schema";
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/lib/clerk/server";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
@@ -30,6 +30,9 @@ interface Edge {
   data?: unknown;
 }
 
+// Determine if we're in development mode
+const isDevelopmentMode = process.env.NEXT_PUBLIC_DEV_MODE === "true";
+
 export const chatRouter = createTRPCRouter({
   getRemainingPrompts: publicProcedure
     .input(z.object({ 
@@ -38,7 +41,13 @@ export const chatRouter = createTRPCRouter({
       playgroundId: z.string().optional()
      }))
     .query(async ({ input, ctx }) => {
-      const { userId } = await auth();
+      let { userId } = await auth();
+      
+      // In development mode, ensure userId is set
+      if (isDevelopmentMode && !userId) {
+        userId = "dev_user_123";
+      }
+      
       const ipAddress = ctx.headers.get("x-forwarded-for") ?? "127.0.0.1";
       
       // Create identifier using the shared utility function
@@ -76,7 +85,15 @@ export const chatRouter = createTRPCRouter({
       const { message: rawMessage, challengeId, stageIndex, history, solution, isPlayground, playgroundId, playgroundTitle } = input;
       
       // Get user identity for tracking and rate limits
-      const { userId } = await auth();
+      let { userId } = await auth();
+      
+      console.log("[Chat Router] User ID:", userId);
+      console.log("[Chat Router] Is Development Mode:", isDevelopmentMode);
+      // In development mode, ensure userId is set
+      if (isDevelopmentMode && !userId) {
+        console.log("[Chat Router] Setting development user ID");
+        userId = "dev_user_123";
+      }
       
       // Get IP address for security logging and rate limiting
       const ipAddress = ctx.headers.get("x-forwarded-for") ?? null;
@@ -288,6 +305,9 @@ Keep these requirements in mind when providing assistance. Guide the user withou
           }
         });
       } catch (error) {
+        console.log('[Chat] Rate limit exceeded, attempting to use credits');
+        console.log('[Chat] User ID:', userId);
+        
         // If authenticated user has hit their free limit, try to use credits
         if (userId) {
           useCredits = true;
@@ -296,10 +316,15 @@ Keep these requirements in mind when providing assistance. Guide the user withou
           const userCredits = await ctx.db.query.credits.findFirst({
             where: eq(credits.userId, userId),
           });
+
+          console.log('[Chat] User credits:', userCredits);
           
           // Calculate estimated cost
           const estimatedCost = calculateGPTCost(inputTokens, 400, 'gpt-4.1-mini');
           const requiredCredits = costToCredits(estimatedCost);
+          
+          console.log('[Chat] Required credits:', requiredCredits);
+          console.log('[Chat] Available credits:', userCredits?.balance);
           
           if (!userCredits || userCredits.balance < requiredCredits) {
             throw new TRPCError({
@@ -307,8 +332,11 @@ Keep these requirements in mind when providing assistance. Guide the user withou
               message: `You've used all your free messages and don't have enough credits. You need at least ${requiredCredits} credits. Current balance: ${userCredits?.balance ?? 0}`,
             });
           }
+          
+          console.log('[Chat] Using credits for request');
         } else {
           // Unauthenticated users can't bypass rate limits with credits
+          console.log('[Chat] No user ID, cannot use credits');
           throw error;
         }
       }

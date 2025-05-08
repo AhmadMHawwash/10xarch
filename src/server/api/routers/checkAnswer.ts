@@ -20,7 +20,7 @@ import {
   createTRPCRouter,
   publicProcedure
 } from "@/server/api/trpc";
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/lib/clerk/server";
 import { TRPCError } from "@trpc/server";
 import OpenAI from "openai";
 import { z } from "zod";

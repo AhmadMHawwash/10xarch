@@ -94,7 +94,7 @@ vi.mock("@/lib/hooks/_useSystemDesigner", () => ({
   }),
 }));
 
-vi.mock("@clerk/nextjs", () => ({
+vi.mock("@/lib/clerk/client", () => ({
   useAuth: vi.fn().mockReturnValue({
     userId: "test-user",
   }),

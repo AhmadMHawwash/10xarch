@@ -1,18 +1,20 @@
 import { calculatePurchaseTokens, isValidAmount } from "@/lib/tokens";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { creditTransactions, credits, users } from "@/server/db/schema";
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/lib/clerk/server";
 import { eq } from "drizzle-orm";
 import Stripe from "stripe";
 import { z } from "zod";
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error("Missing STRIPE_SECRET_KEY");
-}
+// Check if we're in a development environment
+const isDevelopmentMode = process.env.NEXT_PUBLIC_DEV_MODE === "true";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+// Only initialize Stripe in production mode
+const stripe = !isDevelopmentMode && process.env.STRIPE_SECRET_KEY
+  ? new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: "2024-12-18.acacia",
-});
+    })
+  : null;
 
 export const stripeRouter = createTRPCRouter({
   createCheckoutSession: protectedProcedure
@@ -44,6 +46,55 @@ export const stripeRouter = createTRPCRouter({
 
       const { totalTokens, baseTokens, bonusTokens } =
         calculatePurchaseTokens(amount);
+
+      // In development mode, directly add credits without Stripe
+      if (isDevelopmentMode) {
+        console.log("[DEV MODE] Creating instant credit purchase");
+        
+        // Add credits directly in development mode
+        await ctx.db.transaction(async (tx) => {
+          // Record the transaction
+          await tx.insert(creditTransactions).values({
+            userId,
+            amount: totalTokens,
+            type: "purchase",
+            description: `[DEV] Added ${totalTokens} credits (no payment required in dev mode)`,
+            status: "completed",
+          });
+
+          // Get current credits
+          const userCredits = await tx.query.credits.findFirst({
+            where: eq(credits.userId, userId),
+          });
+
+          if (!userCredits) {
+            // Create initial credits record if it doesn't exist
+            await tx.insert(credits).values({
+              userId,
+              balance: totalTokens,
+            });
+          } else {
+            // Update existing credit balance
+            await tx
+              .update(credits)
+              .set({
+                balance: userCredits.balance + totalTokens,
+              })
+              .where(eq(credits.userId, userId));
+          }
+        });
+        
+        // Return success response with redirect to credits page
+        return { 
+          success: true,
+          redirect: `${process.env.NEXT_PUBLIC_APP_URL}/credits?dev_purchase=success` 
+        };
+      }
+
+      // In production mode, verify Stripe is initialized
+      if (!stripe) {
+        throw new Error("Stripe is not initialized. This feature is only available in production mode.");
+      }
 
       try {
         const session = await stripe.checkout.sessions.create({
@@ -83,16 +134,30 @@ export const stripeRouter = createTRPCRouter({
   verifySession: protectedProcedure
     .input(z.object({ sessionId: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      const session = await stripe.checkout.sessions.retrieve(input.sessionId);
-
-      if (!session) {
-        throw new Error("Session not found");
-      }
-
       const { userId } = await auth();
 
       if (!userId) {
         throw new Error("User not authenticated");
+      }
+
+      // For development mode, always return success
+      if (isDevelopmentMode) {
+        console.log("[DEV MODE] Simulating successful payment verification");
+        return {
+          success: true,
+          totalTokens: 1000, // Default tokens for dev mode
+        };
+      }
+      
+      // In production, verify Stripe is initialized
+      if (!stripe) {
+        throw new Error("Stripe is not initialized. This feature is only available in production mode.");
+      }
+
+      const session = await stripe.checkout.sessions.retrieve(input.sessionId);
+
+      if (!session) {
+        throw new Error("Session not found");
       }
 
       const user = await ctx.db.query.users.findFirst({

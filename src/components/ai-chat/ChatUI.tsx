@@ -12,7 +12,7 @@ import ReactMarkdown from "react-markdown";
 import { cn } from "@/lib/utils";
 import { useChatMessages } from "@/lib/hooks/useChatMessages_";
 import { CreditAlert } from "@/components/credits/CreditAlert";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@/lib/clerk/client";
 import { useQueryClient } from "@tanstack/react-query";
 
 interface Message {

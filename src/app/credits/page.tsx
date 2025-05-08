@@ -1,5 +1,5 @@
 import { type Metadata } from "next";
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/lib/clerk/server";
 import { redirect } from "next/navigation";
 import { CreditManagement } from "@/components/credits/CreditManagement";
 

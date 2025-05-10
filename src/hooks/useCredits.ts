@@ -20,6 +20,14 @@ export function useCredits() {
     // Only trigger automatic refetch on mount, not on every window focus
     refetchOnWindowFocus: false,
     refetchOnMount: true,
+    retry: (failureCount, error) => {
+      // Don't retry on authentication errors (401)
+      if (error.message?.includes('401') || error.message?.includes('UNAUTHORIZED')) {
+        return false;
+      }
+      // For other errors, retry up to 3 times
+      return failureCount < 3;
+    }
   });
 
   // Check if we have actual data

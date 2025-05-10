@@ -99,9 +99,18 @@ export function ChatUI({
         playgroundId,
       },
       {
-        staleTime: 30 * 1000, // Consider data stale after 30 seconds instead of immediately
+        staleTime: 5 * 1000, // Consider data stale after 5 seconds
+        gcTime: 30 * 1000, // Keep in garbage collection for 30 seconds
         refetchOnMount: true, // Always refetch when component mounts
         refetchOnWindowFocus: true, // Refetch when window regains focus
+        retry: (failureCount, error) => {
+          // Don't retry on authentication errors (401)
+          if (error.message?.includes('401') || error.message?.includes('UNAUTHORIZED')) {
+            return false;
+          }
+          // For other errors, retry up to 3 times
+          return failureCount < 3;
+        }
       },
     );
 
@@ -154,6 +163,8 @@ export function ChatUI({
       // Simple, single credits update if needed
       if (data.credits !== undefined) {
         void refetchCredits();
+        // Also refetch remaining messages to ensure UI is in sync with database
+        void refetchRemainingMessages();
       }
       
       // Invalidate remaining prompts query

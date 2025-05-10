@@ -110,6 +110,9 @@ vi.mock("@tanstack/react-query", () => ({
 let onSuccessCallback: ((data: ChatResponseSuccess) => void) | null = null;
 let onErrorCallback: ((error: Error) => void) | null = null;
 
+// Define a mock refetch function for the remaining prompts query
+const mockRefetchMessages = vi.fn().mockResolvedValue(undefined);
+
 // Mock the trpc API
 vi.mock("@/trpc/react", () => ({
   api: {
@@ -117,7 +120,7 @@ vi.mock("@/trpc/react", () => ({
       getRemainingPrompts: {
         useQuery: () => ({
           data: { remaining: 3, reset: 0, limit: 3, credits: 100 },
-          refetch: vi.fn(),
+          refetch: mockRefetchMessages,
         }),
       },
       sendMessage: {
@@ -250,6 +253,50 @@ describe("ChatUI", () => {
 
     // Verify refetchCredits was not called
     expect(mockRefetch).not.toHaveBeenCalled();
+  });
+
+  it("should call both refetchCredits and refetchRemainingMessages when credits are in the response", async () => {
+    // Set up mock for refetchCredits that we can track
+    const mockRefetch = vi.fn().mockResolvedValue(undefined);
+    vi.mocked(useCredits).mockReturnValue({
+      balance: 100,
+      isLoading: false,
+      hasValidData: true,
+      error: null,
+      refetch: mockRefetch,
+      isUpdating: false,
+      hasLowCredits: false,
+    } as CreditsInterface);
+
+    // Reset the mockRefetchMessages to track new calls
+    mockRefetchMessages.mockClear();
+
+    render(<ChatUI />);
+
+    // Type and submit a message
+    const input = screen.getByPlaceholderText("Type your message...");
+    const submitButton = screen.getByRole("button");
+
+    fireEvent.change(input, { target: { value: "Hello AI" } });
+    fireEvent.click(submitButton);
+
+    // Simulate API response with credits in the response
+    await act(async () => {
+      if (onSuccessCallback) {
+        onSuccessCallback({
+          message: "Test response",
+          remainingMessages: 2,
+          credits: 95, // Include credits in the response
+          isSystemDesignRelated: true,
+        });
+      }
+    });
+
+    // Verify credits refetch was called
+    expect(mockRefetch).toHaveBeenCalledTimes(1);
+    
+    // Verify that refetchRemainingMessages was also called
+    expect(mockRefetchMessages).toHaveBeenCalled();
   });
 
   it("should handle error responses gracefully", async () => {

@@ -55,14 +55,19 @@ export function ChatUI({
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [remainingMessages, setRemainingMessages] = useState(0);
-  const { 
-    balance: credits, 
+  const [mounted, setMounted] = useState(false);
+
+  const {
+    balance: credits,
     hasValidData: hasValidCreditData,
-    refetch: refetchCredits 
+    refetch: refetchCredits,
   } = useCredits();
   const { getMessages, addMessage, clearSession } = useChatMessages();
-  const [mounted, setMounted] = useState(false);
   const { userId } = useAuth();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const { nodes } = useSystemDesigner();
+  const queryClient = useQueryClient();
 
   // Create a stable chat session ID that persists across component mounts
   const chatSessionId = useMemo(
@@ -70,27 +75,7 @@ export function ChatUI({
     [isPlayground, playgroundId, challengeId],
   );
 
-  // Only get messages after component is mounted to avoid hydration issues
-  useEffect(() => {
-    setMounted(true);
-    // Only refresh credits once if we don't have valid data yet
-    if (userId && !hasValidCreditData) {
-      void refetchCredits();
-    }
-  }, [userId, hasValidCreditData, refetchCredits]); // Intentionally omit refetchCredits from dependencies
-
-  const messages = useMemo(
-    () => (mounted ? getMessages(chatSessionId) : []),
-    [mounted, getMessages, chatSessionId],
-  );
-
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const { nodes } = useSystemDesigner();
-
-  const queryClient = useQueryClient();
-
-  // Get remaining prompts on load
+  // Get remaining prompts on load with explicit timestamp to bust cache
   const { data: rateLimitInfo, refetch: refetchRemainingMessages } =
     api.chat.getRemainingPrompts.useQuery(
       {
@@ -99,20 +84,51 @@ export function ChatUI({
         playgroundId,
       },
       {
-        staleTime: 5 * 1000, // Consider data stale after 5 seconds
-        gcTime: 30 * 1000, // Keep in garbage collection for 30 seconds
-        refetchOnMount: true, // Always refetch when component mounts
-        refetchOnWindowFocus: true, // Refetch when window regains focus
+        staleTime: 0,
+        gcTime: 0,
+        refetchOnMount: "always",
+        refetchOnWindowFocus: "always",
+        refetchOnReconnect: "always",
         retry: (failureCount, error) => {
-          // Don't retry on authentication errors (401)
-          if (error.message?.includes('401') || error.message?.includes('UNAUTHORIZED')) {
+          if (
+            error.message?.includes("401") ||
+            error.message?.includes("UNAUTHORIZED")
+          ) {
             return false;
           }
-          // For other errors, retry up to 3 times
           return failureCount < 3;
-        }
+        },
       },
     );
+
+  const forceRefreshRemainingMessages = useCallback(() => {
+    queryClient.removeQueries({
+      queryKey: ["chat", "getRemainingPrompts"],
+    });
+
+    void refetchRemainingMessages();
+  }, [refetchRemainingMessages, queryClient]);
+
+  useEffect(() => {
+    setMounted(true);
+
+    if (userId && !hasValidCreditData) void refetchCredits();
+
+    if (mounted) {
+      forceRefreshRemainingMessages();
+    }
+  }, [
+    userId,
+    hasValidCreditData,
+    refetchCredits,
+    forceRefreshRemainingMessages,
+    mounted,
+  ]);
+
+  const messages = useMemo(
+    () => (mounted ? getMessages(chatSessionId) : []),
+    [mounted, getMessages, chatSessionId],
+  );
 
   // Update remaining messages when rate limit info changes
   useEffect(() => {
@@ -158,19 +174,14 @@ export function ChatUI({
       }
 
       addMessage(chatSessionId, assistantMessage);
+
       setRemainingMessages(data.remainingMessages);
-      
+      forceRefreshRemainingMessages();
+
       // Simple, single credits update if needed
       if (data.credits !== undefined) {
         void refetchCredits();
-        // Also refetch remaining messages to ensure UI is in sync with database
-        void refetchRemainingMessages();
       }
-      
-      // Invalidate remaining prompts query
-      void queryClient.invalidateQueries({
-        queryKey: ['chat', 'getRemainingPrompts'],
-      });
     },
     onError: (error) => {
       // Immediately set isLoading to false when we get an error
@@ -421,7 +432,7 @@ export function ChatUI({
               <span>Loading free prompts...</span>
             )}
           </div>
-          {(hasValidCreditData && credits > 0) && (
+          {hasValidCreditData && credits > 0 && (
             <div className="flex items-center gap-2 text-yellow-500">
               <Coins className="h-3.5 w-3.5" />
               <span>{credits} credits</span>

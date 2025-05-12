@@ -103,6 +103,7 @@ vi.mock("@clerk/nextjs", () => ({
 vi.mock("@tanstack/react-query", () => ({
   useQueryClient: vi.fn().mockReturnValue({
     invalidateQueries: vi.fn(),
+    removeQueries: vi.fn(),
   }),
 }));
 

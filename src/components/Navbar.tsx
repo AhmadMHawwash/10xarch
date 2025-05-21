@@ -11,7 +11,12 @@ import { useCredits } from "@/hooks/useCredits";
 import { useCurrentUser } from "@/lib/hooks/useCurrentUser";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
-import { SignUpButton, useAuth, SignInButton, UserButton } from "@clerk/nextjs";
+import {
+  SignUpButton,
+  useAuth,
+  useOrganizationList,
+  SignInButton,
+} from "@clerk/nextjs";
 import { Coins, Github, Loader2, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
@@ -19,14 +24,16 @@ import { useCallback, useState, useEffect } from "react";
 import { ThemeToggle } from "./ThemeToggle";
 import { Logo } from "./icons/logo";
 import { Button } from "./ui/button";
+import UserMenu from "./UserMenu";
 
 function RateLimitInfo() {
-  const rateLimitQuery = api.challenges.getChallengesSubmitRateLimitInfo.useQuery(undefined, {
-    refetchInterval: 1000 * 60, // Refresh every minute
-    refetchOnMount: true,
-    refetchOnWindowFocus: true,
-    staleTime: 0, // Consider data stale immediately so it refreshes on mount
-  });
+  const rateLimitQuery =
+    api.challenges.getChallengesSubmitRateLimitInfo.useQuery(undefined, {
+      refetchInterval: 1000 * 60, // Refresh every minute
+      refetchOnMount: true,
+      refetchOnWindowFocus: true,
+      staleTime: 0, // Consider data stale immediately so it refreshes on mount
+    });
 
   const { balance: credits } = useCredits();
 
@@ -125,12 +132,13 @@ function FreeChallengeBadge() {
 export default function Navbar() {
   const { isSignedIn, isLoading: isUserLoading } = useCurrentUser();
   const { userId } = useAuth();
+  const { isLoaded: isOrgListLoaded, userMemberships } = useOrganizationList();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { 
-    balance: credits, 
+  const {
+    balance: credits,
     isLoading: isLoadingCredits,
     hasValidData,
-    refetch: refetchCredits 
+    refetch: refetchCredits,
   } = useCredits();
   const pathname = usePathname();
 
@@ -147,6 +155,9 @@ export default function Navbar() {
 
   // Only apply container class for home and challenges pages
   const shouldUseContainer = pathname === "/" || pathname === "/challenges";
+
+  // Always show the organization switcher for signed-in users
+  const showOrgSwitcher = isSignedIn && isOrgListLoaded;
 
   return (
     <nav className="relative z-50 h-[7vh] border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -231,7 +242,9 @@ export default function Navbar() {
                 )}
               </Link>
               <CreditAlert className="ml-2" />
-              <UserButton afterSignOutUrl="/" />
+              <div className="border-l border-border pl-4">
+                <UserMenu />
+              </div>
             </div>
           ) : (
             <div className="flex items-center space-x-3">
@@ -339,7 +352,7 @@ export default function Navbar() {
               {isUserLoading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : isSignedIn ? (
-                <UserButton afterSignOutUrl="/" />
+                <UserMenu />
               ) : (
                 <div className="flex w-full flex-col space-y-2">
                   <SignInButton mode="modal">

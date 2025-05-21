@@ -21,7 +21,7 @@
     "db:migrate": "tsx src/server/db/migrate.ts"
   },
   "dependencies": {
-    "@clerk/nextjs": "^6.9.6",
+    "@clerk/nextjs": "^6.19.5",
     "@clerk/themes": "^2.2.3",
     "@hookform/resolvers": "^3.9.0",
     "@libsql/client": "^0.6.0",

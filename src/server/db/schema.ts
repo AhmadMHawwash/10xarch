@@ -9,6 +9,8 @@ import {
   text,
   timestamp,
   uuid,
+  jsonb,
+  pgEnum,
 } from "drizzle-orm/pg-core";
 
 /**
@@ -53,13 +55,21 @@ export const usersRelations = relations(users, ({ many }) => ({
   playgrounds: many(playgrounds),
 }));
 
+export const ownerTypeEnum = pgEnum("owner_type", ["user", "org"]);
+
 export const playgrounds = createTable("playgrounds", {
   id: uuid("id").primaryKey().defaultRandom(),
-  name: text("name").notNull(),
-  content: text("content").notNull(),
+  title: text("title").notNull(),
+  jsonBlob: jsonb("json_blob").notNull(),
+  ownerId: text("owner_id").references(() => users.id).notNull(),
+  ownerType: ownerTypeEnum("owner_type").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
-  ownerId: text("owner_id").references(() => users.id),
+  createdBy: text("created_by").references(() => users.id).notNull(),
+  updatedBy: text("updated_by").references(() => users.id).notNull(),
+  editorIds: text("editor_ids").array(),
+  viewerIds: text("viewer_ids").array(),
+  currentVisitorIds: text("current_visitor_ids").array(),
   lastEvaluationAt: timestamp("last_evaluation_at"),
   evaluationScore: integer("evaluation_score"),
   evaluationFeedback: text("evaluation_feedback"),
@@ -74,6 +84,7 @@ export const playgroundsRelations = relations(playgrounds, ({ one }) => ({
   owner: one(users, {
     fields: [playgrounds.ownerId],
     references: [users.id],
+    relationName: "userOwnedPlaygrounds",
   }),
 }));
 

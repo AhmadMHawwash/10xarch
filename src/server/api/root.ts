@@ -4,6 +4,7 @@ import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc";
 import { challengesRouter } from "./routers/challenges";
 import { checkSolution } from "./routers/checkAnswer";
 import { stripeRouter } from "./routers/stripe";
+import { playgroundsRouter } from "./routers/playgrounds";
 
 /**
  * This is the primary router for your server.
@@ -16,6 +17,7 @@ export const appRouter = createTRPCRouter({
   stripe: stripeRouter,
   challenges: challengesRouter,
   chat: chatRouter,
+  playgrounds: playgroundsRouter,
 });
 
 // export type definition of API

@@ -36,6 +36,20 @@
       "when": 1738420060470,
       "tag": "0004_fine_infant_terrible",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1747861003667,
+      "tag": "0005_hesitant_emma_frost",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1747861909670,
+      "tag": "0006_soft_lady_mastermind",
+      "breakpoints": true
     }
   ]
 }

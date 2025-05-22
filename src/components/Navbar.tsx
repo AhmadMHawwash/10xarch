@@ -181,6 +181,18 @@ export default function Navbar() {
           {/* Navigation Links - Desktop */}
           <div className="hidden items-center space-x-4 md:flex">
             <Link
+              href="/playgrounds"
+              className={cn(
+                "text-sm font-medium hover:text-primary",
+                pathname === "/playgrounds" || pathname.startsWith("/playgrounds/")
+                  ? "font-semibold text-primary"
+                  : "text-muted-foreground",
+              )}
+              prefetch={false}
+            >
+              Playgrounds
+            </Link>
+            <Link
               href="/playground"
               className={cn(
                 "text-sm font-medium hover:text-primary",
@@ -283,6 +295,18 @@ export default function Navbar() {
           <div className="absolute left-0 right-0 top-[7vh] z-50 bg-slate-100 p-4 shadow-md dark:bg-gray-800 md:hidden">
             {/* Navigation Links - Mobile */}
             <div className="mb-4 space-y-2">
+              <Link
+                href="/playgrounds"
+                className={cn(
+                  "block py-2 text-sm hover:text-primary",
+                  pathname === "/playgrounds" || pathname.startsWith("/playgrounds/")
+                    ? "font-semibold text-primary"
+                    : "text-muted-foreground",
+                )}
+                prefetch={false}
+              >
+                Playgrounds
+              </Link>
               <Link
                 href="/playground"
                 className={cn(

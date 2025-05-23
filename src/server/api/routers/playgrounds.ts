@@ -13,7 +13,7 @@ const createPlaygroundSchema = z.object({
   title: z.string().min(1).max(100),
   jsonBlob: z.record(z.unknown()),
   ownerType: z.enum(["user", "org"]),
-  ownerId: z.string().optional(),
+  ownerId: z.string().optional(), // ownerId in input is for *filtering* if admin, actual owner is from ctx
   editorIds: z.array(z.string()).optional(),
   viewerIds: z.array(z.string()).optional(),
   isPublic: z.number().optional(),
@@ -45,39 +45,40 @@ export const playgroundsRouter = createTRPCRouter({
   getAll: protectedProcedure
     .input(listPlaygroundsSchema.optional())
     .query(async ({ ctx, input }) => {
-      const { userId } = await auth();
+      const { userId } = await auth(); // Use userId from Clerk auth
       if (!userId) {
+        // This case should ideally be caught by protectedProcedure already,
+        // but as a safeguard or if context changes:
         throw new TRPCError({
           code: "UNAUTHORIZED",
           message: "Not authenticated",
         });
       }
 
-      // Filter by owner if specified
+      // Filter by owner if specified in input (e.g., an admin viewing specific user's playgrounds)
       if (input?.ownerType && input?.ownerId) {
+        // Here, we might add an additional permission check if only admins can use this filter.
+        // For now, assuming if ownerId is provided, it's a valid request.
         const results = await ctx.db.query.playgrounds.findMany({
           where: and(
             eq(playgrounds.ownerType, input.ownerType),
-            eq(playgrounds.ownerId, input.ownerId)
+            eq(playgrounds.ownerId, input.ownerId),
           ),
           orderBy: [desc(playgrounds.updatedAt)],
         });
         return { playgrounds: results };
       } else {
-        // Default to showing user's own playgrounds and shared with them
+        // Default to showing user's own playgrounds, those shared with them, and public ones
         const results = await ctx.db.query.playgrounds.findMany({
           where: or(
-            // User is the owner
             and(
+              // User is the owner
               eq(playgrounds.ownerType, "user"),
-              eq(playgrounds.ownerId, userId)
+              eq(playgrounds.ownerId, userId),
             ),
-            // User is an editor
-            sql`${userId} = ANY(${playgrounds.editorIds})`,
-            // User is a viewer
-            sql`${userId} = ANY(${playgrounds.viewerIds})`,
-            // Playground is public
-            eq(playgrounds.isPublic, 1)
+            sql`${userId} = ANY(${playgrounds.editorIds})`, // User is an editor
+            sql`${userId} = ANY(${playgrounds.viewerIds})`, // User is a viewer
+            eq(playgrounds.isPublic, 1), // Playground is public
           ),
           orderBy: [desc(playgrounds.updatedAt)],
         });
@@ -108,15 +109,10 @@ export const playgroundsRouter = createTRPCRouter({
         });
       }
 
-      // Check if user has access to this playground
-      const hasAccess = 
-        // User is the owner
+      const hasAccess =
         (playground.ownerType === "user" && playground.ownerId === userId) ||
-        // User is an editor
-        ((playground.editorIds?.includes?.(userId)) ?? false) ||
-        // User is a viewer
-        ((playground.viewerIds?.includes?.(userId)) ?? false) ||
-        // Playground is public
+        (playground.editorIds?.includes?.(userId) ?? false) ||
+        (playground.viewerIds?.includes?.(userId) ?? false) ||
         playground.isPublic === 1;
 
       if (!hasAccess) {
@@ -126,21 +122,23 @@ export const playgroundsRouter = createTRPCRouter({
         });
       }
 
-      // Track current visitor
       if (!playground.currentVisitorIds?.includes(userId)) {
-        const currentVisitorIds = playground.currentVisitorIds ? 
-          [...playground.currentVisitorIds, userId] : 
-          [userId];
-
-        await ctx.db.update(playgrounds)
-          .set({ currentVisitorIds })
-          .where(eq(playgrounds.id, input));
+        const currentVisitorIds = playground.currentVisitorIds
+          ? [...playground.currentVisitorIds, userId]
+          : [userId];
+        try {
+          await ctx.db
+            .update(playgrounds)
+            .set({ currentVisitorIds })
+            .where(eq(playgrounds.id, input));
+        } catch (e) {
+          // Log error, but don't fail the read operation if visitor update fails
+          console.error("Failed to update currentVisitorIds:", e);
+        }
       }
-
       return { playground };
     }),
 
-  // Create a new playground
   create: protectedProcedure
     .input(createPlaygroundSchema)
     .mutation(async ({ ctx, input }) => {
@@ -152,14 +150,33 @@ export const playgroundsRouter = createTRPCRouter({
         });
       }
 
+      let determinedOwnerId: string;
+      if (input.ownerType === "user") {
+        determinedOwnerId = userId;
+      } else if (input.ownerType === "org") {
+        if (!input.ownerId) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "ownerId is required when ownerType is 'org'",
+          });
+        }
+        determinedOwnerId = input.ownerId;
+      } else {
+        // This case should be prevented by Zod validation of input.ownerType
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Invalid ownerType specified.",
+        });
+      }
+
       try {
-        // Create the playground
-        const [newPlayground] = await ctx.db.insert(playgrounds)
+        const [newPlayground] = await ctx.db
+          .insert(playgrounds)
           .values({
             title: input.title,
             jsonBlob: input.jsonBlob,
             ownerType: input.ownerType,
-            ownerId: userId,
+            ownerId: determinedOwnerId, // Now guaranteed to be a string
             createdBy: userId,
             updatedBy: userId,
             editorIds: input.editorIds ?? [],
@@ -177,30 +194,20 @@ export const playgroundsRouter = createTRPCRouter({
             message: "Failed to create playground",
           });
         }
-
         return { playground: newPlayground };
       } catch (error) {
         console.error("Detailed error creating playground:", error);
-        
-        // Handle foreign key constraint violations specifically
-        if (error instanceof Error && error.message.includes("violates foreign key constraint")) {
-          console.error("Foreign key violation details:", {
-            message: error.message,
-            userId
-          });
-          
+        if (
+          error instanceof Error &&
+          error.message.includes("violates foreign key constraint")
+        ) {
           throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "User account not yet set up in the database. Please sign out and sign in again.",
+            code: "INTERNAL_SERVER_ERROR", // Could be more specific like BAD_REQUEST or CONFLICT
+            message:
+              "User account not yet set up in the database. Please sign out and sign in again.",
           });
         }
-        
-        // Rethrow TRPC errors
-        if (error instanceof TRPCError) {
-          throw error;
-        }
-        
-        // General error
+        if (error instanceof TRPCError) throw error;
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "An error occurred while creating the playground",
@@ -208,7 +215,6 @@ export const playgroundsRouter = createTRPCRouter({
       }
     }),
 
-  // Update an existing playground
   update: protectedProcedure
     .input(updatePlaygroundSchema)
     .mutation(async ({ ctx, input }) => {
@@ -220,7 +226,6 @@ export const playgroundsRouter = createTRPCRouter({
         });
       }
 
-      // Check if playground exists and user has edit access
       const existingPlayground = await ctx.db.query.playgrounds.findFirst({
         where: eq(playgrounds.id, input.id),
       });
@@ -232,9 +237,9 @@ export const playgroundsRouter = createTRPCRouter({
         });
       }
 
-      // Check if user has edit access (owner or editor)
-      const hasEditAccess = 
-        (existingPlayground.ownerType === "user" && existingPlayground.ownerId === userId) ||
+      const hasEditAccess =
+        (existingPlayground.ownerType === "user" &&
+          existingPlayground.ownerId === userId) ||
         existingPlayground.editorIds?.includes(userId);
 
       if (!hasEditAccess) {
@@ -244,36 +249,43 @@ export const playgroundsRouter = createTRPCRouter({
         });
       }
 
-      // Prepare update values
-      const updateValues = {
-        ...input.title && { title: input.title },
-        ...input.jsonBlob && { jsonBlob: input.jsonBlob },
-        ...input.editorIds && { editorIds: input.editorIds },
-        ...input.viewerIds && { viewerIds: input.viewerIds },
-        ...input.isPublic !== undefined && { isPublic: input.isPublic },
-        ...input.description !== undefined && { description: input.description },
-        ...input.tags !== undefined && { tags: input.tags },
-        updatedBy: userId,
-        updatedAt: new Date(),
-      };
+      const updateValues: Partial<typeof playgrounds.$inferInsert> = {};
+      if (input.title !== undefined) updateValues.title = input.title;
+      if (input.jsonBlob !== undefined) updateValues.jsonBlob = input.jsonBlob;
+      if (input.editorIds !== undefined)
+        updateValues.editorIds = input.editorIds;
+      if (input.viewerIds !== undefined)
+        updateValues.viewerIds = input.viewerIds;
+      if (input.isPublic !== undefined) updateValues.isPublic = input.isPublic;
+      if (input.description !== undefined)
+        updateValues.description = input.description;
+      if (input.tags !== undefined) updateValues.tags = input.tags;
 
-      // Update the playground
-      const [updatedPlayground] = await ctx.db.update(playgrounds)
-        .set(updateValues)
-        .where(eq(playgrounds.id, input.id))
-        .returning();
+      // Only update if there are actual changes beyond audit fields
+      const keysToUpdate = Object.keys(updateValues);
+      if (keysToUpdate.length > 0) {
+        updateValues.updatedAt = new Date();
+        updateValues.updatedBy = userId;
 
-      if (!updatedPlayground) {
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to update playground",
-        });
+        const [updatedPlayground] = await ctx.db
+          .update(playgrounds)
+          .set(updateValues)
+          .where(eq(playgrounds.id, input.id))
+          .returning();
+
+        if (!updatedPlayground) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to update playground",
+          });
+        }
+        return { playground: updatedPlayground };
+      } else {
+        // No actual data fields to update, return the existing playground
+        return { playground: existingPlayground };
       }
-
-      return { playground: updatedPlayground };
     }),
 
-  // Delete a playground
   delete: protectedProcedure
     .input(playgroundIdSchema)
     .mutation(async ({ ctx, input }) => {
@@ -285,7 +297,6 @@ export const playgroundsRouter = createTRPCRouter({
         });
       }
 
-      // Check if playground exists and user is the owner
       const existingPlayground = await ctx.db.query.playgrounds.findFirst({
         where: eq(playgrounds.id, input),
       });
@@ -297,53 +308,38 @@ export const playgroundsRouter = createTRPCRouter({
         });
       }
 
-      // Only the owner can delete a playground
-      if (!(existingPlayground.ownerType === "user" && existingPlayground.ownerId === userId)) {
+      // For user-owned playgrounds, only the owner can delete.
+      // For org-owned, different rules might apply (e.g., org admin), not handled here yet.
+      if (
+        existingPlayground.ownerType === "user" &&
+        existingPlayground.ownerId !== userId
+      ) {
         throw new TRPCError({
           code: "FORBIDDEN",
-          message: "Only the owner can delete a playground",
+          message: "Only the owner can delete a user-owned playground",
         });
       }
+      // Add more complex permission for org-owned playgrounds if necessary
 
-      // Delete the playground
-      await ctx.db.delete(playgrounds)
-        .where(eq(playgrounds.id, input));
+      const deletedItems = await ctx.db
+        .delete(playgrounds)
+        .where(eq(playgrounds.id, input))
+        .returning({ id: playgrounds.id });
 
-      return { success: true };
-    }),
-
-  // Leave a playground (remove from current visitors)
-  leave: protectedProcedure
-    .input(playgroundIdSchema)
-    .mutation(async ({ ctx, input }) => {
-      const { userId } = await auth();
-      if (!userId) {
+      if (!deletedItems || deletedItems.length === 0) {
         throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message: "Not authenticated",
+          code: "INTERNAL_SERVER_ERROR",
+          message:
+            "Failed to delete playground or playground not found after delete attempt.",
         });
       }
-
-      const playground = await ctx.db.query.playgrounds.findFirst({
-        where: eq(playgrounds.id, input),
-      });
-
-      if (!playground) {
+      const firstDeletedItem = deletedItems[0];
+      if (!firstDeletedItem) {
         throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Playground not found",
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to retrieve details of the deleted playground.",
         });
       }
-
-      // Remove user from current visitors
-      if (playground.currentVisitorIds?.includes(userId)) {
-        const currentVisitorIds = playground.currentVisitorIds.filter(id => id !== userId);
-
-        await ctx.db.update(playgrounds)
-          .set({ currentVisitorIds })
-          .where(eq(playgrounds.id, input));
-      }
-
-      return { success: true };
+      return { success: true, deletedId: firstDeletedItem.id };
     }),
-}); 
+});

@@ -71,16 +71,16 @@ const rateLimit = t.middleware(async ({ ctx, next }) => {
     return next();
   }
 
-  // Try to get user auth information if available
-  let auth;
+  let authResult;
   try {
-    auth = await clerkAuth();
+    authResult = await clerkAuth();
   } catch (error) {
-    // Continue without auth if it fails
-    auth = { userId: null };
+    authResult = null; // Ensure authResult is null if clerkAuth throws
   }
 
-  const userId = auth.userId;
+  // If clerkAuth() returns null (unauthenticated by mock or reality) 
+  // or if it threw and was set to null, then userId should be null.
+  const userId = authResult?.userId ?? null;
   const ipAddress = ctx.headers.get("x-forwarded-for") ?? null;
   
   // Create identifier that combines IP and user ID (if available)
@@ -117,6 +117,9 @@ const rateLimit = t.middleware(async ({ ctx, next }) => {
   return next({
     ctx: {
       ...ctx,
+      // Pass the authResult (which might be null) to the next step if needed, 
+      // or just the userId if that's all that's relevant from auth for rate limiting.
+      // For protectedProcedure, it re-fetches auth anyway.
       rateLimit: { remaining }
     }
   });
@@ -161,16 +164,18 @@ export const publicProcedure = t.procedure
  * It guarantees that a user querying is authorized by throwing an error if they are not logged in.
  */
 export const protectedProcedure = t.procedure
-  .use(rateLimit)
+  .use(rateLimit) // rateLimit middleware runs first
   .use(async ({ next, ctx }) => {
-    const auth = await clerkAuth();
-    if (!auth.userId) {
+    // This auth call is crucial for protectedProcedure
+    const auth = await clerkAuth(); 
+    if (!auth?.userId) { // Check auth and auth.userId
       throw new TRPCError({ code: "UNAUTHORIZED" });
     }
     return next({
       ctx: {
         db: ctx.db,
-        auth
+        auth, // Pass the whole auth object
+        headers: ctx.headers, // Make sure headers are also passed
       },
     });
   });

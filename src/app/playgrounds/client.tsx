@@ -195,16 +195,10 @@ export default function PlaygroundsClient({ initialPlaygrounds }: PlaygroundsCli
                     </Dialog>
                   </div>
                   <div className="flex space-x-2">
-                    <Button variant="outline" size="sm" asChild>
-                      <Link href={`/playgrounds/${playground.id}`}>
-                        <Eye className="h-4 w-4 mr-1" />
-                        View
-                      </Link>
-                    </Button>
                     <Button size="sm" asChild>
-                      <Link href={`/playgrounds/${playground.id}/edit`}>
+                      <Link href={`/playgrounds/${playground.id}`}>
                         <Edit className="h-4 w-4 mr-1" />
-                        Edit
+                        Open
                       </Link>
                     </Button>
                   </div>

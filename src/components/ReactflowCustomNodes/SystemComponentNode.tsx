@@ -4,24 +4,17 @@ import {
   type SystemComponentType,
 } from "@/lib/levels/type";
 import { cn } from "@/lib/utils";
+import {
+  type NodeSettingsRef,
+  type NodeSettingsRefObject,
+} from "@/types/system";
 import { InfoIcon, type PiIcon } from "lucide-react";
+import React, { useRef } from "react";
 import { Handle, Position, type NodeProps } from "reactflow";
 import { getSystemComponent } from "../Gallery";
-import { Cache } from "../SystemComponents/Cache";
-import { CDN } from "../SystemComponents/CDN";
-import { Client } from "../SystemComponents/Client";
 import { CustomComponent } from "../SystemComponents/CustomComponent";
-import { Database } from "../SystemComponents/Database";
-import { LoadBalancer } from "../SystemComponents/LoadBalancer";
-import { MessageQueue } from "../SystemComponents/MessageQueue";
-import { Server } from "../SystemComponents/Server";
 import { WithMarkdownDetails } from "../SystemComponents/Wrappers/WithMarkdownDetails";
 import { Muted, Small } from "../ui/typography";
-import { useRef } from "react";
-import {
-  type NodeSettingsRefObject,
-  type NodeSettingsRef,
-} from "@/types/system";
 
 export type SystemComponentNodeDataProps = {
   icon?: typeof PiIcon;

@@ -4,6 +4,8 @@ import { getSystemComponent } from "@/components/Gallery";
 import { ComponentSettings } from "@/components/playground/ComponentSettings";
 import { EdgeSettings } from "@/components/playground/EdgeSettings";
 import SystemContext from "@/components/playground/SystemContext";
+import { type OtherNodeDataProps } from "@/components/ReactflowCustomNodes/SystemComponentNode";
+import { type SystemComponentNodeDataProps } from "@/components/ReactflowCustomNodes/SystemComponentNode";
 import { FlowManager } from "@/components/SolutionFlowManager";
 import SystemBuilder from "@/components/SystemDesigner";
 import { Button } from "@/components/ui/button";
@@ -17,6 +19,16 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   SystemDesignerProvider,
   useSystemDesigner,
 } from "@/lib/hooks/_useSystemDesigner";
@@ -24,9 +36,80 @@ import { ChatMessagesProvider } from "@/lib/hooks/useChatMessages_";
 import { usePlaygroundManager } from "@/lib/hooks/usePlaygroundManager";
 import { type SystemComponentType } from "@/lib/levels/type";
 import { Bot, Info, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useLocalStorage, usePrevious } from "react-use";
-import { ReactFlowProvider } from "reactflow";
+import { type Edge, type Node, ReactFlowProvider } from "reactflow";
+import { useToast } from "@/components/ui/use-toast";
+
+const AUTO_SAVE_INTERVAL = 5000; // 20 seconds
+
+// Helper function to extract relevant details for comparison
+const getImportantDetails = (
+  nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[],
+  edges: Edge[],
+) => {
+  return {
+    nodes: nodes.map((node) => ({
+      id: node.id,
+      type: node.type,
+      position: node.position,
+      data: {
+        name: node.data.name,
+        title: node.data.title,
+        subtitle: node.data.subtitle,
+        // Add other relevant data properties here for comparison
+      },
+      // Include other node properties if they are critical for divergence detection
+      width: node.width,
+      height: node.height,
+      selected: false, // Always false to ignore selection state for divergence
+      dragging: false, // Always false to ignore dragging state for divergence
+    })),
+    edges: edges.map((edge) => ({
+      id: edge.id,
+      source: edge.source,
+      target: edge.target,
+      type: edge.type,
+      // Add other relevant edge properties here for comparison
+    })),
+  };
+};
+
+// Deep compare objects - handles nested objects and arrays
+const deepCompare = (obj1: unknown, obj2: unknown): boolean => {
+  if (obj1 === obj2) return true;
+  if (
+    typeof obj1 !== "object" ||
+    typeof obj2 !== "object" ||
+    obj1 === null ||
+    obj2 === null
+  ) {
+    return false;
+  }
+
+  if (Array.isArray(obj1) && Array.isArray(obj2)) {
+    if (obj1.length !== obj2.length) return false;
+    for (let i = 0; i < obj1.length; i++) {
+      if (!deepCompare(obj1[i], obj2[i])) return false;
+    }
+    return true;
+  }
+
+  if (Array.isArray(obj1) !== Array.isArray(obj2)) return false;
+
+  const keys1 = Object.keys(obj1);
+  const keys2 = Object.keys(obj2);
+  if (keys1.length !== keys2.length) return false;
+
+  return keys1.every((key) => {
+    const obj1Value = obj1 as Record<string, unknown>;
+    const obj2Value = obj2 as Record<string, unknown>;
+    return (
+      Object.prototype.hasOwnProperty.call(obj2Value, key) &&
+      deepCompare(obj1Value[key], obj2Value[key])
+    );
+  });
+};
 
 export default function PlaygroundClient() {
   return (
@@ -41,13 +124,26 @@ export default function PlaygroundClient() {
 }
 
 function PageContent() {
-  const { selectedNode, selectedEdge, useSystemComponentConfigSlice } =
-    useSystemDesigner();
   const {
+    selectedNode,
+    selectedEdge,
+    useSystemComponentConfigSlice,
+    setNodes,
+    setEdges,
+    nodes,
+    edges,
+  } = useSystemDesigner();
+
+  const {
+    playground,
+    playgroundId,
+    updatePlayground,
+    refetchPlayground,
     checkSolution,
     answer: feedback,
     isLoadingAnswer,
   } = usePlaygroundManager();
+
   const [isFeedbackExpanded, setIsFeedbackExpanded] = useState(false);
   const [hideWelcomeGuide, setHideWelcomeGuide] = useLocalStorage(
     "hideWelcomeGuide",
@@ -56,31 +152,165 @@ function PageContent() {
   const [showWelcomeGuide, setShowWelcomeGuide] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const [isChatPanelOpen, setIsChatPanelOpen] = useState(false);
+  const [showDivergenceDialog, setShowDivergenceDialog] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isDirty, setIsDirty] = useState(false);
+  const { toast } = useToast();
+  
+  const isInitialized = useRef(false);
   const prevFeedback = usePrevious(feedback);
+  const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Handle client-side initialization
+  // Client-side initialization
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-  // Show/hide welcome guide based on localStorage preference
+  // Show/hide welcome guide
   useEffect(() => {
     if (isClient && !hideWelcomeGuide) {
       setShowWelcomeGuide(true);
     }
-  }, [hideWelcomeGuide, isClient]);
+  }, [isClient, hideWelcomeGuide]);
 
+  // Expand feedback panel when new feedback arrives
   useEffect(() => {
     if (prevFeedback !== feedback && prevFeedback) {
       setIsFeedbackExpanded(true);
     }
   }, [feedback, prevFeedback]);
 
-  const handleCloseWelcomeGuide = (dontShowAgain: boolean) => {
-    // Always hide the dialog immediately
-    setShowWelcomeGuide(false);
+  const loadPlaygroundData = useCallback(() => {
+    if (!playground?.nodes || !playground?.edges) return;
 
-    // Only persist the "don't show again" preference if checked
+    setNodes(
+      playground.nodes.map((node) => ({
+        ...node,
+        data: {
+          ...node.data,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          icon: getSystemComponent(node.data.name as SystemComponentType)?.icon,
+        },
+      })),
+    );
+    setEdges(playground.edges);
+  }, [playground, setNodes, setEdges]);
+
+  // Initial load and divergence check
+  useEffect(() => {
+    if (!playground?.nodes || !playground?.edges || isSaving) return;
+
+    if (!isInitialized.current) {
+      const localNodesExist = nodes && nodes.length > 0;
+      if (localNodesExist) {
+        const remoteDetails = getImportantDetails(
+          playground.nodes,
+          playground.edges,
+        );
+        const localDetails = getImportantDetails(nodes, edges);
+        if (!deepCompare(remoteDetails, localDetails)) {
+          setShowDivergenceDialog(true);
+          return; // Wait for user decision before initializing
+        }
+      }
+      // No divergence or no local nodes, initialize with remote data
+      loadPlaygroundData();
+      isInitialized.current = true;
+    }
+  }, [playground, nodes, edges, isSaving, loadPlaygroundData]);
+
+  // Auto-save functionality
+  useEffect(() => {
+    if (!isInitialized.current || isSaving || showDivergenceDialog || !isDirty) {
+      if (!playground?.nodes || !playground?.edges) return;
+
+      const localDetails = getImportantDetails(nodes, edges);
+      const remoteDetails = getImportantDetails(playground.nodes, playground.edges);
+      const isDirty = !deepCompare(remoteDetails, localDetails);
+      setIsDirty(isDirty);
+
+      return;
+    }
+
+    if (autoSaveTimeoutRef.current) {
+      clearTimeout(autoSaveTimeoutRef.current);
+    }
+
+    autoSaveTimeoutRef.current = setTimeout(() => {
+      setIsSaving(true);
+      updatePlayground({
+        id: playgroundId,
+        jsonBlob: { nodes, edges },
+      })
+        .catch((error) => {
+          console.error("Auto-save failed:", error);
+        })
+        .finally(() => {
+          setIsSaving(false);
+        });
+    }, AUTO_SAVE_INTERVAL);
+
+    return () => {
+      if (autoSaveTimeoutRef.current) {
+        clearTimeout(autoSaveTimeoutRef.current);
+      }
+    };
+  }, [
+    nodes,
+    edges,
+    playgroundId,
+    updatePlayground,
+    isSaving,
+    showDivergenceDialog,
+  ]);
+
+  const handleKeepDbVersion = useCallback(() => {
+    loadPlaygroundData();
+    setShowDivergenceDialog(false);
+    isInitialized.current = true; // Mark as initialized with DB data
+  }, [loadPlaygroundData]);
+
+  const handleKeepLocalVersion = useCallback(async () => {
+    setShowDivergenceDialog(false);
+    setIsSaving(true);
+    try {
+      await updatePlayground({
+        id: playgroundId,
+        jsonBlob: { nodes, edges },
+      });
+      await refetchPlayground(); // Ensure local state matches the newly saved state
+      isInitialized.current = true; // Mark as initialized with local data now saved
+    } catch (error) {
+      console.error("Failed to save local playground version:", error);
+      // Optionally, re-open dialog or notify user of save failure
+    } finally {
+      setIsSaving(false);
+    }
+  }, [playgroundId, nodes, edges, updatePlayground, refetchPlayground]);
+
+  const handleManualSave = useCallback(async () => {
+    if (autoSaveTimeoutRef.current) {
+      clearTimeout(autoSaveTimeoutRef.current); // Prevent auto-save race condition
+    }
+    setIsSaving(true);
+    try {
+      await updatePlayground({
+        id: playgroundId,
+        jsonBlob: { nodes, edges },
+      });
+      toast({
+        title: "Saved",
+        description: "Your changes have been saved",
+      });
+    } catch (error) {
+      console.error("Manual save failed:", error);
+    } finally {
+      setIsSaving(false);
+    }
+  }, [playgroundId, nodes, edges, updatePlayground]);
+
+  const handleCloseWelcomeGuide = (dontShowAgain: boolean) => {
+    setShowWelcomeGuide(false);
     if (dontShowAgain) {
       setHideWelcomeGuide(true);
     }
@@ -102,23 +332,54 @@ function PageContent() {
     "",
   );
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const comp = getSystemComponent(
-    selectedNode?.data.name as SystemComponentType,
-  );
-
+  const selectedNodeName: SystemComponentType | undefined = selectedNode?.data
+    ?.name as SystemComponentType | undefined;
+  const comp = selectedNodeName
+    ? getSystemComponent(selectedNodeName)
+    : undefined;
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const Icon = comp?.icon ?? (() => null);
-  const isSystem = !selectedNode?.data.id || selectedNode.type === "Whiteboard";
-
+  const isSystemNodeSelected =
+    !selectedNode?.data?.id || selectedNode?.type === "Whiteboard";
   const showEdgeSettings = selectedEdge !== null;
-  const showNodeSettings = selectedNode !== null && !isSystem;
+  const showNodeSettings = selectedNode !== null && !isSystemNodeSelected;
 
   return (
     <>
       {isClient && showWelcomeGuide && (
         <WelcomeGuide onClose={handleCloseWelcomeGuide} />
       )}
+
+      <AlertDialog
+        open={showDivergenceDialog && !isSaving}
+        onOpenChange={(open: boolean) => {
+          if (!isSaving) {
+            setShowDivergenceDialog(open);
+          }
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Unsaved Changes Detected</AlertDialogTitle>
+            <AlertDialogDescription>
+              There is a difference between your current design and the saved
+              version. Which version would you like to keep?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleKeepDbVersion}>
+              Use Saved Version
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                void handleKeepLocalVersion();
+              }}
+            >
+              {isSaving ? "Saving..." : "Keep Current Changes"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <ResizablePanelGroup direction="horizontal">
         <ResizablePanel defaultSize={25} minSize={3}>
@@ -132,7 +393,9 @@ function PageContent() {
                     <>
                       <Icon className="h-4 w-4 text-gray-700 dark:text-gray-300" />
                       <span className="text-base font-medium">
-                        {isSystem ? "System" : selectedNode?.data.name}
+                        {isSystemNodeSelected
+                          ? "System"
+                          : selectedNodeName ?? "Component"}
                       </span>
                     </>
                   )}
@@ -211,6 +474,8 @@ function PageContent() {
                 isFeedbackExpanded={isFeedbackExpanded}
                 onOpen={() => setIsFeedbackExpanded(true)}
                 onClose={() => setIsFeedbackExpanded(false)}
+                isSaving={isSaving}
+                onSave={handleManualSave}
               />
             )}
           />
@@ -248,9 +513,8 @@ function PageContent() {
         )}
       </ResizablePanelGroup>
 
-      {/* Add the chat button (only when side panel is closed) */}
       {!isChatPanelOpen && (
-        <div className="ai-chat-container fixed bottom-4 -right-2 z-50">
+        <div className="ai-chat-container fixed -right-2 bottom-4 z-50">
           <PanelChat
             isPlayground={true}
             playgroundId="default"
@@ -343,4 +607,4 @@ function WelcomeGuide({ onClose }: WelcomeGuideProps) {
       </div>
     </div>
   );
-} 
+}

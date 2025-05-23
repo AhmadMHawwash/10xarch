@@ -4,33 +4,45 @@ import {
   type SystemComponentNodeDataProps,
 } from "@/components/ReactflowCustomNodes/SystemComponentNode";
 import { useToast } from "@/components/ui/use-toast";
-import { api } from "@/trpc/react";
 import { type PlaygroundResponse } from "@/server/api/routers/checkAnswer";
-import { usePathname } from "next/navigation";
+import { api } from "@/trpc/react";
+import { useParams, usePathname } from "next/navigation";
 import { useEffect } from "react";
-import { type Edge, type Node } from "reactflow";
 import { useLocalStorage } from "react-use";
+import { type Edge, type Node } from "reactflow";
 import { useSystemDesigner } from "./_useSystemDesigner";
 
 export const SYSTEM_COMPONENT_NODE = "SystemComponentNode";
 
 export const usePlaygroundManager = () => {
   const pathname = usePathname();
+  const { id: playgroundId } = useParams();
   const { nodes, edges } = useSystemDesigner();
   const { toast } = useToast();
+
+  const { data: playgroundData, refetch: refetchPlayground, isLoading: isLoadingPlayground } = api.playgrounds.getById.useQuery(
+    playgroundId as string,
+    {
+      enabled: !!playgroundId,
+    },
+  );
+
+  const storageKey = `/playgrounds/${pathname}-feedback`;
+
   const [feedback, setFeedback] = useLocalStorage<PlaygroundResponse | null>(
-    `playground-${pathname}-feedback`,
+    storageKey,
     null,
   );
 
-  const { mutate, isPending, data, error } = api.ai.playground.useMutation({
+  // Mutation to get AI feedback
+  const { mutate, isPending, data } = api.ai.playground.useMutation({
     onError: (err) => {
       // Check if this is a rate limit error
-      const isRateLimitError = 
-        err.data?.code === "TOO_MANY_REQUESTS" || 
-        err.message.includes("rate limit") || 
+      const isRateLimitError =
+        err.data?.code === "TOO_MANY_REQUESTS" ||
+        err.message.includes("rate limit") ||
         err.message.includes("evaluation limit");
-      
+
       // Show error toast with a credits purchase suggestion for rate limit errors
       toast({
         title: isRateLimitError ? "Rate Limit Reached" : "Error",
@@ -39,7 +51,11 @@ export const usePlaygroundManager = () => {
             <p>{err.message}</p>
             {isRateLimitError && (
               <p className="pt-1 text-sm">
-                You can <a href="/credits" className="font-medium underline">purchase credits</a> to continue using evaluations beyond the free limit.
+                You can{" "}
+                <a href="/credits" className="font-medium underline">
+                  purchase credits
+                </a>{" "}
+                to continue using evaluations beyond the free limit.
               </p>
             )}
           </div>
@@ -47,6 +63,16 @@ export const usePlaygroundManager = () => {
         variant: "destructive",
       });
       console.error("Error checking solution:", err);
+    },
+  });
+
+  // Mutation to update playground data
+  const { mutateAsync: updatePlayground, isPending: isUpdatingPlayground } = api.playgrounds.update.useMutation({
+    onError: (err) => {
+      console.error("Error saving feedback to database:", err);
+    },
+    onSuccess: () => {
+      void refetchPlayground();
     },
   });
 
@@ -59,7 +85,7 @@ export const usePlaygroundManager = () => {
 
     if (whiteboard?.data?.configs) {
       const context = whiteboard.data.configs.context as string | undefined;
-      
+
       mutate({
         systemDesign: prompt,
         systemDesignContext: context ?? "",
@@ -80,10 +106,27 @@ export const usePlaygroundManager = () => {
     }
   }, [data, setFeedback]);
 
+  const dbSavedNodes = (playgroundData?.playground.jsonBlob as {
+    nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[];
+  })?.nodes;
+  const dbSavedEdges = (playgroundData?.playground.jsonBlob as {
+    edges: Edge[];
+  })?.edges;
+
   return {
     checkSolution,
     isLoadingAnswer: isPending,
     answer: feedback,
+    playgroundId: playgroundId as string,
+    updatePlayground,
+    refetchPlayground,
+    isLoadingPlayground,
+    isUpdatingPlayground,
+    playground: {
+      ...playgroundData?.playground,
+      nodes: dbSavedNodes,
+      edges: dbSavedEdges,
+    },
   };
 };
 

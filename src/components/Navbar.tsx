@@ -193,18 +193,6 @@ export default function Navbar() {
               Playgrounds
             </Link>
             <Link
-              href="/playground"
-              className={cn(
-                "text-sm font-medium hover:text-primary",
-                pathname === "/playground"
-                  ? "font-semibold text-primary"
-                  : "text-muted-foreground",
-              )}
-              prefetch={false}
-            >
-              Playground
-            </Link>
-            <Link
               href="/challenges"
               className={cn(
                 "text-sm font-medium hover:text-primary",
@@ -306,18 +294,6 @@ export default function Navbar() {
                 prefetch={false}
               >
                 Playgrounds
-              </Link>
-              <Link
-                href="/playground"
-                className={cn(
-                  "block py-2 text-sm hover:text-primary",
-                  pathname === "/playground"
-                    ? "font-semibold text-primary"
-                    : "text-muted-foreground",
-                )}
-                prefetch={false}
-              >
-                Playground
               </Link>
               <Link
                 href="/challenges"

@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { Footer } from "@/components/Footer";
 import HeroSystemDesigner from "@/components/HeroSystemDesigner";
@@ -11,19 +11,18 @@ import {
 import {
   ArrowRight,
   BookOpen,
+  BookOpenCheck,
   CheckCircle,
   Code,
-  CreditCard,
   IterationCcw,
   Layers,
-  BookOpenCheck,
   PenTool
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
 export default function HomeClient() {
-  const [activeTab, setActiveTab] = useState<'learn' | 'design'>('learn');
+  const [activeTab, setActiveTab] = useState<"learn" | "design">("design");
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -32,60 +31,54 @@ export default function HomeClient() {
         <div className="relative flex w-full max-w-md overflow-hidden rounded-xl shadow-lg">
           {/* Background gradient for tabs container */}
           <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600"></div>
-          
+
           {/* Tab buttons container */}
-          <div className="relative flex w-full z-10">
+          <div className="relative z-10 flex w-full">
             <button
-              onClick={() => setActiveTab('learn')}
-              className={`hover:cursor-pointer flex-1 flex items-center justify-center gap-1 md:gap-2 py-3 px-3 md:px-5 text-sm md:text-base transition-all duration-200 ${
-                activeTab === 'learn'
-                  ? 'bg-white/15 backdrop-blur-sm text-white'
-                  : 'text-white/80 hover:text-white hover:bg-white/5'
+              onClick={() => setActiveTab("design")}
+              className={`flex flex-1 items-center justify-center gap-1 px-3 py-3 text-sm transition-all duration-200 hover:cursor-pointer md:gap-2 md:px-5 md:text-base ${
+                activeTab === "design"
+                  ? "bg-white/15 text-white backdrop-blur-sm"
+                  : "text-white/80 hover:bg-white/5 hover:text-white"
               }`}
             >
-              <BookOpenCheck className={`h-4 w-4 md:h-5 md:w-5 flex-shrink-0 ${activeTab === 'learn' ? 'text-white' : 'text-white/80'}`} />
-              <span>Learn System Design</span>
-            </button>
-            
-            <button
-              onClick={() => setActiveTab('design')}
-              className={`hover:cursor-pointer flex-1 flex items-center justify-center gap-1 md:gap-2 py-3 px-3 md:px-5 text-sm md:text-base transition-all duration-200 ${
-                activeTab === 'design'
-                  ? 'bg-white/15 backdrop-blur-sm text-white'
-                  : 'text-white/80 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <PenTool className={`h-4 w-4 md:h-5 md:w-5 flex-shrink-0 ${activeTab === 'design' ? 'text-white' : 'text-white/80'}`} />
+              <PenTool
+                className={`h-4 w-4 flex-shrink-0 md:h-5 md:w-5 ${activeTab === "design" ? "text-white" : "text-white/80"}`}
+              />
               <span>Design Your System</span>
+            </button>
+            <button
+              onClick={() => setActiveTab("learn")}
+              className={`flex flex-1 items-center justify-center gap-1 px-3 py-3 text-sm transition-all duration-200 hover:cursor-pointer md:gap-2 md:px-5 md:text-base ${
+                activeTab === "learn"
+                  ? "bg-white/15 text-white backdrop-blur-sm"
+                  : "text-white/80 hover:bg-white/5 hover:text-white"
+              }`}
+            >
+              <BookOpenCheck
+                className={`h-4 w-4 flex-shrink-0 md:h-5 md:w-5 ${activeTab === "learn" ? "text-white" : "text-white/80"}`}
+              />
+              <span>Learn System Design</span>
             </button>
           </div>
         </div>
       </div>
 
       <header className="mb-14 flex flex-col items-center justify-between gap-10 md:flex-row md:gap-0">
-        <div className="text-center md:text-left md:w-1/2 md:pr-8">
-          <div className="md:relative flex flex-col flex-wrap items-center justify-center gap-3 md:justify-start">
-            <span className="md:absolute top-0 right-28 items-center rounded-md bg-amber-50 px-2 py-1 text-xs font-medium text-amber-700 ring-1 ring-inset ring-amber-600/20 dark:bg-amber-900/30 dark:text-amber-400 dark:ring-amber-800/30">
+        <div className="text-center md:w-1/2 md:pr-8 md:text-left">
+          <div className="flex flex-col flex-wrap items-center justify-center gap-3 md:relative md:justify-start">
+            <span className="right-28 top-0 items-center rounded-md bg-amber-50 px-2 py-1 text-xs font-medium text-amber-700 ring-1 ring-inset ring-amber-600/20 dark:bg-amber-900/30 dark:text-amber-400 dark:ring-amber-800/30 md:absolute">
               BETA
             </span>
-            <h1 className="bg-gradient-to-r from-blue-500 to-indigo-500 bg-clip-text text-4xl font-bold text-transparent leading-tight pb-2 sm:text-5xl md:text-6xl lg:text-7xl">
+            <h1 className="bg-gradient-to-r from-blue-500 to-indigo-500 bg-clip-text pb-2 text-4xl font-bold leading-tight text-transparent sm:text-5xl md:text-6xl lg:text-7xl">
               System Design Playground
             </h1>
           </div>
-          {activeTab === 'learn' ? (
+          {activeTab === "design" ? (
             <>
-              <p className="mb-4 text-xl text-gray-600 dark:text-gray-400">
-                Master system design concepts through interactive challenges and expert guidance.
-              </p>
-              <p className="mb-8 text-lg text-gray-500 dark:text-gray-400">
-                Learn by doing with guided challenges that help you understand real-world system design problems.
-                Get AI feedback on your solutions and build your engineering skills.
-              </p>
-            </>
-          ) : (
-            <>
-              <p className="mt-2 mb-4 text-xl text-gray-600 dark:text-gray-400">
-                Your space to design, visualize, and document your system architecture.
+              <p className="mb-4 mt-2 text-xl text-gray-600 dark:text-gray-400">
+                Your space to design, visualize, and document your system
+                architecture.
               </p>
               <p className="mb-8 text-lg text-gray-500 dark:text-gray-400">
                 Design systems, get AI feedback, and use it as interactive
@@ -93,10 +86,45 @@ export default function HomeClient() {
                 drag-and-drop interface.
               </p>
             </>
+          ) : (
+            <>
+              <p className="mb-4 text-xl text-gray-600 dark:text-gray-400">
+                Master system design concepts through interactive challenges and
+                expert guidance.
+              </p>
+              <p className="mb-8 text-lg text-gray-500 dark:text-gray-400">
+                Learn by doing with guided challenges that help you understand
+                real-world system design problems. Get AI feedback on your
+                solutions and build your engineering skills.
+              </p>
+            </>
           )}
 
           <div className="mb-8 flex flex-wrap justify-center gap-4 md:justify-start">
-            {activeTab === 'learn' ? (
+            {activeTab === "design" ? (
+              <>
+                <Link
+                  href="/playgrounds"
+                  className="group inline-flex items-center overflow-hidden rounded-full bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-3 text-white transition-all hover:from-blue-700 hover:to-purple-700"
+                  prefetch={false}
+                >
+                  <span className="mr-2">Start Designing</span>
+                  <ArrowRight className="transition-transform group-hover:translate-x-1" />
+                </Link>
+                <div className="relative inline-block">
+                  <button
+                    disabled
+                    className="group inline-flex cursor-not-allowed items-center overflow-hidden rounded-full bg-white/5 px-8 py-3 text-gray-500 opacity-70 ring-1 ring-gray-900/5 backdrop-blur-sm dark:text-gray-400 dark:ring-white/10"
+                  >
+                    <span className="mr-2">Start with a Template</span>
+                    <ArrowRight className="h-4 w-4" />
+                  </button>
+                  <span className="absolute -right-10 -top-3 z-10 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 shadow-sm dark:bg-amber-900/30 dark:text-amber-500">
+                    Coming Soon
+                  </span>
+                </div>
+              </>
+            ) : (
               <>
                 <Link
                   href="/challenges/url-shortener"
@@ -115,52 +143,11 @@ export default function HomeClient() {
                   <ArrowRight className="transition-transform group-hover:translate-x-1" />
                 </Link>
               </>
-            ) : (
-              <>
-                <Link
-                  href="/playground"
-                  className="group inline-flex items-center overflow-hidden rounded-full bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-3 text-white transition-all hover:from-blue-700 hover:to-purple-700"
-                  prefetch={false}
-                >
-                  <span className="mr-2">Start Designing</span>
-                  <ArrowRight className="transition-transform group-hover:translate-x-1" />
-                </Link>
-                <div className="relative inline-block">
-                  <button
-                    disabled
-                    className="group inline-flex cursor-not-allowed items-center overflow-hidden rounded-full bg-white/5 px-8 py-3 text-gray-500 ring-1 ring-gray-900/5 opacity-70 backdrop-blur-sm dark:text-gray-400 dark:ring-white/10"
-                  >
-                    <span className="mr-2">Start with a Template</span>
-                    <ArrowRight className="h-4 w-4" />
-                  </button>
-                  <span className="absolute -right-10 -top-3 z-10 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 shadow-sm dark:bg-amber-900/30 dark:text-amber-500">
-                    Coming Soon
-                  </span>
-                </div>
-              </>
             )}
           </div>
 
-          <div className="flex flex-wrap justify-center items-center gap-4 text-sm text-gray-600 dark:text-gray-400 md:justify-start">
-            {activeTab === 'learn' ? (
-              <>
-                <div className="flex items-center">
-                  <CheckCircle className="mr-2 h-5 w-5 text-green-500" />
-                  Guided Challenges
-                </div>
-                <div className="flex items-center">
-                  <CheckCircle className="mr-2 h-5 w-5 text-green-500" />
-                  AI Feedback
-                </div>
-                <div className="flex items-center">
-                  <CheckCircle className="mr-2 h-5 w-5 text-green-500" />
-                  Track Progress
-                  <span className="ml-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-800 dark:bg-amber-900/30 dark:text-amber-500">
-                    Coming Soon
-                  </span>
-                </div>
-              </>
-            ) : (
+          <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-gray-600 dark:text-gray-400 md:justify-start">
+            {activeTab === "design" ? (
               <>
                 <div className="flex items-center">
                   <CheckCircle className="mr-2 h-5 w-5 text-green-500" />
@@ -178,12 +165,30 @@ export default function HomeClient() {
                   </span>
                 </div>
               </>
+            ) : (
+              <>
+                <div className="flex items-center">
+                  <CheckCircle className="mr-2 h-5 w-5 text-green-500" />
+                  Guided Challenges
+                </div>
+                <div className="flex items-center">
+                  <CheckCircle className="mr-2 h-5 w-5 text-green-500" />
+                  AI Feedback
+                </div>
+                <div className="flex items-center">
+                  <CheckCircle className="mr-2 h-5 w-5 text-green-500" />
+                  Track Progress
+                  <span className="ml-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-800 dark:bg-amber-900/30 dark:text-amber-500">
+                    Coming Soon
+                  </span>
+                </div>
+              </>
             )}
           </div>
         </div>
 
-        <div className="relative w-full h-[400px] sm:h-[450px] md:h-[500px] overflow-hidden rounded-lg border border-gray-200 bg-white/50 backdrop-blur-sm dark:border-gray-700 dark:bg-gray-800/50 md:w-1/2">
-          {activeTab === 'design' ? (
+        <div className="relative h-[400px] w-full overflow-hidden rounded-lg border border-gray-200 bg-white/50 backdrop-blur-sm dark:border-gray-700 dark:bg-gray-800/50 sm:h-[450px] md:h-[500px] md:w-1/2">
+          {activeTab === "design" ? (
             <HeroSystemDesigner mode="playground" />
           ) : (
             <HeroSystemDesigner mode="challenge" />
@@ -192,57 +197,7 @@ export default function HomeClient() {
       </header>
 
       <section className="mb-16 grid gap-8 md:grid-cols-2">
-        {activeTab === 'learn' ? (
-          <>
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 p-8 shadow-lg transition-all hover:shadow-xl dark:from-gray-800 dark:to-blue-900">
-              {/* Decorative elements */}
-              <div className="absolute -right-20 -top-20 h-40 w-40 rounded-full bg-blue-100 opacity-50 blur-3xl dark:bg-blue-800"></div>
-              <div className="absolute -bottom-20 -left-20 h-40 w-40 rounded-full bg-purple-100 opacity-50 blur-3xl dark:bg-purple-800"></div>
-
-              <div className="relative">
-                <h2 className="mb-4 flex items-center text-3xl font-bold text-gray-900 dark:text-white">
-                  <BookOpen className="mr-3 h-8 w-8 text-blue-600 dark:text-blue-400" />
-                  Guided Challenges
-                </h2>
-                <p className="mb-6 text-lg text-gray-600 dark:text-gray-300">
-                  Learn system design through structured challenges with real-world scenarios.
-                </p>
-                <Link
-                  href="/challenges"
-                  className="group relative inline-flex items-center overflow-hidden rounded-full bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-3 text-white transition-all hover:from-blue-700 hover:to-purple-700"
-                  prefetch={false}
-                >
-                  <span className="mr-2">Browse Challenges</span>
-                  <ArrowRight className="transition-transform group-hover:translate-x-1" />
-                </Link>
-              </div>
-            </div>
-
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 p-8 shadow-lg transition-all hover:shadow-xl dark:from-gray-800 dark:to-blue-900">
-              {/* Decorative elements */}
-              <div className="absolute -right-20 -top-20 h-40 w-40 rounded-full bg-blue-100 opacity-50 blur-3xl dark:bg-blue-800"></div>
-              <div className="absolute -bottom-20 -left-20 h-40 w-40 rounded-full bg-purple-100 opacity-50 blur-3xl dark:bg-purple-800"></div>
-
-              <div className="relative">
-                <h2 className="mb-4 flex items-center text-3xl font-bold text-gray-900 dark:text-white">
-                  <IterationCcw className="mr-3 h-8 w-8 text-blue-600 dark:text-blue-400" />
-                  AI Feedback
-                </h2>
-                <p className="mb-6 text-lg text-gray-600 dark:text-gray-300">
-                  Get expert-level feedback on your solutions and learn how to improve your designs.
-                </p>
-                <Link
-                  href="/challenges/url-shortener"
-                  className="group relative inline-flex items-center overflow-hidden rounded-full bg-white/10 px-8 py-3 text-gray-700 ring-1 ring-gray-900/5 transition-all hover:bg-white/20 dark:text-gray-200 dark:ring-white/10"
-                  prefetch={false}
-                >
-                  <span className="mr-2">Try a Challenge</span>
-                  <ArrowRight className="transition-transform group-hover:translate-x-1" />
-                </Link>
-              </div>
-            </div>
-          </>
-        ) : (
+        {activeTab === "design" ? (
           <>
             <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 p-8 shadow-lg transition-all hover:shadow-xl dark:from-gray-800 dark:to-blue-900">
               {/* Decorative elements */}
@@ -259,7 +214,7 @@ export default function HomeClient() {
                   architecture in one place.
                 </p>
                 <Link
-                  href="/playground"
+                  href="/playgrounds"
                   className="group relative inline-flex items-center overflow-hidden rounded-full bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-3 text-white transition-all hover:from-blue-700 hover:to-purple-700"
                   prefetch={false}
                 >
@@ -283,17 +238,70 @@ export default function HomeClient() {
                   </span>
                 </h2>
                 <p className="mb-6 text-lg text-gray-600 dark:text-gray-300">
-                  Start with pre-built templates for common architectures and customize to your needs.
+                  Start with pre-built templates for common architectures and
+                  customize to your needs.
                 </p>
                 <div className="inline-block">
                   <button
                     disabled
-                    className="group inline-flex cursor-not-allowed items-center overflow-hidden rounded-full bg-white/10 px-8 py-3 text-gray-500 ring-1 ring-gray-900/5 opacity-70 dark:text-gray-400 dark:ring-white/10"
+                    className="group inline-flex cursor-not-allowed items-center overflow-hidden rounded-full bg-white/10 px-8 py-3 text-gray-500 opacity-70 ring-1 ring-gray-900/5 dark:text-gray-400 dark:ring-white/10"
                   >
                     <span className="mr-2">Browse Templates</span>
                     <ArrowRight className="h-4 w-4" />
                   </button>
                 </div>
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 p-8 shadow-lg transition-all hover:shadow-xl dark:from-gray-800 dark:to-blue-900">
+              {/* Decorative elements */}
+              <div className="absolute -right-20 -top-20 h-40 w-40 rounded-full bg-blue-100 opacity-50 blur-3xl dark:bg-blue-800"></div>
+              <div className="absolute -bottom-20 -left-20 h-40 w-40 rounded-full bg-purple-100 opacity-50 blur-3xl dark:bg-purple-800"></div>
+
+              <div className="relative">
+                <h2 className="mb-4 flex items-center text-3xl font-bold text-gray-900 dark:text-white">
+                  <BookOpen className="mr-3 h-8 w-8 text-blue-600 dark:text-blue-400" />
+                  Guided Challenges
+                </h2>
+                <p className="mb-6 text-lg text-gray-600 dark:text-gray-300">
+                  Learn system design through structured challenges with
+                  real-world scenarios.
+                </p>
+                <Link
+                  href="/challenges"
+                  className="group relative inline-flex items-center overflow-hidden rounded-full bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-3 text-white transition-all hover:from-blue-700 hover:to-purple-700"
+                  prefetch={false}
+                >
+                  <span className="mr-2">Browse Challenges</span>
+                  <ArrowRight className="transition-transform group-hover:translate-x-1" />
+                </Link>
+              </div>
+            </div>
+
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 p-8 shadow-lg transition-all hover:shadow-xl dark:from-gray-800 dark:to-blue-900">
+              {/* Decorative elements */}
+              <div className="absolute -right-20 -top-20 h-40 w-40 rounded-full bg-blue-100 opacity-50 blur-3xl dark:bg-blue-800"></div>
+              <div className="absolute -bottom-20 -left-20 h-40 w-40 rounded-full bg-purple-100 opacity-50 blur-3xl dark:bg-purple-800"></div>
+
+              <div className="relative">
+                <h2 className="mb-4 flex items-center text-3xl font-bold text-gray-900 dark:text-white">
+                  <IterationCcw className="mr-3 h-8 w-8 text-blue-600 dark:text-blue-400" />
+                  AI Feedback
+                </h2>
+                <p className="mb-6 text-lg text-gray-600 dark:text-gray-300">
+                  Get expert-level feedback on your solutions and learn how to
+                  improve your designs.
+                </p>
+                <Link
+                  href="/challenges/url-shortener"
+                  className="group relative inline-flex items-center overflow-hidden rounded-full bg-white/10 px-8 py-3 text-gray-700 ring-1 ring-gray-900/5 transition-all hover:bg-white/20 dark:text-gray-200 dark:ring-white/10"
+                  prefetch={false}
+                >
+                  <span className="mr-2">Try a Challenge</span>
+                  <ArrowRight className="transition-transform group-hover:translate-x-1" />
+                </Link>
               </div>
             </div>
           </>
@@ -304,151 +312,152 @@ export default function HomeClient() {
       <section className="mb-20 bg-gradient-to-br from-gray-50 to-white py-12 dark:from-gray-900 dark:to-gray-800">
         <div className="container mx-auto px-4">
           <h2 className="mb-12 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-center text-2xl font-bold text-transparent sm:text-3xl">
-            {activeTab === 'learn' ? 'Master System Design' : 'Design Your Systems with Ease'}
+            {activeTab === "design"
+              ? "Design Your Systems with Ease"
+              : "Master System Design"}
           </h2>
 
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            {activeTab === 'learn' ? (
-              [
-                {
-                  step: 1,
-                  title: "Choose a Challenge",
-                  description:
-                    "Select from our library of real-world system design challenges",
-                  icon: BookOpen,
-                },
-                {
-                  step: 2,
-                  title: "Design Your Solution",
-                  description:
-                    "Use our visual tools to create your system architecture solution",
-                  icon: Layers,
-                },
-                {
-                  step: 3,
-                  title: "Document Your Approach",
-                  description:
-                    "Explain your design decisions and architecture considerations",
-                  icon: Code,
-                },
-                {
-                  step: 4,
-                  title: "Get Expert Feedback",
-                  description:
-                    "Receive detailed feedback on your solution from our AI",
-                  icon: IterationCcw,
-                  isGolden: true,
-                },
-              ].map((item, index) => (
-                <div key={index} className="relative">
-                  <div
-                    className={`h-full rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800 ${
-                      item.isGolden
-                        ? "border-2 border-amber-400/50 dark:border-amber-500/50"
-                        : ""
-                    }`}
-                  >
+            {activeTab === "design"
+              ? 
+                [
+                  {
+                    step: 1,
+                    title: "Create a New Design",
+                    description:
+                      "Start with a blank canvas and add your first system components",
+                    icon: Layers,
+                  },
+                  {
+                    step: 2,
+                    title: "Drag & Connect Components",
+                    description:
+                      "Build your architecture by adding and connecting components visually",
+                    icon: Code,
+                  },
+                  {
+                    step: 3,
+                    title: "Add Context & Documentation",
+                    description:
+                      "Document your design decisions and add context to each component",
+                    icon: BookOpen,
+                  },
+                  {
+                    step: 4,
+                    title: "Get AI Feedback",
+                    description:
+                      "Receive insights and suggestions on your system design from our AI",
+                    icon: IterationCcw,
+                    isGolden: true,
+                  },
+                ].map((item, index) => (
+                  <div key={index} className="relative">
                     <div
-                      className={`absolute -top-4 left-4 flex h-8 w-8 items-center justify-center rounded-full font-bold text-white ${
+                      className={`h-full rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800 ${
                         item.isGolden
-                          ? "bg-gradient-to-r from-amber-400 to-amber-500 dark:from-amber-500 dark:to-amber-600"
-                          : "bg-gradient-to-r from-blue-600 to-purple-600"
+                          ? "border-2 border-amber-400/50 dark:border-amber-500/50"
+                          : ""
                       }`}
                     >
-                      {item.step}
-                    </div>
-                    <div className="mb-4 mt-2">
-                      <item.icon
-                        className={`h-8 w-8 ${
+                      <div
+                        className={`absolute -top-4 left-4 flex h-8 w-8 items-center justify-center rounded-full font-bold text-white ${
                           item.isGolden
-                            ? "text-amber-500 dark:text-amber-400"
-                            : "text-blue-600 dark:text-blue-400"
+                            ? "bg-gradient-to-r from-amber-400 to-amber-500 dark:from-amber-500 dark:to-amber-600"
+                            : "bg-gradient-to-r from-blue-600 to-purple-600"
                         }`}
-                      />
+                      >
+                        {item.step}
+                      </div>
+                      <div className="mb-4 mt-2">
+                        <item.icon
+                          className={`h-8 w-8 ${
+                            item.isGolden
+                              ? "text-amber-500 dark:text-amber-400"
+                              : "text-blue-600 dark:text-blue-400"
+                          }`}
+                        />
+                      </div>
+                      <h3 className="mb-2 text-xl font-semibold text-gray-900 dark:text-white">
+                        {item.title}
+                      </h3>
+                      <p className="text-gray-600 dark:text-gray-400">
+                        {item.description}
+                      </p>
                     </div>
-                    <h3 className="mb-2 text-xl font-semibold text-gray-900 dark:text-white">
-                      {item.title}
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-400">
-                      {item.description}
-                    </p>
+                    {index < 3 && (
+                      <div className="absolute -right-8 top-1/2 hidden h-0.5 w-8 bg-gradient-to-r from-blue-600 to-purple-600 md:block"></div>
+                    )}
                   </div>
-                  {index < 3 && (
-                    <div className="absolute -right-8 top-1/2 hidden h-0.5 w-8 bg-gradient-to-r from-blue-600 to-purple-600 md:block"></div>
-                  )}
-                </div>
-              ))
-            ) : (
-              [
-                {
-                  step: 1,
-                  title: "Create a New Design",
-                  description:
-                    "Start with a blank canvas and add your first system components",
-                  icon: Layers,
-                },
-                {
-                  step: 2,
-                  title: "Drag & Connect Components",
-                  description:
-                    "Build your architecture by adding and connecting components visually",
-                  icon: Code,
-                },
-                {
-                  step: 3,
-                  title: "Add Context & Documentation",
-                  description:
-                    "Document your design decisions and add context to each component",
-                  icon: BookOpen,
-                },
-                {
-                  step: 4,
-                  title: "Get AI Feedback",
-                  description:
-                    "Receive insights and suggestions on your system design from our AI",
-                  icon: IterationCcw,
-                  isGolden: true,
-                },
-              ].map((item, index) => (
-                <div key={index} className="relative">
-                  <div
-                    className={`h-full rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800 ${
-                      item.isGolden
-                        ? "border-2 border-amber-400/50 dark:border-amber-500/50"
-                        : ""
-                    }`}
-                  >
+                ))
+                : [
+                  {
+                    step: 1,
+                    title: "Choose a Challenge",
+                    description:
+                      "Select from our library of real-world system design challenges",
+                    icon: BookOpen,
+                  },
+                  {
+                    step: 2,
+                    title: "Design Your Solution",
+                    description:
+                      "Use our visual tools to create your system architecture solution",
+                    icon: Layers,
+                  },
+                  {
+                    step: 3,
+                    title: "Document Your Approach",
+                    description:
+                      "Explain your design decisions and architecture considerations",
+                    icon: Code,
+                  },
+                  {
+                    step: 4,
+                    title: "Get Expert Feedback",
+                    description:
+                      "Receive detailed feedback on your solution from our AI",
+                    icon: IterationCcw,
+                    isGolden: true,
+                  },
+                ].map((item, index) => (
+                  <div key={index} className="relative">
                     <div
-                      className={`absolute -top-4 left-4 flex h-8 w-8 items-center justify-center rounded-full font-bold text-white ${
+                      className={`h-full rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800 ${
                         item.isGolden
-                          ? "bg-gradient-to-r from-amber-400 to-amber-500 dark:from-amber-500 dark:to-amber-600"
-                          : "bg-gradient-to-r from-blue-600 to-purple-600"
+                          ? "border-2 border-amber-400/50 dark:border-amber-500/50"
+                          : ""
                       }`}
                     >
-                      {item.step}
-                    </div>
-                    <div className="mb-4 mt-2">
-                      <item.icon
-                        className={`h-8 w-8 ${
+                      <div
+                        className={`absolute -top-4 left-4 flex h-8 w-8 items-center justify-center rounded-full font-bold text-white ${
                           item.isGolden
-                            ? "text-amber-500 dark:text-amber-400"
-                            : "text-blue-600 dark:text-blue-400"
+                            ? "bg-gradient-to-r from-amber-400 to-amber-500 dark:from-amber-500 dark:to-amber-600"
+                            : "bg-gradient-to-r from-blue-600 to-purple-600"
                         }`}
-                      />
+                      >
+                        {item.step}
+                      </div>
+                      <div className="mb-4 mt-2">
+                        <item.icon
+                          className={`h-8 w-8 ${
+                            item.isGolden
+                              ? "text-amber-500 dark:text-amber-400"
+                              : "text-blue-600 dark:text-blue-400"
+                          }`}
+                        />
+                      </div>
+                      <h3 className="mb-2 text-xl font-semibold text-gray-900 dark:text-white">
+                        {item.title}
+                      </h3>
+                      <p className="text-gray-600 dark:text-gray-400">
+                        {item.description}
+                      </p>
                     </div>
-                    <h3 className="mb-2 text-xl font-semibold text-gray-900 dark:text-white">
-                      {item.title}
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-400">
-                      {item.description}
-                    </p>
+                    {index < 3 && (
+                      <div className="absolute -right-8 top-1/2 hidden h-0.5 w-8 bg-gradient-to-r from-blue-600 to-purple-600 md:block"></div>
+                    )}
                   </div>
-                  {index < 3 && (
-                    <div className="absolute -right-8 top-1/2 hidden h-0.5 w-8 bg-gradient-to-r from-blue-600 to-purple-600 md:block"></div>
-                  )}
-                </div>
-              ))
-            )}
+                ))}
           </div>
         </div>
       </section>
@@ -509,16 +518,23 @@ export default function HomeClient() {
           <div className="mx-auto max-w-4xl rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 p-6 text-white shadow-xl md:p-12">
             <div className="text-center">
               <h2 className="mb-4 text-2xl font-bold sm:text-3xl md:text-4xl">
-                {activeTab === 'learn' ? 'Start Learning System Design Today' : 'Start Designing Your Systems Today'}
+                {activeTab === "design"
+                  ? "Start Designing Your Systems Today"
+                  : "Start Learning System Design Today"}
               </h2>
               <p className="mb-8 text-base opacity-90 sm:text-lg">
-                {activeTab === 'learn' 
-                  ? 'Join thousands of engineers improving their system design skills'
-                  : 'Join thousands of engineers creating beautiful and functional system designs'}
+                {activeTab === "design"
+                  ? "Join thousands of engineers creating beautiful and functional system designs"
+                  : "Join thousands of engineers improving their system design skills"}
               </p>
-              <Link href={activeTab === 'learn' ? '/challenges' : '/playground'} prefetch={false}>
+              <Link
+                href={activeTab === "design" ? "/playgrounds" : "/challenges"}
+                prefetch={false}
+              >
                 <button className="rounded-full bg-white px-8 py-3 font-medium text-blue-600 shadow-md transition-all hover:bg-gray-100 hover:shadow-lg">
-                  {activeTab === 'learn' ? 'Browse Challenges' : 'Launch Playground'}
+                  {activeTab === "design"
+                    ? "Launch Playground"
+                    : "Browse Challenges"}
                 </button>
               </Link>
             </div>
@@ -529,4 +545,4 @@ export default function HomeClient() {
       <Footer />
     </div>
   );
-} 
+}

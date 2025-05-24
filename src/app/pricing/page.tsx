@@ -96,7 +96,7 @@ export default function PricingPage() {
             </ul>
           </CardContent>
           <CardFooter className="mt-auto">
-            <Link href="/playground" className="w-full" prefetch={false}>
+            <Link href="/playgrounds" className="w-full" prefetch={false}>
               <Button variant="outline" className="w-full">
                 Start Designing
                 <Layers className="ml-2 h-4 w-4" />
@@ -453,7 +453,7 @@ export default function PricingPage() {
               Join thousands of engineers creating beautiful and functional system designs
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Link href="/playground" prefetch={false}>
+              <Link href="/playgrounds" prefetch={false}>
                 <Button className="w-full sm:w-auto bg-white text-blue-600 hover:bg-gray-100">
                   Try For Free
                   <Layers className="ml-2 h-4 w-4" />

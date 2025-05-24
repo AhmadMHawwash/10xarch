@@ -25,7 +25,7 @@ export default function PlaygroundsClient({ initialPlaygrounds }: PlaygroundsCli
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [playgroundToDelete, setPlaygroundToDelete] = useState<string | null>(null);
 
-  const { data, isLoading } = api.playgrounds.getAll.useQuery(undefined, {
+  const { data, isLoading, refetch } = api.playgrounds.getAll.useQuery(undefined, {
     initialData: { playgrounds: initialPlaygrounds },
     refetchOnWindowFocus: true,
   });
@@ -38,7 +38,7 @@ export default function PlaygroundsClient({ initialPlaygrounds }: PlaygroundsCli
       });
       setNewPlaygroundTitle('');
       setIsCreateDialogOpen(false);
-      router.refresh();
+      void refetch();
     },
     onError: (error) => {
       toast({

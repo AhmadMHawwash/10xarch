@@ -11,6 +11,7 @@ import { useEffect } from "react";
 import { useLocalStorage } from "react-use";
 import { type Edge, type Node } from "reactflow";
 import { useSystemDesigner } from "./_useSystemDesigner";
+import { extractAPIDefinitions } from "@/components/ai-chat/ChatUI";
 
 export const SYSTEM_COMPONENT_NODE = "SystemComponentNode";
 
@@ -20,12 +21,13 @@ export const usePlaygroundManager = () => {
   const { nodes, edges } = useSystemDesigner();
   const { toast } = useToast();
 
-  const { data: playgroundData, refetch: refetchPlayground, isLoading: isLoadingPlayground } = api.playgrounds.getById.useQuery(
-    playgroundId as string,
-    {
-      enabled: !!playgroundId,
-    },
-  );
+  const {
+    data: playgroundData,
+    refetch: refetchPlayground,
+    isLoading: isLoadingPlayground,
+  } = api.playgrounds.getById.useQuery(playgroundId as string, {
+    enabled: !!playgroundId,
+  });
 
   const storageKey = `/playgrounds/${pathname}-feedback`;
 
@@ -67,14 +69,15 @@ export const usePlaygroundManager = () => {
   });
 
   // Mutation to update playground data
-  const { mutateAsync: updatePlayground, isPending: isUpdatingPlayground } = api.playgrounds.update.useMutation({
-    onError: (err) => {
-      console.error("Error saving feedback to database:", err);
-    },
-    onSuccess: () => {
-      void refetchPlayground();
-    },
-  });
+  const { mutateAsync: updatePlayground, isPending: isUpdatingPlayground } =
+    api.playgrounds.update.useMutation({
+      onError: (err) => {
+        console.error("Error saving feedback to database:", err);
+      },
+      onSuccess: () => {
+        void refetchPlayground();
+      },
+    });
 
   const checkSolution = async () => {
     const whiteboard = nodes.find((node) => node.type === "Whiteboard");
@@ -106,12 +109,16 @@ export const usePlaygroundManager = () => {
     }
   }, [data, setFeedback]);
 
-  const dbSavedNodes = (playgroundData?.playground.jsonBlob as {
-    nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[];
-  })?.nodes;
-  const dbSavedEdges = (playgroundData?.playground.jsonBlob as {
-    edges: Edge[];
-  })?.edges;
+  const dbSavedNodes = (
+    playgroundData?.playground.jsonBlob as {
+      nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[];
+    }
+  )?.nodes;
+  const dbSavedEdges = (
+    playgroundData?.playground.jsonBlob as {
+      edges: Edge[];
+    }
+  )?.edges;
 
   return {
     checkSolution,
@@ -135,7 +142,11 @@ const getSystemDesignPrompt = ({
   edges,
 }: {
   nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[];
-  edges: Edge[];
+  edges: Edge<{
+    label?: string;
+    apiDefinition?: string;
+    requestFlow?: string;
+  }>[];
 }): string => {
   const extractRequirements = (
     nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[],
@@ -152,17 +163,7 @@ const getSystemDesignPrompt = ({
       nonFunctionalRequirements: configs[
         "non-functional requirements"
       ] as string,
-      apiDefinitions: (
-        configs["API definitions and flows"] as Array<{
-          name: string;
-          definition: string;
-          flow: string;
-        }>
-      )?.map((api) => ({
-        name: api.name,
-        definition: api.definition,
-        flow: api.flow,
-      })),
+      apiDefinitions: extractAPIDefinitions(edges),
       capacityEstimations: configs["Capacity estimations"] as Record<
         string,
         string

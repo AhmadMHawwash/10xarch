@@ -84,7 +84,7 @@ interface ParsedPromptSolutionComponent {
 interface ParsedPromptSolution {
   'Functional requirments': string;
   'Non functional requirments': string;
-  'API definitions': Array<{ name: string; definition: string; flow: string }>;
+  'API definitions': Array<{ label: string; apiDefinition: string; requestFlow: string }>;
   components: ParsedPromptSolutionComponent[];
 }
 
@@ -415,7 +415,6 @@ describe('usePlaygroundManager', () => {
           displayName: 'Test System',
           'functional requirements': 'Func req 1',
           'non-functional requirements': 'Non-func req 1',
-          'API definitions and flows': [{ name: 'API1', definition: 'Def1', flow: 'Flow1' }] as {name: string, definition: string, flow: string}[],
           'Capacity estimations': { Traffic: '1000 RPS', Storage: '1TB' } as Record<string, string>,
         },
       },
@@ -427,8 +426,8 @@ describe('usePlaygroundManager', () => {
       { id: 'db-1', type: 'SystemComponentNode', data: { name: 'Database', configs: { 'Database models': [['User', 'id, name']] as [string, string][], 'Database details': 'PostgreSQL' } }, position: {x:0, y:0} },
     ] as Node[];
     const systemEdges = [
-      { id: 'e1', source: 'client-1', target: 'server-1' },
-      { id: 'e2', source: 'server-1', target: 'db-1' },
+      { id: 'e1', source: 'client-1', target: 'server-1', data: { label: 'API1', apiDefinition: 'Def1', requestFlow: 'Flow1' } },
+      { id: 'e2', source: 'server-1', target: 'db-1', data: { label: '', apiDefinition: '', requestFlow: '' } },
     ] as Edge[];
 
     mockedUseSystemDesigner.mockReturnValue({
@@ -452,7 +451,9 @@ describe('usePlaygroundManager', () => {
 
     expect(prompt.solution['Functional requirments']).toBe('Func req 1');
     expect(prompt.solution['Non functional requirments']).toBe('Non-func req 1');
-    expect(prompt.solution['API definitions']).toEqual([{ name: 'API1', definition: 'Def1', flow: 'Flow1' }]);
+    expect(prompt.solution['API definitions']).toEqual([
+      { name: 'API1', apiDefinition: 'Def1', requestFlow: 'Flow1', source: 'client-1', target: 'server-1' }
+    ]);
     expect(prompt.solution.components).toHaveLength(3);
     
     const clientComponent = prompt.solution.components.find(c => c.type === 'Client');

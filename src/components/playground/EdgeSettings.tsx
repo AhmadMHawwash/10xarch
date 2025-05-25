@@ -150,7 +150,7 @@ export const EdgeSettings = ({
                   value={apiDefinition}
                   onChange={handleApiDefinitionChange}
                   placeholder="Define API endpoints, request/response formats..."
-                  rows={4}
+                  rows={20}
                   data-testid="api-definition-textarea"
                   className="bg-gray-50 dark:bg-gray-800"
                   onKeyDown={(e) => e.stopPropagation()}
@@ -165,7 +165,7 @@ export const EdgeSettings = ({
                   onChange={handleRequestFlowChange}
                   placeholder="Describe how requests flow through this connection..."
                   aria-label="Request Flow"
-                  rows={4}
+                  rows={20}
                   data-testid="request-flow-textarea"
                   className="bg-gray-50 dark:bg-gray-800"
                   onKeyDown={(e) => e.stopPropagation()}

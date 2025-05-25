@@ -4,20 +4,9 @@ import { getSystemComponent } from "@/components/Gallery";
 import { ComponentSettings } from "@/components/playground/ComponentSettings";
 import { EdgeSettings } from "@/components/playground/EdgeSettings";
 import SystemContext from "@/components/playground/SystemContext";
-import { type OtherNodeDataProps } from "@/components/ReactflowCustomNodes/SystemComponentNode";
-import { type SystemComponentNodeDataProps } from "@/components/ReactflowCustomNodes/SystemComponentNode";
+import { type OtherNodeDataProps, type SystemComponentNodeDataProps } from "@/components/ReactflowCustomNodes/SystemComponentNode";
 import { FlowManager } from "@/components/SolutionFlowManager";
 import SystemBuilder from "@/components/SystemDesigner";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from "@/components/ui/resizable";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,6 +17,17 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
+import { useToast } from "@/components/ui/use-toast";
 import {
   SystemDesignerProvider,
   useSystemDesigner,
@@ -36,10 +36,9 @@ import { ChatMessagesProvider } from "@/lib/hooks/useChatMessages_";
 import { usePlaygroundManager } from "@/lib/hooks/usePlaygroundManager";
 import { type SystemComponentType } from "@/lib/levels/type";
 import { Bot, Info, X } from "lucide-react";
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocalStorage, usePrevious } from "react-use";
 import { type Edge, type Node, ReactFlowProvider } from "reactflow";
-import { useToast } from "@/components/ui/use-toast";
 
 const AUTO_SAVE_INTERVAL = 5000; // 20 seconds
 
@@ -155,11 +154,28 @@ function PageContent() {
   const [showDivergenceDialog, setShowDivergenceDialog] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
+  const [localPlaygroundTitle, setLocalPlaygroundTitle] = useLocalStorage(
+    `${playgroundId}-localPlaygroundTitle`,
+    "",
+  );
+  const [localPlaygroundDescription, setLocalPlaygroundDescription] =
+    useLocalStorage(`${playgroundId}-localPlaygroundDescription`, "");
   const { toast } = useToast();
-  
+
   const isInitialized = useRef(false);
   const prevFeedback = usePrevious(feedback);
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const [title, setTitle] = useSystemComponentConfigSlice<string>(
+    selectedNode?.id ?? "",
+    "title",
+    "",
+  );
+  const [subtitle, setSubtitle] = useSystemComponentConfigSlice<string>(
+    selectedNode?.id ?? "",
+    "subtitle",
+    "",
+  );
 
   // Client-side initialization
   useEffect(() => {
@@ -194,6 +210,12 @@ function PageContent() {
       })),
     );
     setEdges(playground.edges);
+    if (playground.title) {
+      setLocalPlaygroundTitle(playground.title);
+    }
+    if (playground.description) {
+      setLocalPlaygroundDescription(playground.description);
+    }
   }, [playground, setNodes, setEdges]);
 
   // Initial load and divergence check
@@ -208,7 +230,12 @@ function PageContent() {
           playground.edges,
         );
         const localDetails = getImportantDetails(nodes, edges);
-        if (!deepCompare(remoteDetails, localDetails)) {
+        const isDivergent =
+          playground.title !== localPlaygroundTitle ||
+          playground.description !== localPlaygroundDescription ||
+          !deepCompare(remoteDetails, localDetails);
+          
+        if (isDivergent) {
           setShowDivergenceDialog(true);
           return; // Wait for user decision before initializing
         }
@@ -221,12 +248,24 @@ function PageContent() {
 
   // Auto-save functionality
   useEffect(() => {
-    if (!isInitialized.current || isSaving || showDivergenceDialog || !isDirty) {
+    if (
+      !isInitialized.current ||
+      isSaving ||
+      showDivergenceDialog ||
+      !isDirty
+    ) {
       if (!playground?.nodes || !playground?.edges) return;
 
       const localDetails = getImportantDetails(nodes, edges);
-      const remoteDetails = getImportantDetails(playground.nodes, playground.edges);
-      const isDirty = !deepCompare(remoteDetails, localDetails);
+      const remoteDetails = getImportantDetails(
+        playground.nodes,
+        playground.edges,
+      );
+      const isDirty =
+        playground.title !== localPlaygroundTitle ||
+        playground.description !== localPlaygroundDescription ||
+        !deepCompare(remoteDetails, localDetails);
+
       setIsDirty(isDirty);
 
       return;
@@ -240,6 +279,8 @@ function PageContent() {
       setIsSaving(true);
       updatePlayground({
         id: playgroundId,
+        title: localPlaygroundTitle,
+        description: localPlaygroundDescription,
         jsonBlob: { nodes, edges },
       })
         .catch((error) => {
@@ -262,6 +303,8 @@ function PageContent() {
     updatePlayground,
     isSaving,
     showDivergenceDialog,
+    localPlaygroundTitle,
+    localPlaygroundDescription,
   ]);
 
   const handleKeepDbVersion = useCallback(() => {
@@ -276,6 +319,8 @@ function PageContent() {
     try {
       await updatePlayground({
         id: playgroundId,
+        title: localPlaygroundTitle,
+        description: localPlaygroundDescription,
         jsonBlob: { nodes, edges },
       });
       await refetchPlayground(); // Ensure local state matches the newly saved state
@@ -296,6 +341,8 @@ function PageContent() {
     try {
       await updatePlayground({
         id: playgroundId,
+        title: localPlaygroundTitle,
+        description: localPlaygroundDescription,
         jsonBlob: { nodes, edges },
       });
       toast({
@@ -315,22 +362,6 @@ function PageContent() {
       setHideWelcomeGuide(true);
     }
   };
-
-  const [context, setContext] = useSystemComponentConfigSlice<string>(
-    selectedNode?.id ?? "",
-    "context",
-    "",
-  );
-  const [title, setTitle] = useSystemComponentConfigSlice<string>(
-    selectedNode?.id ?? "",
-    "title",
-    "",
-  );
-  const [subtitle, setSubtitle] = useSystemComponentConfigSlice<string>(
-    selectedNode?.id ?? "",
-    "subtitle",
-    "",
-  );
 
   const selectedNodeName: SystemComponentType | undefined = selectedNode?.data
     ?.name as SystemComponentType | undefined;
@@ -360,22 +391,22 @@ function PageContent() {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Unsaved Changes Detected</AlertDialogTitle>
+            <AlertDialogTitle>Divergence Detected</AlertDialogTitle>
             <AlertDialogDescription>
               There is a difference between your current design and the saved
-              version. Which version would you like to keep?
+              version. Which version would you like to use?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={handleKeepDbVersion}>
-              Use Saved Version
+              Use Remote Changes
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
                 void handleKeepLocalVersion();
               }}
             >
-              {isSaving ? "Saving..." : "Keep Current Changes"}
+              {isSaving ? "Saving..." : "Keep Local Changes"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -442,18 +473,24 @@ function PageContent() {
                   <EdgeSettings edge={selectedEdge} />
                 ) : (
                   <>
-                    <div>
-                      {!selectedNode || selectedNode?.data.name === "Whiteboard"
-                        ? "Context"
-                        : "Configuration"}
-                    </div>
-                    <div className="mt-4 h-[calc(100vh-280px)]">
+                    <div className="h-[calc(100vh-280px)]">
                       {showNodeSettings ? (
-                        <ComponentSettings node={selectedNode} />
+                        <>
+                          <Label className="text-sm font-medium">
+                            Configuration
+                          </Label>
+                          <ComponentSettings node={selectedNode} />
+                        </>
                       ) : (
                         <SystemContext
-                          context={context}
-                          setContext={setContext}
+                          title={localPlaygroundTitle}
+                          onTitleChange={(e) =>
+                            setLocalPlaygroundTitle(e.target.value)
+                          }
+                          description={localPlaygroundDescription}
+                          onDescriptionChange={(e) =>
+                            setLocalPlaygroundDescription(e.target.value)
+                          }
                         />
                       )}
                     </div>

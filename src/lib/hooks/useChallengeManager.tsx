@@ -17,6 +17,7 @@ import useLocalStorageState from "./useLocalStorageState";
 import { useSystemDesigner } from "./_useSystemDesigner";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/components/ui/use-toast";
+import { extractAPIDefinitions } from "@/components/ai-chat/ChatUI";
 
 export const SYSTEM_COMPONENT_NODE = "SystemComponentNode";
 
@@ -148,8 +149,8 @@ export const useChallengeManager = () => {
 
 interface EdgeData {
   label?: string;
-  definition?: string;
-  flow?: string;
+  apiDefinition?: string;
+  requestFlow?: string;
 }
 
 export const getChallengePrompt = ({
@@ -182,30 +183,14 @@ export const getChallengePrompt = ({
     };
   };
 
-  const extractAPIDefinitions = (edges: Edge<EdgeData>[]) => {
-    return edges
-      .filter(
-        (edge) =>
-          // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-          edge.data?.label && (edge.data?.definition || edge.data?.flow),
-      )
-      .map((edge) => ({
-        name: edge.data?.label ?? "",
-        definition: edge.data?.definition ?? "",
-        flow: edge.data?.flow ?? "",
-        source: edge.source,
-        target: edge.target,
-      }));
-  };
-
   const findTargets = (sourceId: string) => {
     return edges
       .filter((edge) => edge.source === sourceId)
       .map((edge) => ({
         targetId: edge.target,
         title: edge.data?.label ?? "connects to",
-        ...(edge.data?.definition && { apiDefinition: edge.data?.definition }),
-        ...(edge.data?.flow && { apiFlow: edge.data?.flow }),
+        ...(edge.data?.apiDefinition && { apiDefinition: edge.data?.apiDefinition }),
+        ...(edge.data?.requestFlow && { requestFlow: edge.data?.requestFlow }),
       }));
   };
 

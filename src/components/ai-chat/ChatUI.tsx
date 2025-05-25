@@ -14,6 +14,7 @@ import { useChatMessages } from "@/lib/hooks/useChatMessages_";
 import { CreditAlert } from "@/components/credits/CreditAlert";
 import { useAuth } from "@clerk/nextjs";
 import { useQueryClient } from "@tanstack/react-query";
+import { type Edge } from "reactflow";
 
 interface Message {
   role: "user" | "assistant" | "system";
@@ -45,6 +46,29 @@ interface WhiteboardConfigs {
   "non-functional requirements"?: string;
 }
 
+export const extractAPIDefinitions = (
+  edges: Edge<{
+    label?: string;
+    apiDefinition?: string;
+    requestFlow?: string;
+  }>[],
+) => {
+  return edges
+    ?.filter(
+      (edge) =>
+        edge.data?.label &&
+        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+        (edge.data?.apiDefinition || edge.data?.requestFlow),
+    )
+    .map((edge) => ({
+      name: edge.data?.label ?? "",
+      apiDefinition: edge.data?.apiDefinition ?? "",
+      requestFlow: edge.data?.requestFlow ?? "",
+      source: edge.source,
+      target: edge.target,
+    }));
+};
+
 export function ChatUI({
   challengeId,
   stageIndex = 0,
@@ -66,7 +90,7 @@ export function ChatUI({
   const { userId } = useAuth();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const { nodes } = useSystemDesigner();
+  const { nodes, edges } = useSystemDesigner();
   const queryClient = useQueryClient();
 
   // Create a stable chat session ID that persists across component mounts
@@ -226,9 +250,11 @@ export function ChatUI({
         configs: node.data.configs,
       }));
 
+    const apiDefinitions = extractAPIDefinitions(edges);
+
     return {
       components: cleanedNodes,
-      apiDefinitions: configs["API definitions and flows"] ?? [],
+      apiDefinitions,
       capacityEstimations: {
         traffic: configs["Capacity estimations"]?.Traffic ?? "",
         storage: configs["Capacity estimations"]?.Storage ?? "",

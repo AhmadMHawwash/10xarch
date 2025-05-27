@@ -406,7 +406,7 @@ function PageContent() {
                 void handleKeepLocalVersion();
               }}
             >
-              {isSaving ? "Saving..." : "Keep Local Changes"}
+              {isSaving ? "Saving..." : "Keep Local Changes & Update Remote"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

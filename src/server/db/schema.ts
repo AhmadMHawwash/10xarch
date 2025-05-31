@@ -43,16 +43,62 @@ export const posts = createTable(
 export type Post = typeof posts.$inferSelect;
 
 export const users = createTable("users", {
-  id: text("id").primaryKey(),
-  email: text("email").notNull().unique(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  id: text("id").primaryKey().notNull(),
+  email: text("email").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  // Stripe customer info
+  stripe_customer_id: text("stripe_customer_id"),
 });
 
 export type User = typeof users.$inferSelect;
 
-export const usersRelations = relations(users, ({ many }) => ({
+// Subscription status enum
+export const subscriptionStatusEnum = pgEnum("subscription_status", [
+  "incomplete",
+  "incomplete_expired",
+  "trialing",
+  "active",
+  "past_due",
+  "canceled",
+  "unpaid",
+  "paused",
+]);
+
+// Subscriptions table
+export const subscriptions = createTable("subscriptions", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: text("user_id").references(() => users.id).notNull(),
+  stripe_subscription_id: text("stripe_subscription_id").unique(),
+  status: subscriptionStatusEnum("status").notNull(),
+  tier: text("tier").notNull(),
+  current_period_start: timestamp("current_period_start").notNull(),
+  current_period_end: timestamp("current_period_end").notNull(),
+  cancel_at_period_end: integer("cancel_at_period_end").notNull().default(0),
+  canceled_at: timestamp("canceled_at"),
+  ended_at: timestamp("ended_at"),
+  trial_start: timestamp("trial_start"),
+  trial_end: timestamp("trial_end"),
+  created_at: timestamp("created_at").notNull().defaultNow(),
+  updated_at: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export type Subscription = typeof subscriptions.$inferSelect;
+
+export const usersRelations = relations(users, ({ many, one }) => ({
   playgrounds: many(playgrounds),
+  activeSubscription: one(subscriptions, {
+    fields: [users.id],
+    references: [subscriptions.userId],
+    relationName: "userActiveSubscription",
+  }),
+}));
+
+export const subscriptionsRelations = relations(subscriptions, ({ one }) => ({
+  user: one(users, {
+    fields: [subscriptions.userId],
+    references: [users.id],
+  }),
 }));
 
 export const ownerTypeEnum = pgEnum("owner_type", ["user", "org"]);
@@ -88,39 +134,24 @@ export const playgroundsRelations = relations(playgrounds, ({ one }) => ({
   }),
 }));
 
-export const credits = createTable("credits", {
+export const tokenBalances = createTable("token_balances", {
   id: uuid("id").primaryKey().defaultRandom(),
-  userId: text("user_id").references(() => users.id).notNull(),
-  balance: integer("balance").notNull().default(0),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  ownerType: text("owner_type").notNull(), // 'user' or 'org'
+  ownerId: text("owner_id").notNull(),
+  expiringTokens: integer("expiring_tokens").notNull().default(0),
+  expiringTokensExpiry: timestamp("expiring_tokens_expiry"),
+  nonexpiringTokens: integer("nonexpiring_tokens").notNull().default(0),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
-export const creditTransactions = createTable("credit_transactions", {
+export const tokenLedger = createTable("token_ledger", {
   id: uuid("id").primaryKey().defaultRandom(),
-  userId: text("user_id").references(() => users.id).notNull(),
+  ownerType: text("owner_type").notNull(), // 'user' or 'org'
+  ownerId: text("owner_id").notNull(),
+  type: text("type").notNull(), // 'expiring' or 'nonexpiring'
   amount: integer("amount").notNull(),
-  type: text("type", { enum: ["purchase", "usage"] }).notNull(),
-  description: text("description"),
-  status: text("status", { enum: ["pending", "completed", "failed"] }).notNull(),
-  paymentId: text("payment_id"),
-  stripeSessionId: text("stripe_session_id").unique(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
+  reason: text("reason").notNull(), // 'subscription', 'topup', 'usage', 'reset', etc.
+  expiry: timestamp("expiry"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
 });
-
-export type Credits = typeof credits.$inferSelect;
-export type CreditTransaction = typeof creditTransactions.$inferSelect;
-
-export const creditsRelations = relations(credits, ({ one }) => ({
-  user: one(users, {
-    fields: [credits.userId],
-    references: [users.id],
-  }),
-}));
-
-export const creditTransactionsRelations = relations(creditTransactions, ({ one }) => ({
-  user: one(users, {
-    fields: [creditTransactions.userId],
-    references: [users.id],
-  }),
-}));
 

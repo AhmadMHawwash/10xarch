@@ -50,6 +50,34 @@
       "when": 1747861909670,
       "tag": "0006_soft_lady_mastermind",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1748545242611,
+      "tag": "0007_demonic_groot",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1748548239134,
+      "tag": "0008_graceful_golden_guardian",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1748685208398,
+      "tag": "0009_marvelous_fallen_one",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1748688955156,
+      "tag": "0010_legal_plazm",
+      "breakpoints": true
     }
   ]
 }

@@ -1,0 +1,1 @@
+ALTER TABLE "sdp_subscriptions" ADD COLUMN "user_id" text NOT NULL;

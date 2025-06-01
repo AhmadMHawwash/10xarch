@@ -68,8 +68,9 @@ export const subscriptionStatusEnum = pgEnum("subscription_status", [
 // Subscriptions table
 export const subscriptions = createTable("subscriptions", {
   id: uuid("id").primaryKey().defaultRandom(),
+  userId: text("user_id").notNull(), // The user who purchased/manages the subscription
   ownerType: text("owner_type").notNull(), // 'user' or 'org'
-  ownerId: text("owner_id").notNull(),
+  ownerId: text("owner_id").notNull(), // The account the subscription benefits
   stripe_subscription_id: text("stripe_subscription_id").unique(),
   status: subscriptionStatusEnum("status").notNull(),
   tier: text("tier").notNull(),

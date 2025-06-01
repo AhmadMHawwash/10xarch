@@ -68,7 +68,8 @@ export const subscriptionStatusEnum = pgEnum("subscription_status", [
 // Subscriptions table
 export const subscriptions = createTable("subscriptions", {
   id: uuid("id").primaryKey().defaultRandom(),
-  userId: text("user_id").references(() => users.id).notNull(),
+  ownerType: text("owner_type").notNull(), // 'user' or 'org'
+  ownerId: text("owner_id").notNull(),
   stripe_subscription_id: text("stripe_subscription_id").unique(),
   status: subscriptionStatusEnum("status").notNull(),
   tier: text("tier").notNull(),
@@ -85,20 +86,8 @@ export const subscriptions = createTable("subscriptions", {
 
 export type Subscription = typeof subscriptions.$inferSelect;
 
-export const usersRelations = relations(users, ({ many, one }) => ({
+export const usersRelations = relations(users, ({ many }) => ({
   playgrounds: many(playgrounds),
-  activeSubscription: one(subscriptions, {
-    fields: [users.id],
-    references: [subscriptions.userId],
-    relationName: "userActiveSubscription",
-  }),
-}));
-
-export const subscriptionsRelations = relations(subscriptions, ({ one }) => ({
-  user: one(users, {
-    fields: [subscriptions.userId],
-    references: [users.id],
-  }),
 }));
 
 export const ownerTypeEnum = pgEnum("owner_type", ["user", "org"]);

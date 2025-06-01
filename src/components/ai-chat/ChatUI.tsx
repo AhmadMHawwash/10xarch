@@ -12,7 +12,7 @@ import ReactMarkdown from "react-markdown";
 import { cn } from "@/lib/utils";
 import { useChatMessages } from "@/lib/hooks/useChatMessages_";
 import { CreditAlert } from "@/components/credits/CreditAlert";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth, useOrganization } from "@clerk/nextjs";
 import { useQueryClient } from "@tanstack/react-query";
 import { type Edge } from "reactflow";
 
@@ -85,16 +85,20 @@ export function ChatUI({
     expiringTokens,
     expiringTokensExpiry,
     nonexpiringTokens,
-    totalTokens,
+    totalUsableTokens: totalTokens,
     hasValidData: hasValidCreditData,
     refetch: refetchCredits,
   } = useCredits();
   const { getMessages, addMessage, clearSession } = useChatMessages();
   const { userId } = useAuth();
+  const { organization } = useOrganization();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { nodes, edges } = useSystemDesigner();
   const queryClient = useQueryClient();
+
+  // Track the previous organization ID to detect changes
+  const prevOrgIdRef = useRef<string | null | undefined>();
 
   // Create a stable chat session ID that persists across component mounts
   const chatSessionId = useMemo(
@@ -152,6 +156,19 @@ export function ChatUI({
     mounted,
   ]);
 
+  // Watch for organization changes and refetch remaining prompts when context switches
+  useEffect(() => {
+    const currentOrgId = organization?.id ?? null;
+    
+    // Only refetch if the organization actually changed (not on initial mount)
+    if (prevOrgIdRef.current !== undefined && prevOrgIdRef.current !== currentOrgId) {
+      forceRefreshRemainingMessages();
+    }
+    
+    // Update the ref to the current org ID
+    prevOrgIdRef.current = currentOrgId;
+  }, [organization?.id, forceRefreshRemainingMessages]);
+
   const messages = useMemo(
     () => (mounted ? getMessages(chatSessionId) : []),
     [mounted, getMessages, chatSessionId],
@@ -206,7 +223,7 @@ export function ChatUI({
       forceRefreshRemainingMessages();
 
       // If tokens were used, refetch balances
-      if (typeof data.tokens === 'number') {
+      if (data.tokensUsed !== null) {
         void refetchCredits();
       }
     },

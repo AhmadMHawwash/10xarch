@@ -22,6 +22,7 @@ import {
   TableRow,
 } from "../ui/table";
 import { useAuth } from "@clerk/nextjs";
+import { type CreditTransactionInput } from "@/lib/validations/credits";
 
 if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
   throw new Error("Missing NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY");
@@ -296,7 +297,6 @@ export function CreditManagement() {
                 <TableHead>Type</TableHead>
                 <TableHead>Amount</TableHead>
                 <TableHead>Description</TableHead>
-                <TableHead>Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -306,15 +306,15 @@ export function CreditManagement() {
                     Loading transactions...
                   </TableCell>
                 </TableRow>
-              ) : transactionData?.transactions.length === 0 ? (
+              ) : transactionData?.transactions?.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center">
                     No transactions found
                   </TableCell>
                 </TableRow>
               ) : (
-                transactionData?.transactions.map(
-                  (transaction: Transaction) => (
+                transactionData?.transactions?.map(
+                  (transaction: CreditTransactionInput) => (
                     <TableRow key={transaction.id}>
                       <TableCell>
                         {new Date(transaction.createdAt).toLocaleDateString()}
@@ -332,10 +332,7 @@ export function CreditManagement() {
                         {transaction.amount > 0 ? "+" : ""}
                         {transaction.amount}
                       </TableCell>
-                      <TableCell>{transaction?.description ?? "-"}</TableCell>
-                      <TableCell className="capitalize">
-                        {transaction?.status}
-                      </TableCell>
+                      <TableCell>{transaction?.reason ?? "-"}</TableCell>
                     </TableRow>
                   ),
                 )

@@ -13,7 +13,7 @@ interface CreditAlertProps {
 }
 
 export function CreditAlert({ className, variant = "inline", hasNoFreePrompts = true }: CreditAlertProps) {
-  const { hasLowCredits, balance } = useCredits();
+  const { hasLowCredits, totalUsableTokens } = useCredits();
 
   if (!hasLowCredits || !hasNoFreePrompts) {
     return null;
@@ -54,7 +54,7 @@ export function CreditAlert({ className, variant = "inline", hasNoFreePrompts = 
       )}
     >
       <CreditCard className="h-3.5 w-3.5" />
-      <span>You have {balance} credits. Buy more</span>
+      <span>You have {totalUsableTokens} tokens. Buy more</span>
     </Link>
   );
 } 

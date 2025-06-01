@@ -1,12 +1,16 @@
 import { api } from "@/trpc/react";
-import { useAuth } from "@clerk/nextjs";
-import { useCallback } from "react";
+import { useAuth, useOrganization } from "@clerk/nextjs";
+import { useCallback, useEffect, useRef } from "react";
 
 // Define a global state flag to track when updates are in progress
 let isUpdating = false;
 
 export function useCredits() {
   const { userId } = useAuth();
+  const { organization } = useOrganization();
+  
+  // Track the previous organization ID to detect changes
+  const prevOrgIdRef = useRef<string | null | undefined>();
   
   const {
     data: creditsData,
@@ -29,6 +33,19 @@ export function useCredits() {
       return failureCount < 3;
     }
   });
+
+  // Watch for organization changes and refetch when context switches
+  useEffect(() => {
+    const currentOrgId = organization?.id ?? null;
+    
+    // Only refetch if the organization actually changed (not on initial mount)
+    if (prevOrgIdRef.current !== undefined && prevOrgIdRef.current !== currentOrgId) {
+      void refetch();
+    }
+    
+    // Update the ref to the current org ID
+    prevOrgIdRef.current = currentOrgId;
+  }, [organization?.id, refetch]);
 
   // Extract token balances
   const balance = creditsData?.balance;

@@ -35,7 +35,7 @@ function RateLimitInfo() {
       staleTime: 0, // Consider data stale immediately so it refreshes on mount
     });
 
-  const { expiringTokens, expiringTokensExpiry, nonexpiringTokens, totalTokens } = useCredits();
+  const { totalUsableTokens: totalTokens } = useCredits();
 
   if (rateLimitQuery.isLoading) {
     return <p>Loading...</p>;
@@ -132,13 +132,12 @@ function FreeChallengeBadge() {
 export default function Navbar() {
   const { isSignedIn, isLoading: isUserLoading } = useCurrentUser();
   const { userId } = useAuth();
-  const { isLoaded: isOrgListLoaded, userMemberships } = useOrganizationList();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const {
     expiringTokens,
     expiringTokensExpiry,
     nonexpiringTokens,
-    totalTokens,
+    totalUsableTokens: totalTokens,
     isLoading: isLoadingCredits,
     hasValidData,
     refetch: refetchCredits,
@@ -158,9 +157,6 @@ export default function Navbar() {
 
   // Only apply container class for home and challenges pages
   const shouldUseContainer = pathname === "/" || pathname === "/challenges";
-
-  // Always show the organization switcher for signed-in users
-  const showOrgSwitcher = isSignedIn && isOrgListLoaded;
 
   return (
     <nav className="relative z-50 h-[7vh] border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">

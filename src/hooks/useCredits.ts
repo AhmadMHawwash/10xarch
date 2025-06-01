@@ -9,7 +9,7 @@ export function useCredits() {
   const { userId } = useAuth();
   
   const {
-    data: credits,
+    data: creditsData,
     isLoading,
     error,
     refetch,
@@ -30,12 +30,16 @@ export function useCredits() {
     }
   });
 
+  // Extract token balances
+  const balance = creditsData?.balance;
+  const expiringTokens = balance?.expiringTokens ?? 0;
+  const expiringTokensExpiry = balance?.expiringTokensExpiry ?? null;
+  const nonexpiringTokens = balance?.nonexpiringTokens ?? 0;
+  const totalUsableTokens = expiringTokens + nonexpiringTokens;
+
   // Check if we have actual data
-  const hasValidData = Boolean(credits?.credits?.balance !== undefined);
-  
-  // Return the balance or 0 if not available
-  const balance = credits?.credits?.balance ?? 0;
-  const hasLowCredits = balance === 0;
+  const hasValidData = typeof balance === 'object' && balance !== null;
+  const hasLowCredits = totalUsableTokens === 0;
   
   // Create a debounced refetch that won't trigger multiple simultaneous requests
   const debouncedRefetch = useCallback(async () => {
@@ -53,7 +57,10 @@ export function useCredits() {
   }, [refetch]);
   
   return {
-    balance,
+    expiringTokens,
+    expiringTokensExpiry,
+    nonexpiringTokens,
+    totalUsableTokens,
     isLoading,
     hasValidData,
     error,

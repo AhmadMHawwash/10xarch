@@ -62,7 +62,10 @@ export function CreditManagement() {
   }, []);
 
   const {
-    balance: credits,
+    expiringTokens,
+    expiringTokensExpiry,
+    nonexpiringTokens,
+    totalUsableTokens,
     refetch: refetchCredits,
     isLoading: isLoadingCredits,
   } = useCredits();
@@ -98,7 +101,7 @@ export function CreditManagement() {
 
   const addCreditsMutation = api.stripe.createCheckoutSession.useMutation();
 
-  const { baseTokens, bonusTokens, totalTokens, bonusPercentage } =
+  const { baseTokens, bonusTokens, bonusPercentage, totalTokens: totalTokensToPurchase } =
     calculatePurchaseTokens(parseFloat(amount));
 
   const handleAddCredits = async () => {
@@ -149,18 +152,34 @@ export function CreditManagement() {
       staleTime: 0, // Consider data stale immediately so it refreshes on mount
     });
 
-  if (!credits && isLoadingCredits) {
+  if (isLoadingCredits) {
     return <div>Loading...</div>;
   }
 
   return (
     <div className="container mx-auto">
       <div className="space-y-4 p-4">
-        <h2 className="text-2xl font-bold">Credit Management</h2>
+        <h2 className="text-2xl font-bold">Token Management</h2>
         <div className="rounded-lg border p-4">
-          <p className="mb-4">
-            Current Balance: {credits?.toLocaleString()} credits
-          </p>
+          <div className="mb-4">
+            <div className="font-semibold">Current Token Balances:</div>
+            <ul className="mt-2 space-y-1 text-sm">
+              <li>
+                <span className="font-medium">Total:</span> {totalUsableTokens.toLocaleString()} tokens
+              </li>
+              <li>
+                <span className="font-medium">Expiring:</span> {expiringTokens.toLocaleString()} tokens
+                {expiringTokensExpiry && expiringTokens > 0 && (
+                  <span className="ml-2 text-xs text-muted-foreground">
+                    (expires {new Date(expiringTokensExpiry).toLocaleDateString()})
+                  </span>
+                )}
+              </li>
+              <li>
+                <span className="font-medium">Non-expiring:</span> {nonexpiringTokens.toLocaleString()} tokens
+              </li>
+            </ul>
+          </div>
 
           <div className="mb-6 space-y-4">
             <div className="flex max-w-md flex-col space-y-4">
@@ -221,7 +240,7 @@ export function CreditManagement() {
                           <div className="flex items-center border-t border-gray-200 pt-1 dark:border-gray-700">
                             <span className="w-16 font-medium">Total:</span>
                             <span className="ml-2 font-bold tabular-nums">
-                              {totalTokens.toLocaleString()}
+                              {totalTokensToPurchase.toLocaleString()}
                             </span>
                           </div>
                         </div>
@@ -248,7 +267,7 @@ export function CreditManagement() {
                     ) : (
                       <>
                         <span className="text-lg text-gray-100 dark:text-gray-200">
-                          Purchase {totalTokens.toLocaleString()} tokens
+                          Purchase {totalTokensToPurchase.toLocaleString()} tokens
                         </span>
                         <span className="text-sm text-gray-100 dark:text-gray-200">
                           •

@@ -82,7 +82,10 @@ export function ChatUI({
   const [mounted, setMounted] = useState(false);
 
   const {
-    balance: credits,
+    expiringTokens,
+    expiringTokensExpiry,
+    nonexpiringTokens,
+    totalTokens,
     hasValidData: hasValidCreditData,
     refetch: refetchCredits,
   } = useCredits();
@@ -162,7 +165,7 @@ export function ChatUI({
   }, [rateLimitInfo]);
 
   const hasRemainingFreePrompts = rateLimitInfo ? remainingMessages > 0 : false;
-  const hasAvailablePrompts = hasRemainingFreePrompts || (credits ?? 0) > 0;
+  const hasAvailablePrompts = hasRemainingFreePrompts || totalTokens > 0;
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -202,8 +205,8 @@ export function ChatUI({
       setRemainingMessages(data.remainingMessages);
       forceRefreshRemainingMessages();
 
-      // Simple, single credits update if needed
-      if (data.credits !== undefined) {
+      // If tokens were used, refetch balances
+      if (typeof data.tokens === 'number') {
         void refetchCredits();
       }
     },
@@ -458,10 +461,30 @@ export function ChatUI({
               <span>Loading free prompts...</span>
             )}
           </div>
-          {hasValidCreditData && credits > 0 && (
+          {hasValidCreditData && totalTokens > 0 && (
             <div className="flex items-center gap-2 text-yellow-500">
               <Coins className="h-3.5 w-3.5" />
-              <span>{credits} credits</span>
+              <span>
+                Tokens: {totalTokens}
+                {expiringTokens > 0 && (
+                  <>
+                    {" "}(expiring: {expiringTokens}
+                    {expiringTokensExpiry && (
+                      <>
+                        , expires {new Date(expiringTokensExpiry).toLocaleDateString()}
+                      </>
+                    )}
+                    )
+                  </>
+                )}
+                {nonexpiringTokens > 0 && (
+                  <>
+                    {expiringTokens > 0 ? ", " : " ("}
+                    non-expiring: {nonexpiringTokens}
+                    )
+                  </>
+                )}
+              </span>
             </div>
           )}
         </div>

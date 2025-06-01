@@ -35,7 +35,7 @@ function RateLimitInfo() {
       staleTime: 0, // Consider data stale immediately so it refreshes on mount
     });
 
-  const { balance: credits } = useCredits();
+  const { expiringTokens, expiringTokensExpiry, nonexpiringTokens, totalTokens } = useCredits();
 
   if (rateLimitQuery.isLoading) {
     return <p>Loading...</p>;
@@ -78,9 +78,9 @@ function RateLimitInfo() {
       )}
       {remaining === 0 && (
         <div className="mt-2 border-t border-border/40 pt-2">
-          {credits > 0 ? (
+          {totalTokens > 0 ? (
             <p className="text-xs text-emerald-600 dark:text-emerald-400">
-              You have {credits} credits available to continue using AI features
+              You have {totalTokens} tokens available to continue using AI features
             </p>
           ) : (
             <p className="text-xs text-amber-600 dark:text-amber-400">
@@ -135,7 +135,10 @@ export default function Navbar() {
   const { isLoaded: isOrgListLoaded, userMemberships } = useOrganizationList();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const {
-    balance: credits,
+    expiringTokens,
+    expiringTokensExpiry,
+    nonexpiringTokens,
+    totalTokens,
     isLoading: isLoadingCredits,
     hasValidData,
     refetch: refetchCredits,
@@ -237,7 +240,25 @@ export default function Navbar() {
                   <span className="text-muted-foreground">Loading...</span>
                 ) : (
                   <span className="text-muted-foreground">
-                    {credits} credits
+                    Tokens: {totalTokens}
+                    {expiringTokens > 0 && (
+                      <>
+                        {" "}(expiring: {expiringTokens}
+                        {expiringTokensExpiry && (
+                          <>
+                            , expires {new Date(expiringTokensExpiry).toLocaleDateString()}
+                          </>
+                        )}
+                        )
+                      </>
+                    )}
+                    {nonexpiringTokens > 0 && (
+                      <>
+                        {expiringTokens > 0 ? ", " : " ("}
+                        non-expiring: {nonexpiringTokens}
+                        )
+                      </>
+                    )}
                   </span>
                 )}
               </Link>
@@ -329,9 +350,29 @@ export default function Navbar() {
                   prefetch={false}
                 >
                   {isLoadingCredits || !hasValidData ? (
-                    "Loading credits..."
+                    "Loading tokens..."
                   ) : (
-                    <>Credits: {credits}</>
+                    <>
+                      Tokens: {totalTokens}
+                      {expiringTokens > 0 && (
+                        <>
+                          {" "}(expiring: {expiringTokens}
+                          {expiringTokensExpiry && (
+                            <>
+                              , expires {new Date(expiringTokensExpiry).toLocaleDateString()}
+                            </>
+                          )}
+                          )
+                        </>
+                      )}
+                      {nonexpiringTokens > 0 && (
+                        <>
+                          {expiringTokens > 0 ? ", " : " ("}
+                          non-expiring: {nonexpiringTokens}
+                          )
+                        </>
+                      )}
+                    </>
                   )}
                 </Link>
               )

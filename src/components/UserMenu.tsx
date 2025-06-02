@@ -30,6 +30,7 @@ import {
   User,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { usePathname } from "next/navigation";
 
 export default function UserMenu() {
   const { user, isLoaded: isUserLoaded } = useUser();
@@ -37,7 +38,10 @@ export default function UserMenu() {
   const { organization, isLoaded: isOrgLoaded } = useOrganization();
   const clerk = useClerk();
   const { openOrganizationProfile, openUserProfile } = clerk;
-
+  const pathname = usePathname();
+  const isPricingPage = pathname.includes("/pricing");
+  const isCreditsPage = pathname.includes("/credits");
+  
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [orgs, setOrgs] = useState<Array<{ id: string; name: string }>>([]);
   const [isLoadingOrgs, setIsLoadingOrgs] = useState(false);
@@ -201,6 +205,10 @@ export default function UserMenu() {
         case "switch":
           if (orgId) {
             await clerk.setActive({ organization: orgId });
+            if (isPricingPage || isCreditsPage) {
+              // because of a bug, quickest way to refresh the page is to reload to show the correct context for subscription pricing table
+              window.location.reload();
+            }
             setSelectedOrgId(orgId);
           }
           break;

@@ -203,7 +203,7 @@ export function SubscriptionPricingTable({ contextOnly = false }: SubscriptionPr
               <div className="mt-1 text-orange-700 dark:text-orange-300">
                 Your subscription will be canceled on{" "}
                 <strong>{getCancellationDate() && formatDate(getCancellationDate()!)}</strong>.
-                You'll continue to have access to your current plan and tokens until then.
+                You&apos;ll continue to have access to your current plan and tokens until then.
               </div>
               <div className="mt-2">
                 <Button
@@ -220,7 +220,7 @@ export function SubscriptionPricingTable({ contextOnly = false }: SubscriptionPr
           </div>
         </div>
       )}
-
+      
       <div className="grid gap-8 md:grid-cols-2">
         {Object.entries(SUBSCRIPTION_TIERS).map(([tier, tierData]) => {
           const pricing = TIER_PRICING[tier as keyof typeof TIER_PRICING];

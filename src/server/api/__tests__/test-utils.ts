@@ -207,7 +207,8 @@ export const createMockPlayground = (userId: string): Playground => ({
 // Create a mock user
 export const createMockUser = (userId: string): User => ({
   id: userId,
-  email: 'test@example.com',
+  email: `${userId}@example.com`,
+  stripe_customer_id: null,
   createdAt: new Date(),
   updatedAt: new Date(),
 });

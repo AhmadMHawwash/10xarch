@@ -14,6 +14,7 @@
     "test:coverage": "vitest run --coverage",
     "ts-check": "tsc --noEmit",
     "prepare": "husky install",
+    "stripe:listen": "stripe listen --forward-to localhost:3000/api/stripe/webhook",
     "ngrok": "ngrok http --domain=civil-roughly-feline.ngrok-free.app 3000",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",

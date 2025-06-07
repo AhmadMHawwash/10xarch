@@ -11,14 +11,13 @@ export const useCreditsSchema = z.object({
 });
 
 export const creditTransactionSchema = z.object({
-  id: z.string().uuid(),
-  userId: z.string(),
+  type: z.string(),
   amount: z.number(),
-  type: z.enum(["purchase", "usage"]),
-  description: z.string().nullable(),
-  status: z.enum(["pending", "completed", "failed"]),
-  paymentId: z.string().nullable(),
+  id: z.string(),
   createdAt: z.date(),
+  ownerType: z.string(),
+  ownerId: z.string(),
+  reason: z.string(),
 });
 
 export type PurchaseCreditsInput = z.infer<typeof purchaseCreditsSchema>;

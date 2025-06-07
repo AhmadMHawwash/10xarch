@@ -9,10 +9,13 @@ describe('useCredits', () => {
     vi.clearAllMocks();
     vi.resetModules();
     
-    // Mock dependencies at runtime
+    // Mock dependencies at runtime - now including useOrganization
     vi.doMock('@clerk/nextjs', () => ({
       useAuth: () => ({
         userId: 'test-user',
+      }),
+      useOrganization: () => ({
+        organization: null, // Default to personal account
       }),
     }));
 
@@ -22,13 +25,19 @@ describe('useCredits', () => {
       })),
     }));
     
-    // Set up the data to be returned by the API
+    // Set up the data to be returned by the API - updated for token system
     vi.doMock('@/trpc/react', () => ({
       api: {
         credits: {
           getBalance: {
             useQuery: vi.fn().mockReturnValue({
-              data: { credits: { balance: 100 } },
+              data: { 
+                balance: {
+                  expiringTokens: 100,
+                  expiringTokensExpiry: null,
+                  nonexpiringTokens: 0
+                }
+              },
               isLoading: false,
               error: null,
               refetch: mockRefetch,
@@ -44,7 +53,7 @@ describe('useCredits', () => {
     const { useCredits } = await import('../useCredits');
     
     const { result } = renderHook(() => useCredits());
-    expect(result.current.balance).toBe(100);
+    expect(result.current.totalUsableTokens).toBe(100);
   });
 
   it('should have hasValidData true when balance is available', async () => {
@@ -60,7 +69,13 @@ describe('useCredits', () => {
         credits: {
           getBalance: {
             useQuery: vi.fn().mockReturnValue({
-              data: { credits: { balance: 0 } },
+              data: { 
+                balance: {
+                  expiringTokens: 0,
+                  expiringTokensExpiry: null,
+                  nonexpiringTokens: 0
+                }
+              },
               isLoading: false,
               error: null,
               refetch: mockRefetch,
@@ -155,13 +170,19 @@ describe('useCredits', () => {
     const { result } = renderHook(() => useCredits());
     
     expect(result.current.error).toBe(testError);
-    expect(result.current.balance).toBe(0);
+    expect(result.current.totalUsableTokens).toBe(0);
     expect(result.current.hasValidData).toBe(false);
   });
   
   it('should call useQuery with appropriate options', async () => {
     const mockUseQuery = vi.fn().mockReturnValue({
-      data: { credits: { balance: 100 } },
+      data: { 
+        balance: {
+          expiringTokens: 100,
+          expiringTokensExpiry: null,
+          nonexpiringTokens: 0
+        }
+      },
       isLoading: false,
       error: null,
       refetch: mockRefetch,

@@ -88,6 +88,15 @@ vi.mock('@/lib/tokens', () => ({
   costToCredits: vi.fn().mockReturnValue(2),
 }));
 
+// Mock the new token deduction utility
+vi.mock('@/lib/tokens-server', () => ({
+  deductTokensFromAccount: vi.fn().mockResolvedValue({
+    tokensDeducted: 2,
+    finalExpiringBalance: 98,
+    finalNonexpiringBalance: 0,
+  }),
+}));
+
 // Mock the challenges import
 vi.mock('@/content/challenges', () => {
   return {
@@ -121,7 +130,10 @@ vi.mock('@/content/challenges', () => {
 // Create a mock DB structure
 const mockDb = {
   query: {
-    credits: {
+    tokenBalances: {
+      findFirst: vi.fn().mockResolvedValue(null),
+    },
+    tokenLedger: {
       findFirst: vi.fn().mockResolvedValue(null),
     },
   },
@@ -164,8 +176,13 @@ describe('Chat Router Functions', () => {
     expect(result).toHaveProperty('remaining');
     expect(result).toHaveProperty('reset');
     expect(result).toHaveProperty('limit');
-    // For unauthenticated users, credits should be 0
-    expect(result.credits).toBe(0);
+    // For unauthenticated users, tokenBalance should be a zero object, not null
+    expect(result.tokenBalance).toEqual({
+      expiringTokens: 0,
+      expiringTokensExpiry: null,
+      nonexpiringTokens: 0,
+      totalTokens: 0
+    });
   });
 
   test('getRemainingPrompts for authenticated users', async () => {
@@ -176,8 +193,12 @@ describe('Chat Router Functions', () => {
     // @ts-expect-error - Intentionally using simplified mock
     vi.mocked(auth).mockResolvedValueOnce({ userId: 'test-user' });
     
-    // Setup mock DB to return user credits
-    mockDb.query.credits.findFirst.mockResolvedValueOnce({ balance: 100 });
+    // Setup mock DB to return user token balance
+    mockDb.query.tokenBalances.findFirst.mockResolvedValueOnce({ 
+      expiringTokens: 100,
+      expiringTokensExpiry: null,
+      nonexpiringTokens: 0
+    });
     
     // Create a test context
     const ctx = {
@@ -195,7 +216,12 @@ describe('Chat Router Functions', () => {
     expect(result).toHaveProperty('remaining');
     expect(result).toHaveProperty('reset');
     expect(result).toHaveProperty('limit');
-    expect(result.credits).toBe(100);
+    expect(result.tokenBalance).toEqual({
+      expiringTokens: 100,
+      expiringTokensExpiry: null,
+      nonexpiringTokens: 0,
+      totalTokens: 100
+    });
   });
   
   test('history message sanitization in sendMessage', async () => {
@@ -246,49 +272,45 @@ describe('Chat Router Functions', () => {
   });
 
   test('should reject when user has insufficient credits', async () => {
-    // Import the router and TRPCError for testing
     const { chatRouter } = await import('../chat');
     
-    // Import rate limiting functions
-    const { enforceRateLimit } = await import('@/lib/rate-limit');
-    
-    // Mock rate limit failed
-    vi.mocked(enforceRateLimit).mockRejectedValueOnce(
-      new TRPCError({
-        code: 'TOO_MANY_REQUESTS',
-        message: 'Rate limit exceeded for chat messages'
-      })
-    );
-    
-    // Mock user with zero credits
+    // Mock auth for authenticated user
     // @ts-expect-error - Intentionally using simplified mock
     vi.mocked(auth).mockResolvedValueOnce({ userId: 'test-user' });
     
-    // Setup mock DB to return zero credits
-    mockDb.query.credits.findFirst.mockResolvedValueOnce({ balance: 0 });
+    // Setup insufficient token balance
+    mockDb.query.tokenBalances.findFirst.mockResolvedValueOnce({ 
+      expiringTokens: 0,
+      expiringTokensExpiry: null,
+      nonexpiringTokens: 0
+    });
     
-    // Create a test context
+    // Force rate limit to be exceeded to trigger token check
+    const rateLimitError = new TRPCError({
+      code: "TOO_MANY_REQUESTS",
+      message: "Rate limit exceeded for chat messages",
+    });
+    
+    // Mock enforce rate limit to throw an error (rate limit exceeded)
+    const mockEnforceRateLimit = vi.mocked(await import('@/lib/rate-limit')).enforceRateLimit;
+    mockEnforceRateLimit.mockRejectedValueOnce(rateLimitError);
+    
     const ctx = {
       headers: { get: vi.fn().mockReturnValue('127.0.0.1') },
       db: mockDb,
     };
     
-    // Create caller from the router
     const caller = chatRouter.createCaller(ctx as any);
     
-    // Create input for the test
     const input = {
-      challengeId: 'chat-system',
+      message: 'Hello world',
+      challengeId: 'test-challenge',
       stageIndex: 0,
-      message: 'Test message',
-      history: [
-        { role: 'user' as const, content: 'Previous message' },
-        { role: 'assistant' as const, content: 'Previous response' }
-      ]
+      history: [],
     };
     
-    // Test that sending a message throws an error about insufficient credits
-    await expect(caller.sendMessage(input)).rejects.toThrow("You've used all your free messages and don't have enough credits");
+    // Test that sending a message throws an error about insufficient tokens
+    await expect(caller.sendMessage(input)).rejects.toThrow("You've used all your free messages and don't have enough tokens");
   });
 
   test('should detect prompt injection attempts', async () => {
@@ -410,6 +432,7 @@ describe('Chat Router Functions', () => {
     // Import rate limiting and token functions
     const { enforceRateLimit } = await import('@/lib/rate-limit');
     const { costToCredits, calculateGPTCost } = await import('@/lib/tokens');
+    const { deductTokensFromAccount } = await import('@/lib/tokens-server');
     
     // Mock rate limit failure
     vi.mocked(enforceRateLimit).mockRejectedValueOnce(
@@ -419,12 +442,16 @@ describe('Chat Router Functions', () => {
       })
     );
     
-    // Mock user with sufficient credits
+    // Mock user with sufficient tokens
     // @ts-expect-error - Intentionally using simplified mock
     vi.mocked(auth).mockResolvedValueOnce({ userId: 'test-user' });
     
-    // Setup mock DB to return sufficient credits
-    mockDb.query.credits.findFirst.mockResolvedValueOnce({ balance: 100 });
+    // Setup mock DB to return sufficient token balance
+    mockDb.query.tokenBalances.findFirst.mockResolvedValueOnce({ 
+      expiringTokens: 100,
+      nonexpiringTokens: 0,
+      expiringTokensExpiry: new Date()
+    });
     
     // Mock token calculations
     vi.mocked(calculateGPTCost).mockReturnValueOnce(0.002);
@@ -436,8 +463,15 @@ describe('Chat Router Functions', () => {
     // Create a test context with a well-defined DB mock
     const mockDbForCredits = {
       query: {
-        credits: {
-          findFirst: vi.fn().mockResolvedValue({ balance: 100 }),
+        tokenBalances: {
+          findFirst: vi.fn().mockResolvedValue({ 
+            expiringTokens: 100,
+            nonexpiringTokens: 0,
+            expiringTokensExpiry: new Date()
+          }),
+        },
+        tokenLedger: {
+          findFirst: vi.fn().mockResolvedValue(null),
         },
       },
       select: vi.fn().mockReturnThis(),
@@ -449,6 +483,9 @@ describe('Chat Router Functions', () => {
       returning: vi.fn().mockReturnThis(),
       update: vi.fn().mockReturnThis(),
       set: vi.fn().mockReturnThis(),
+      transaction: vi.fn().mockImplementation(async (callback: (tx: any) => Promise<any>) => {
+        return await callback(mockDbForCredits);
+      }),
     };
     
     const ctx = {
@@ -473,63 +510,43 @@ describe('Chat Router Functions', () => {
     // Verify result
     expect(result).toBeDefined();
     
-    // Verify database operations were called
-    expect(mockDbForCredits.update).toHaveBeenCalled();
-    expect(mockDbForCredits.set).toHaveBeenCalled();
+    // Verify deductTokensFromAccount was called instead of raw DB operations
+    expect(deductTokensFromAccount).toHaveBeenCalled();
+    expect(deductTokensFromAccount).toHaveBeenCalledWith({
+      userId: 'test-user',
+      orgId: undefined,
+      tokensUsed: expect.any(Number),
+      reason: 'chat',
+    });
   });
 
   test('should allow unauthenticated user to send a message', async () => {
-    // Import the router
     const { chatRouter } = await import('../chat');
     
     // Mock auth for unauthenticated user
     // @ts-expect-error - Intentionally using simplified mock
     vi.mocked(auth).mockResolvedValueOnce({ userId: null });
     
-    // Create a test context with DB that returns correct values for unauthenticated user
-    const unauthedMockDb = {
-      query: {
-        credits: {
-          findFirst: vi.fn().mockResolvedValue(null),
-        },
-      },
-      select: vi.fn().mockReturnThis(),
-      from: vi.fn().mockReturnThis(),
-      where: vi.fn().mockReturnThis(),
-      execute: vi.fn().mockResolvedValue([]),
-      insert: vi.fn().mockReturnThis(),
-      values: vi.fn().mockReturnThis(),
-      returning: vi.fn().mockReturnThis(),
-      update: vi.fn().mockReturnThis(),
-      set: vi.fn().mockReturnThis(),
-    };
-    
     const ctx = {
       headers: { get: vi.fn().mockReturnValue('127.0.0.1') },
-      db: unauthedMockDb,
+      db: mockDb,
     };
     
-    // Create caller from the router
     const caller = chatRouter.createCaller(ctx as any);
     
-    // Create input for the test
     const input = {
-      challengeId: 'chat-system',
+      message: 'Hello world',
+      challengeId: 'test-challenge',
       stageIndex: 0,
-      message: 'Test message from unauthenticated user',
-      history: []
+      history: [],
     };
     
-    // Call the function
     const result = await caller.sendMessage(input);
     
-    // Verify result
-    expect(result).toBeDefined();
     expect(result).toHaveProperty('message');
-    expect(result).toHaveProperty('isSystemDesignRelated');
     expect(result).toHaveProperty('remainingMessages');
     expect(result).toHaveProperty('tokensUsed');
-    expect(result.credits).toBe(0);
+    expect(result.tokensUsed).toBe(null); // Unauthenticated users don't use tokens
   });
 
   test('should handle rate limiting differently for different challenges', async () => {
@@ -580,9 +597,9 @@ describe('Chat Router Functions', () => {
     // Get the calls to enforceRateLimit
     const enforceCalls = vi.mocked(enforceRateLimit).mock.calls;
     
-    // Check that the identifiers are correctly formed
-    expect(enforceCalls[0]?.[0]?.identifier).toBe('127.0.0.1-test-user');
-    expect(enforceCalls[1]?.[0]?.identifier).toBe('127.0.0.1-test-user');
+    // Check that the identifiers include the personal context suffix
+    expect(enforceCalls[0]?.[0]?.identifier).toBe('127.0.0.1-test-user:personal');
+    expect(enforceCalls[1]?.[0]?.identifier).toBe('127.0.0.1-test-user:personal');
 
     // Check that metadata contains the challenge information
     expect(enforceCalls[0]?.[0]?.metadata?.contextId).toBe('test-challenge');
@@ -596,6 +613,7 @@ describe('Chat Router Functions', () => {
     // Import rate limiting and token functions
     const { enforceRateLimit } = await import('@/lib/rate-limit');
     const { costToCredits, calculateGPTCost, calculateTextTokens } = await import('@/lib/tokens');
+    const { deductTokensFromAccount } = await import('@/lib/tokens-server');
     
     // Mock token calculations with specific values
     vi.mocked(calculateTextTokens).mockReturnValue(1000); // Input tokens
@@ -614,24 +632,46 @@ describe('Chat Router Functions', () => {
     // @ts-expect-error - Intentionally using simplified mock
     vi.mocked(auth).mockResolvedValueOnce({ userId: 'test-user' });
     
-    // Setup mock DB with 100 credits
+    // Setup mock DB with 100 tokens
     const initialBalance = 100;
-    const mockDbWithCredits = {
+    const mockDbWithTokens = {
       query: {
-        credits: {
-          findFirst: vi.fn().mockResolvedValue({ balance: initialBalance }),
+        tokenBalances: {
+          findFirst: vi.fn().mockResolvedValue({ 
+            expiringTokens: initialBalance,
+            nonexpiringTokens: 0,
+            expiringTokensExpiry: new Date()
+          }),
+        },
+        tokenLedger: {
+          findFirst: vi.fn().mockResolvedValue(null),
         },
       },
       update: vi.fn().mockReturnThis(),
       set: vi.fn().mockReturnThis(),
       where: vi.fn().mockReturnThis(),
       execute: vi.fn(),
+      insert: vi.fn().mockReturnThis(),
+      values: vi.fn().mockReturnThis(),
+      transaction: vi.fn().mockImplementation(async (callback: (tx: any) => Promise<any>) => {
+        // Create a transaction mock that has the same structure
+        const txMock = {
+          query: mockDbWithTokens.query,
+          update: mockDbWithTokens.update,
+          set: mockDbWithTokens.set,
+          where: mockDbWithTokens.where,
+          execute: mockDbWithTokens.execute,
+          insert: mockDbWithTokens.insert,
+          values: mockDbWithTokens.values,
+        };
+        return await callback(txMock);
+      }),
     };
     
     // Create a test context
     const ctx = {
       headers: { get: vi.fn().mockReturnValue('127.0.0.1') },
-      db: mockDbWithCredits,
+      db: mockDbWithTokens,
     };
     
     // Create caller from the router
@@ -648,11 +688,13 @@ describe('Chat Router Functions', () => {
     // Call the function
     await caller.sendMessage(input);
     
-    // Verify update was called with correct balance reduction
-    expect(mockDbWithCredits.set).toHaveBeenCalledWith(
-      expect.objectContaining({
-        balance: initialBalance - 5, // Should deduct exactly 5 credits
-      })
-    );
+    // Verify deductTokensFromAccount was called with the exact calculated amount
+    expect(deductTokensFromAccount).toHaveBeenCalled();
+    expect(deductTokensFromAccount).toHaveBeenCalledWith({
+      userId: 'test-user',
+      orgId: undefined,
+      tokensUsed: 5, // Should match the mocked costToCredits return value
+      reason: 'chat',
+    });
   });
 });

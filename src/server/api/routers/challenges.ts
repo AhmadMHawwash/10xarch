@@ -11,6 +11,7 @@ import {
   calculateTextTokens,
   costToCredits,
 } from "@/lib/tokens";
+import { deductTokensFromAccount } from "@/lib/tokens-server";
 import {
   challengeSolutionSchema,
   sanitizePrompt,
@@ -20,10 +21,8 @@ import {
   createTRPCRouter,
   publicProcedure,
 } from "@/server/api/trpc";
-import { credits } from "@/server/db/schema";
 import { auth } from "@clerk/nextjs/server";
 import { TRPCError } from "@trpc/server";
-import { eq } from "drizzle-orm";
 import { checkSolution } from "./checkAnswer";
 
 const createAICaller = createCallerFactory(checkSolution);
@@ -52,7 +51,8 @@ export const challengesRouter = createTRPCRouter({
   submit: publicProcedure
     .input(challengeSolutionSchema)
     .mutation(async ({ input, ctx }) => {
-      const { userId } = await auth();
+      const { userId, orgId } = await auth();
+      const ownerId = orgId ?? userId;
 
       // Get the challenge
       const challenge = challenges.find((c) => c.slug === input.challengeSlug);
@@ -110,13 +110,15 @@ export const challengesRouter = createTRPCRouter({
 
           return { success: true, evaluation: result };
         } catch (error) {
-          // Just throw the error as enforceRateLimit already handles logging
-          throw error;
+          // throw error if user is not authenticated. Otherwise, just continue
+          if (!userId) {
+            throw error;
+          }
         }
       }
 
       // Handle paid challenges (must be authenticated)
-      if (!userId) {
+      if (!ownerId) {
         // Log the unauthorized access attempt
         logSecurityEvent({
           eventType: "unauthorized-access",
@@ -134,68 +136,10 @@ export const challengesRouter = createTRPCRouter({
         });
       }
 
-      // Check if user has credits
-      const userCredits = await ctx.db.query.credits.findFirst({
-        where: eq(credits.userId, userId),
-      });
-
-      if (!userCredits || userCredits.balance <= 0) {
-        // Log the credit issue
-        logSecurityEvent({
-          eventType: "insufficient-credits",
-          message: `User has insufficient credits`,
-          userId,
-          ipAddress: ipAddress ?? undefined,
-          endpoint: `/api/challenges/${input.challengeSlug}`,
-          metadata: {
-            limitType: "credits",
-            challengeId: input.challengeSlug,
-            currentBalance: userCredits?.balance ?? 0,
-          },
-        });
-
-        throw new TRPCError({
-          code: "FORBIDDEN",
-          message: "You need to purchase credits to submit this challenge",
-        });
-      }
-
-      // Calculate estimated input tokens
+      // Calculate estimated input tokens for logging purposes
       const promptTokens = calculateTextTokens(sanitizedPrompt);
-      // Estimate output tokens (max allowed in API call)
-      const estimatedOutputTokens = 512;
 
-      // Calculate estimated cost
-      const estimatedCost = calculateGPTCost(
-        promptTokens,
-        estimatedOutputTokens,
-        "gpt-4.1-mini",
-      );
-      const estimatedCredits = costToCredits(estimatedCost);
-
-      // Check if user has enough credits for estimated cost
-      if (userCredits.balance < estimatedCredits) {
-        logSecurityEvent({
-          eventType: "insufficient-credits",
-          message: `User has insufficient credits for estimated cost`,
-          userId,
-          ipAddress: ipAddress ?? undefined,
-          endpoint: `/api/challenges/${input.challengeSlug}`,
-          metadata: {
-            limitType: "credits",
-            challengeId: input.challengeSlug,
-            currentBalance: userCredits.balance,
-            requiredCredits: estimatedCredits,
-          },
-        });
-
-        throw new TRPCError({
-          code: "FORBIDDEN",
-          message: `You need at least ${estimatedCredits} credits to submit this challenge. Current balance: ${userCredits.balance}`,
-        });
-      }
-
-      // Process submission (before deducting credits)
+      // Process submission and deduct actual tokens after
       const aiCaller = createAICaller(ctx);
       try {
         const result = await aiCaller.hello({
@@ -204,34 +148,31 @@ export const challengesRouter = createTRPCRouter({
           challengeAndSolutionPrompt: sanitizedPrompt,
           bypassInternalToken: process.env.BYPASS_TOKEN,
         });
-
-        // Calculate actual tokens used (we have to estimate since the API doesn't return token count)
+        
+        // Calculate actual tokens used
         const responseText = JSON.stringify(result);
         const outputTokens = calculateTextTokens(responseText);
-
-        // Calculate actual cost
         const actualCost = calculateGPTCost(
           promptTokens,
           outputTokens,
           "gpt-4.1-mini",
         );
-        const actualCredits = costToCredits(actualCost);
+        const actualTokens = costToCredits(actualCost);
 
-        // Only deduct credits AFTER successful API call
-        await ctx.db
-          .update(credits)
-          .set({
-            balance: userCredits.balance - actualCredits,
-            updatedAt: new Date(),
-          })
-          .where(eq(credits.userId, userId));
+        // Deduct tokens after successful operation (allows negative balances)
+        await deductTokensFromAccount({
+          userId: userId!,
+          orgId,
+          tokensUsed: actualTokens,
+          reason: "challenge",
+        });
 
         return {
           success: true,
           evaluation: result,
         };
       } catch (error) {
-        // If API call fails, don't deduct credits and pass the error
+        // If API call fails, don't deduct tokens and pass the error
         throw error;
       }
     }),

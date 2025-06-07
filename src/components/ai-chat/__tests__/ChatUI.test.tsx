@@ -4,12 +4,14 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Define the expected types for our mocks that match the actual implementations
 interface CreditsInterface {
-  balance: number;
+  expiringTokens: number;
+  expiringTokensExpiry: Date | null;
+  nonexpiringTokens: number;
+  totalUsableTokens: number;
   isLoading: boolean;
   hasValidData: boolean;
   error: null;
   refetch: () => Promise<void>;
-  isUpdating: boolean;
   hasLowCredits: boolean;
 }
 
@@ -26,7 +28,7 @@ type MessagesMap = Map<string, Message[]>;
 interface ChatResponseSuccess {
   message: string;
   remainingMessages: number;
-  credits?: number;
+  tokensUsed?: { deducted: number; input: number; output: number; cost: number; } | null;
   isSystemDesignRelated: boolean;
 }
 
@@ -49,12 +51,14 @@ interface ChatMessagesInterface {
 // Mock dependencies
 vi.mock("@/hooks/useCredits", () => ({
   useCredits: vi.fn().mockReturnValue({
-    balance: 100,
+    expiringTokens: 100,
+    expiringTokensExpiry: null,
+    nonexpiringTokens: 0,
+    totalUsableTokens: 100,
     isLoading: false,
     hasValidData: true,
     error: null,
     refetch: vi.fn().mockResolvedValue(undefined),
-    isUpdating: false,
     hasLowCredits: false,
   } as CreditsInterface),
 }));
@@ -97,6 +101,9 @@ vi.mock("@/lib/hooks/_useSystemDesigner", () => ({
 vi.mock("@clerk/nextjs", () => ({
   useAuth: vi.fn().mockReturnValue({
     userId: "test-user",
+  }),
+  useOrganization: () => ({
+    organization: null, // Default to personal account
   }),
 }));
 
@@ -177,19 +184,21 @@ describe("ChatUI", () => {
     render(<ChatUI />);
 
     expect(screen.getByText(/Hi! I am your AI assistant/i)).toBeInTheDocument();
-    expect(screen.getByText(/100 credits/i)).toBeInTheDocument();
+    expect(screen.getByText(/Tokens: 100/i)).toBeInTheDocument();
   });
 
   it("should call refetchCredits when a message is sent and credits are returned", async () => {
     // Set up mock for refetchCredits that we can track
     const mockRefetch = vi.fn().mockResolvedValue(undefined);
     vi.mocked(useCredits).mockReturnValue({
-      balance: 100,
+      expiringTokens: 100,
+      expiringTokensExpiry: null,
+      nonexpiringTokens: 0,
+      totalUsableTokens: 100,
       isLoading: false,
       hasValidData: true,
       error: null,
       refetch: mockRefetch,
-      isUpdating: false,
       hasLowCredits: false,
     } as CreditsInterface);
 
@@ -208,7 +217,7 @@ describe("ChatUI", () => {
         onSuccessCallback({
           message: "Test response",
           remainingMessages: 2,
-          credits: 95, // Include credits in the response
+          tokensUsed: { deducted: 5, input: 10, output: 15, cost: 20 },
           isSystemDesignRelated: true,
         });
       }
@@ -218,16 +227,18 @@ describe("ChatUI", () => {
     expect(mockRefetch).toHaveBeenCalledTimes(1);
   });
 
-  it("should not call refetchCredits when credits are undefined in the response", async () => {
+  it("should not call refetchCredits when tokensUsed is null in the response", async () => {
     // Set up mock for refetchCredits that we can track
     const mockRefetch = vi.fn().mockResolvedValue(undefined);
     vi.mocked(useCredits).mockReturnValue({
-      balance: 100,
+      expiringTokens: 100,
+      expiringTokensExpiry: null,
+      nonexpiringTokens: 0,
+      totalUsableTokens: 100,
       isLoading: false,
       hasValidData: true,
       error: null,
       refetch: mockRefetch,
-      isUpdating: false,
       hasLowCredits: false,
     } as CreditsInterface);
 
@@ -240,14 +251,14 @@ describe("ChatUI", () => {
     fireEvent.change(input, { target: { value: "Hello AI" } });
     fireEvent.click(submitButton);
 
-    // Simulate API response without credits in the response
+    // Simulate API response without tokensUsed in the response (free message)
     await act(async () => {
       if (onSuccessCallback) {
         onSuccessCallback({
           message: "Test response",
           remainingMessages: 2,
           isSystemDesignRelated: true,
-          // No credits property
+          tokensUsed: null, // No tokens used for free messages
         });
       }
     });
@@ -256,16 +267,18 @@ describe("ChatUI", () => {
     expect(mockRefetch).not.toHaveBeenCalled();
   });
 
-  it("should call both refetchCredits and refetchRemainingMessages when credits are in the response", async () => {
+  it("should call both refetchCredits and refetchRemainingMessages when tokensUsed is in the response", async () => {
     // Set up mock for refetchCredits that we can track
     const mockRefetch = vi.fn().mockResolvedValue(undefined);
     vi.mocked(useCredits).mockReturnValue({
-      balance: 100,
+      expiringTokens: 100,
+      expiringTokensExpiry: null,
+      nonexpiringTokens: 0,
+      totalUsableTokens: 100,
       isLoading: false,
       hasValidData: true,
       error: null,
       refetch: mockRefetch,
-      isUpdating: false,
       hasLowCredits: false,
     } as CreditsInterface);
 
@@ -281,13 +294,13 @@ describe("ChatUI", () => {
     fireEvent.change(input, { target: { value: "Hello AI" } });
     fireEvent.click(submitButton);
 
-    // Simulate API response with credits in the response
+    // Simulate API response with tokensUsed in the response
     await act(async () => {
       if (onSuccessCallback) {
         onSuccessCallback({
           message: "Test response",
           remainingMessages: 2,
-          credits: 95, // Include credits in the response
+          tokensUsed: { deducted: 5, input: 10, output: 15, cost: 20 },
           isSystemDesignRelated: true,
         });
       }

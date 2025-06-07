@@ -156,7 +156,6 @@ export const checkSolution = createTRPCRouter({
               const caller = createCreditsCaller(ctx);
               await caller.use({
                 amount: totalCredits,
-                description: "AI Solution Evaluation",
               });
             } catch (creditError) {
               // Log rate limit exceeded
@@ -260,7 +259,6 @@ export const checkSolution = createTRPCRouter({
           const caller = createCreditsCaller(ctx);
           await caller.use({
             amount: totalCredits,
-            description: "AI Playground Feedback",
           });
         } catch (creditError) {
           // Log rate limit exceeded

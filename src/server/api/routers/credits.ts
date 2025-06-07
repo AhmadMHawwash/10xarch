@@ -1,43 +1,42 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { TRPCError } from "@trpc/server";
-import { eq } from "drizzle-orm";
-import { credits, creditTransactions } from "@/server/db/schema";
+import { eq, and } from "drizzle-orm";
+import { tokenBalances, tokenLedger } from "@/server/db/schema";
 import { auth } from "@clerk/nextjs/server";
 import { creditTransactionSchema } from "@/lib/validations/credits";
-
-const useCreditsSchema = z.object({
-  amount: z.number(),
-  description: z.string(),
-});
-
-const addCreditsSchema = z.object({
-  amount: z.number(),
-});
-
-const getTransactionsOutputSchema = z.object({
-  transactions: z.array(creditTransactionSchema),
-});
+import { deductTokensFromAccount } from "@/lib/tokens-server";
 
 export const creditsRouter = createTRPCRouter({
   getBalance: protectedProcedure.query(async ({ ctx }) => {
-    const { userId } = await auth();
-      if (!userId) {
-      throw new TRPCError({
-        code: "UNAUTHORIZED",
-        message: "Not authenticated",
-      });
-      }
+    const { userId, orgId } = await auth();
 
-      const userCredits = await ctx.db.query.credits.findFirst({
-        where: eq(credits.userId, userId),
-      });
+    if (!userId) {
+      throw new Error("User not authenticated");
+    }
 
-      return { credits: userCredits };
-    }),
+    // Determine current context (org or personal)
+    const ownerType = orgId ? "org" : "user";
+    const ownerId = orgId ?? userId;
+
+    const balance = await ctx.db.query.tokenBalances.findFirst({
+      where: and(
+        eq(tokenBalances.ownerType, ownerType),
+        eq(tokenBalances.ownerId, ownerId),
+      ),
+    });
+
+    return {
+      balance,
+    };
+  }),
 
   getTransactions: protectedProcedure
-    .output(getTransactionsOutputSchema)
+    .output(
+      z.object({
+        transactions: z.array(creditTransactionSchema),
+      }),
+    )
     .query(async ({ ctx }) => {
       const { userId } = await auth();
       if (!userId) {
@@ -46,123 +45,38 @@ export const creditsRouter = createTRPCRouter({
           message: "Not authenticated",
         });
       }
-
-      const transactions = await ctx.db.query.creditTransactions.findMany({
-        where: eq(creditTransactions.userId, userId),
-        orderBy: (creditTransactions, { desc }) => [
-          desc(creditTransactions.createdAt),
-        ],
+      const transactions = await ctx.db.query.tokenLedger.findMany({
+        where: eq(tokenLedger.ownerId, userId),
+        orderBy: (tokenLedger, { desc }) => [desc(tokenLedger.createdAt)],
         limit: 50,
       });
-
       return { transactions };
     }),
 
   use: protectedProcedure
-    .input(useCreditsSchema)
-    .output(
-      z.object({
-        success: z.boolean(),
-        transaction: creditTransactionSchema,
-        left: z.number(),
-      }),
-    )
-    .mutation(async ({ ctx, input }) => {
-      const { userId } = await auth();
+    .input(z.object({ amount: z.number().min(1) }))
+    .mutation(async ({ input }) => {
+      const { userId, orgId } = await auth();
+
       if (!userId) {
-        throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message: "Not authenticated",
-        });
+        throw new Error("User not authenticated");
       }
 
-      // Check if user has enough credits
-      const userCredits = await ctx.db.query.credits.findFirst({
-        where: eq(credits.userId, userId),
+      // Use the shared token deduction utility
+      const result = await deductTokensFromAccount({
+        userId,
+        orgId,
+        tokensUsed: input.amount,
+        reason: "usage",
       });
 
-      if (!userCredits || userCredits.balance < input.amount) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Insufficient credits",
-        });
-      }
-
-      // Create transaction and update balance
-      const [transaction] = await ctx.db
-        .insert(creditTransactions)
-        .values({
-          userId,
-          amount: -input.amount,
-          type: "usage",
-          status: "completed",
-          description: input.description,
-        })
-        .returning();
-
-      if (!transaction) {
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to create transaction",
-        });
-      }
-
-      const left = userCredits.balance - input.amount;
-      await ctx.db
-        .update(credits)
-        .set({ balance: left })
-        .where(eq(credits.userId, userId));
-
-      return { success: true, transaction, left };
-    }),
-
-  addCredits: protectedProcedure
-    .input(addCreditsSchema)
-    .mutation(async ({ ctx, input }) => {
-      const { userId } = await auth();
-      if (!userId) {
-        throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message: "Not authenticated",
-        });
-      }
-
-      // Get current credits
-      const userCredits = await ctx.db.query.credits.findFirst({
-        where: eq(credits.userId, userId),
-      });
-
-      if (!userCredits) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "User credits not found",
-        });
-      }
-
-      // Create transaction and update balance
-      const [transaction] = await ctx.db
-        .insert(creditTransactions)
-        .values({
-          userId,
-          amount: input.amount,
-          type: "purchase",
-          status: "completed",
-          description: `Purchased ${input.amount} credits`,
-        })
-        .returning();
-
-      if (!transaction) {
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to create transaction",
-        });
-      }
-
-      await ctx.db
-        .update(credits)
-        .set({ balance: userCredits.balance + input.amount })
-        .where(eq(credits.userId, userId));
-
-      return { success: true, transaction };
+      return {
+        success: true,
+        transaction: {
+          expiringTokens: result.finalExpiringBalance,
+          nonexpiringTokens: result.finalNonexpiringBalance,
+          tokensDeducted: result.tokensDeducted,
+        },
+      };
     }),
 });

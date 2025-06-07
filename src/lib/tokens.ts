@@ -10,6 +10,74 @@ export const BONUS_TIERS = [
   { threshold: 10, bonus: 1.05 }, // 5% bonus
 ] as const;
 
+// Credit packages for one-time purchases
+export const CREDIT_PACKAGES = {
+  small: { 
+    name: "Starter Pack",
+    description: "Perfect for trying out the platform",
+    tokens: 1000, 
+    bonusTokens: 0,
+    price: 5,
+    totalTokens: 1000,
+  },
+  medium: { 
+    name: "Creator Bundle",
+    description: "Great for regular users and small projects",
+    tokens: 2000, 
+    bonusTokens: 100,
+    price: 10,
+    totalTokens: 2100,
+  },
+  large: { 
+    name: "Power User",
+    description: "Ideal for heavy usage and larger projects",
+    tokens: 5000, 
+    bonusTokens: 500,
+    price: 25,
+    totalTokens: 5500,
+  },
+  extra_large: { 
+    name: "Professional",
+    description: "Maximum value for teams and power users",
+    tokens: 10000, 
+    bonusTokens: 1500,
+    price: 50,
+    totalTokens: 11500,
+  },
+} as const;
+
+// Subscription tier constants
+export const SUBSCRIPTION_TIERS = {
+  pro: {
+    name: "Team Start", 
+    monthlyTokens: 15000,
+    priceId: "price_1RUB5RLNbPmrufVhctyMl2w9",
+  },
+  premium: {
+    name: "Team Pro",
+    monthlyTokens: 25000,
+    priceId: "price_1RUB7BLNbPmrufVh7fW5R2Cg",
+  },
+} as const;
+
+export type SubscriptionTier = keyof typeof SUBSCRIPTION_TIERS;
+
+// Helper function to get subscription token amount by tier
+export function getSubscriptionTokens(tier: string): number {
+  const subscriptionTier = SUBSCRIPTION_TIERS[tier as SubscriptionTier];
+  return subscriptionTier?.monthlyTokens ?? 0;
+}
+
+// Helper function to get tier by Stripe price ID
+export function getTierByPriceId(priceId: string): SubscriptionTier | null {
+  for (const [tierKey, tierData] of Object.entries(SUBSCRIPTION_TIERS)) {
+    if (tierData.priceId === priceId) {
+      return tierKey as SubscriptionTier;
+    }
+  }
+  return null;
+}
+
 // GPT model costs per 1K tokens
 export const GPT_TOKEN_COSTS = {
   "gpt-4": {

@@ -16,12 +16,6 @@ interface CheckoutSessionResponse {
   url: string;
 }
 
-interface VerifySessionResponse {
-  success: boolean;
-  totalTokens: number;
-  message?: string; // Optional message field for additional context
-}
-
 interface MockContext {
   auth: {
     userId: string;
@@ -196,8 +190,9 @@ describe('Stripe Router Tests', () => {
       // Setup success case
       vi.mocked(stripeRouter.verifySession).mockResolvedValue({
         success: true,
-        totalTokens: 1000
-      } as VerifySessionResponse);
+        totalTokens: 1000,
+        message: 'Session verified successfully'
+      });
       
       // Call the mocked function
       // @ts-expect-error - Mocked function doesn't need to match exact signature
@@ -209,7 +204,8 @@ describe('Stripe Router Tests', () => {
       // Verify result
       expect(result).toEqual({
         success: true,
-        totalTokens: 1000
+        totalTokens: 1000,
+        message: 'Session verified successfully'
       });
     });
     
@@ -268,8 +264,9 @@ describe('Stripe Router Tests', () => {
       // Setup success case for already processed transaction
       vi.mocked(stripeRouter.verifySession).mockResolvedValue({
         success: true,
-        totalTokens: 1000
-      } as VerifySessionResponse);
+        totalTokens: 1000,
+        message: 'Transaction already processed'
+      });
       
       // Call the mocked function
       // @ts-expect-error - Mocked function doesn't need to match exact signature
@@ -306,7 +303,7 @@ describe('Stripe Router Tests', () => {
         success: true,
         totalTokens: 1000,
         message: 'Credits already added'
-      } as VerifySessionResponse);
+      });
       
       // Call the mocked function
       // @ts-expect-error - Mocked function doesn't need to match exact signature

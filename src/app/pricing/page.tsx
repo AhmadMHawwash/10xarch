@@ -247,20 +247,6 @@ export default function PricingPage() {
                   $2.00
                 </td>
               </tr>
-              <tr className="border-b border-gray-200 dark:border-gray-700">
-                <td className="p-4 text-gray-700 dark:text-gray-300">
-                  Account Types
-                </td>
-                <td className="p-4 text-center">
-                  <CheckCircle className="h-5 w-5 text-green-500 mx-auto" />
-                </td>
-                <td className="p-4 text-center">
-                  <CheckCircle className="h-5 w-5 text-green-500 mx-auto" />
-                </td>
-                <td className="p-4 text-center">
-                  <CheckCircle className="h-5 w-5 text-green-500 mx-auto" />
-                </td>
-              </tr>
             </tbody>
           </table>
         </div>
@@ -309,27 +295,6 @@ export default function PricingPage() {
             <h3 className="mb-2 text-xl font-bold">Team Collaboration</h3>
             <p className="text-gray-600 dark:text-gray-400">
               Invite teammates to view or edit your system designs
-              <span className="ml-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-800 dark:bg-amber-900/30 dark:text-amber-500">
-                Coming Soon
-              </span>
-            </p>
-          </div>
-          <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-            <div className="mb-4 rounded-full bg-red-100 p-2 w-12 h-12 flex items-center justify-center dark:bg-red-900/30">
-              <MessageSquareText className="h-6 w-6 text-red-600 dark:text-red-400" />
-            </div>
-            <h3 className="mb-2 text-xl font-bold">Advanced Components</h3>
-            <p className="text-gray-600 dark:text-gray-400">
-              Access to specialized templates and advanced component library
-            </p>
-          </div>
-          <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-            <div className="mb-4 rounded-full bg-indigo-100 p-2 w-12 h-12 flex items-center justify-center dark:bg-indigo-900/30">
-              <Lightbulb className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
-            </div>
-            <h3 className="mb-2 text-xl font-bold">Priority Support</h3>
-            <p className="text-gray-600 dark:text-gray-400">
-              Get faster response times and priority assistance when you need help
             </p>
           </div>
         </div>
@@ -343,7 +308,7 @@ export default function PricingPage() {
         <div className="space-y-4">
           {[
             {
-              question: "What&apos;s the difference between subscriptions and token purchases?",
+              question: "What's the difference between subscriptions and token purchases?",
               answer:
                 "Subscriptions provide predictable monthly token allocations that expire after 30 days, perfect for consistent usage. Token purchases never expire and are ideal for occasional users or supplementing subscriptions."
             },

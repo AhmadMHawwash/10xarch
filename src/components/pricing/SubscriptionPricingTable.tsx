@@ -233,7 +233,7 @@ export function SubscriptionPricingTable({ contextOnly = false }: SubscriptionPr
           return (
             <Card
               key={tier}
-              className={`relative flex min-h-[450px] flex-col overflow-hidden border-2 ${
+              className={`relative flex min-h-[150px] flex-col overflow-hidden border-2 ${
                 isPro
                   ? "scale-105 border-purple-400 shadow-lg dark:border-purple-600"
                   : "border-gray-200 dark:border-gray-700"
@@ -274,16 +274,16 @@ export function SubscriptionPricingTable({ contextOnly = false }: SubscriptionPr
                     </span>
                   )}
                 </CardTitle>
-                <CardDescription>
+                {/* <CardDescription>
                   {pricing.description}
-                </CardDescription>
+                </CardDescription> */}
                 <div className="mt-4">
                   <span className="text-3xl font-bold">${pricing.price}</span>
                   <span className="text-gray-500 dark:text-gray-400"> / month</span>
                 </div>
               </CardHeader>
 
-              <CardContent className="flex-1">
+              <CardContent className="">
                 <ul className="space-y-3">
                   <li className="flex items-start">
                     <CheckCircle className="mr-2 mt-0.5 h-5 w-5 shrink-0 text-green-500" />
@@ -292,43 +292,9 @@ export function SubscriptionPricingTable({ contextOnly = false }: SubscriptionPr
                       <span> per month</span>
                     </div>
                   </li>
-                  <li className="flex items-start">
-                    <CheckCircle className="mr-2 mt-0.5 h-5 w-5 shrink-0 text-green-500" />
-                    <div>
-                      <span className="font-medium">Advanced system design tools</span>
-                    </div>
-                  </li>
-                  <li className="flex items-start">
-                    <CheckCircle className="mr-2 mt-0.5 h-5 w-5 shrink-0 text-green-500" />
-                    <div>
-                      <span className="font-medium">Priority AI processing</span>
-                    </div>
-                  </li>
-                  <li className="flex items-start">
-                    <CheckCircle className="mr-2 mt-0.5 h-5 w-5 shrink-0 text-green-500" />
-                    <div>
-                      <span className="font-medium">Advanced component library</span>
-                    </div>
-                  </li>
-                  {tier === "premium" && (
-                    <>
-                      <li className="flex items-start">
-                        <CheckCircle className="mr-2 mt-0.5 h-5 w-5 shrink-0 text-green-500" />
-                        <div>
-                          <span className="font-medium">Advanced analytics</span>
-                        </div>
-                      </li>
-                      <li className="flex items-start">
-                        <CheckCircle className="mr-2 mt-0.5 h-5 w-5 shrink-0 text-green-500" />
-                        <div>
-                          <span className="font-medium">Premium support</span>
-                        </div>
-                      </li>
-                    </>
-                  )}
                 </ul>
                 
-                <div className={`mt-4 rounded-md border p-3 ${
+                {/* <div className={`mt-4 rounded-md border p-3 ${
                   isPro
                     ? "border-purple-100 bg-purple-50 dark:border-purple-800/30 dark:bg-purple-900/20"
                     : "border-blue-100 bg-blue-50 dark:border-blue-800/30 dark:bg-blue-900/20"
@@ -341,7 +307,7 @@ export function SubscriptionPricingTable({ contextOnly = false }: SubscriptionPr
                     <CreditCard className="mr-2 h-4 w-4" />
                     <span className="font-medium">Tokens expire 30 days after subscription starts</span>
                   </div>
-                </div>
+                </div> */}
               </CardContent>
 
               <CardFooter className="mt-auto space-y-3">

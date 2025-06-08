@@ -203,6 +203,18 @@ export default function Navbar() {
             >
               Challenges
             </Link>
+            <Link
+              href="/pricing"
+              className={cn(
+                "text-sm font-medium hover:text-primary",
+                pathname === "/pricing"
+                  ? "text-primary"
+                  : "text-muted-foreground",
+              )}
+              prefetch={false}
+            >
+              Pricing
+            </Link>
           </div>
         </div>
 
@@ -323,6 +335,18 @@ export default function Navbar() {
                 prefetch={false}
               >
                 Challenges
+              </Link>
+              <Link
+                href="/pricing"
+                className={cn(
+                  "block py-2 text-sm hover:text-primary",
+                  pathname === "/pricing"
+                    ? "text-primary"
+                    : "text-muted-foreground",
+                )}
+                prefetch={false}
+              >
+                Pricing
               </Link>
             </div>
 

@@ -26,8 +26,19 @@ export const creditsRouter = createTRPCRouter({
       ),
     });
 
+    // Return a default balance object if no record is found
+    const defaultBalance = {
+      id: null,
+      ownerType,
+      ownerId,
+      expiringTokens: 0,
+      expiringTokensExpiry: null,
+      nonexpiringTokens: 0,
+      updatedAt: new Date(),
+    };
+
     return {
-      balance,
+      balance: balance ?? defaultBalance,
     };
   }),
 

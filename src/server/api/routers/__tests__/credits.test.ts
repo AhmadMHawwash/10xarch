@@ -198,6 +198,87 @@ describe('Credits Router Functions', () => {
       .rejects.toThrow('Not authenticated');
   });
 
+  test('getBalance returns default balance when no record exists', async () => {
+    // Setup auth to return authenticated user
+    const { auth } = await import('@clerk/nextjs/server');
+    // @ts-expect-error - We're intentionally using a simplified mock structure for auth  
+    vi.mocked(auth).mockResolvedValueOnce({
+      userId: 'test-user',
+      sessionId: 'test-session',
+    });
+    
+    // Setup mock implementation to return default balance when no record exists
+    vi.mocked(creditsFunctions.getBalance).mockImplementationOnce(async () => {
+      return {
+        balance: {
+          id: null,
+          ownerType: 'user',
+          ownerId: 'test-user',
+          expiringTokens: 0,
+          expiringTokensExpiry: null,
+          nonexpiringTokens: 0,
+          updatedAt: new Date(),
+        }
+      };
+    });
+    
+    // Call the function
+    const result = await creditsFunctions.getBalance({ ctx: mockContext });
+    
+    // Check expectations - should return default balance object instead of null
+    expect(result).toHaveProperty('balance');
+    expect(result.balance).not.toBeNull();
+    expect(result.balance).toHaveProperty('id', null);
+    expect(result.balance).toHaveProperty('ownerType', 'user');
+    expect(result.balance).toHaveProperty('ownerId', 'test-user');
+    expect(result.balance).toHaveProperty('expiringTokens', 0);
+    expect(result.balance).toHaveProperty('expiringTokensExpiry', null);
+    expect(result.balance).toHaveProperty('nonexpiringTokens', 0);
+    expect(result.balance).toHaveProperty('updatedAt');
+    expect(result.balance.updatedAt).toBeInstanceOf(Date);
+  });
+
+  test('getBalance returns default balance for organization when no record exists', async () => {
+    // Setup auth to return authenticated user with organization
+    const { auth } = await import('@clerk/nextjs/server');
+    // @ts-expect-error - We're intentionally using a simplified mock structure for auth
+    vi.mocked(auth).mockResolvedValueOnce({
+      userId: 'test-user',
+      orgId: 'test-org',
+      sessionId: 'test-session',
+    });
+    
+    // Setup mock implementation to return default balance for organization
+    vi.mocked(creditsFunctions.getBalance).mockImplementationOnce(async () => {
+      return {
+        balance: {
+          id: null,
+          ownerType: 'org',
+          ownerId: 'test-org',
+          expiringTokens: 0,
+          expiringTokensExpiry: null,
+          nonexpiringTokens: 0,
+          updatedAt: new Date(),
+        }
+      };
+    });
+    
+    // Call the function
+    const result = await creditsFunctions.getBalance({ ctx: mockContext });
+    
+    // Check expectations - should return default balance object for organization
+    expect(result).toHaveProperty('balance');
+    expect(result.balance).not.toBeNull();
+    expect(result.balance).toHaveProperty('id', null);
+    expect(result.balance).toHaveProperty('ownerType', 'org');
+    expect(result.balance).toHaveProperty('ownerId', 'test-org');
+    expect(result.balance).toHaveProperty('expiringTokens', 0);
+    expect(result.balance).toHaveProperty('expiringTokensExpiry', null);
+    expect(result.balance).toHaveProperty('nonexpiringTokens', 0);
+    expect(result.balance).toHaveProperty('updatedAt');
+    expect(result.balance.updatedAt).toBeInstanceOf(Date);
+  });
+
   test('getTransactions returns user transactions when authenticated', async () => {
     // Setup auth to return authenticated user
     const { auth } = await import('@clerk/nextjs/server');

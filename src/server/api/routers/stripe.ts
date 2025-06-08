@@ -63,6 +63,21 @@ export const stripeRouter = createTRPCRouter({
         throw new Error("User not found");
       }
 
+      // For organizations, check if they have an active subscription before allowing topup
+      if (orgId) {
+        const activeSubscription = await ctx.db.query.subscriptions.findFirst({
+          where: and(
+            eq(subscriptions.ownerType, "org"),
+            eq(subscriptions.ownerId, orgId),
+            eq(subscriptions.status, "active")
+          ),
+        });
+
+        if (!activeSubscription) {
+          throw new Error("Organizations must have an active subscription before purchasing credits. Please subscribe first.");
+        }
+      }
+
       // Calculate tokens based on package or amount
       let totalTokens: number, baseTokens: number, bonusTokens: number;
       

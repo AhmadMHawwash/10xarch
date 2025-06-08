@@ -13,8 +13,10 @@ import { useToast } from "@/components/ui/use-toast";
 import { CREDIT_PACKAGES } from "@/lib/tokens";
 import { api } from "@/trpc/react";
 import { loadStripe } from "@stripe/stripe-js";
-import { CreditCard, Zap } from "lucide-react";
+import { CreditCard, Zap, AlertTriangle } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { useAuth } from "@clerk/nextjs";
+import Link from "next/link";
 
 if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
   throw new Error("Missing NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY");
@@ -33,9 +35,18 @@ const formatCurrency = (amount: number) => {
 
 export function CreditPackages() {
   const { toast } = useToast();
+  const { orgId } = useAuth();
   const addCreditsMutation = api.stripe.createCheckoutSession.useMutation();
+  const { data: currentSubscription, isLoading: isLoadingSubscription } = 
+    api.stripe.getCurrentSubscription.useQuery(undefined, {
+      enabled: !!orgId, // Only fetch when in organization context
+    });
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [showShadow, setShowShadow] = useState(false);
+
+  // Check if organization needs subscription
+  const isOrgWithoutSubscription = orgId && !currentSubscription;
+  const shouldDisablePurchase = Boolean(isOrgWithoutSubscription && !isLoadingSubscription);
 
   useEffect(() => {
     const checkOverflow = () => {
@@ -93,6 +104,27 @@ export function CreditPackages() {
 
   return (
     <div className="relative">
+      {/* Warning message for organizations without subscription */}
+      {shouldDisablePurchase && (
+        <div className="mb-6 rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/50">
+          <div className="flex items-center">
+            <AlertTriangle className="mr-3 h-5 w-5 text-yellow-600 dark:text-yellow-400" />
+            <div className="flex-1">
+              <h3 className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+                Subscription Required
+              </h3>
+              <p className="mt-1 text-sm text-yellow-700 dark:text-yellow-300">
+                Organizations must have an active subscription before purchasing credits.{" "}
+                <Link href="/pricing" className="font-medium underline hover:no-underline">
+                  Subscribe now
+                </Link>{" "}
+                to get started.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div
         ref={scrollContainerRef}
         className="flex justify-center gap-4 overflow-x-auto pb-4 [&::-webkit-scrollbar-thumb:hover]:bg-gray-400 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar]:h-2"
@@ -100,7 +132,10 @@ export function CreditPackages() {
         {Object.entries(CREDIT_PACKAGES).map(([key, package_], index) => (
           <Card
             key={key}
-            className="relative w-64 flex-shrink-0 overflow-hidden border-2 border-gray-200 bg-white transition-all hover:border-blue-200 hover:shadow-lg dark:border-gray-700 dark:bg-gray-900 dark:hover:border-blue-600"
+            className={`relative w-64 flex-shrink-0 overflow-hidden border-2 transition-all ${shouldDisablePurchase 
+              ? "border-gray-300 bg-gray-50 opacity-60 dark:border-gray-600 dark:bg-gray-800"
+              : "border-gray-200 bg-white hover:border-blue-200 hover:shadow-lg dark:border-gray-700 dark:bg-gray-900 dark:hover:border-blue-600"
+            }`}
             style={{
               marginRight:
                 index === Object.entries(CREDIT_PACKAGES).length - 1
@@ -161,17 +196,21 @@ export function CreditPackages() {
             </CardContent>
 
             <CardFooter className="pt-3">
-              <Button
-                onClick={() =>
-                  handlePurchasePackage(key as keyof typeof CREDIT_PACKAGES)
-                }
-                disabled={addCreditsMutation.isPending}
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 dark:from-blue-500 dark:to-purple-500 dark:hover:from-blue-600 dark:hover:to-purple-600"
-                size="default"
-              >
-                <CreditCard className="mr-2 h-4 w-4" />
-                {addCreditsMutation.isPending ? "Processing..." : "Purchase"}
-              </Button>
+                              <Button
+                  onClick={() =>
+                    handlePurchasePackage(key as keyof typeof CREDIT_PACKAGES)
+                  }
+                  disabled={shouldDisablePurchase || addCreditsMutation.isPending}
+                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 dark:from-blue-500 dark:to-purple-500 dark:hover:from-blue-600 dark:hover:to-purple-600"
+                  size="default"
+                >
+                  <CreditCard className="mr-2 h-4 w-4" />
+                  {shouldDisablePurchase
+                    ? "Subscription Required"
+                    : addCreditsMutation.isPending
+                    ? "Processing..."
+                    : "Purchase"}
+                </Button>
             </CardFooter>
           </Card>
         ))}

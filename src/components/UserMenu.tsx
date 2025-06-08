@@ -327,93 +327,6 @@ export default function UserMenu() {
           </div>
         </DropdownMenuLabel>
 
-        <DropdownMenuSeparator className="my-2 opacity-20" />
-
-        {/* Token Balance Section */}
-        <DropdownMenuGroup>
-          <div className="p-2">
-            <Link 
-              href="/balance"
-              className="block rounded-lg bg-gradient-to-br from-blue-50/80 to-blue-100/80 dark:from-blue-900/20 dark:to-blue-800/20 p-3 transition-all duration-200 hover:from-blue-100/90 hover:to-blue-200/90 dark:hover:from-blue-900/30 dark:hover:to-blue-800/30"
-              onClick={() => setIsDropdownOpen(false)}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Coins className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                  <span className="text-sm font-medium text-blue-800 dark:text-blue-200">
-                    Token Balance
-                  </span>
-                </div>
-                <ChevronDown className="h-3 w-3 -rotate-90 text-blue-600 dark:text-blue-400" />
-              </div>
-              
-              {isLoadingCredits || !hasValidData ? (
-                <div className="mt-2 flex items-center gap-2">
-                  <RefreshCw className="h-3 w-3 animate-spin text-blue-600/70 dark:text-blue-400/70" />
-                  <span className="text-xs text-blue-700/70 dark:text-blue-300/70">Loading...</span>
-                </div>
-              ) : (
-                <div className="mt-2 space-y-1">
-                  <div className="text-lg font-bold text-blue-800 dark:text-blue-200">
-                    {totalTokens.toLocaleString()} tokens
-                  </div>
-                  
-                  {(expiringTokens > 0 || nonexpiringTokens > 0) && (
-                    <div className="space-y-0.5 text-xs">
-                      {expiringTokens > 0 && (
-                        <div className="flex justify-between text-amber-700 dark:text-amber-300">
-                          <span>Expiring:</span>
-                          <span className="font-medium">
-                            {expiringTokens.toLocaleString()}
-                            {expiringTokensExpiry && (
-                              <span className="ml-1 text-amber-600 dark:text-amber-400">
-                                ({new Date(expiringTokensExpiry).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})
-                              </span>
-                            )}
-                          </span>
-                        </div>
-                      )}
-                      
-                      {nonexpiringTokens > 0 && (
-                        <div className="flex justify-between text-green-700 dark:text-green-300">
-                          <span>Permanent:</span>
-                          <span className="font-medium">{nonexpiringTokens.toLocaleString()}</span>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              )}
-            </Link>
-          </div>
-          
-          {/* Purchase Credits Button */}
-          <div className="px-2 pb-2">
-            <Link
-              href="/credits"
-              className="group flex w-full items-center justify-center gap-3 rounded-xl bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 p-4 text-sm font-semibold text-white shadow-lg transition-all duration-300 hover:from-emerald-600 hover:via-emerald-700 hover:to-teal-700 hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] border border-emerald-400/20"
-              onClick={() => setIsDropdownOpen(false)}
-            >
-              <CreditCard className="h-5 w-5 transition-transform duration-300 group-hover:rotate-12" />
-              <span className="font-semibold">Purchase Credits</span>
-              <div className="ml-auto opacity-70 group-hover:opacity-100 transition-opacity duration-300">
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="transform transition-transform duration-300 group-hover:translate-x-1"
-                >
-                  <path d="m9 18 6-6-6-6"/>
-                </svg>
-              </div>
-            </Link>
-          </div>
-        </DropdownMenuGroup>
 
         <DropdownMenuSeparator className="my-1 opacity-20" />
 
@@ -563,6 +476,65 @@ export default function UserMenu() {
                 <Settings className="h-3.5 w-3.5" />
               </Button>
             </div>
+          </div>
+        </DropdownMenuGroup>
+
+        {/* Token Balance Section */}
+        <DropdownMenuGroup>
+          <div className="p-1">
+            <Link 
+              href="/balance"
+              className="block rounded-lg bg-gradient-to-br from-blue-50/80 to-blue-100/80 dark:from-blue-900/20 dark:to-blue-800/20 p-3 transition-all duration-200 hover:from-blue-100/90 hover:to-blue-200/90 dark:hover:from-blue-900/30 dark:hover:to-blue-800/30"
+              onClick={() => setIsDropdownOpen(false)}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Coins className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                  <span className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                    Token Balance
+                  </span>
+                </div>
+                <ChevronDown className="h-3 w-3 -rotate-90 text-blue-600 dark:text-blue-400" />
+              </div>
+              
+              {isLoadingCredits || !hasValidData ? (
+                <div className="mt-2 flex items-center gap-2">
+                  <RefreshCw className="h-3 w-3 animate-spin text-blue-600/70 dark:text-blue-400/70" />
+                  <span className="text-xs text-blue-700/70 dark:text-blue-300/70">Loading...</span>
+                </div>
+              ) : (
+                <div className="mt-2 space-y-1">
+                  <div className="text-lg font-bold text-blue-800 dark:text-blue-200">
+                    {totalTokens.toLocaleString()} tokens
+                  </div>
+                  
+                  {(expiringTokens > 0 || nonexpiringTokens > 0) && (
+                    <div className="space-y-0.5 text-xs">
+                      {expiringTokens > 0 && (
+                        <div className="flex justify-between text-amber-700 dark:text-amber-300">
+                          <span>Expiring:</span>
+                          <span className="font-medium">
+                            {expiringTokens.toLocaleString()}
+                            {expiringTokensExpiry && (
+                              <span className="ml-1 text-amber-600 dark:text-amber-400">
+                                ({new Date(expiringTokensExpiry).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})
+                              </span>
+                            )}
+                          </span>
+                        </div>
+                      )}
+                      
+                      {nonexpiringTokens > 0 && (
+                        <div className="flex justify-between text-green-700 dark:text-green-300">
+                          <span>Permanent:</span>
+                          <span className="font-medium">{nonexpiringTokens.toLocaleString()}</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+            </Link>
           </div>
         </DropdownMenuGroup>
 

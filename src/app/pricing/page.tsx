@@ -8,16 +8,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   CheckCircle,
   CreditCard,
   Zap,
-  Lightbulb,
   Layers,
   Save,
   Share2,
   Brain,
-  MessageSquareText,
   Users,
   User,
 } from "lucide-react";
@@ -72,99 +71,124 @@ export default function PricingPage() {
         </div>
       </div>
 
-      {/* Subscription Plans Section */}
+      {/* Pricing Options Tabs */}
       <div className="mx-auto mb-20 max-w-6xl">
         <div className="mb-12 text-center">
-          <h2 className="mb-4 text-3xl font-bold">Monthly Subscription Plans</h2>
+          <h2 className="mb-4 text-3xl font-bold">Choose Your Pricing Model</h2>
           <p className="text-lg text-gray-600 dark:text-gray-400">
-            Get predictable monthly tokens with our subscription plans. Perfect for teams with consistent usage.
-          </p>
-        </div>
-        <SubscriptionPricingTable />
-      </div>
-
-      {/* Token Purchases Section */}
-      <div className="mx-auto mb-20 max-w-4xl">
-        <div className="mb-12 text-center">
-          <h2 className="mb-4 text-3xl font-bold">Pay-As-You-Go Tokens</h2>
-          <p className="text-lg text-gray-600 dark:text-gray-400">
-            Prefer flexibility? Purchase tokens as needed with bonus rewards for larger purchases.
+            Select between predictable monthly subscriptions or flexible pay-as-you-go tokens
           </p>
         </div>
         
-        <Card className="relative overflow-hidden border-2 border-gradient-to-r from-blue-500 to-purple-500">
-          <div className="absolute left-0 top-0 h-1 w-full bg-gradient-to-r from-blue-500 to-purple-500"></div>
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Token Purchases</CardTitle>
-            <CardDescription>
-              Non-expiring tokens that you can use anytime. Perfect for occasional users or teams who want to supplement their subscription.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="grid gap-6 md:grid-cols-2">
-              <div className="space-y-4">
-                <h3 className="font-semibold text-lg">Pricing Tiers</h3>
-                <ul className="space-y-3">
-                  <li className="flex items-center justify-between">
-                    <span>$5 - $9</span>
-                    <span className="rounded-full bg-gray-100 px-3 py-1 text-sm dark:bg-gray-800">Base Rate</span>
-                  </li>
-                  <li className="flex items-center justify-between">
-                    <span>$10 - $19</span>
-                    <span className="rounded-full bg-green-100 px-3 py-1 text-sm text-green-800 dark:bg-green-900 dark:text-green-200">+5% Bonus</span>
-                  </li>
-                  <li className="flex items-center justify-between">
-                    <span>$20 - $49</span>
-                    <span className="rounded-full bg-blue-100 px-3 py-1 text-sm text-blue-800 dark:bg-blue-900 dark:text-blue-200">+10% Bonus</span>
-                  </li>
-                  <li className="flex items-center justify-between">
-                    <span>$50 - $99</span>
-                    <span className="rounded-full bg-purple-100 px-3 py-1 text-sm text-purple-800 dark:bg-purple-900 dark:text-purple-200">+15% Bonus</span>
-                  </li>
-                  <li className="flex items-center justify-between">
-                    <span>$100+</span>
-                    <span className="rounded-full bg-yellow-100 px-3 py-1 text-sm text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">+20% Bonus</span>
-                  </li>
-                </ul>
-              </div>
-              <div className="space-y-4">
-                <h3 className="font-semibold text-lg">Key Features</h3>
-                <ul className="space-y-3">
-                  <li className="flex items-start">
-                    <CheckCircle className="mr-2 mt-0.5 h-5 w-5 shrink-0 text-green-500" />
-                    <span>200 tokens per dollar</span>
-                  </li>
-                  <li className="flex items-start">
-                    <CheckCircle className="mr-2 mt-0.5 h-5 w-5 shrink-0 text-green-500" />
-                    <span>Tokens never expire</span>
-                  </li>
-                  <li className="flex items-start">
-                    <CheckCircle className="mr-2 mt-0.5 h-5 w-5 shrink-0 text-green-500" />
-                    <span>Works for personal & organization accounts</span>
-                  </li>
-                  <li className="flex items-start">
-                    <CheckCircle className="mr-2 mt-0.5 h-5 w-5 shrink-0 text-green-500" />
-                    <span>Automatic bonus calculation</span>
-                  </li>
-                </ul>
-              </div>
+        <Tabs defaultValue="subscriptions" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-12 bg-gray-100 dark:bg-gray-800 px-4 py-2 rounded-xl h-auto gap-2">
+            <TabsTrigger
+              value="subscriptions" 
+              className="flex items-center justify-center gap-3 py-4 px-6 text-base font-semibold rounded-lg transition-all duration-300 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:scale-[1.02] hover:bg-white/50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 data-[state=active]:border-0"
+            >
+              <Users className="h-5 w-5" />
+              <span>Monthly Subscriptions</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="tokens" 
+              className="flex items-center justify-center gap-3 py-4 px-6 text-base font-semibold rounded-lg transition-all duration-300 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:scale-[1.02] hover:bg-white/50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 data-[state=active]:border-0"
+            >
+              <CreditCard className="h-5 w-5" />
+              <span>Pay-As-You-Go Tokens</span>
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="subscriptions" className="space-y-8 transition-opacity duration-500">
+            <div className="text-center mb-10">
+              <h3 className="text-2xl font-bold mb-3 bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent">Monthly Subscription Plans</h3>
+              <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+                Get predictable monthly tokens with our subscription plans. Perfect for teams with consistent usage.
+              </p>
             </div>
-            <div className="rounded-md border border-blue-100 bg-blue-50 p-4 dark:border-blue-800/30 dark:bg-blue-900/20">
-              <div className="flex items-center text-sm text-blue-700 dark:text-blue-300">
-                <Zap className="mr-2 h-4 w-4 text-blue-500" />
-                <span className="font-medium">Perfect for supplementing subscriptions or occasional usage</span>
-              </div>
+            <SubscriptionPricingTable />
+          </TabsContent>
+          
+          <TabsContent value="tokens" className="space-y-8 transition-opacity duration-500">
+            <div className="text-center mb-10">
+              <h3 className="text-2xl font-bold mb-3 bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">Pay-As-You-Go Tokens</h3>
+              <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+                Prefer flexibility? Purchase tokens as needed with bonus rewards for larger purchases.
+              </p>
             </div>
-          </CardContent>
-          <CardFooter>
-            <Link href="/credits" className="w-full" prefetch={false}>
-              <Button className="w-full bg-gradient-to-r from-blue-500 to-purple-500 shadow-md transition-all hover:from-blue-600 hover:to-purple-600 hover:shadow-lg">
-                Purchase Tokens
-                <CreditCard className="ml-2 h-4 w-4" />
-              </Button>
-            </Link>
-          </CardFooter>
-        </Card>
+            
+            <div className="max-w-4xl mx-auto">
+              <Card className="relative overflow-hidden border-2 border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900">
+                <div className="absolute left-0 top-0 h-1 w-full bg-gradient-to-r from-blue-500 to-purple-500"></div>
+                <CardHeader className="text-center">
+                  <CardTitle className="text-2xl text-gray-900 dark:text-white">Token Purchases</CardTitle>
+                  <CardDescription className="text-gray-600 dark:text-gray-400">
+                    Non-expiring tokens that you can use anytime. Perfect for occasional users or teams who want to supplement their subscription.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="grid gap-6 md:grid-cols-2">
+                    <div className="space-y-4">
+                      <h3 className="font-semibold text-lg text-gray-900 dark:text-white">Available Packages</h3>
+                      <ul className="space-y-3">
+                        <li className="flex items-center justify-between">
+                          <span className="text-gray-700 dark:text-gray-300">Starter Pack - $5</span>
+                          <span className="rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-700 dark:bg-gray-800 dark:text-gray-300">1,000 tokens</span>
+                        </li>
+                        <li className="flex items-center justify-between">
+                          <span className="text-gray-700 dark:text-gray-300">Creator Bundle - $10</span>
+                          <span className="rounded-full bg-green-100 px-3 py-1 text-sm text-green-800 dark:bg-green-900/50 dark:text-green-200">2,100 tokens</span>
+                        </li>
+                        <li className="flex items-center justify-between">
+                          <span className="text-gray-700 dark:text-gray-300">Power User - $25</span>
+                          <span className="rounded-full bg-blue-100 px-3 py-1 text-sm text-blue-800 dark:bg-blue-900/50 dark:text-blue-200">5,500 tokens</span>
+                        </li>
+                        <li className="flex items-center justify-between">
+                          <span className="text-gray-700 dark:text-gray-300">Professional - $50</span>
+                          <span className="rounded-full bg-purple-100 px-3 py-1 text-sm text-purple-800 dark:bg-purple-900/50 dark:text-purple-200">11,500 tokens</span>
+                        </li>
+                      </ul>
+                    </div>
+                    <div className="space-y-4">
+                      <h3 className="font-semibold text-lg text-gray-900 dark:text-white">Key Features</h3>
+                      <ul className="space-y-3">
+                        <li className="flex items-start">
+                          <CheckCircle className="mr-2 mt-0.5 h-5 w-5 shrink-0 text-green-500 dark:text-green-400" />
+                          <span className="text-gray-700 dark:text-gray-300">Bonus tokens included on larger packages</span>
+                        </li>
+                        <li className="flex items-start">
+                          <CheckCircle className="mr-2 mt-0.5 h-5 w-5 shrink-0 text-green-500 dark:text-green-400" />
+                          <span className="text-gray-700 dark:text-gray-300">Tokens never expire</span>
+                        </li>
+                        <li className="flex items-start">
+                          <CheckCircle className="mr-2 mt-0.5 h-5 w-5 shrink-0 text-green-500 dark:text-green-400" />
+                          <span className="text-gray-700 dark:text-gray-300">Works for personal & organization accounts</span>
+                        </li>
+                        <li className="flex items-start">
+                          <CheckCircle className="mr-2 mt-0.5 h-5 w-5 shrink-0 text-green-500 dark:text-green-400" />
+                          <span className="text-gray-700 dark:text-gray-300">One-time purchase, no recurring charges</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div className="rounded-md border border-blue-100 bg-blue-50 p-4 dark:border-blue-800/30 dark:bg-blue-900/20">
+                    <div className="flex items-center text-sm text-blue-700 dark:text-blue-300">
+                      <Zap className="mr-2 h-4 w-4 text-blue-500 dark:text-blue-400" />
+                      <span className="font-medium">Perfect for supplementing subscriptions or occasional usage</span>
+                    </div>
+                  </div>
+                </CardContent>
+                <CardFooter>
+                  <Link href="/credits" className="w-full" prefetch={false}>
+                    <Button className="w-full bg-gradient-to-r from-blue-500 to-purple-500 shadow-md transition-all hover:from-blue-600 hover:to-purple-600 hover:shadow-lg">
+                      Purchase Tokens
+                      <CreditCard className="ml-2 h-4 w-4" />
+                    </Button>
+                  </Link>
+                </CardFooter>
+              </Card>
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
 
       {/* Comparison Table */}
@@ -238,7 +262,7 @@ export default function PricingPage() {
                   Cost per 1000 tokens
                 </td>
                 <td className="p-4 text-center text-gray-600 dark:text-gray-400">
-                  $5.00 (+ bonuses)
+                  $4.35 - $5.00
                 </td>
                 <td className="p-4 text-center font-semibold text-green-600">
                   $2.33

@@ -13,14 +13,12 @@ import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
 import {
   SignUpButton,
-  useAuth,
-  useOrganizationList,
   SignInButton,
 } from "@clerk/nextjs";
-import { Coins, Github, Loader2, Menu, X } from "lucide-react";
+import { Github, Loader2, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
-import { useCallback, useState, useEffect } from "react";
+import { useCallback, useState } from "react";
 import { ThemeToggle } from "./ThemeToggle";
 import { Logo } from "./icons/logo";
 import { Button } from "./ui/button";
@@ -131,25 +129,8 @@ function FreeChallengeBadge() {
 
 export default function Navbar() {
   const { isSignedIn, isLoading: isUserLoading } = useCurrentUser();
-  const { userId } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const {
-    expiringTokens,
-    expiringTokensExpiry,
-    nonexpiringTokens,
-    totalUsableTokens: totalTokens,
-    isLoading: isLoadingCredits,
-    hasValidData,
-    refetch: refetchCredits,
-  } = useCredits();
   const pathname = usePathname();
-
-  // Only refresh credits once when the user is first identified
-  useEffect(() => {
-    if (userId && !isLoadingCredits) {
-      void refetchCredits();
-    }
-  }, [userId]); // Intentionally omit refetchCredits from dependencies to prevent re-runs
 
   const toggleMenu = useCallback(() => {
     setIsMenuOpen(!isMenuOpen);
@@ -238,39 +219,7 @@ export default function Navbar() {
             </div>
           ) : isSignedIn ? (
             <div className="flex items-center space-x-4">
-              <Link
-                href="/credits"
-                className="flex items-center gap-1.5 text-sm font-medium"
-                prefetch={false}
-              >
-                <Coins className="h-4 w-4" />
-                {isLoadingCredits || !hasValidData ? (
-                  <span className="text-muted-foreground">Loading...</span>
-                ) : (
-                  <span className="text-muted-foreground">
-                    Tokens: {totalTokens}
-                    {expiringTokens > 0 && (
-                      <>
-                        {" "}(expiring: {expiringTokens}
-                        {expiringTokensExpiry && (
-                          <>
-                            , expires {new Date(expiringTokensExpiry).toLocaleDateString()}
-                          </>
-                        )}
-                        )
-                      </>
-                    )}
-                    {nonexpiringTokens > 0 && (
-                      <>
-                        {expiringTokens > 0 ? ", " : " ("}
-                        non-expiring: {nonexpiringTokens}
-                        )
-                      </>
-                    )}
-                  </span>
-                )}
-              </Link>
-              <CreditAlert className="ml-2" />
+              <CreditAlert />
               <div className="border-l border-border pl-4">
                 <UserMenu />
               </div>
@@ -350,53 +299,8 @@ export default function Navbar() {
               </Link>
             </div>
 
-            {/* Challenge & Credits Info - Mobile */}
+            {/* Challenge Info - Mobile */}
             <FreeChallengeBadge />
-            {isUserLoading ? (
-              <div className="flex items-center space-x-2 py-2">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                <span className="text-sm text-muted-foreground">
-                  Loading...
-                </span>
-              </div>
-            ) : (
-              isSignedIn && (
-                <Link
-                  href="/credits"
-                  className={cn(
-                    "block py-2 text-sm text-muted-foreground hover:text-foreground",
-                    isLoadingCredits && "animate-pulse",
-                  )}
-                  prefetch={false}
-                >
-                  {isLoadingCredits || !hasValidData ? (
-                    "Loading tokens..."
-                  ) : (
-                    <>
-                      Tokens: {totalTokens}
-                      {expiringTokens > 0 && (
-                        <>
-                          {" "}(expiring: {expiringTokens}
-                          {expiringTokensExpiry && (
-                            <>
-                              , expires {new Date(expiringTokensExpiry).toLocaleDateString()}
-                            </>
-                          )}
-                          )
-                        </>
-                      )}
-                      {nonexpiringTokens > 0 && (
-                        <>
-                          {expiringTokens > 0 ? ", " : " ("}
-                          non-expiring: {nonexpiringTokens}
-                          )
-                        </>
-                      )}
-                    </>
-                  )}
-                </Link>
-              )
-            )}
 
             {/* User & Theme - Mobile */}
             <div className="flex items-center justify-between py-2">

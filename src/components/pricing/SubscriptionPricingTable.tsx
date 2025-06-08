@@ -182,15 +182,6 @@ export function SubscriptionPricingTable({ contextOnly = false }: SubscriptionPr
 
   return (
     <div className="space-y-6">
-      {contextOnly && userId && (
-        <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
-          <div className="flex items-center text-sm text-blue-700 dark:text-blue-300">
-            <Star className="mr-2 h-4 w-4" />
-            <span>Managing subscription for: <strong>{context.name}</strong> ({context.type})</span>
-          </div>
-        </div>
-      )}
-      
       {/* Cancellation Warning Banner */}
       {isScheduledForCancellation() && (
         <div className="rounded-lg border border-orange-200 bg-orange-50 p-4 dark:border-orange-800 dark:bg-orange-900/20">
@@ -233,10 +224,10 @@ export function SubscriptionPricingTable({ contextOnly = false }: SubscriptionPr
           return (
             <Card
               key={tier}
-              className={`relative flex min-h-[150px] flex-col overflow-hidden border-2 ${
+              className={`relative flex min-h-[150px] flex-col overflow-hidden border-2 bg-white dark:bg-gray-900 ${
                 isPro
                   ? "scale-105 border-purple-400 shadow-lg dark:border-purple-600"
-                  : "border-gray-200 dark:border-gray-700"
+                  : "border-gray-200 shadow-sm dark:border-gray-700"
               }`}
             >
               <div className={`absolute left-0 top-0 h-1 w-full ${
@@ -266,10 +257,10 @@ export function SubscriptionPricingTable({ contextOnly = false }: SubscriptionPr
               )}
 
               <CardHeader>
-                <CardTitle className="flex items-center text-2xl">
+                <CardTitle className="flex items-center text-2xl text-gray-900 dark:text-white">
                   {tierData.name}
                   {isPro && (
-                    <span className="ml-2 rounded-full bg-purple-100 px-2 py-0.5 text-xs text-purple-700 dark:bg-purple-900 dark:text-purple-300">
+                    <span className="ml-2 rounded-full bg-purple-100 px-2 py-0.5 text-xs text-purple-700 dark:bg-purple-900/50 dark:text-purple-300">
                       Popular
                     </span>
                   )}
@@ -278,7 +269,7 @@ export function SubscriptionPricingTable({ contextOnly = false }: SubscriptionPr
                   {pricing.description}
                 </CardDescription> */}
                 <div className="mt-4">
-                  <span className="text-3xl font-bold">${pricing.price}</span>
+                  <span className="text-3xl font-bold text-gray-900 dark:text-white">${pricing.price}</span>
                   <span className="text-gray-500 dark:text-gray-400"> / month</span>
                 </div>
               </CardHeader>
@@ -286,8 +277,8 @@ export function SubscriptionPricingTable({ contextOnly = false }: SubscriptionPr
               <CardContent className="">
                 <ul className="space-y-3">
                   <li className="flex items-start">
-                    <CheckCircle className="mr-2 mt-0.5 h-5 w-5 shrink-0 text-green-500" />
-                    <div>
+                    <CheckCircle className="mr-2 mt-0.5 h-5 w-5 shrink-0 text-green-500 dark:text-green-400" />
+                    <div className="text-gray-700 dark:text-gray-300">
                       <span className="font-medium">{tierData.monthlyTokens.toLocaleString()} AI tokens</span>
                       <span> per month</span>
                     </div>
@@ -328,16 +319,16 @@ export function SubscriptionPricingTable({ contextOnly = false }: SubscriptionPr
                   disabled={createSubscriptionMutation.isPending || createPortalMutation.isPending}
                   className={`w-full shadow-md transition-all hover:shadow-lg ${
                     buttonVariant === "upgrade"
-                      ? "bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600"
+                      ? "bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:from-green-600 hover:to-emerald-600"
                       : buttonVariant === "downgrade"
-                      ? "bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600"
+                      ? "bg-gradient-to-r from-orange-500 to-amber-500 text-white hover:from-orange-600 hover:to-amber-600"
                       : buttonVariant === "manage"
-                      ? "bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700"
+                      ? "bg-gradient-to-r from-gray-500 to-gray-600 text-white hover:from-gray-600 hover:to-gray-700"
                       : buttonVariant === "reactivate"
-                      ? "bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600"
+                      ? "bg-gradient-to-r from-orange-500 to-amber-500 text-white hover:from-orange-600 hover:to-amber-600"
                       : isPro
-                      ? "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
-                      : "bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
+                      ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600"
+                      : "bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700"
                   }`}
                 >
                   {createSubscriptionMutation.isPending || createPortalMutation.isPending ? (

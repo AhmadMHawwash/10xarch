@@ -6,13 +6,14 @@ import { useRouter } from 'next/navigation';
 import { Plus, Trash2, Edit, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToast } from '@/components/ui/use-toast';
 import { api } from '@/trpc/react';
 import { type Playground } from '@/server/db/schema';
 import { formatDistanceToNow } from '@/lib/utils';
+import { type Edge, type Node } from 'reactflow';
+import { type OtherNodeDataProps, type SystemComponentNodeDataProps } from '@/components/ReactflowCustomNodes/SystemComponentNode';
+import { defaultStartingNodes } from '@/lib/hooks/systemDesignerUtils';
 
 interface PlaygroundsClientProps {
   initialPlaygrounds: Playground[];
@@ -21,8 +22,6 @@ interface PlaygroundsClientProps {
 export default function PlaygroundsClient({ initialPlaygrounds }: PlaygroundsClientProps) {
   const router = useRouter();
   const { toast } = useToast();
-  const [newPlaygroundTitle, setNewPlaygroundTitle] = useState('');
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [playgroundToDelete, setPlaygroundToDelete] = useState<string | null>(null);
 
   const { data, isLoading, refetch } = api.playgrounds.getAll.useQuery(undefined, {
@@ -31,14 +30,13 @@ export default function PlaygroundsClient({ initialPlaygrounds }: PlaygroundsCli
   });
 
   const createPlaygroundMutation = api.playgrounds.create.useMutation({
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast({
         title: 'Success',
         description: 'Playground created successfully',
       });
-      setNewPlaygroundTitle('');
-      setIsCreateDialogOpen(false);
-      void refetch();
+      // Redirect to the new playground
+      router.push(`/playgrounds/${data.playground.id}`);
     },
     onError: (error) => {
       toast({
@@ -68,18 +66,12 @@ export default function PlaygroundsClient({ initialPlaygrounds }: PlaygroundsCli
   });
 
   const handleCreatePlayground = async () => {
-    if (!newPlaygroundTitle.trim()) {
-      toast({
-        title: 'Error',
-        description: 'Please enter a playground title',
-        variant: 'destructive',
-      });
-      return;
-    }
-
     createPlaygroundMutation.mutate({
-      title: newPlaygroundTitle,
-      jsonBlob: {}, // Initialize with empty diagram
+      title: 'Untitled Playground',
+      jsonBlob: {
+        nodes: defaultStartingNodes,
+        edges: [] as Edge[],
+      }, // Initialize with empty diagram
       ownerType: 'user',
       // ownerId will be set to the current user on the server
     });
@@ -93,40 +85,10 @@ export default function PlaygroundsClient({ initialPlaygrounds }: PlaygroundsCli
     <div className="container mx-auto py-8">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">Your Playgrounds</h1>
-        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              New Playground
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Create a new playground</DialogTitle>
-              <DialogDescription>
-                Give your playground a name to get started.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="py-4">
-              <Label htmlFor="name">Name</Label>
-              <Input
-                id="name"
-                placeholder="My System Design"
-                value={newPlaygroundTitle}
-                onChange={(e) => setNewPlaygroundTitle(e.target.value)}
-                className="mt-2"
-              />
-            </div>
-            <DialogFooter>
-              <DialogClose asChild>
-                <Button variant="outline">Cancel</Button>
-              </DialogClose>
-              <Button onClick={handleCreatePlayground} disabled={createPlaygroundMutation.isPending}>
-                {createPlaygroundMutation.isPending ? 'Creating...' : 'Create'}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <Button onClick={handleCreatePlayground} disabled={createPlaygroundMutation.isPending}>
+          <Plus className="mr-2 h-4 w-4" />
+          {createPlaygroundMutation.isPending ? 'Creating...' : 'New Playground'}
+        </Button>
       </div>
 
       {isLoading ? (
@@ -141,9 +103,9 @@ export default function PlaygroundsClient({ initialPlaygrounds }: PlaygroundsCli
               <p className="mt-2 text-muted-foreground">
                 Create your first playground to get started with system design.
               </p>
-              <Button className="mt-4" onClick={() => setIsCreateDialogOpen(true)}>
+              <Button className="mt-4" onClick={handleCreatePlayground} disabled={createPlaygroundMutation.isPending}>
                 <Plus className="mr-2 h-4 w-4" />
-                Create Playground
+                {createPlaygroundMutation.isPending ? 'Creating...' : 'Create Playground'}
               </Button>
             </div>
           ) : (

@@ -55,6 +55,10 @@ export const playgroundSolutionSchema = z.object({
     .trim()
     .max(5000, "System design context too long")
     .optional(),
+  playgroundId: z
+    .string()
+    .uuid("Invalid playground ID")
+    .optional(),
 });
 
 // Type for the validated challenge solution

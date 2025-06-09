@@ -1,4 +1,5 @@
 // import { type SystemComponentNodeDataProps } from "@/components/ReactflowCustomNodes/APIsNode";
+import { extractAPIDefinitions } from "@/components/ai-chat/ChatUI";
 import {
   type OtherNodeDataProps,
   type SystemComponentNodeDataProps,
@@ -6,17 +7,13 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import { type PlaygroundResponse } from "@/server/api/routers/checkAnswer";
 import { api } from "@/trpc/react";
-import { useParams, usePathname } from "next/navigation";
-import { useEffect } from "react";
-import { useLocalStorage } from "react-use";
+import { useParams } from "next/navigation";
 import { type Edge, type Node } from "reactflow";
 import { useSystemDesigner } from "./_useSystemDesigner";
-import { extractAPIDefinitions } from "@/components/ai-chat/ChatUI";
 
 export const SYSTEM_COMPONENT_NODE = "SystemComponentNode";
 
 export const usePlaygroundManager = () => {
-  const pathname = usePathname();
   const { id: playgroundId } = useParams();
   const { nodes, edges } = useSystemDesigner();
   const { toast } = useToast();
@@ -29,12 +26,10 @@ export const usePlaygroundManager = () => {
     enabled: !!playgroundId,
   });
 
-  const storageKey = `/playgrounds/${pathname}-feedback`;
-
-  const [feedback, setFeedback] = useLocalStorage<PlaygroundResponse | null>(
-    storageKey,
-    null,
-  );
+  // Get feedback from the playground data (backend) instead of local storage
+  const feedback = playgroundData?.playground.evaluationFeedback 
+    ? (JSON.parse(playgroundData.playground.evaluationFeedback) as PlaygroundResponse)
+    : null;
 
   // Mutation to get AI feedback
   const { mutate, isPending, data } = api.ai.playground.useMutation({
@@ -66,6 +61,11 @@ export const usePlaygroundManager = () => {
       });
       console.error("Error checking solution:", err);
     },
+    onSuccess: async () => {
+      // Feedback is automatically saved by the AI endpoint
+      // Just refetch to get the updated data
+      void refetchPlayground();
+    },
   });
 
   // Mutation to update playground data
@@ -92,6 +92,7 @@ export const usePlaygroundManager = () => {
       mutate({
         systemDesign: prompt,
         systemDesignContext: context ?? "",
+        playgroundId: playgroundId as string,
       });
     } else {
       toast({
@@ -103,11 +104,6 @@ export const usePlaygroundManager = () => {
     }
   };
 
-  useEffect(() => {
-    if (data) {
-      setFeedback(data);
-    }
-  }, [data, setFeedback]);
 
   const dbSavedNodes = (
     playgroundData?.playground.jsonBlob as {

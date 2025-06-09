@@ -7,16 +7,6 @@ import SystemContext from "@/components/playground/SystemContext";
 import { type OtherNodeDataProps, type SystemComponentNodeDataProps } from "@/components/ReactflowCustomNodes/SystemComponentNode";
 import { FlowManager } from "@/components/SolutionFlowManager";
 import SystemBuilder from "@/components/SystemDesigner";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -37,17 +27,27 @@ import { usePlaygroundManager } from "@/lib/hooks/usePlaygroundManager";
 import { type SystemComponentType } from "@/lib/levels/type";
 import { Bot, Info, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useLocalStorage, usePrevious } from "react-use";
-import { type Edge, type Node, ReactFlowProvider } from "reactflow";
+  import { useLocalStorage, usePrevious } from "react-use";
+  import { ReactFlowProvider, type Edge, type Node } from "reactflow";
+
 
 const AUTO_SAVE_INTERVAL = 5000; // 20 seconds
 
 // Helper function to extract relevant details for comparison
-const getImportantDetails = (
-  nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[],
-  edges: Edge[],
-) => {
+const getImportantDetails = ({
+  title,
+  description,
+  nodes,
+  edges,
+}: {
+  title: string;
+  description: string;
+  nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[];
+  edges: Edge[];
+}) => {
   return {
+    title,
+    description,
     nodes: nodes.map((node) => ({
       id: node.id,
       type: node.type,
@@ -151,20 +151,20 @@ function PageContent() {
   const [showWelcomeGuide, setShowWelcomeGuide] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const [isChatPanelOpen, setIsChatPanelOpen] = useState(false);
-  const [showDivergenceDialog, setShowDivergenceDialog] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [isDirty, setIsDirty] = useState(false);
-  const [localPlaygroundTitle, setLocalPlaygroundTitle] = useLocalStorage(
-    `${playgroundId}-localPlaygroundTitle`,
-    "",
-  );
-  const [localPlaygroundDescription, setLocalPlaygroundDescription] =
-    useLocalStorage(`${playgroundId}-localPlaygroundDescription`, "");
+  const [localTitle, setLocalTitle] = useState("");
+  const [localDescription, setLocalDescription] = useState("");
   const { toast } = useToast();
 
   const isInitialized = useRef(false);
   const prevFeedback = usePrevious(feedback);
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastSavedStateRef = useRef<{
+    title: string;
+    description: string;
+    nodes: typeof nodes;
+    edges: typeof edges;
+  } | null>(null);
 
   const [title, setTitle] = useSystemComponentConfigSlice<string>(
     selectedNode?.id ?? "",
@@ -199,75 +199,69 @@ function PageContent() {
   const loadPlaygroundData = useCallback(() => {
     if (!playground?.nodes || !playground?.edges) return;
 
-    setNodes(
-      playground.nodes.map((node) => ({
-        ...node,
-        data: {
-          ...node.data,
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-          icon: getSystemComponent(node.data.name as SystemComponentType)?.icon,
-        },
-      })),
-    );
+    const processedNodes = playground.nodes.map((node) => ({
+      ...node,
+      data: {
+        ...node.data,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        icon: getSystemComponent(node.data.name as SystemComponentType)?.icon,
+      },
+    }));
+
+    setNodes(processedNodes);
     setEdges(playground.edges);
-    if (playground.title) {
-      setLocalPlaygroundTitle(playground.title);
-    }
-    if (playground.description) {
-      setLocalPlaygroundDescription(playground.description);
-    }
+    
+    // Initialize local title and description from playground data
+    const title = playground.title ?? "";
+    const description = playground.description ?? "";
+    setLocalTitle(title);
+    setLocalDescription(description);
+
+    // Set initial saved state
+    lastSavedStateRef.current = {
+      title,
+      description,
+      nodes: processedNodes,
+      edges: playground.edges,
+    };
   }, [playground, setNodes, setEdges]);
 
-  // Initial load and divergence check
+  // Initial load
   useEffect(() => {
     if (!playground?.nodes || !playground?.edges || isSaving) return;
 
     if (!isInitialized.current) {
-      const localNodesExist = nodes && nodes.length > 0;
-      if (localNodesExist) {
-        const remoteDetails = getImportantDetails(
-          playground.nodes,
-          playground.edges,
-        );
-        const localDetails = getImportantDetails(nodes, edges);
-        const isDivergent =
-          playground.title !== localPlaygroundTitle ||
-          playground.description !== localPlaygroundDescription ||
-          !deepCompare(remoteDetails, localDetails);
-          
-        if (isDivergent) {
-          setShowDivergenceDialog(true);
-          return; // Wait for user decision before initializing
-        }
-      }
-      // No divergence or no local nodes, initialize with remote data
       loadPlaygroundData();
       isInitialized.current = true;
     }
-  }, [playground, nodes, edges, isSaving, loadPlaygroundData]);
+  }, [playground, isSaving, loadPlaygroundData]);
+
+
+  // Helper function to detect changes
+  const hasChanges = useCallback(() => {
+    if (!lastSavedStateRef.current) return false;
+    
+    const currentState = {
+      title: localTitle || "Untitled Playground",
+      description: localDescription,
+      nodes,
+      edges,
+    };
+    
+    const currentDetails = getImportantDetails(currentState);
+    const savedDetails = getImportantDetails(lastSavedStateRef.current);
+    
+    return !deepCompare(currentDetails, savedDetails);
+  }, [localTitle, localDescription, nodes, edges]);
 
   // Auto-save functionality
   useEffect(() => {
-    if (
-      !isInitialized.current ||
-      isSaving ||
-      showDivergenceDialog ||
-      !isDirty
-    ) {
-      if (!playground?.nodes || !playground?.edges) return;
+    if (!isInitialized.current || isSaving) {
+      return;
+    }
 
-      const localDetails = getImportantDetails(nodes, edges);
-      const remoteDetails = getImportantDetails(
-        playground.nodes,
-        playground.edges,
-      );
-      const isDirty =
-        playground.title !== localPlaygroundTitle ||
-        playground.description !== localPlaygroundDescription ||
-        !deepCompare(remoteDetails, localDetails);
-
-      setIsDirty(isDirty);
-
+    // Only set up auto-save if there are changes
+    if (!hasChanges()) {
       return;
     }
 
@@ -276,13 +270,29 @@ function PageContent() {
     }
 
     autoSaveTimeoutRef.current = setTimeout(() => {
+      // Double-check for changes before saving
+      if (!hasChanges()) {
+        return;
+      }
+
       setIsSaving(true);
+      const currentState = {
+        title: localTitle || "Untitled Playground",
+        description: localDescription,
+        nodes,
+        edges,
+      };
+
       updatePlayground({
         id: playgroundId,
-        title: localPlaygroundTitle,
-        description: localPlaygroundDescription,
-        jsonBlob: { nodes, edges },
+        title: currentState.title,
+        description: currentState.description,
+        jsonBlob: { nodes: currentState.nodes, edges: currentState.edges },
       })
+        .then(() => {
+          // Update last saved state after successful save
+          lastSavedStateRef.current = currentState;
+        })
         .catch((error) => {
           console.error("Auto-save failed:", error);
         })
@@ -302,49 +312,35 @@ function PageContent() {
     playgroundId,
     updatePlayground,
     isSaving,
-    showDivergenceDialog,
-    localPlaygroundTitle,
-    localPlaygroundDescription,
+    localTitle,
+    localDescription,
+    hasChanges,
   ]);
-
-  const handleKeepDbVersion = useCallback(() => {
-    loadPlaygroundData();
-    setShowDivergenceDialog(false);
-    isInitialized.current = true; // Mark as initialized with DB data
-  }, [loadPlaygroundData]);
-
-  const handleKeepLocalVersion = useCallback(async () => {
-    setShowDivergenceDialog(false);
-    setIsSaving(true);
-    try {
-      await updatePlayground({
-        id: playgroundId,
-        title: localPlaygroundTitle,
-        description: localPlaygroundDescription,
-        jsonBlob: { nodes, edges },
-      });
-      await refetchPlayground(); // Ensure local state matches the newly saved state
-      isInitialized.current = true; // Mark as initialized with local data now saved
-    } catch (error) {
-      console.error("Failed to save local playground version:", error);
-      // Optionally, re-open dialog or notify user of save failure
-    } finally {
-      setIsSaving(false);
-    }
-  }, [playgroundId, nodes, edges, updatePlayground, refetchPlayground]);
 
   const handleManualSave = useCallback(async () => {
     if (autoSaveTimeoutRef.current) {
       clearTimeout(autoSaveTimeoutRef.current); // Prevent auto-save race condition
     }
     setIsSaving(true);
+    
+    const currentState = {
+      title: localTitle || "Untitled Playground",
+      description: localDescription,
+      nodes,
+      edges,
+    };
+    
     try {
       await updatePlayground({
         id: playgroundId,
-        title: localPlaygroundTitle,
-        description: localPlaygroundDescription,
-        jsonBlob: { nodes, edges },
+        title: currentState.title,
+        description: currentState.description,
+        jsonBlob: { nodes: currentState.nodes, edges: currentState.edges },
       });
+      
+      // Update last saved state after successful save
+      lastSavedStateRef.current = currentState;
+      
       toast({
         title: "Saved",
         description: "Your changes have been saved",
@@ -354,7 +350,7 @@ function PageContent() {
     } finally {
       setIsSaving(false);
     }
-  }, [playgroundId, nodes, edges, updatePlayground]);
+  }, [playgroundId, nodes, edges, updatePlayground, localTitle, localDescription, toast]);
 
   const handleCloseWelcomeGuide = (dontShowAgain: boolean) => {
     setShowWelcomeGuide(false);
@@ -380,37 +376,6 @@ function PageContent() {
       {isClient && showWelcomeGuide && (
         <WelcomeGuide onClose={handleCloseWelcomeGuide} />
       )}
-
-      <AlertDialog
-        open={showDivergenceDialog && !isSaving}
-        onOpenChange={(open: boolean) => {
-          if (!isSaving) {
-            setShowDivergenceDialog(open);
-          }
-        }}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Divergence Detected</AlertDialogTitle>
-            <AlertDialogDescription>
-              There is a difference between your current design and the saved
-              version. Which version would you like to use?
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={handleKeepDbVersion}>
-              Use Remote Changes
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => {
-                void handleKeepLocalVersion();
-              }}
-            >
-              {isSaving ? "Saving..." : "Keep Local Changes & Update Remote"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
 
       <ResizablePanelGroup direction="horizontal">
         <ResizablePanel defaultSize={25} minSize={3}>
@@ -483,14 +448,10 @@ function PageContent() {
                         </>
                       ) : (
                         <SystemContext
-                          title={localPlaygroundTitle}
-                          onTitleChange={(e) =>
-                            setLocalPlaygroundTitle(e.target.value)
-                          }
-                          description={localPlaygroundDescription}
-                          onDescriptionChange={(e) =>
-                            setLocalPlaygroundDescription(e.target.value)
-                          }
+                          title={localTitle}
+                          onTitleChange={(e) => setLocalTitle(e.target.value)}
+                          description={localDescription}
+                          onDescriptionChange={(e) => setLocalDescription(e.target.value)}
                         />
                       )}
                     </div>
@@ -644,4 +605,4 @@ function WelcomeGuide({ onClose }: WelcomeGuideProps) {
       </div>
     </div>
   );
-}
+} 

@@ -262,32 +262,38 @@ describe('usePlaygroundManager', () => {
     });
   });
 
-  it('should update feedback in local storage when AI mutation succeeds', () => {
+  it('should read feedback from backend when AI mutation succeeds', () => {
     const mockAiResponse: AiPlaygroundMutationOutput = { 
         strengths: 'Good design', 
         improvementAreas: 'Could be better', 
         recommendations: 'Try harder' 
     };
-    (mockedApi.ai.playground.useMutation as MockedFunction<typeof mockedApi.ai.playground.useMutation>).mockReturnValue({
-      mutate: mockAiPlaygroundMutate,
-      mutateAsync: vi.fn(),
-      isPending: false,
+    
+    // Mock playground data with feedback stored in evaluationFeedback field
+    const mockPlaygroundWithFeedback = {
+      ...mockPlaygroundFull,
+      evaluationFeedback: JSON.stringify(mockAiResponse),
+    };
+    
+    (mockedApi.playgrounds.getById.useQuery as MockedFunction<typeof mockedApi.playgrounds.getById.useQuery>).mockReturnValue({
+      data: { playground: mockPlaygroundWithFeedback },
+      refetch: vi.fn(),
+      isLoading: false,
       isError: false,
       error: null,
-      data: mockAiResponse,
-      variables: undefined,
+      isSuccess: true,
+      isFetching: false,
       status: 'success',
-      failureCount: 0,
-      failureReason: null,
-      reset: vi.fn(),
-      context: undefined,
-      trpc: { path: 'ai.playground' },
-    } as unknown as PlaygroundMutationResult<PlaygroundResponse, AiPlaygroundMutationInput>);
+      trpc: { path: 'playgrounds.getById' },
+    } as unknown as PlaygroundQueryResult);
 
-    const { rerender } = renderHook(() => usePlaygroundManager());
-    rerender();
+    const { result } = renderHook(() => usePlaygroundManager());
 
-    expect(mockSetLocalStorage).toHaveBeenCalledWith(mockAiResponse);
+    // Verify feedback is read from backend (evaluationFeedback field)
+    expect(result.current.answer).toEqual(mockAiResponse);
+    
+    // Verify local storage is NOT called for playgrounds
+    expect(mockSetLocalStorage).not.toHaveBeenCalled();
   });
 
   it('should handle AI mutation error and show toast', () => {

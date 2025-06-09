@@ -24,7 +24,7 @@ const SystemContext = ({
           id="playground-title"
           className="mt-1 w-full"
           placeholder="Enter playground title"
-          value={title}
+          value={title ?? ""}
           onChange={onTitleChange}
         />
       </div>
@@ -37,7 +37,7 @@ const SystemContext = ({
           id="playground-description"
           className="mt-1 w-full"
           placeholder="Enter playground description"
-          value={description}
+          value={description ?? ""}
           onChange={onDescriptionChange}
           rows={3}
         />

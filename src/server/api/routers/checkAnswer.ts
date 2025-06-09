@@ -20,8 +20,10 @@ import {
   createTRPCRouter,
   publicProcedure
 } from "@/server/api/trpc";
+import { playgrounds } from "@/server/db/schema";
 import { auth } from "@clerk/nextjs/server";
 import { TRPCError } from "@trpc/server";
+import { eq } from "drizzle-orm";
 import OpenAI from "openai";
 import { z } from "zod";
 import { creditsRouter } from "./credits";
@@ -326,6 +328,20 @@ export const checkSolution = createTRPCRouter({
         // Parse the content as JSON with type checking
         try {
           const jsonResponse = JSON.parse(content) as PlaygroundResponse;
+          
+          // Save feedback to playground if user is authenticated
+          if (userId && input.playgroundId) {
+            try {
+              await ctx.db.update(playgrounds).set({
+                evaluationFeedback: JSON.stringify(jsonResponse),
+                lastEvaluationAt: new Date(),
+              }).where(eq(playgrounds.id, input.playgroundId));
+            } catch (dbError) {
+              console.error("Failed to save feedback to playground:", dbError);
+              // Don't throw error, just log it and continue
+            }
+          }
+          
           return jsonResponse;
         } catch (parseError) {
           console.error("Error parsing OpenAI response as JSON:", parseError);

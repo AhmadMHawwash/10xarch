@@ -17,10 +17,10 @@ import {
   type PropsWithChildren,
 } from "react";
 import {
-  type EdgeChange,
   useReactFlow,
   useUpdateNodeInternals,
   type Edge,
+  type EdgeChange,
   type Node,
   type OnConnect,
   type OnConnectEnd,
@@ -43,7 +43,7 @@ import {
   restoreFlow,
   saveFlow,
   updateComponentConfig,
-  updateEdgeLabel as updateEdgeLabelPure
+  updateEdgeLabel as updateEdgeLabelPure,
 } from "./systemDesignerUtils";
 import useLocalStorageState from "./useLocalStorageState";
 
@@ -117,7 +117,15 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
   const pathname = usePathname();
   const normalizedPathname = pathname;
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
-  const [nodes, setNodes] = useLocalStorageState<
+  
+  // Check if we're in a playground (not a challenge)
+  const isPlayground = pathname.startsWith('/playgrounds/');
+  
+  // For playgrounds, use regular state; for challenges, use local storage
+  const [playgroundNodes, setPlaygroundNodes] = useState<Node<SystemComponentNodeDataProps | OtherNodeDataProps>[]>(defaultStartingNodes);
+  const [playgroundEdges, setPlaygroundEdges] = useState<Edge[]>([]);
+  
+  const [challengeNodes, setChallengeNodes] = useLocalStorageState<
     Node<SystemComponentNodeDataProps | OtherNodeDataProps>[]
   >(
     `${normalizedPathname}-reactflow-nodes`, 
@@ -132,10 +140,16 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
       return parsedNodes;
     }
   );
-  const [edges, setEdges] = useLocalStorageState<Edge[]>(
+  const [challengeEdges, setChallengeEdges] = useLocalStorageState<Edge[]>(
     `${normalizedPathname}-reactflow-edges`,
     [],
   );
+  
+  // Use the appropriate state based on context
+  const nodes = isPlayground ? playgroundNodes : challengeNodes;
+  const edges = isPlayground ? playgroundEdges : challengeEdges;
+  const setNodes = isPlayground ? setPlaygroundNodes : setChallengeNodes;
+  const setEdges = isPlayground ? setPlaygroundEdges : setChallengeEdges;
   const [reactFlowInstance, setReactFlowInstance] =
     useState<ReactFlowInstance | null>(null);
   const { setViewport } = useReactFlow();

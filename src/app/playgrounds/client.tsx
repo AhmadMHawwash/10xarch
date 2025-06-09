@@ -56,7 +56,7 @@ export default function PlaygroundsClient({ initialPlaygrounds }: PlaygroundsCli
         description: 'Playground deleted successfully',
       });
       setPlaygroundToDelete(null);
-      router.refresh();
+      void refetch();
     },
     onError: (error) => {
       toast({
@@ -162,37 +162,13 @@ export default function PlaygroundsClient({ initialPlaygrounds }: PlaygroundsCli
                 </CardContent>
                 <CardFooter className="flex justify-between">
                   <div className="flex space-x-2">
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => setPlaygroundToDelete(playground.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>Delete Playground</DialogTitle>
-                          <DialogDescription>
-                            Are you sure you want to delete &quot;{playground.title}&quot;? This action cannot be undone.
-                          </DialogDescription>
-                        </DialogHeader>
-                        <DialogFooter className="mt-4">
-                          <DialogClose asChild>
-                            <Button variant="outline">Cancel</Button>
-                          </DialogClose>
-                          <Button
-                            variant="destructive"
-                            onClick={() => handleDeletePlayground(playground.id)}
-                            disabled={deletePlaygroundMutation.isPending}
-                          >
-                            {deletePlaygroundMutation.isPending ? 'Deleting...' : 'Delete'}
-                          </Button>
-                        </DialogFooter>
-                      </DialogContent>
-                    </Dialog>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => setPlaygroundToDelete(playground.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
                   <div className="flex space-x-2">
                     <Button size="sm" asChild>

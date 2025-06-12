@@ -8,6 +8,7 @@ interface PanelChatProps {
   isPlayground?: boolean;
   playgroundId?: string;
   playgroundTitle?: string;
+  playgroundDescription?: string;
   inSidePanel?: boolean;
   onOpenSidePanel?: () => void;
 }
@@ -16,6 +17,7 @@ export function PanelChat({
   isPlayground = false,
   playgroundId,
   playgroundTitle,
+  playgroundDescription,
   inSidePanel = false,
   onOpenSidePanel,
 }: PanelChatProps) {
@@ -34,6 +36,7 @@ export function PanelChat({
           isPlayground={isPlayground}
           playgroundId={playgroundId}
           playgroundTitle={playgroundTitle}
+          playgroundDescription={playgroundDescription}
         />
       </div>
     );

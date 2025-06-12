@@ -33,7 +33,7 @@ export type SystemComponentNodeDataProps = {
 export type OtherNodeDataProps = {
   icon?: typeof PiIcon;
   id: string;
-  name: "Whiteboard" | "Group" | "APIs List";
+  name: "Whiteboard";
   withTargetHandle?: boolean;
   withSourceHandle?: boolean;
   configs: Record<string, unknown>;

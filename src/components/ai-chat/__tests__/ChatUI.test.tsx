@@ -184,7 +184,7 @@ describe("ChatUI", () => {
     render(<ChatUI />);
 
     expect(screen.getByText(/Hi! I am your AI assistant/i)).toBeInTheDocument();
-    expect(screen.getByText(/Tokens: 100/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("Type your message...")).toBeInTheDocument();
   });
 
   it("should call refetchCredits when a message is sent and credits are returned", async () => {

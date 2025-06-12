@@ -137,7 +137,6 @@ function PageContent() {
     playground,
     playgroundId,
     updatePlayground,
-    refetchPlayground,
     checkSolution,
     answer: feedback,
     isLoadingAnswer,
@@ -500,8 +499,9 @@ function PageContent() {
                 <div className="flex-1 overflow-hidden">
                   <PanelChat
                     isPlayground={true}
-                    playgroundId="default"
-                    playgroundTitle="10×arch"
+                    playgroundId={playgroundId}
+                    playgroundTitle={localTitle || "Untitled Playground"}
+                    playgroundDescription={localDescription}
                     inSidePanel={true}
                   />
                 </div>
@@ -515,8 +515,9 @@ function PageContent() {
         <div className="ai-chat-container fixed -right-2 bottom-4 z-50">
           <PanelChat
             isPlayground={true}
-            playgroundId="default"
-            playgroundTitle="10×arch"
+            playgroundId={playgroundId}
+            playgroundTitle={localTitle || "Untitled Playground"}
+            playgroundDescription={localDescription}
             onOpenSidePanel={() => setIsChatPanelOpen(true)}
           />
         </div>

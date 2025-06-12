@@ -28,6 +28,7 @@ interface ChatUIProps {
   isPlayground?: boolean;
   playgroundId?: string;
   playgroundTitle?: string;
+  playgroundDescription?: string;
 }
 
 interface WhiteboardConfigs {
@@ -75,6 +76,7 @@ export function ChatUI({
   isPlayground = false,
   playgroundId,
   playgroundTitle,
+  playgroundDescription,
 }: ChatUIProps) {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -283,8 +285,10 @@ export function ChatUI({
       },
       functionalRequirements: configs["functional requirements"] ?? "",
       nonFunctionalRequirements: configs["non-functional requirements"] ?? "",
+      title: playgroundTitle,
+      description: playgroundDescription,
     };
-  }, [nodes]);
+  }, [nodes, edges, playgroundTitle, playgroundDescription]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -467,7 +471,7 @@ export function ChatUI({
       </ScrollArea>
       <div className="border-t border-border/40 bg-background/95">
         <div className="flex items-center justify-between px-4 py-2 text-xs text-muted-foreground">
-          <div className="flex items-center gap-2">
+          {/* <div className="flex items-center gap-2">
             <MessageSquare className="h-3.5 w-3.5" />
             {rateLimitInfo ? (
               <>
@@ -477,33 +481,7 @@ export function ChatUI({
             ) : (
               <span>Loading free prompts...</span>
             )}
-          </div>
-          {hasValidCreditData && totalTokens > 0 && (
-            <div className="flex items-center gap-2 text-yellow-500">
-              <Coins className="h-3.5 w-3.5" />
-              <span>
-                Tokens: {totalTokens}
-                {expiringTokens > 0 && (
-                  <>
-                    {" "}(expiring: {expiringTokens}
-                    {expiringTokensExpiry && (
-                      <>
-                        , expires {new Date(expiringTokensExpiry).toLocaleDateString()}
-                      </>
-                    )}
-                    )
-                  </>
-                )}
-                {nonexpiringTokens > 0 && (
-                  <>
-                    {expiringTokens > 0 ? ", " : " ("}
-                    non-expiring: {nonexpiringTokens}
-                    )
-                  </>
-                )}
-              </span>
-            </div>
-          )}
+          </div> */}
         </div>
         <form onSubmit={handleSubmit} className="flex gap-2 p-3">
           <Input

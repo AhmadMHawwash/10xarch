@@ -79,7 +79,7 @@ export const usePlaygroundManager = () => {
       },
     });
 
-  const checkSolution = async () => {
+  const checkSolution = async (title?: string, description?: string) => {
     const whiteboard = nodes.find((node) => node.type === "Whiteboard");
     const prompt = getSystemDesignPrompt({
       nodes,
@@ -92,6 +92,8 @@ export const usePlaygroundManager = () => {
       mutate({
         systemDesign: prompt,
         systemDesignContext: context ?? "",
+        title: title?.trim() ?? undefined,
+        description: description?.trim() ?? undefined,
         playgroundId: playgroundId as string,
       });
     } else {

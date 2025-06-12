@@ -289,10 +289,13 @@ export const checkSolution = createTRPCRouter({
               content:
                 `You are a system design evaluation expert. You will receive: 
                 1. The systemDesignContext, which describes the system and business 
-                2. the systemDesign, which is the proposed solution. 
+                2. The systemDesign, which is the proposed solution
+                3. The title and description of the playground (if provided), which gives additional context about what the user is trying to build
                 Your task is to evaluate the provided solution in the context of: 
                 1. systemDesignContext, 
-                2. The systemDesign. And then provide some feedback for the user to improve their solution.`,
+                2. The systemDesign
+                3. The playground title and description (if available)
+                And then provide some feedback for the user to improve their solution.`,
             },
             {
               role: "assistant",
@@ -301,7 +304,7 @@ export const checkSolution = createTRPCRouter({
             },
             {
               role: "user",
-              content: `systemDesignContext: ${sanitizedContext} \n systemDesign: ${sanitizedSystemDesign}`,
+              content: `${input.title ? `Title: ${input.title}\n` : ''}${input.description ? `Description: ${input.description}\n` : ''}systemDesignContext: ${sanitizedContext} \n systemDesign: ${sanitizedSystemDesign}`,
             },
             {
               role: "assistant",

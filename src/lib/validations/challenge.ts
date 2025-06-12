@@ -55,6 +55,14 @@ export const playgroundSolutionSchema = z.object({
     .trim()
     .max(5000, "System design context too long")
     .optional(),
+  title: z
+    .string()
+    .trim()
+    .optional(),
+  description: z
+    .string()
+    .trim()
+    .optional(),
   playgroundId: z
     .string()
     .uuid("Invalid playground ID")

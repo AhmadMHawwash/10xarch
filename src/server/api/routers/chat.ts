@@ -267,6 +267,8 @@ ${
   solution
     ? `
 Current Solution State:
+${solution.title ? `- Title: ${solution.title}` : ""}
+${solution.description ? `- Description: ${solution.description}` : ""}
 - Components: ${solution.components.length} components defined
 ${solution.edges?.length ? `- Connections: ${solution.edges.length} connections between components` : ""}
 ${solution.apiDefinitions?.length ? `- API Definitions: ${solution.apiDefinitions.length} endpoints defined` : ""}

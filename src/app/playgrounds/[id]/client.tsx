@@ -465,7 +465,7 @@ function PageContent() {
           <SystemBuilder
             PassedFlowManager={() => (
               <FlowManager
-                checkSolution={checkSolution}
+                checkSolution={() => checkSolution(localTitle, localDescription)}
                 feedback={feedback}
                 isLoadingAnswer={isLoadingAnswer}
                 isFeedbackExpanded={isFeedbackExpanded}

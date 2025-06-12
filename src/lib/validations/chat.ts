@@ -29,6 +29,8 @@ export const chatMessageSchema = z.object({
     })
   ),
   solution: z.object({
+    title: z.string().optional(),
+    description: z.string().optional(),
     components: z.array(z.any()),
     edges: z.array(z.any()).optional(),
     apiDefinitions: z.array(z.any()).optional(),

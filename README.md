@@ -54,6 +54,10 @@ Then edit `.env.local` with your configuration.
 yarn dev
 ```
 
+## Roadmap 🗺️
+
+Check out our [development roadmap](ROADMAP.md) to see what we're working on next and our long-term vision for the platform.
+
 ## Contributing 🤝
 
 We welcome contributions! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.

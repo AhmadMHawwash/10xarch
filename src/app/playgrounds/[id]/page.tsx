@@ -8,7 +8,7 @@ export default async function PlaygroundPage() {
   const { userId } = await auth();
 
   if (!userId) {
-    redirect("/signin");
+    redirect("/sign-in");
   }
 
   try {

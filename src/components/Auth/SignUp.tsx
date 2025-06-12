@@ -132,7 +132,7 @@ export function SignUp() {
             </div>
             <div className="mt-4 text-center text-sm">
               Already have an account?{" "}
-              <Link href="/signin" className="underline" prefetch={false}>
+              <Link href="/sign-in" className="underline" prefetch={false}>
                 Sign in
               </Link>
             </div>

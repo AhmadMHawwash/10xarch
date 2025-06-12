@@ -1,17 +1,21 @@
 # 10×arch 🏗️
 
-A modern web application for learning and practicing system design concepts. Built with the T3 Stack.
+A modern web application for documenting, practicing and learning system design concepts and getting AI feedback using chat assistent or dedicated feedback feature.
 
-## Our Mission 🌟
+## Our Mission 🇵🇸
 
-This project is part of a charitable initiative. All profits generated from commercial use of this software will be donated to Children of Palestine through trusted organisations.
+This project is part of a charitable initiative. All profits generated from commercial use of this software will be donated to Children of Palestine through trusted organisations ❤️.
 
 ## Features ✨
 
+- Playgrounds to build your own system designs
 - Interactive system design learning environment
-- Modern tech stack with Next.js, Drizzle, and Tailwind CSS
-- Type-safe API with tRPC
-- Comprehensive testing setup with Vitest
+- Individual or Organisation signup with multiple team members
+- AI feedback on system designs
+- Token topup
+- Monthly subscriptions
+- Free signup token topup
+- Modern tech stack with Next.js, Drizzle, Shadcn ui with Tailwind CSS and tRPC
 
 ## Tech Stack 💻
 

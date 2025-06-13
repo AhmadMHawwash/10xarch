@@ -296,7 +296,20 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
   const onEdgesChange: OnEdgesChange = useCallback((changes) => {
     const result = handleEdgesChange(changes, edges, nodes);
     queueMicrotask(() => {
-      setNodes(result.updatedNodes);
+      setNodes(nodes => {
+        // Update the nodes with the updated data
+        // this is just to not overwrite reactflow's internal state (selected, etc)
+        return nodes.map(node => {
+          const updatedNode = result.updatedNodes.find(n => n.id === node.id);
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              ...updatedNode?.data,
+            }
+          }
+        });
+      });
       setEdges(result.updatedEdges);
     });
 

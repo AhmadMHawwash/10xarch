@@ -4,7 +4,10 @@ import { getSystemComponent } from "@/components/Gallery";
 import { ComponentSettings } from "@/components/playground/ComponentSettings";
 import { EdgeSettings } from "@/components/playground/EdgeSettings";
 import SystemContext from "@/components/playground/SystemContext";
-import { type OtherNodeDataProps, type SystemComponentNodeDataProps } from "@/components/ReactflowCustomNodes/SystemComponentNode";
+import {
+  type OtherNodeDataProps,
+  type SystemComponentNodeDataProps,
+} from "@/components/ReactflowCustomNodes/SystemComponentNode";
 import { FlowManager } from "@/components/SolutionFlowManager";
 import SystemBuilder from "@/components/SystemDesigner";
 import { Button } from "@/components/ui/button";
@@ -27,9 +30,8 @@ import { usePlaygroundManager } from "@/lib/hooks/usePlaygroundManager";
 import { type SystemComponentType } from "@/lib/levels/type";
 import { Bot, Info, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
-  import { useLocalStorage, usePrevious } from "react-use";
-  import { ReactFlowProvider, type Edge, type Node } from "reactflow";
-
+import { useLocalStorage, usePrevious } from "react-use";
+import { ReactFlowProvider, type Edge, type Node } from "reactflow";
 
 const AUTO_SAVE_INTERVAL = 5000; // 20 seconds
 
@@ -190,7 +192,12 @@ function PageContent() {
 
   // Expand feedback panel when new feedback arrives
   useEffect(() => {
-    if (prevFeedback !== feedback && prevFeedback) {
+    if (
+      prevFeedback?.improvementAreas !== feedback?.improvementAreas &&
+      prevFeedback?.recommendations !== feedback?.recommendations &&
+      prevFeedback?.strengths !== feedback?.strengths &&
+      feedback
+    ) {
       setIsFeedbackExpanded(true);
     }
   }, [feedback, prevFeedback]);
@@ -209,7 +216,7 @@ function PageContent() {
 
     setNodes(processedNodes);
     setEdges(playground.edges);
-    
+
     // Initialize local title and description from playground data
     const title = playground.title ?? "";
     const description = playground.description ?? "";
@@ -235,21 +242,20 @@ function PageContent() {
     }
   }, [playground, isSaving, loadPlaygroundData]);
 
-
   // Helper function to detect changes
   const hasChanges = useCallback(() => {
     if (!lastSavedStateRef.current) return false;
-    
+
     const currentState = {
       title: localTitle || "Untitled Playground",
       description: localDescription,
       nodes,
       edges,
     };
-    
+
     const currentDetails = getImportantDetails(currentState);
     const savedDetails = getImportantDetails(lastSavedStateRef.current);
-    
+
     return !deepCompare(currentDetails, savedDetails);
   }, [localTitle, localDescription, nodes, edges]);
 
@@ -321,14 +327,14 @@ function PageContent() {
       clearTimeout(autoSaveTimeoutRef.current); // Prevent auto-save race condition
     }
     setIsSaving(true);
-    
+
     const currentState = {
       title: localTitle || "Untitled Playground",
       description: localDescription,
       nodes,
       edges,
     };
-    
+
     try {
       await updatePlayground({
         id: playgroundId,
@@ -336,10 +342,10 @@ function PageContent() {
         description: currentState.description,
         jsonBlob: { nodes: currentState.nodes, edges: currentState.edges },
       });
-      
+
       // Update last saved state after successful save
       lastSavedStateRef.current = currentState;
-      
+
       toast({
         title: "Saved",
         description: "Your changes have been saved",
@@ -349,7 +355,15 @@ function PageContent() {
     } finally {
       setIsSaving(false);
     }
-  }, [playgroundId, nodes, edges, updatePlayground, localTitle, localDescription, toast]);
+  }, [
+    playgroundId,
+    nodes,
+    edges,
+    updatePlayground,
+    localTitle,
+    localDescription,
+    toast,
+  ]);
 
   const handleCloseWelcomeGuide = (dontShowAgain: boolean) => {
     setShowWelcomeGuide(false);
@@ -450,7 +464,9 @@ function PageContent() {
                           title={localTitle}
                           onTitleChange={(e) => setLocalTitle(e.target.value)}
                           description={localDescription}
-                          onDescriptionChange={(e) => setLocalDescription(e.target.value)}
+                          onDescriptionChange={(e) =>
+                            setLocalDescription(e.target.value)
+                          }
                         />
                       )}
                     </div>
@@ -465,7 +481,9 @@ function PageContent() {
           <SystemBuilder
             PassedFlowManager={() => (
               <FlowManager
-                checkSolution={() => checkSolution(localTitle, localDescription)}
+                checkSolution={() =>
+                  checkSolution(localTitle, localDescription)
+                }
                 feedback={feedback}
                 isLoadingAnswer={isLoadingAnswer}
                 isFeedbackExpanded={isFeedbackExpanded}
@@ -606,4 +624,4 @@ function WelcomeGuide({ onClose }: WelcomeGuideProps) {
       </div>
     </div>
   );
-} 
+}

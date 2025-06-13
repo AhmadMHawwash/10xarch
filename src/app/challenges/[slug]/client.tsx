@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { PanelChat } from "@/components/ai-chat/PanelChat";
 import { LevelContent } from "@/components/playground/LevelContent";
@@ -32,7 +32,10 @@ import { useMount, usePrevious } from "react-use";
 import { ReactFlowProvider } from "reactflow";
 import { type ChallengeData } from "./StaticChallengeData";
 import { type Challenge } from "@/content/challenges/types";
-import { type EvaluationResponse, type PlaygroundResponse } from "@/server/api/routers/checkAnswer";
+import {
+  type EvaluationResponse,
+  type PlaygroundResponse,
+} from "@/server/api/routers/checkAnswer";
 
 // Define props for the client component
 interface ChallengeClientProps {
@@ -61,7 +64,7 @@ function Level({ initialData }: ChallengeClientProps) {
     currentStageIndex,
     toNextStage,
   } = useChallengeManager();
-  
+
   // After getting the hook, we can set the challenge from initialData if needed
 
   const [isFeedbackExpanded, setIsFeedbackExpanded] = useState(false);
@@ -71,7 +74,12 @@ function Level({ initialData }: ChallengeClientProps) {
   const prevFeedback = usePrevious(feedback);
 
   useEffect(() => {
-    if (prevFeedback !== feedback && feedback) {
+    if (
+      prevFeedback?.improvementAreas !== feedback?.improvementAreas &&
+      prevFeedback?.recommendations !== feedback?.recommendations &&
+      prevFeedback?.strengths !== feedback?.strengths &&
+      feedback
+    ) {
       setIsFeedbackExpanded(true);
     }
   }, [feedback, prevFeedback]);
@@ -163,7 +171,7 @@ function Level({ initialData }: ChallengeClientProps) {
       </ResizablePanelGroup>
       {/* Add the chat button (only when side panel is closed) */}
       {!isChatPanelOpen && (
-        <div className="ai-chat-container fixed bottom-4 -right-2 z-50">
+        <div className="ai-chat-container fixed -right-2 bottom-4 z-50">
           <PanelChat
             isPlayground={false}
             playgroundId={challenge.slug}
@@ -180,7 +188,9 @@ interface ChallengeOverviewDialogProps {
   challenge: Challenge;
 }
 
-const ChallengeOverviewDialog = ({ challenge }: ChallengeOverviewDialogProps) => {
+const ChallengeOverviewDialog = ({
+  challenge,
+}: ChallengeOverviewDialogProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   useMount(() => {
@@ -214,16 +224,18 @@ const ChallengeOverviewDialog = ({ challenge }: ChallengeOverviewDialogProps) =>
             <CardContent className="pt-6">
               <h3 className="mb-4 text-lg font-semibold">General Learnings</h3>
               <ul className="space-y-3">
-                {challenge.generalLearnings.map((learning: string, index: number) => (
-                  <li key={index} className="flex items-start">
-                    <Badge variant="secondary" className="mr-2 mt-1">
-                      {index + 1}
-                    </Badge>
-                    <p className="text-sm text-gray-700 dark:text-gray-300">
-                      {learning}
-                    </p>
-                  </li>
-                ))}
+                {challenge.generalLearnings.map(
+                  (learning: string, index: number) => (
+                    <li key={index} className="flex items-start">
+                      <Badge variant="secondary" className="mr-2 mt-1">
+                        {index + 1}
+                      </Badge>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">
+                        {learning}
+                      </p>
+                    </li>
+                  ),
+                )}
               </ul>
             </CardContent>
           </Card>
@@ -252,7 +264,7 @@ const ChallengeClosureDialog = ({
   isOpen,
   onClose,
   challenge,
-  feedback
+  feedback,
 }: ChallengeClosureDialogProps) => {
   if (!challenge || !feedback) return null;
 
@@ -282,16 +294,18 @@ const ChallengeClosureDialog = ({
             <CardContent className="pt-6">
               <h3 className="mb-4 text-lg font-semibold">General Learnings</h3>
               <ul className="space-y-3">
-                {challenge.generalLearnings.map((learning: string, index: number) => (
-                  <li key={index} className="flex items-start">
-                    <Badge variant="secondary" className="mr-2 mt-1">
-                      {index + 1}
-                    </Badge>
-                    <p className="text-sm text-gray-700 dark:text-gray-300">
-                      {learning}
-                    </p>
-                  </li>
-                ))}
+                {challenge.generalLearnings.map(
+                  (learning: string, index: number) => (
+                    <li key={index} className="flex items-start">
+                      <Badge variant="secondary" className="mr-2 mt-1">
+                        {index + 1}
+                      </Badge>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">
+                        {learning}
+                      </p>
+                    </li>
+                  ),
+                )}
               </ul>
             </CardContent>
           </Card>
@@ -299,7 +313,7 @@ const ChallengeClosureDialog = ({
             <CardContent className="pt-6">
               <h3 className="mb-4 text-lg font-semibold">Feedback</h3>
               <div className="mt-6">
-                {'score' in feedback && <ScoreDisplay score={feedback.score} />}
+                {"score" in feedback && <ScoreDisplay score={feedback.score} />}
                 <Accordion type="single" collapsible className="w-full">
                   <FeedbackList
                     items={strengths}
@@ -331,4 +345,4 @@ const ChallengeClosureDialog = ({
       </DialogContent>
     </Dialog>
   );
-}; 
+};

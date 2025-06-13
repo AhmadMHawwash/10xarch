@@ -5,7 +5,7 @@ import { ComponentSettings } from "@/components/playground/ComponentSettings";
 import { EdgeSettings } from "@/components/playground/EdgeSettings";
 import SystemContext from "@/components/playground/SystemContext";
 import {
-  type OtherNodeDataProps,
+  type WhiteboardNodeDataProps,
   type SystemComponentNodeDataProps,
 } from "@/components/ReactflowCustomNodes/SystemComponentNode";
 import { FlowManager } from "@/components/SolutionFlowManager";
@@ -44,7 +44,7 @@ const getImportantDetails = ({
 }: {
   title: string;
   description: string;
-  nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[];
+  nodes: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[];
   edges: Edge[];
 }) => {
   return {

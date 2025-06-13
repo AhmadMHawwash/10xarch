@@ -30,7 +30,7 @@ export type SystemComponentNodeDataProps = {
   sourceHandles?: Array<{ id: string; isConnected: boolean }>;
 };
 
-export type OtherNodeDataProps = {
+export type WhiteboardNodeDataProps = {
   icon?: typeof PiIcon;
   id: string;
   name: "Whiteboard";

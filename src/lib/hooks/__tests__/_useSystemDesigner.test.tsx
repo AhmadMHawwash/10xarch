@@ -4,7 +4,7 @@ import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { SystemDesignerProvider, useSystemDesigner } from '../_useSystemDesigner';
 import { ToastProvider } from '@/components/ui/toast';
 import { type Node, type Edge, type NodeChange } from 'reactflow';
-import { type SystemComponentNodeDataProps, type OtherNodeDataProps } from '@/components/ReactflowCustomNodes/SystemComponentNode';
+import { type SystemComponentNodeDataProps, type WhiteboardNodeDataProps } from '@/components/ReactflowCustomNodes/SystemComponentNode';
 import { type PiIcon } from 'lucide-react';
 import { defaultStartingNodes } from '../systemDesignerUtils';
 // Mock dependencies
@@ -126,7 +126,7 @@ describe('useSystemDesigner', () => {
     });
 
     // Create a properly typed mock node
-    const mockNode: Node<OtherNodeDataProps> = {
+    const mockNode: Node<WhiteboardNodeDataProps> = {
       id: 'test-node',
       type: 'service',
       position: { x: 100, y: 100 },
@@ -172,7 +172,7 @@ describe('useSystemDesigner', () => {
     // Use void to handle Promise warning
     void act(() => {
       // Type assertion to Node<SystemComponentNodeDataProps | OtherNodeDataProps>[]
-      const newNodes = [...defaultStartingNodes, mockNode] as Node<SystemComponentNodeDataProps | OtherNodeDataProps>[];
+      const newNodes = [...defaultStartingNodes, mockNode] as Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[];
       result.current.setNodes(newNodes);
     });
 
@@ -217,7 +217,7 @@ describe('useSystemDesigner', () => {
     // Use void to handle Promise warning
     void act(() => {
       // Type assertion to Node<SystemComponentNodeDataProps | OtherNodeDataProps>[]
-      const newNodes = [...defaultStartingNodes, mockNode] as Node<SystemComponentNodeDataProps | OtherNodeDataProps>[];
+      const newNodes = [...defaultStartingNodes, mockNode] as Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[];
       result.current.setNodes(newNodes);
     });
 
@@ -264,7 +264,7 @@ describe('useSystemDesigner', () => {
 
     // Add the node to the board and select it
     void act(() => {
-      const newNodes = [...defaultStartingNodes, mockNode] as Node<SystemComponentNodeDataProps | OtherNodeDataProps>[];
+      const newNodes = [...defaultStartingNodes, mockNode] as Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[];
       result.current.setNodes(newNodes);
     });
 
@@ -340,7 +340,7 @@ describe('useSystemDesigner', () => {
 
     // Add the nodes and edge to the board
     void act(() => {
-      const newNodes = [...defaultStartingNodes, mockNode1, mockNode2] as Node<SystemComponentNodeDataProps | OtherNodeDataProps>[];
+      const newNodes = [...defaultStartingNodes, mockNode1, mockNode2] as Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[];
       result.current.setNodes(newNodes);
       result.current.setEdges([mockEdge]);
     });

@@ -14,7 +14,7 @@ import {
 } from '../systemDesignerUtils';
 import { componentsNumberingStore } from '../../levels/utils';
 import { type Edge, type Node, type Connection, type NodeChange } from 'reactflow';
-import { type SystemComponentNodeDataProps, type OtherNodeDataProps } from '@/components/ReactflowCustomNodes/SystemComponentNode';
+import { type SystemComponentNodeDataProps, type WhiteboardNodeDataProps } from '@/components/ReactflowCustomNodes/SystemComponentNode';
 import { SYSTEM_COMPONENT_NODE } from '../useChallengeManager';
 import { type SystemComponent } from '@/lib/levels/type';
 import { type LucideIcon } from 'lucide-react';
@@ -455,7 +455,7 @@ describe('systemDesignerUtils', () => {
 
   describe('handleNodesChange', () => {
     it('should call notification when trying to delete whiteboard node', () => {
-      const nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[] = [
+      const nodes: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[] = [
         // Create a whiteboard node that correctly represents the structure
         {
           id: 'Whiteboard-1',
@@ -605,7 +605,7 @@ describe('systemDesignerUtils', () => {
     });
 
     it('should detect whiteboard nodes', () => {
-      const nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[] = [
+      const nodes: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[] = [
         { ...createMockNode('Server-1'), selected: true },
         // Create a proper whiteboard node
         {

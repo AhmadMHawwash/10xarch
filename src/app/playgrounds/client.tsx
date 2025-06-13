@@ -12,7 +12,6 @@ import { api } from '@/trpc/react';
 import { type Playground } from '@/server/db/schema';
 import { formatDistanceToNow } from '@/lib/utils';
 import { type Edge, type Node } from 'reactflow';
-import { type OtherNodeDataProps, type SystemComponentNodeDataProps } from '@/components/ReactflowCustomNodes/SystemComponentNode';
 import { defaultStartingNodes } from '@/lib/hooks/systemDesignerUtils';
 
 interface PlaygroundsClientProps {

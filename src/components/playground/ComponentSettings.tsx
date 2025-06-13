@@ -1,6 +1,6 @@
 import { type Node } from "reactflow";
 import {
-  type OtherNodeDataProps,
+  type WhiteboardNodeDataProps,
   type SystemComponentNodeDataProps,
 } from "../ReactflowCustomNodes/SystemComponentNode";
 import { CacheSettings } from "../SystemComponents/Cache";
@@ -16,7 +16,7 @@ export const ComponentSettings = ({
   node,
   className,
 }: {
-  node: Node<SystemComponentNodeDataProps | OtherNodeDataProps> | null;
+  node: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps> | null;
   className?: string;
 }) => {
   const id = node?.id ?? "";

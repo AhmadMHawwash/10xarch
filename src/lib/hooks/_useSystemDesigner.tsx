@@ -1,6 +1,6 @@
 "use client";
 import {
-  type OtherNodeDataProps,
+  type WhiteboardNodeDataProps,
   type SystemComponentNodeDataProps,
 } from "@/components/ReactflowCustomNodes/SystemComponentNode";
 import { useToast } from "@/components/ui/use-toast";
@@ -48,7 +48,7 @@ import {
 import useLocalStorageState from "./useLocalStorageState";
 
 interface SystemDesignerState {
-  nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[];
+  nodes: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[];
   edges: Edge[];
   initInstance: (instance: ReactFlowInstance) => void;
   initWrapper: (wrapper: HTMLDivElement) => void;
@@ -66,14 +66,14 @@ interface SystemDesignerState {
   onRestore: () => void;
   isEdgeBeingConnected?: boolean;
   setNodes: (
-    nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[],
+    nodes: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[],
   ) => void;
   setEdges: (edges: Edge[]) => void;
   onSelectNode: (
-    node: Node<SystemComponentNodeDataProps | OtherNodeDataProps> | null,
+    node: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps> | null,
   ) => void;
   onSelectEdge: (edge: Edge | null) => void;
-  selectedNode: Node<SystemComponentNodeDataProps | OtherNodeDataProps> | null;
+  selectedNode: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps> | null;
   selectedEdge: Edge | null;
   useSystemComponentConfigSlice: <T>(
     componentId: string,
@@ -122,11 +122,11 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
   const isPlayground = pathname.startsWith('/playgrounds/');
   
   // For playgrounds, use regular state; for challenges, use local storage
-  const [playgroundNodes, setPlaygroundNodes] = useState<Node<SystemComponentNodeDataProps | OtherNodeDataProps>[]>(defaultStartingNodes);
+  const [playgroundNodes, setPlaygroundNodes] = useState<Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[]>(defaultStartingNodes);
   const [playgroundEdges, setPlaygroundEdges] = useState<Edge[]>([]);
   
   const [challengeNodes, setChallengeNodes] = useLocalStorageState<
-    Node<SystemComponentNodeDataProps | OtherNodeDataProps>[]
+    Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[]
   >(
     `${normalizedPathname}-reactflow-nodes`, 
     defaultStartingNodes, 
@@ -155,12 +155,12 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
   const { setViewport } = useReactFlow();
   const [isEdgeBeingConnected, setIsEdgeBeingConnected] = useState(false);
   const [selectedNode, setSelectedNode] = useState<Node<
-    SystemComponentNodeDataProps | OtherNodeDataProps
+    SystemComponentNodeDataProps | WhiteboardNodeDataProps
   > | null>(null);
   const [selectedEdge, setSelectedEdge] = useState<Edge | null>(null);
   const { toast } = useToast();
   const [clipboardData, setClipboardData] = useState<{
-    nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[];
+    nodes: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[];
     edges: Edge[];
   } | null>(null);
   const updateNodeInternals = useUpdateNodeInternals();

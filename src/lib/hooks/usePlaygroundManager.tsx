@@ -1,7 +1,7 @@
 // import { type SystemComponentNodeDataProps } from "@/components/ReactflowCustomNodes/APIsNode";
 import { extractAPIDefinitions } from "@/components/ai-chat/ChatUI";
 import {
-  type OtherNodeDataProps,
+  type WhiteboardNodeDataProps,
   type SystemComponentNodeDataProps,
 } from "@/components/ReactflowCustomNodes/SystemComponentNode";
 import { useToast } from "@/components/ui/use-toast";
@@ -109,7 +109,7 @@ export const usePlaygroundManager = () => {
 
   const dbSavedNodes = (
     playgroundData?.playground.jsonBlob as {
-      nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[];
+      nodes: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[];
     }
   )?.nodes;
   const dbSavedEdges = (
@@ -139,7 +139,7 @@ const getSystemDesignPrompt = ({
   nodes,
   edges,
 }: {
-  nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[];
+  nodes: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[];
   edges: Edge<{
     label?: string;
     apiDefinition?: string;
@@ -147,7 +147,7 @@ const getSystemDesignPrompt = ({
   }>[];
 }): string => {
   const extractRequirements = (
-    nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[],
+    nodes: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[],
   ) => {
     const whiteboard = nodes.find((node) => node.type === "Whiteboard");
     if (!whiteboard || !("configs" in whiteboard.data)) return null;
@@ -176,7 +176,7 @@ const getSystemDesignPrompt = ({
   };
 
   const extractNodeConfigs = (
-    node: Node<SystemComponentNodeDataProps | OtherNodeDataProps>,
+    node: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>,
   ) => {
     if (node.data.name === "Database" && "configs" in node.data) {
       return {

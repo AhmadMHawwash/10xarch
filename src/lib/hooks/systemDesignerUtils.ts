@@ -1,7 +1,7 @@
 import { type Edge, type Node, type NodeChange, type Connection, type ReactFlowJsonObject, type EdgeChange, applyEdgeChanges, applyNodeChanges, addEdge, type ReactFlowInstance } from "reactflow";
 import { type SystemComponent, type SystemComponentType } from "../levels/type";
 import { getSystemComponent } from "@/components/Gallery";
-import { type OtherNodeDataProps, type SystemComponentNodeDataProps } from "@/components/ReactflowCustomNodes/SystemComponentNode";
+import { type WhiteboardNodeDataProps, type SystemComponentNodeDataProps } from "@/components/ReactflowCustomNodes/SystemComponentNode";
 import { componentsNumberingStore } from "../levels/utils";
 import { SYSTEM_COMPONENT_NODE } from "./useChallengeManager";
 
@@ -22,7 +22,7 @@ export const componentTargets: Record<
 
 // Default starting nodes
 export const defaultStartingNodes: Node<
-  SystemComponentNodeDataProps | OtherNodeDataProps
+  SystemComponentNodeDataProps | WhiteboardNodeDataProps
 >[] = [
   {
     id: "Whiteboard-1",
@@ -41,11 +41,11 @@ export const defaultStartingNodes: Node<
 ];
 
 // Pure function to deserialize nodes
-export const deserializeNodes = (nodes: string | null): Node<SystemComponentNodeDataProps | OtherNodeDataProps>[] => {
+export const deserializeNodes = (nodes: string | null): Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[] => {
   if (nodes === null || nodes === undefined) return [];
   try {
     const parsedNodes = JSON.parse(nodes) as Node<
-      SystemComponentNodeDataProps | OtherNodeDataProps
+      SystemComponentNodeDataProps | WhiteboardNodeDataProps
     >[];
 
     // Instead of resetting, update the component numbering store to the highest number for each component
@@ -100,10 +100,10 @@ export const deserializeNodes = (nodes: string | null): Node<SystemComponentNode
 // Pure function to handle node connection
 export const handleConnect = (
   params: Connection,
-  nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[],
+  nodes: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[],
   edges: Edge[]
 ): {
-  updatedNodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[],
+  updatedNodes: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[],
   updatedEdges: Edge[],
   nodesToUpdate: string[]
 } => {
@@ -226,8 +226,8 @@ export const handleConnect = (
 export const handleConnectStart = (
   nodeId: string | null,
   handleType: string | null,
-  nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[]
-): Node<SystemComponentNodeDataProps | OtherNodeDataProps>[] => {
+  nodes: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[]
+): Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[] => {
   if (!nodeId) return nodes;
   
   const sourceNode = nodes.find((node) => node.id === nodeId);
@@ -264,8 +264,8 @@ export const handleConnectStart = (
 
 // Pure function to handle connection end
 export const handleConnectEnd = (
-  nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[]
-): Node<SystemComponentNodeDataProps | OtherNodeDataProps>[] => {
+  nodes: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[]
+): Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[] => {
   return nodes.map((node) => ({
     ...node,
     selected: false,
@@ -281,8 +281,8 @@ export const handleConnectEnd = (
 export const handleNodeDrop = (
   componentName: string,
   position: { x: number, y: number },
-  nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[]
-): Node<SystemComponentNodeDataProps | OtherNodeDataProps>[] => {
+  nodes: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[]
+): Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[] => {
   // Cast the string to SystemComponent["name"] since we know it's valid
   const typedComponentName = componentName as SystemComponent["name"];
   const component = getSystemComponent(typedComponentName);
@@ -319,11 +319,11 @@ export const handleNodeDrop = (
 // Pure function to handle node changes
 export const handleNodesChange = (
   changes: NodeChange[],
-  nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[],
+  nodes: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[],
   edges: Edge[],
   notifyWhiteboardDeletion: () => void
 ): {
-  updatedNodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[],
+  updatedNodes: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[],
   updatedEdges: Edge[]
 } => {
   const isDeletingWhiteboard = changes.some(
@@ -479,9 +479,9 @@ export const handleNodesChange = (
 export const handleEdgesChange = (
   changes: EdgeChange[],
   edges: Edge[],
-  nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[]
+  nodes: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[]
 ): {
-  updatedNodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[],
+  updatedNodes: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[],
   updatedEdges: Edge[],
   nodesToUpdateUI: string[]
 } => {
@@ -560,7 +560,7 @@ export const handleEdgesChange = (
 
 // Helper function to update node handles when an edge is deleted
 export const updateNodeHandlesForEdgeDeletion = (
-  nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[],
+  nodes: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[],
   sourceId: string,
   sourceHandleId: string | null | undefined,
   targetId: string,
@@ -665,11 +665,11 @@ export const updateEdgeLabel = (
 
 // Pure function to update component config
 export const updateComponentConfig = <T,>(
-  nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[],
+  nodes: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[],
   componentId: string,
   configKey: string,
   configValue: T
-): Node<SystemComponentNodeDataProps | OtherNodeDataProps>[] => {
+): Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[] => {
   return nodes.map((node) => {
     if (node.id === componentId) {
       return {
@@ -689,10 +689,10 @@ export const updateComponentConfig = <T,>(
 
 // Pure function to handle copy
 export const handleCopy = (
-  nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[],
+  nodes: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[],
   edges: Edge[]
 ): {
-  clipboardNodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[],
+  clipboardNodes: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[],
   clipboardEdges: Edge[],
   hasWhiteboard: boolean
 } => {
@@ -717,13 +717,13 @@ export const handleCopy = (
 // Pure function to handle paste
 export const handlePaste = (
   clipboardData: {
-    nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[],
+    nodes: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[],
     edges: Edge[]
   } | null,
-  existingNodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[],
+  existingNodes: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[],
   existingEdges: Edge[]
 ): { 
-  newNodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[],
+  newNodes: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[],
   newEdges: Edge[] 
 } => {
   if (!clipboardData) {
@@ -918,7 +918,7 @@ export const saveFlow = (
 
 // Pure function to restore flow
 export const restoreFlow = (): {
-  nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[],
+  nodes: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[],
   edges: Edge[],
   viewport: { x: number, y: number, zoom: number }
 } => {

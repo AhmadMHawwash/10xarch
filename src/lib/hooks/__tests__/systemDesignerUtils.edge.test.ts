@@ -6,7 +6,7 @@ import {
   deserializeNodes,
 } from '../systemDesignerUtils';
 import { type Edge, type Node, type EdgeChange } from 'reactflow';
-import { type SystemComponentNodeDataProps, type OtherNodeDataProps } from '@/components/ReactflowCustomNodes/SystemComponentNode';
+import { type SystemComponentNodeDataProps, type WhiteboardNodeDataProps } from '@/components/ReactflowCustomNodes/SystemComponentNode';
 import { SYSTEM_COMPONENT_NODE } from '../useChallengeManager';
 import { type SystemComponent } from '@/lib/levels/type';
 import { type LucideIcon } from 'lucide-react';
@@ -30,7 +30,7 @@ describe('systemDesignerUtils edge cases', () => {
 
   // Helper function to create mock nodes for testing
   // Using proper typing for node creation
-  const createMockNode = (id: string, type = SYSTEM_COMPONENT_NODE, name = 'Server'): Node<SystemComponentNodeDataProps | OtherNodeDataProps> => ({
+  const createMockNode = (id: string, type = SYSTEM_COMPONENT_NODE, name = 'Server'): Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps> => ({
     id,
     type,
     position: { x: 100, y: 100 },

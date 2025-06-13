@@ -3,30 +3,30 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { useSystemDesigner, SystemDesignerProvider } from '../_useSystemDesigner';
 import * as systemDesignerUtils from '../systemDesignerUtils';
 import type { Edge, Node, EdgeChange, NodeChange, Connection } from 'reactflow';
-import type { SystemComponentNodeDataProps, OtherNodeDataProps } from '@/components/ReactflowCustomNodes/SystemComponentNode';
+import type { SystemComponentNodeDataProps, WhiteboardNodeDataProps } from '@/components/ReactflowCustomNodes/SystemComponentNode';
 import { type PropsWithChildren } from 'react';
 
 // Mock the systemDesignerUtils
 vi.mock('../systemDesignerUtils', () => ({
   defaultStartingNodes: [{ id: 'Whiteboard-1', type: 'Whiteboard', data: { name: 'Whiteboard' }, position: { x: 0, y: 0 } }],
-  deserializeNodes: vi.fn((value: string): Node<SystemComponentNodeDataProps | OtherNodeDataProps>[] => {
+  deserializeNodes: vi.fn((value: string): Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[] => {
     try {
-      return value ? JSON.parse(value) as Node<SystemComponentNodeDataProps | OtherNodeDataProps>[] : [];
+      return value ? JSON.parse(value) as Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[] : [];
     } catch {
       return [];
     }
   }),
-  handleNodesChange: vi.fn((changes: NodeChange[], nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[], edges: Edge[]): { updatedNodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[]; updatedEdges: Edge[] } => 
+  handleNodesChange: vi.fn((changes: NodeChange[], nodes: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[], edges: Edge[]): { updatedNodes: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[]; updatedEdges: Edge[] } => 
     ({ updatedNodes: nodes, updatedEdges: edges })),
-  handleEdgesChange: vi.fn((changes: EdgeChange[], edges: Edge[], nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[]): { updatedNodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[]; updatedEdges: Edge[]; nodesToUpdateUI: string[] } => 
+  handleEdgesChange: vi.fn((changes: EdgeChange[], edges: Edge[], nodes: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[]): { updatedNodes: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[]; updatedEdges: Edge[]; nodesToUpdateUI: string[] } => 
     ({ updatedNodes: nodes, updatedEdges: edges, nodesToUpdateUI: [] })),
-  handleConnect: vi.fn((params: Connection, nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[], edges: Edge[]) => ({
+  handleConnect: vi.fn((params: Connection, nodes: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[], edges: Edge[]) => ({
     updatedNodes: nodes,
     updatedEdges: edges,
     nodesToUpdate: []
   })),
-  handleConnectStart: vi.fn((nodeId: string | null, handleType: string | null, nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[]) => nodes),
-  handleConnectEnd: vi.fn((nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[]) => nodes),
+  handleConnectStart: vi.fn((nodeId: string | null, handleType: string | null, nodes: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[]) => nodes),
+  handleConnectEnd: vi.fn((nodes: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[]) => nodes),
   handleNodeDrop: vi.fn(),
   saveFlow: vi.fn(),
   restoreFlow: vi.fn(),
@@ -34,7 +34,7 @@ vi.mock('../systemDesignerUtils', () => ({
   updateEdgeLabel: vi.fn((edges: Edge[], id: string, label: string, data?: Record<string, unknown>): Edge[] => edges),
   handleCopy: vi.fn(),
   handlePaste: vi.fn(),
-  updateNodeHandlesForEdgeDeletion: vi.fn((nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[], sourceId: string, sourceHandleId: string | null | undefined, targetId: string, targetHandleId: string | null | undefined): Node<SystemComponentNodeDataProps | OtherNodeDataProps>[] => nodes),
+  updateNodeHandlesForEdgeDeletion: vi.fn((nodes: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[], sourceId: string, sourceHandleId: string | null | undefined, targetId: string, targetHandleId: string | null | undefined): Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[] => nodes),
 }));
 
 // Mock localStorage

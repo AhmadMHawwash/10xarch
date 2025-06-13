@@ -1,5 +1,5 @@
 import {
-  type OtherNodeDataProps,
+  type WhiteboardNodeDataProps,
   type SystemComponentNodeDataProps,
 } from "@/components/ReactflowCustomNodes/SystemComponentNode";
 import challenges from "@/content/challenges";
@@ -157,14 +157,14 @@ export const getChallengePrompt = ({
   nodes,
   edges,
 }: {
-  nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[];
+  nodes: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[];
   edges: Edge<EdgeData>[];
 }): ((
   challenge: Challenge,
   currentStage: Challenge["stages"][number],
 ) => string) => {
   const extractRequirements = (
-    nodes: Node<SystemComponentNodeDataProps | OtherNodeDataProps>[],
+    nodes: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[],
   ) => {
     const whiteboard = nodes.find((node) => node.type === "Whiteboard");
     if (!whiteboard || !("configs" in whiteboard.data)) return null;
@@ -195,7 +195,7 @@ export const getChallengePrompt = ({
   };
 
   const extractNodeConfigs = (
-    node: Node<SystemComponentNodeDataProps | OtherNodeDataProps>,
+    node: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>,
   ) => {
     if (node.data.name === "Database" && "configs" in node.data) {
       return {

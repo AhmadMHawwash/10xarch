@@ -29,6 +29,7 @@ import { ChatMessagesProvider } from "@/lib/hooks/useChatMessages_";
 import { usePlaygroundManager } from "@/lib/hooks/usePlaygroundManager";
 import { type SystemComponentType } from "@/lib/levels/type";
 import { Bot, Info, X } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocalStorage, usePrevious } from "react-use";
 import { ReactFlowProvider, type Edge, type Node } from "reactflow";
@@ -125,6 +126,7 @@ export default function PlaygroundClient() {
 }
 
 function PageContent() {
+  const router = useRouter();
   const {
     selectedNode,
     selectedEdge,
@@ -155,6 +157,8 @@ function PageContent() {
   const [isSaving, setIsSaving] = useState(false);
   const [localTitle, setLocalTitle] = useState("");
   const [localDescription, setLocalDescription] = useState("");
+  const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
+  const [pendingNavigation, setPendingNavigation] = useState<string | null>(null);
   const { toast } = useToast();
 
   const isInitialized = useRef(false);
@@ -322,6 +326,26 @@ function PageContent() {
     hasChanges,
   ]);
 
+  // Warn user before leaving page if there are unsaved changes
+  useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (!isInitialized.current) return;
+      
+      if (hasChanges()) {
+        event.preventDefault();
+        // Chrome requires returnValue to be set
+        event.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+        return 'You have unsaved changes. Are you sure you want to leave?';
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [hasChanges]);
+
   const handleManualSave = useCallback(async () => {
     if (autoSaveTimeoutRef.current) {
       clearTimeout(autoSaveTimeoutRef.current); // Prevent auto-save race condition
@@ -371,6 +395,35 @@ function PageContent() {
       setHideWelcomeGuide(true);
     }
   };
+
+  const handleConfirmNavigation = useCallback(async () => {
+    if (pendingNavigation) {
+      setShowUnsavedWarning(false);
+      // Clear the unsaved state to allow navigation
+      lastSavedStateRef.current = {
+        title: localTitle || "Untitled Playground",
+        description: localDescription,
+        nodes,
+        edges,
+      };
+      // Navigate to the pending URL
+      window.location.href = pendingNavigation;
+    }
+  }, [pendingNavigation, localTitle, localDescription, nodes, edges]);
+
+  const handleCancelNavigation = useCallback(() => {
+    setShowUnsavedWarning(false);
+    setPendingNavigation(null);
+  }, []);
+
+  const handleSaveAndNavigate = useCallback(async () => {
+    if (pendingNavigation) {
+      await handleManualSave();
+      setShowUnsavedWarning(false);
+      // Navigate after saving
+      window.location.href = pendingNavigation;
+    }
+  }, [pendingNavigation, handleManualSave]);
 
   const selectedNodeName: SystemComponentType | undefined = selectedNode?.data
     ?.name as SystemComponentType | undefined;

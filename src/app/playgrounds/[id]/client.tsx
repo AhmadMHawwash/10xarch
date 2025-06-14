@@ -1,6 +1,7 @@
 "use client";
 import { PanelChat } from "@/components/ai-chat/PanelChat";
 import { getSystemComponent } from "@/components/Gallery";
+import Gallery from "@/components/Gallery";
 import { ComponentSettings } from "@/components/playground/ComponentSettings";
 import { EdgeSettings } from "@/components/playground/EdgeSettings";
 import SystemContext from "@/components/playground/SystemContext";
@@ -28,6 +29,7 @@ import {
 } from "@/lib/hooks/_useSystemDesigner";
 import { ChatMessagesProvider } from "@/lib/hooks/useChatMessages_";
 import { usePlaygroundManager } from "@/lib/hooks/usePlaygroundManager";
+import { usePlaygroundPermissions } from "@/lib/hooks/usePlaygroundPermissions";
 import { type SystemComponentType } from "@/lib/levels/type";
 import { Bot, Info, X } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -71,6 +73,9 @@ function PageContent() {
     isLoadingAnswer,
   } = usePlaygroundManager();
 
+  // Check permissions
+  const { canEdit, canView } = usePlaygroundPermissions(playground);
+
   const [isFeedbackExpanded, setIsFeedbackExpanded] = useState(false);
   const [hideWelcomeGuide, setHideWelcomeGuide] = useLocalStorage(
     "hideWelcomeGuide",
@@ -106,6 +111,18 @@ function PageContent() {
     "subtitle",
     "",
   );
+
+  // Show access error if user doesn't have view permission
+  useEffect(() => {
+    if (isClient && playground && !canView) {
+      toast({
+        title: "Access Denied",
+        description: "You don't have permission to view this playground.",
+        variant: "destructive",
+      });
+      router.push("/");
+    }
+  }, [isClient, playground, canView, toast, router]);
 
   // Client-side initialization
   useEffect(() => {
@@ -183,9 +200,9 @@ function PageContent() {
     return hasPlaygroundChanges(currentState, lastSavedStateRef.current);
   }, [localTitle, localDescription, nodes, edges]);
 
-  // Auto-save functionality
+  // Auto-save functionality - only for editors
   useEffect(() => {
-    if (!isInitialized.current || isSaving) {
+    if (!isInitialized.current || isSaving || !canEdit) {
       return;
     }
 
@@ -224,6 +241,11 @@ function PageContent() {
         })
         .catch((error) => {
           console.error("Auto-save failed:", error);
+          toast({
+            title: "Save Failed",
+            description: "You don't have permission to edit this playground.",
+            variant: "destructive",
+          });
         })
         .finally(() => {
           setIsSaving(false);
@@ -244,10 +266,14 @@ function PageContent() {
     localTitle,
     localDescription,
     hasChanges,
+    canEdit,
+    toast,
   ]);
 
-  // Warn user before leaving page if there are unsaved changes
+  // Warn user before leaving page if there are unsaved changes - only for editors
   useEffect(() => {
+    if (!canEdit) return;
+
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
       if (!isInitialized.current) return;
       
@@ -264,9 +290,18 @@ function PageContent() {
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
-  }, [hasChanges]);
+  }, [hasChanges, canEdit]);
 
   const handleManualSave = useCallback(async () => {
+    if (!canEdit) {
+      toast({
+        title: "Access Denied",
+        description: "You don't have permission to edit this playground.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (autoSaveTimeoutRef.current) {
       clearTimeout(autoSaveTimeoutRef.current); // Prevent auto-save race condition
     }
@@ -296,6 +331,11 @@ function PageContent() {
       });
     } catch (error) {
       console.error("Manual save failed:", error);
+      toast({
+        title: "Save Failed",
+        description: "You don't have permission to edit this playground.",
+        variant: "destructive",
+      });
     } finally {
       setIsSaving(false);
     }
@@ -307,7 +347,20 @@ function PageContent() {
     localTitle,
     localDescription,
     toast,
+    canEdit,
   ]);
+
+  const handleCheckSolution = useCallback(() => {
+    if (!canEdit) {
+      toast({
+        title: "Access Denied",
+        description: "You don't have permission to run evaluations on this playground.",
+        variant: "destructive",
+      });
+      return;
+    }
+    void checkSolution(localTitle, localDescription);
+  }, [checkSolution, localTitle, localDescription, canEdit, toast]);
 
   const handleCloseWelcomeGuide = (dontShowAgain: boolean) => {
     setShowWelcomeGuide(false);
@@ -357,6 +410,11 @@ function PageContent() {
   const showEdgeSettings = selectedEdge !== null;
   const showNodeSettings = selectedNode !== null && !isSystemNodeSelected;
 
+  // Don't render anything if user doesn't have view permission
+  if (!canView && isClient) {
+    return null;
+  }
+
   return (
     <>
       {isClient && showWelcomeGuide && (
@@ -397,7 +455,7 @@ function PageContent() {
                   <>
                     <div className="space-y-2">
                       <Label htmlFor="title" className="text-sm font-medium">
-                        Title
+                        Title {!canEdit && <span className="text-xs text-gray-500">(Read Only)</span>}
                       </Label>
                       <Input
                         id="title"
@@ -405,14 +463,15 @@ function PageContent() {
                         placeholder="Component title"
                         value={title}
                         onChange={(e) => {
-                          if (!selectedNode?.id) return;
+                          if (!selectedNode?.id || !canEdit) return;
                           setTitle(e.target.value);
                         }}
+                        readOnly={!canEdit}
                       />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="subtitle" className="text-sm font-medium">
-                        Subtitle
+                        Subtitle {!canEdit && <span className="text-xs text-gray-500">(Read Only)</span>}
                       </Label>
                       <Input
                         id="subtitle"
@@ -420,16 +479,17 @@ function PageContent() {
                         placeholder="Component subtitle"
                         value={subtitle}
                         onChange={(e) => {
-                          if (!selectedNode?.id) return;
+                          if (!selectedNode?.id || !canEdit) return;
                           setSubtitle(e.target.value);
                         }}
+                        readOnly={!canEdit}
                       />
                     </div>
                   </>
                 )}
 
                 {showEdgeSettings ? (
-                  <EdgeSettings edge={selectedEdge} />
+                  <EdgeSettings edge={selectedEdge} canEdit={canEdit} />
                 ) : (
                   <>
                     <div className="h-[calc(100vh-280px)]">
@@ -438,16 +498,17 @@ function PageContent() {
                           <Label className="text-sm font-medium">
                             Configuration
                           </Label>
-                          <ComponentSettings node={selectedNode} />
+                          <ComponentSettings node={selectedNode} canEdit={canEdit} />
                         </>
                       ) : (
                         <SystemContext
                           title={localTitle}
-                          onTitleChange={(e) => setLocalTitle(e.target.value)}
+                          onTitleChange={(e) => canEdit && setLocalTitle(e.target.value)}
                           description={localDescription}
                           onDescriptionChange={(e) =>
-                            setLocalDescription(e.target.value)
+                            canEdit && setLocalDescription(e.target.value)
                           }
+                          canEdit={canEdit}
                         />
                       )}
                     </div>
@@ -462,18 +523,18 @@ function PageContent() {
           <SystemBuilder
             PassedFlowManager={() => (
               <FlowManager
-                checkSolution={() =>
-                  checkSolution(localTitle, localDescription)
-                }
+                checkSolution={handleCheckSolution}
                 feedback={feedback}
                 isLoadingAnswer={isLoadingAnswer}
                 isFeedbackExpanded={isFeedbackExpanded}
                 onOpen={() => setIsFeedbackExpanded(true)}
                 onClose={() => setIsFeedbackExpanded(false)}
                 isSaving={isSaving}
-                onSave={handleManualSave}
+                onSave={canEdit ? handleManualSave : undefined}
+                canEdit={canEdit}
               />
             )}
+            canEdit={canEdit}
           />
         </ResizablePanel>
         {isChatPanelOpen && (

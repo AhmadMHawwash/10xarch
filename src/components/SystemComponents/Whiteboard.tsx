@@ -6,8 +6,13 @@ import { CapacityEstimationDefinition } from "../TextualSolution/CapacityEstimat
 import { RequirementsDefinition } from "../TextualSolution/RequirementsDefinition";
 import { Small } from "../ui/typography";
 import { WithMarkdownDetails } from "./Wrappers/WithMarkdownDetails";
+import { usePlaygroundPermissions } from "@/lib/hooks/usePlaygroundPermissions";
+import { usePlaygroundManager } from "@/lib/hooks/usePlaygroundManager";
 
 export const Whiteboard = ({ selected }: NodeProps) => {
+  const { playground } = usePlaygroundManager();
+  const { canEdit } = usePlaygroundPermissions(playground);
+
   return (
     <div
       className={cn(
@@ -15,10 +20,13 @@ export const Whiteboard = ({ selected }: NodeProps) => {
         selected ? "bg-gray-200 dark:bg-gray-700" : "bg-gray-50 dark:bg-gray-800",
       )}
     >
-      <Small className="mb-2">System definitions</Small>
-      <RequirementsDefinition />
+      <Small className="mb-2">
+        System definitions
+        {!canEdit && <span className="ml-2 text-xs text-gray-500">(Read Only)</span>}
+      </Small>
+      <RequirementsDefinition canEdit={canEdit} />
       {/* <APIDefinition /> */}
-      <CapacityEstimationDefinition />
+      <CapacityEstimationDefinition canEdit={canEdit} />
       <WithMarkdownDetails
         className="absolute left-0 top-[-17px] rounded-full bg-gray-200 dark:bg-gray-700 opacity-0 transition-all group-hover:opacity-100"
         Icon={PresentationIcon}

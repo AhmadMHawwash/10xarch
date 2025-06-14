@@ -102,11 +102,15 @@ const componentCategories = {
   "Custom Components": ["Custom Component"],
 };
 
-const Gallery = () => {
+const Gallery = ({ canEdit = true }: { canEdit?: boolean }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [collapsed, setCollapsed] = useState(false);
 
   const onDragStart = (event: DragEvent, nodeType: SystemComponentType) => {
+    if (!canEdit) {
+      event.preventDefault();
+      return;
+    }
     event.dataTransfer.setData("application/reactflow", nodeType);
     event.dataTransfer.effectAllowed = "move";
   };
@@ -122,7 +126,8 @@ const Gallery = () => {
   return (
     <div className={cn(
       "transition-all duration-300 ease-in-out m-2 w-48 flex flex-col rounded-md border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 bg-opacity-70",
-      collapsed ? "h-10" : "h-fit"
+      collapsed ? "h-10" : "h-fit",
+      !canEdit && "opacity-60" // Visual indication of disabled state
     )}>
       <div 
         className="flex items-center justify-between cursor-pointer p-2 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
@@ -145,10 +150,11 @@ const Gallery = () => {
         <div className="relative mb-2 component-search">
           <input
             type="text"
-            placeholder="Search..."
+            placeholder={canEdit ? "Search..." : "Search (Read Only)"}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full px-2 py-1 text-xs bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-md pr-6"
+            readOnly={!canEdit}
           />
           <Search className="absolute right-1 top-1 text-gray-600 dark:text-gray-400" size={14} />
         </div>
@@ -156,10 +162,13 @@ const Gallery = () => {
           {filteredComponents.map(([name, { icon: Icon, description }]) => (
             <div
               key={name}
-              className="component-item my-1 flex cursor-grab items-center rounded-md border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 bg-opacity-70 p-1 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
+              className={cn(
+                "component-item my-1 flex items-center rounded-md border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 bg-opacity-70 p-1 text-gray-800 dark:text-gray-200 transition-colors duration-200",
+                canEdit ? "cursor-grab hover:bg-gray-200 dark:hover:bg-gray-700" : "cursor-not-allowed opacity-50"
+              )}
               onDragStart={(event) => onDragStart(event, name as SystemComponentType)}
-              draggable
-              title={description}
+              draggable={canEdit}
+              title={canEdit ? description : "View-only mode: Cannot add components"}
             >
               {Icon && <Icon size={16} className="text-gray-700 dark:text-gray-300 mr-1" />}
               <div className="text-xs">{name}</div>

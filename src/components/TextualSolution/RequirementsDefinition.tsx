@@ -14,7 +14,7 @@ import { Textarea } from "../ui/textarea";
 import { Muted } from "../ui/typography";
 import { useWhiteboard } from "../ReactflowCustomNodes/APIsNode";
 
-export const RequirementsDefinition: React.FC = () => {
+export const RequirementsDefinition: React.FC<{ canEdit?: boolean }> = ({ canEdit = true }) => {
   const { stage } = useChallengeManager();
   const { functional, nonfunctional, setFunctional, setNonfunctional } =
     useWhiteboard();
@@ -24,13 +24,13 @@ export const RequirementsDefinition: React.FC = () => {
       <DialogTrigger className="mt-1 flex w-full items-center rounded-md border border-gray-400 bg-gray-50 p-1 px-2 text-sm font-medium text-gray-800 transition-all hover:border-gray-500 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200 dark:hover:border-gray-500 dark:hover:bg-gray-800">
         <>
           <CogIcon size={15} className="mr-2" />
-          Requirements
+          Requirements {!canEdit && <span className="text-xs text-gray-500">(Read Only)</span>}
         </>
       </DialogTrigger>
       <DialogContent className="flex h-[90vh] max-w-4xl flex-col overflow-scroll bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100">
         <DialogHeader>
           <DialogTitle className="mb-4 text-2xl font-bold">
-            Requirements Definition
+            Requirements Definition {!canEdit && <span className="text-sm text-gray-500 font-normal">(Read Only)</span>}
           </DialogTitle>
         </DialogHeader>
         <Tabs defaultValue="functional" className="w-full">
@@ -45,6 +45,7 @@ export const RequirementsDefinition: React.FC = () => {
               placeholder="Example: User Authentication, Data Processing, etc."
               infoContent={functionalRequirements}
               infoButtonText="What the system should do"
+              canEdit={canEdit}
             />
             <Hints hints={stage?.hintsPerArea.requirements.functional} />
           </TabsContent>
@@ -55,6 +56,7 @@ export const RequirementsDefinition: React.FC = () => {
               placeholder="Example: Performance, Scalability, Security, etc."
               infoContent={nonFunctionalRequirements}
               infoButtonText="How the system should perform"
+              canEdit={canEdit}
             />
             <Hints hints={stage?.hintsPerArea.requirements.nonFunctional} />
           </TabsContent>
@@ -70,6 +72,7 @@ interface RequirementSectionProps {
   placeholder: string;
   infoContent: string;
   infoButtonText: string;
+  canEdit: boolean;
 }
 
 const RequirementSection: React.FC<RequirementSectionProps> = ({
@@ -78,6 +81,7 @@ const RequirementSection: React.FC<RequirementSectionProps> = ({
   placeholder,
   infoContent,
   infoButtonText,
+  canEdit,
 }) => (
   <div className="space-y-4">
     <Textarea
@@ -86,6 +90,7 @@ const RequirementSection: React.FC<RequirementSectionProps> = ({
       placeholder={placeholder}
       onChange={(e) => onChange(e.target.value)}
       className="text-md border-gray-300 bg-gray-100 text-gray-900 focus:border-gray-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-gray-600"
+      readOnly={!canEdit}
     />
     <WithMarkdownDetails
       Icon={InfoIcon}

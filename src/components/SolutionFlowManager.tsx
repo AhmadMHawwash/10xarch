@@ -31,6 +31,7 @@ interface FlowManagerProps {
   onNextStage?: () => void;
   onSave?: () => void;
   isSaving?: boolean;
+  canEdit?: boolean;
 }
 
 export const FlowManager: React.FC<FlowManagerProps> = ({
@@ -43,6 +44,7 @@ export const FlowManager: React.FC<FlowManagerProps> = ({
   onNextStage,
   onSave,
   isSaving,
+  canEdit = true,
 }) => {
   const { runSolutionLabel } = useFeatureCustomisation();
   const { canRunSolution } = useFeatures();
@@ -74,7 +76,9 @@ export const FlowManager: React.FC<FlowManagerProps> = ({
       } fixed bottom-0 left-0 right-0 z-10 transition-all duration-300 sm:static`}
     >
       <div className="flex w-full flex-wrap justify-center gap-2 sm:flex-nowrap sm:items-center sm:gap-0 sm:space-x-3">
-        <ResetFlowButton resetDone={resetDone} onReset={resetFlow} />
+        {canEdit && (
+          <ResetFlowButton resetDone={resetDone} onReset={resetFlow} />
+        )}
         <div className="relative">
           {!canRunSolution && (
             <Badge
@@ -84,14 +88,16 @@ export const FlowManager: React.FC<FlowManagerProps> = ({
               Soon
             </Badge>
           )}
-          <RunSolutionButton
-            isLoading={isLoadingAnswer}
-            onClick={checkSolution}
-            disabled={!canRunSolution}
-            label={runSolutionLabel}
-          />
+          {canEdit && (
+            <RunSolutionButton
+              isLoading={isLoadingAnswer}
+              onClick={checkSolution}
+              disabled={!canRunSolution}
+              label={runSolutionLabel}
+            />
+          )}
         </div>
-        {onSave && (
+        {onSave && canEdit && (
           <Button
             className="w-full text-white transition-colors duration-300 hover:bg-green-700/80 sm:w-auto"
             variant="outline"

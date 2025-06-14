@@ -15,9 +15,11 @@ import { CustomComponentSettings } from "../SystemComponents/CustomComponent";
 export const ComponentSettings = ({
   node,
   className,
+  canEdit = true,
 }: {
   node: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps> | null;
   className?: string;
+  canEdit?: boolean;
 }) => {
   const id = node?.id ?? "";
 
@@ -27,6 +29,11 @@ export const ComponentSettings = ({
 
   return (
     <div className={className}>
+      {!canEdit && (
+        <div className="p-2 text-center text-sm text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+          Component settings are read-only
+        </div>
+      )}
       <div className="component-settings-container overflow-auto">
         <div className="component-inner-content w-full">
           {/* Import and create the settings components directly */}

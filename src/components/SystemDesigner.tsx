@@ -34,8 +34,10 @@ const edgeTypes: Record<string, ComponentType<EdgeProps>> = {
 
 const SystemDesigner = ({
   PassedFlowManager,
+  canEdit = true,
 }: {
   PassedFlowManager: () => React.ReactNode;
+  canEdit?: boolean;
 }) => {
   const {
     nodes,
@@ -55,6 +57,7 @@ const SystemDesigner = ({
   } = useSystemDesigner();
 
   const handleConnect: OnConnect = (params) => {
+    if (!canEdit) return; // Prevent connections in view-only mode
     const { source, target } = params;
     if (!source || !target) return;
 
@@ -69,6 +72,10 @@ const SystemDesigner = ({
 
   // Handler to deselect all nodes when starting a connection
   const handleConnectStart: OnConnectStart = (event, params) => {
+    if (!canEdit) {
+      event.preventDefault(); // Prevent connection start in view-only mode
+      return;
+    }
     // Deselect all nodes
     const deselectedNodes = nodes.map((node) => ({
       ...node,
@@ -82,6 +89,7 @@ const SystemDesigner = ({
 
   // Handler to deselect all nodes when ending a connection
   const handleConnectEnd: OnConnectEnd = (event) => {
+    if (!canEdit) return; // Prevent connection end in view-only mode
     // Deselect all nodes
     const deselectedNodes = nodes.map((node) => ({
       ...node,
@@ -102,14 +110,14 @@ const SystemDesigner = ({
       <ReactFlow
         nodes={nodes}
         edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
+        onNodesChange={canEdit ? onNodesChange : undefined}
+        onEdgesChange={canEdit ? onEdgesChange : undefined}
         onConnect={handleConnect}
         onConnectStart={handleConnectStart}
         onConnectEnd={handleConnectEnd}
         onInit={initInstance}
-        onDrop={onDrop}
-        onDragOver={onDragOver}
+        onDrop={canEdit ? onDrop : undefined}
+        onDragOver={canEdit ? onDragOver : undefined}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
         onNodeClick={(_, node) => {
@@ -127,16 +135,16 @@ const SystemDesigner = ({
           onSelectEdge(edge);
           onSelectNode(null);
         }}
-        onNodeDragStart={(_, node) => {
+        onNodeDragStart={canEdit ? (_, node) => {
           onSelectNode(node);
           onSelectEdge(null);
-        }}
+        } : undefined}
         onSelectionStart={() => {
           onSelectNode(whiteboardNode);
           onSelectEdge(null);
         }}
-        onNodesDelete={() => onSelectNode(whiteboardNode)}
-        onEdgesDelete={() => onSelectEdge(null)}
+        onNodesDelete={canEdit ? () => onSelectNode(whiteboardNode) : undefined}
+        onEdgesDelete={canEdit ? () => onSelectEdge(null) : undefined}
         onPaneClick={() => {
           onSelectNode(whiteboardNode);
           onSelectEdge(null);
@@ -154,8 +162,13 @@ const SystemDesigner = ({
         panOnDrag={false}
         panOnScroll={true}
         panOnScrollMode={PanOnScrollMode.Free}
-        selectionOnDrag={true}
+        selectionOnDrag={canEdit}
         className="light-theme dark:dark-theme"
+        nodesDraggable={canEdit}
+        nodesConnectable={canEdit}
+        nodesFocusable={canEdit}
+        edgesFocusable={canEdit}
+        elementsSelectable={true} // Always allow selection for viewing
       >
         <Background
           variant={BackgroundVariant.Dots}
@@ -168,7 +181,7 @@ const SystemDesigner = ({
         </Panel>
         <Panel position="top-right" className="m-auto flex">
           <div className="component-gallery">
-            <Gallery />
+            <Gallery canEdit={canEdit} />
           </div>
         </Panel>
         <Controls />
@@ -179,8 +192,10 @@ const SystemDesigner = ({
 
 export default function SystemBuilder({
   PassedFlowManager,
+  canEdit = true,
 }: {
   PassedFlowManager: () => React.ReactNode;
+  canEdit?: boolean;
 }) {
-  return <SystemDesigner PassedFlowManager={PassedFlowManager} />;
+  return <SystemDesigner PassedFlowManager={PassedFlowManager} canEdit={canEdit} />;
 }

@@ -27,9 +27,11 @@ interface NodeData {
 export const EdgeSettings = ({
   edge,
   className,
+  canEdit = true,
 }: {
   edge: Edge | null;
   className?: string;
+  canEdit?: boolean;
 }) => {
   const { updateEdgeLabel, nodes } = useSystemDesigner();
   const [label, setLabel] = useState("");
@@ -60,6 +62,7 @@ export const EdgeSettings = ({
     newApiDefinition: string = apiDefinition,
     newRequestFlow: string = requestFlow,
   ) => {
+    if (!canEdit) return; // Don't update if in view-only mode
     updateEdgeLabel(edge.id, newLabel, {
       label: newLabel, // Store in data as well for consistency
       apiDefinition: newApiDefinition,
@@ -123,7 +126,9 @@ export const EdgeSettings = ({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="connection-title">Connection Title</Label>
+            <Label htmlFor="connection-title">
+              Connection Title {!canEdit && <span className="text-xs text-gray-500">(Read Only)</span>}
+            </Label>
             <Input
               id="connection-title"
               value={label}
@@ -131,44 +136,42 @@ export const EdgeSettings = ({
               placeholder="e.g., API Request, Database Query"
               className="bg-gray-50 dark:bg-gray-800"
               onKeyDown={(e) => e.stopPropagation()}
+              readOnly={!canEdit}
             />
           </div>
 
-          <Tabs defaultValue="api-definition" className="w-full">
-            <TabsList className="w-full">
-              <TabsTrigger className="w-full" value="api-definition">
-                API Definition
-              </TabsTrigger>
-              <TabsTrigger className="w-full" value="request-flow">
-                Request Flow
-              </TabsTrigger>
+          <Tabs defaultValue="api" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="api">API Definition</TabsTrigger>
+              <TabsTrigger value="request">Request Flow</TabsTrigger>
             </TabsList>
-            <TabsContent value="api-definition">
+            <TabsContent value="api">
               <div className="space-y-2">
+                <Label htmlFor="api-definition">
+                  API Definition {!canEdit && <span className="text-xs text-gray-500">(Read Only)</span>}
+                </Label>
                 <Textarea
                   id="api-definition"
                   value={apiDefinition}
                   onChange={handleApiDefinitionChange}
-                  placeholder="Define API endpoints, request/response formats..."
-                  rows={20}
-                  data-testid="api-definition-textarea"
-                  className="bg-gray-50 dark:bg-gray-800"
-                  onKeyDown={(e) => e.stopPropagation()}
+                  placeholder="Define the API endpoint, method, payload..."
+                  className="min-h-[200px] bg-gray-50 dark:bg-gray-800"
+                  readOnly={!canEdit}
                 />
               </div>
             </TabsContent>
-            <TabsContent value="request-flow">
+            <TabsContent value="request">
               <div className="space-y-2">
+                <Label htmlFor="request-flow">
+                  Request Flow {!canEdit && <span className="text-xs text-gray-500">(Read Only)</span>}
+                </Label>
                 <Textarea
                   id="request-flow"
                   value={requestFlow}
                   onChange={handleRequestFlowChange}
-                  placeholder="Describe how requests flow through this connection..."
-                  aria-label="Request Flow"
-                  rows={20}
-                  data-testid="request-flow-textarea"
-                  className="bg-gray-50 dark:bg-gray-800"
-                  onKeyDown={(e) => e.stopPropagation()}
+                  placeholder="Describe the request/response flow between components..."
+                  className="min-h-[200px] bg-gray-50 dark:bg-gray-800"
+                  readOnly={!canEdit}
                 />
               </div>
             </TabsContent>

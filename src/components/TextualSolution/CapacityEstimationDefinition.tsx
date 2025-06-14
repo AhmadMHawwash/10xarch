@@ -17,7 +17,7 @@ import { useState } from "react";
 import { type Stage } from "@/content/challenges/types";
 
 const defaultValue = "traffic";
-export const CapacityEstimationDefinition = () => {
+export const CapacityEstimationDefinition = ({ canEdit = true }: { canEdit?: boolean }) => {
   const { capacity, setCapacity } = useWhiteboard();
   const { stage } = useChallengeManager();
   const [tabValue, setTabValue] = useState<string>(defaultValue);
@@ -27,13 +27,13 @@ export const CapacityEstimationDefinition = () => {
       <DialogTrigger className="mt-1 flex w-full items-center rounded-md border border-gray-400 bg-gray-50 p-1 px-2 text-sm font-medium text-gray-800 transition-all hover:border-gray-500 hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200 dark:hover:border-gray-500 dark:hover:bg-gray-700">
         <>
           <NotebookPen size={15} className="mr-2" />
-          Capacity Estimations
+          Capacity Estimations {!canEdit && <span className="text-xs text-gray-500">(Read Only)</span>}
         </>
       </DialogTrigger>
       <DialogContent className="flex h-[90vh] max-w-4xl flex-col overflow-scroll bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100">
         <DialogHeader>
           <DialogTitle className="mb-4 text-2xl font-bold">
-            Capacity Estimation
+            Capacity Estimation {!canEdit && <span className="text-sm text-gray-500 font-normal">(Read Only)</span>}
           </DialogTitle>
         </DialogHeader>
         <Tabs
@@ -54,6 +54,7 @@ export const CapacityEstimationDefinition = () => {
               placeholder="Example: URL Shortening Service traffic estimation..."
               infoContent={trafficEstimation}
               infoButtonText="How to estimate traffic"
+              canEdit={canEdit}
             />
           </TabsContent>
           <TabsContent value="storage">
@@ -63,6 +64,7 @@ export const CapacityEstimationDefinition = () => {
               placeholder="Example: URL Shortening Service storage estimation..."
               infoContent={storageEstimation}
               infoButtonText="How to estimate storage"
+              canEdit={canEdit}
             />
           </TabsContent>
           <TabsContent value="bandwidth">
@@ -74,6 +76,7 @@ export const CapacityEstimationDefinition = () => {
               placeholder="Example: URL Shortening Service bandwidth estimation..."
               infoContent={bandwidthEstimation}
               infoButtonText="How to estimate bandwidth"
+              canEdit={canEdit}
             />
           </TabsContent>
           <TabsContent value="memory">
@@ -83,6 +86,7 @@ export const CapacityEstimationDefinition = () => {
               placeholder="Example: URL Shortening Service memory estimation..."
               infoContent={memoryEstimation}
               infoButtonText="How to estimate memory"
+              canEdit={canEdit}
             />
           </TabsContent>
         </Tabs>
@@ -104,6 +108,7 @@ interface CapacitySectionProps {
   placeholder: string;
   infoContent: string;
   infoButtonText: string;
+  canEdit: boolean;
 }
 
 const CapacitySection: React.FC<CapacitySectionProps> = ({
@@ -112,6 +117,7 @@ const CapacitySection: React.FC<CapacitySectionProps> = ({
   placeholder,
   infoContent,
   infoButtonText,
+  canEdit,
 }) => (
   <div className="space-y-4">
     <Textarea
@@ -120,6 +126,7 @@ const CapacitySection: React.FC<CapacitySectionProps> = ({
       placeholder={placeholder}
       onChange={(e) => onChange(e.target.value)}
       className="text-md border-gray-300 bg-gray-100 text-gray-900 focus:border-gray-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-gray-600"
+      readOnly={!canEdit}
     />
     <WithMarkdownDetails
       Icon={InfoIcon}

@@ -45,6 +45,13 @@ import {
   updateComponentConfig,
   updateEdgeLabel as updateEdgeLabelPure,
 } from "./systemDesignerUtils";
+import {
+  handleSystemDesignerKeyDown,
+  createWhiteboardDeletionNotifier,
+  updateNodesFromEdgeChanges,
+  scheduleNodeInternalsUpdate,
+  findNodesToUpdateAfterDeletion,
+} from "@/lib/utils/system-designer-utils";
 import useLocalStorageState from "./useLocalStorageState";
 
 interface SystemDesignerState {
@@ -249,11 +256,7 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
   }, []);
 
   const onNodesChange: OnNodesChange = useCallback((changes) => {
-    const notifyWhiteboardDeletion = () => {
-      toast({
-        title: "You cannot delete the System definitions",
-      });
-    };
+    const notifyWhiteboardDeletion = createWhiteboardDeletionNotifier(toast);
     
     const result = handleNodesChange(changes, nodes, edges, notifyWhiteboardDeletion);
     
@@ -268,28 +271,10 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
     if (nodeDeletions.length > 0) {
       // For each deleted node, find connected nodes that need their internals updated
       const deletedNodeIds = nodeDeletions.map(change => change.id);
-      const nodesToUpdateInternals: string[] = [];
-      
-      // Check all edges to see which nodes were connected to deleted nodes
-      edges.forEach(edge => {
-        // If source was deleted, update target node
-        if (deletedNodeIds.includes(edge.source) && !deletedNodeIds.includes(edge.target)) {
-          nodesToUpdateInternals.push(edge.target);
-        }
-        // If target was deleted, update source node
-        if (deletedNodeIds.includes(edge.target) && !deletedNodeIds.includes(edge.source)) {
-          nodesToUpdateInternals.push(edge.source);
-        }
-      });
+      const nodesToUpdateInternals = findNodesToUpdateAfterDeletion(deletedNodeIds, edges);
       
       // Update the internals of all affected nodes
-      if (nodesToUpdateInternals.length > 0) {
-        queueMicrotask(() => {
-          nodesToUpdateInternals.forEach(nodeId => {
-            updateNodeInternals(nodeId);
-          });
-        });
-      }
+      scheduleNodeInternalsUpdate(nodesToUpdateInternals, updateNodeInternals);
     }
   }, [nodes, edges, toast, updateNodeInternals]);
 
@@ -299,27 +284,13 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
       setNodes(nodes => {
         // Update the nodes with the updated data
         // this is just to not overwrite reactflow's internal state (selected, etc)
-        return nodes.map(node => {
-          const updatedNode = result.updatedNodes.find(n => n.id === node.id);
-          return {
-            ...node,
-            data: {
-              ...node.data,
-              ...updatedNode?.data,
-            }
-          }
-        });
+        return updateNodesFromEdgeChanges(nodes, result.updatedNodes);
       });
       setEdges(result.updatedEdges);
     });
 
-    if (result.nodesToUpdateUI.length > 0) {
-      setTimeout(() => {
-        result.nodesToUpdateUI.forEach((nodeId) => {
-          updateNodeInternals(nodeId);
-        });
-      }, 100);
-    }
+    // Schedule UI updates for affected nodes
+    scheduleNodeInternalsUpdate(result.nodesToUpdateUI, updateNodeInternals, 100);
   }, [nodes, edges, updateNodeInternals]);
 
   const onSave = useCallback(() => {

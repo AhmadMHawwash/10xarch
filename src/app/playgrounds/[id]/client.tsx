@@ -33,85 +33,9 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocalStorage, usePrevious } from "react-use";
 import { ReactFlowProvider, type Edge, type Node } from "reactflow";
+import { hasPlaygroundChanges, type PlaygroundState } from "@/lib/utils/playground-utils";
 
 const AUTO_SAVE_INTERVAL = 5000; // 20 seconds
-
-// Helper function to extract relevant details for comparison
-const getImportantDetails = ({
-  title,
-  description,
-  nodes,
-  edges,
-}: {
-  title: string;
-  description: string;
-  nodes: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[];
-  edges: Edge[];
-}) => {
-  return {
-    title,
-    description,
-    nodes: nodes.map((node) => ({
-      id: node.id,
-      type: node.type,
-      position: node.position,
-      data: {
-        name: node.data.name,
-        title: node.data.title,
-        subtitle: node.data.subtitle,
-        // Add other relevant data properties here for comparison
-      },
-      // Include other node properties if they are critical for divergence detection
-      width: node.width,
-      height: node.height,
-      selected: false, // Always false to ignore selection state for divergence
-      dragging: false, // Always false to ignore dragging state for divergence
-    })),
-    edges: edges.map((edge) => ({
-      id: edge.id,
-      source: edge.source,
-      target: edge.target,
-      type: edge.type,
-      // Add other relevant edge properties here for comparison
-    })),
-  };
-};
-
-// Deep compare objects - handles nested objects and arrays
-const deepCompare = (obj1: unknown, obj2: unknown): boolean => {
-  if (obj1 === obj2) return true;
-  if (
-    typeof obj1 !== "object" ||
-    typeof obj2 !== "object" ||
-    obj1 === null ||
-    obj2 === null
-  ) {
-    return false;
-  }
-
-  if (Array.isArray(obj1) && Array.isArray(obj2)) {
-    if (obj1.length !== obj2.length) return false;
-    for (let i = 0; i < obj1.length; i++) {
-      if (!deepCompare(obj1[i], obj2[i])) return false;
-    }
-    return true;
-  }
-
-  if (Array.isArray(obj1) !== Array.isArray(obj2)) return false;
-
-  const keys1 = Object.keys(obj1);
-  const keys2 = Object.keys(obj2);
-  if (keys1.length !== keys2.length) return false;
-
-  return keys1.every((key) => {
-    const obj1Value = obj1 as Record<string, unknown>;
-    const obj2Value = obj2 as Record<string, unknown>;
-    return (
-      Object.prototype.hasOwnProperty.call(obj2Value, key) &&
-      deepCompare(obj1Value[key], obj2Value[key])
-    );
-  });
-};
 
 export default function PlaygroundClient() {
   return (
@@ -248,19 +172,14 @@ function PageContent() {
 
   // Helper function to detect changes
   const hasChanges = useCallback(() => {
-    if (!lastSavedStateRef.current) return false;
-
-    const currentState = {
+    const currentState: PlaygroundState = {
       title: localTitle || "Untitled Playground",
       description: localDescription,
       nodes,
       edges,
     };
 
-    const currentDetails = getImportantDetails(currentState);
-    const savedDetails = getImportantDetails(lastSavedStateRef.current);
-
-    return !deepCompare(currentDetails, savedDetails);
+    return hasPlaygroundChanges(currentState, lastSavedStateRef.current);
   }, [localTitle, localDescription, nodes, edges]);
 
   // Auto-save functionality

@@ -1,7 +1,13 @@
 import { usePathname, useRouter } from "next/navigation";
 import { useCurrentUser } from "./useCurrentUser";
 
-export const useWithLogin = () => {
+interface UseWithLoginReturn {
+  withLogin: <TArgs extends unknown[], TReturn>(
+    fn: (...args: TArgs) => TReturn
+  ) => (...args: TArgs) => TReturn | void;
+}
+
+export const useWithLogin = (): UseWithLoginReturn => {
   const router = useRouter();
   const pathname = usePathname();
 
@@ -9,7 +15,7 @@ export const useWithLogin = () => {
   return {
     withLogin:
       <TArgs extends unknown[], TReturn>(fn: (...args: TArgs) => TReturn) =>
-      (...args: TArgs) => {
+      (...args: TArgs): TReturn | void => {
         if (!isLoading && !isSignedIn) {
           router.push("/sign-in?next=" + pathname);
         } else if (!isLoading && isSignedIn) {

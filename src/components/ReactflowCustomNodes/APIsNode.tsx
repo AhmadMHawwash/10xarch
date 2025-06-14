@@ -22,7 +22,21 @@ export type SystemComponentNodeDataProps = {
 
 export type Capacity = "Traffic" | "Storage" | "Bandwidth" | "Memory";
 export type API = { name: string; definition: string; flow: string };
-export const useWhiteboard = () => {
+
+interface UseWhiteboardReturn {
+  apis: API[];
+  setApis: (apis: API[]) => void;
+  functional: string;
+  setFunctional: (functional: string) => void;
+  nonfunctional: string;
+  setNonfunctional: (nonfunctional: string) => void;
+  capacity: Record<Capacity, string>;
+  setCapacity: (capacity: Record<Capacity, string>) => void;
+  flows: [string, string][];
+  setFlows: (flows: [string, string][]) => void;
+}
+
+export const useWhiteboard = (): UseWhiteboardReturn => {
   const { useSystemComponentConfigSlice } = useSystemDesigner();
 
   const whiteboardId = "Whiteboard-1";
@@ -35,11 +49,13 @@ export const useWhiteboard = () => {
   const [functional, setFunctional] = useSystemComponentConfigSlice<string>(
     whiteboardId,
     "functional requirements",
+    "",
   );
   const [nonfunctional, setNonfunctional] =
     useSystemComponentConfigSlice<string>(
       whiteboardId,
       "non-functional requirements",
+      "",
     );
 
   const [capacity, setCapacity] = useSystemComponentConfigSlice<

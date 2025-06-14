@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import {
   type NodeSettingsRef,
   type NodeSettingsRefObject,
+  type NodeHandle,
 } from "@/types/system";
 import { InfoIcon, type PiIcon } from "lucide-react";
 import React, { useRef } from "react";
@@ -26,8 +27,8 @@ export type SystemComponentNodeDataProps = {
   displayName?: string;
   subtitle?: string;
   title?: string;
-  targetHandles?: Array<{ id: string; isConnected: boolean }>;
-  sourceHandles?: Array<{ id: string; isConnected: boolean }>;
+  targetHandles?: NodeHandle[];
+  sourceHandles?: NodeHandle[];
 };
 
 export type WhiteboardNodeDataProps = {
@@ -40,8 +41,8 @@ export type WhiteboardNodeDataProps = {
   displayName?: string;
   subtitle?: string;
   title?: string;
-  targetHandles?: Array<{ id: string; isConnected: boolean }>;
-  sourceHandles?: Array<{ id: string; isConnected: boolean }>;
+  targetHandles?: NodeHandle[];
+  sourceHandles?: NodeHandle[];
 };
 
 export default function SystemComponentNode({

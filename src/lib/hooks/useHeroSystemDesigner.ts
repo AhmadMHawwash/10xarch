@@ -2,6 +2,10 @@ import { useCallback, useState } from "react";
 import {
   type Edge,
   type Node,
+  type OnNodesChange,
+  type OnEdgesChange,
+  type OnConnect,
+  type ReactFlowInstance,
 } from "reactflow";
 import { type HeroNodeData } from "@/components/ReactflowCustomNodes/HeroSystemComponentNode";
 
@@ -110,23 +114,32 @@ const initialDemoEdges: Edge[] = [
   },
 ];
 
-export function useHeroSystemDesigner() {
+interface UseHeroSystemDesignerReturn {
+  nodes: Node<HeroNodeData>[];
+  edges: Edge[];
+  onNodesChange: OnNodesChange;
+  onEdgesChange: OnEdgesChange;
+  onConnect: OnConnect;
+  onInit: (instance: ReactFlowInstance) => void;
+}
+
+export function useHeroSystemDesigner(): UseHeroSystemDesignerReturn {
   const [nodes] = useState<Node<HeroNodeData>[]>(initialDemoNodes);
   const [edges] = useState<Edge[]>(initialDemoEdges);
 
-  const onNodesChange = useCallback(() => {
+  const onNodesChange = useCallback<OnNodesChange>(() => {
     // Nodes are not changeable in demo
   }, []);
 
-  const onEdgesChange = useCallback(() => {
+  const onEdgesChange = useCallback<OnEdgesChange>(() => {
     // Edges are not changeable in demo
   }, []);
 
-  const onConnect = useCallback(() => {
+  const onConnect = useCallback<OnConnect>(() => {
     // Connections are not allowed in demo
   }, []);
 
-  const onInit = useCallback(() => {
+  const onInit = useCallback((instance: ReactFlowInstance) => {
     // No initialization needed for demo
   }, []);
 

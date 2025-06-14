@@ -17,6 +17,7 @@ import {
   P,
   Quote,
 } from "@/components/ui/typography";
+import { type LucideIcon } from "lucide-react";
 import React from "react";
 import ReactMarkdown, { type Components } from "react-markdown";
 import rehypeRaw from "rehype-raw";
@@ -50,8 +51,7 @@ export const WithMarkdownDetails = ({
   trigger,
 }: {
   content?: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  Icon: any;
+  Icon: LucideIcon;
   className?: string;
   trigger?: React.ReactNode;
 }) => {

@@ -1,6 +1,14 @@
 import { usePathname } from "next/navigation";
 
-export const useFeatures = () => {
+interface UseFeatures {
+  canRunSolution: boolean;
+}
+
+interface UseFeatureCustomisation {
+  runSolutionLabel: string;
+}
+
+export const useFeatures = (): UseFeatures => {
   const pathname = usePathname();
 
   if (pathname?.includes("playground")) {
@@ -14,7 +22,7 @@ export const useFeatures = () => {
   };
 };
 
-export const useFeatureCustomisation = () => {
+export const useFeatureCustomisation = (): UseFeatureCustomisation => {
   const pathname = usePathname();
 
   if (pathname?.includes("playground")) {

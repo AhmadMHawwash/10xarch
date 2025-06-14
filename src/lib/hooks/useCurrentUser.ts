@@ -3,8 +3,15 @@ import { useQuery } from "@tanstack/react-query";
 import { db } from "@/server/db";
 import { eq } from "drizzle-orm";
 import { type User, users } from "@/server/db/schema";
+import { type UserResource } from "@clerk/types";
 
-export function useCurrentUser() {
+interface UseCurrentUserReturn {
+  clerkUser: UserResource | null | undefined;
+  isSignedIn: boolean | undefined;
+  isLoading: boolean;
+}
+
+export function useCurrentUser(): UseCurrentUserReturn {
   const { user: clerkUser, isLoaded: isClerkLoaded, isSignedIn } = useUser();
 
   // const { data: dbUser, isLoading: isDbLoading } = useQuery<User | null>({

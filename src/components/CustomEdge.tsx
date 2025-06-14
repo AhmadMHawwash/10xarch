@@ -8,15 +8,9 @@ import {
   Position,
 } from "reactflow";
 import { useSystemDesigner } from "@/lib/hooks/_useSystemDesigner";
+import { type CustomEdgeData } from "@/types/system";
 
-interface EdgeData {
-  apiDefinition?: string;
-  requestFlow?: string;
-  label?: string;
-  [key: string]: unknown;
-}
-
-export const CustomEdge: FC<EdgeProps<EdgeData>> = ({
+export const CustomEdge: FC<EdgeProps<CustomEdgeData>> = ({
   sourceX,
   sourceY,
   targetX,
@@ -134,7 +128,7 @@ export const CustomEdge: FC<EdgeProps<EdgeData>> = ({
   const handleEdgeClick = (e: React.MouseEvent) => {
     // Open the edge settings panel
     e.stopPropagation();
-    const edge: Edge<EdgeData> = {
+    const edge: Edge<CustomEdgeData> = {
       id,
       data: data ?? {},
       source: source ?? "",

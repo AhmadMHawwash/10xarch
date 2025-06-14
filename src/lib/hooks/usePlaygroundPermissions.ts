@@ -13,7 +13,7 @@ export function usePlaygroundPermissions(playground?: Partial<Playground> | null
   const { user } = useUser();
   const userId = user?.id;
 
-  if (!playground || !userId) {
+  if (!playground) {
     return {
       canEdit: false,
       canView: false,
@@ -23,10 +23,22 @@ export function usePlaygroundPermissions(playground?: Partial<Playground> | null
     };
   }
 
+  const isPublic = playground.isPublic === 1;
+  
+  // If user is not authenticated, they can only view public playgrounds
+  if (!userId) {
+    return {
+      canEdit: false,
+      canView: isPublic,
+      isOwner: false,
+      isEditor: false,
+      isViewer: false,
+    };
+  }
+
   const isOwner = playground.ownerType === "user" && playground.ownerId === userId;
   const isEditor = playground.editorIds?.includes(userId) ?? false;
   const isViewer = playground.viewerIds?.includes(userId) ?? false;
-  const isPublic = playground.isPublic === 1;
 
   const canEdit = isOwner || isEditor;
   const canView = canEdit || isViewer || isPublic;

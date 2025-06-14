@@ -39,7 +39,7 @@ const SystemContext = ({
           placeholder="Enter playground description"
           value={description ?? ""}
           onChange={onDescriptionChange}
-          rows={3}
+          rows={20}
         />
       </div>
     </div>

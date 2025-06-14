@@ -38,6 +38,7 @@ const listPlaygroundsSchema = z.object({
   ownerType: z.enum(["user", "org"]).optional(),
   ownerId: z.string().optional(),
   includeShared: z.boolean().optional().default(true),
+  filter: z.enum(["all", "shared_with_me", "shared_with_others"]).optional().default("all"),
 });
 
 export const playgroundsRouter = createTRPCRouter({
@@ -68,18 +69,41 @@ export const playgroundsRouter = createTRPCRouter({
         });
         return { playgrounds: results };
       } else {
-        // Default to showing user's own playgrounds, those shared with them, and public ones
-        const results = await ctx.db.query.playgrounds.findMany({
-          where: or(
-            and(
-              // User is the owner
+        // Apply filter based on user's request
+        let whereCondition;
+        
+        switch (input?.filter) {
+          case "shared_with_me":
+            whereCondition = or(
+              sql`${userId} = ANY(${playgrounds.editorIds})`, // User is an editor
+              sql`${userId} = ANY(${playgrounds.viewerIds})`, // User is a viewer
+            );
+            break;
+          case "shared_with_others":
+            whereCondition = and(
               eq(playgrounds.ownerType, "user"),
               eq(playgrounds.ownerId, userId),
-            ),
-            sql`${userId} = ANY(${playgrounds.editorIds})`, // User is an editor
-            sql`${userId} = ANY(${playgrounds.viewerIds})`, // User is a viewer
-            eq(playgrounds.isPublic, 1), // Playground is public
-          ),
+              or(
+                sql`array_length(${playgrounds.editorIds}, 1) > 0`,
+                sql`array_length(${playgrounds.viewerIds}, 1) > 0`,
+              ),
+            );
+            break;
+          default: // "all"
+            whereCondition = or(
+              and(
+                // User is the owner
+                eq(playgrounds.ownerType, "user"),
+                eq(playgrounds.ownerId, userId),
+              ),
+              sql`${userId} = ANY(${playgrounds.editorIds})`, // User is an editor
+              sql`${userId} = ANY(${playgrounds.viewerIds})`, // User is a viewer
+              eq(playgrounds.isPublic, 1), // Playground is public
+            );
+        }
+
+        const results = await ctx.db.query.playgrounds.findMany({
+          where: whereCondition,
           orderBy: [desc(playgrounds.updatedAt)],
         });
         return { playgrounds: results };
@@ -341,5 +365,87 @@ export const playgroundsRouter = createTRPCRouter({
         });
       }
       return { success: true, deletedId: firstDeletedItem.id };
+    }),
+
+  // Search users by email for sharing
+  searchUsers: protectedProcedure
+    .input(z.object({ email: z.string().email() }))
+    .query(async ({ ctx, input }) => {
+      const { userId } = await auth();
+      if (!userId) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Not authenticated",
+        });
+      }
+
+      const foundUsers = await ctx.db.query.users.findMany({
+        where: eq(users.email, input.email),
+        columns: {
+          id: true,
+          email: true,
+        },
+      });
+
+      return { users: foundUsers };
+    }),
+
+  // Update sharing permissions for a playground
+  updateSharing: protectedProcedure
+    .input(z.object({
+      playgroundId: playgroundIdSchema,
+      editorIds: z.array(z.string()),
+      viewerIds: z.array(z.string()),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const { userId } = await auth();
+      if (!userId) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Not authenticated",
+        });
+      }
+
+      const existingPlayground = await ctx.db.query.playgrounds.findFirst({
+        where: eq(playgrounds.id, input.playgroundId),
+      });
+
+      if (!existingPlayground) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Playground not found",
+        });
+      }
+
+      // Only the owner can update sharing permissions
+      if (
+        existingPlayground.ownerType === "user" &&
+        existingPlayground.ownerId !== userId
+      ) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Only the owner can update sharing permissions",
+        });
+      }
+
+      const [updatedPlayground] = await ctx.db
+        .update(playgrounds)
+        .set({
+          editorIds: input.editorIds,
+          viewerIds: input.viewerIds,
+          updatedAt: new Date(),
+          updatedBy: userId,
+        })
+        .where(eq(playgrounds.id, input.playgroundId))
+        .returning();
+
+      if (!updatedPlayground) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to update sharing permissions",
+        });
+      }
+
+      return { playground: updatedPlayground };
     }),
 });

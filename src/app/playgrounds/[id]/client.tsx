@@ -4,6 +4,7 @@ import { getSystemComponent } from "@/components/Gallery";
 import { ComponentSettings } from "@/components/playground/ComponentSettings";
 import { EdgeSettings } from "@/components/playground/EdgeSettings";
 import SystemContext from "@/components/playground/SystemContext";
+import { PlaygroundToolbar } from "@/components/playground/PlaygroundToolbar";
 import {
   type WhiteboardNodeDataProps,
   type SystemComponentNodeDataProps,
@@ -367,7 +368,7 @@ function PageContent() {
           <div className="h-full bg-gray-50/50 p-4 dark:bg-gray-900/50">
             <Card className="h-full border-gray-200 dark:border-gray-800">
               <div className="flex items-center border-b border-gray-200 p-4 dark:border-gray-800">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-1">
                   {showEdgeSettings ? (
                     <span className="text-base font-medium">Connection</span>
                   ) : (
@@ -381,6 +382,14 @@ function PageContent() {
                     </>
                   )}
                 </div>
+                {!showNodeSettings && !showEdgeSettings && playground && (
+                  <PlaygroundToolbar 
+                    playground={playground as any}
+                    onPlaygroundUpdate={(updatedPlayground) => {
+                      console.log('Playground updated:', updatedPlayground);
+                    }}
+                  />
+                )}
               </div>
 
               <div className="space-y-4 p-4">

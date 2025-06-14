@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 };
 
 export default async function PlaygroundsPage({
-  searchParams
+  searchParams: _searchParams
 }: {
   searchParams: Record<string, string | string[] | undefined>
 }) {

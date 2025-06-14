@@ -119,7 +119,7 @@ describe('EdgeSettings', () => {
     const apiTab = screen.getByRole('tab', { name: 'API Definition' });
     fireEvent.click(apiTab);
     
-    const apiTextarea = screen.getByTestId('api-definition-textarea');
+    const apiTextarea = screen.getByRole('textbox', { name: 'API Definition' });
     fireEvent.change(apiTextarea, { target: { value: 'New API definition' } });
     
     // Check that updateEdgeLabel was called with the new API definition

@@ -27,7 +27,6 @@ import { Switch } from "../ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Textarea } from "../ui/textarea";
 import { H6, Muted, Small } from "../ui/typography";
-import { WithSettings } from "./Wrappers/WithSettings";
 
 export const Database = ({
   name,

@@ -25,7 +25,6 @@ import {
 import { Switch } from "../ui/switch";
 import { Textarea } from "../ui/textarea";
 import { Muted, Small } from "../ui/typography";
-import { WithSettings } from "./Wrappers/WithSettings";
 
 interface FeatureInfo {
   name: string;
@@ -147,7 +146,6 @@ const InfoPopup = ({ feature }: { feature: FeatureInfo }) => {
 export const Cache = ({
   name,
   Icon,
-  nodeSettingsRef,
   subtitle,
 }: ComponentNodeProps) => {
   return (
@@ -166,10 +164,8 @@ export const Cache = ({
 
 const CacheSettings = ({
   name: id,
-  nodeSettingsRef,
 }: {
   name: string;
-  nodeSettingsRef?: NodeSettingsRefObject;
 }) => {
   const { useSystemComponentConfigSlice } = useSystemDesigner();
   const [isFreeText, setIsFreeText] = useState<boolean>(true);

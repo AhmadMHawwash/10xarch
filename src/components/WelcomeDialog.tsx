@@ -1,19 +1,17 @@
-import { useState, useEffect } from 'react';
+import { Play, SkipForward } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { TOUR_PREFERENCE_KEY } from './Onboarding';
 import { Button } from './ui/button';
+import { Checkbox } from './ui/checkbox';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
-  DialogClose,
+  DialogTitle
 } from './ui/dialog';
-import { Play, SkipForward, X } from 'lucide-react';
-import Image from 'next/image';
-import { Checkbox } from './ui/checkbox';
 import { Label } from './ui/label';
-import { TOUR_PREFERENCE_KEY } from './Onboarding';
 
 interface WelcomeDialogProps {
   startTour: () => void;

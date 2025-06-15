@@ -1,19 +1,19 @@
 "use client";
 
+import { CreditAlert } from "@/components/credits/CreditAlert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useCredits } from "@/hooks/useCredits";
 import { useSystemDesigner } from "@/lib/hooks/_useSystemDesigner";
-import { api } from "@/trpc/react";
-import { Coins, MessageSquare, Send } from "lucide-react";
-import { useEffect, useRef, useState, useMemo, useCallback } from "react";
-import ReactMarkdown from "react-markdown";
-import { cn } from "@/lib/utils";
 import { useChatMessages } from "@/lib/hooks/useChatMessages_";
-import { CreditAlert } from "@/components/credits/CreditAlert";
+import { cn } from "@/lib/utils";
+import { api } from "@/trpc/react";
 import { useAuth, useOrganization } from "@clerk/nextjs";
 import { useQueryClient } from "@tanstack/react-query";
+import { Send } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import ReactMarkdown from "react-markdown";
 import { type Edge } from "reactflow";
 
 interface Message {

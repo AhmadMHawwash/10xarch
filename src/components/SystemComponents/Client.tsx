@@ -1,6 +1,5 @@
 import { useSystemDesigner } from "@/lib/hooks/_useSystemDesigner";
 import { cn } from "@/lib/utils";
-import { type NodeSettingsRefObject } from "@/types/system";
 import { ExternalLink, HelpCircle } from "lucide-react";
 import { useState } from "react";
 import { type ComponentNodeProps } from "../ReactflowCustomNodes/SystemComponentNode";
@@ -24,7 +23,6 @@ import {
 import { Switch } from "../ui/switch";
 import { Textarea } from "../ui/textarea";
 import { Muted, Small } from "../ui/typography";
-import { WithSettings } from "./Wrappers/WithSettings";
 
 interface FeatureInfo {
   name: string;
@@ -99,7 +97,6 @@ const InfoPopup = ({ feature }: { feature: FeatureInfo }) => {
 export const Client = ({
   name,
   Icon,
-  nodeSettingsRef,
   subtitle,
 }: ComponentNodeProps) => {
   return (

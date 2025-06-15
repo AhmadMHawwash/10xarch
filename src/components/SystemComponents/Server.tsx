@@ -25,7 +25,6 @@ import {
 import { Switch } from "../ui/switch";
 import { Textarea } from "../ui/textarea";
 import { Muted, Small } from "../ui/typography";
-import { WithSettings } from "./Wrappers/WithSettings";
 
 interface FeatureInfo {
   name: string;

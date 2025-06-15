@@ -1,13 +1,12 @@
+import { usePlaygroundManager } from "@/lib/hooks/usePlaygroundManager";
+import { usePlaygroundPermissions } from "@/lib/hooks/usePlaygroundPermissions";
 import { cn } from "@/lib/utils";
 import { InfoIcon, PresentationIcon } from "lucide-react";
 import { type NodeProps } from "reactflow";
-import { APIDefinition } from "../TextualSolution/APIDefinition";
 import { CapacityEstimationDefinition } from "../TextualSolution/CapacityEstimationDefinition";
 import { RequirementsDefinition } from "../TextualSolution/RequirementsDefinition";
 import { Small } from "../ui/typography";
 import { WithMarkdownDetails } from "./Wrappers/WithMarkdownDetails";
-import { usePlaygroundPermissions } from "@/lib/hooks/usePlaygroundPermissions";
-import { usePlaygroundManager } from "@/lib/hooks/usePlaygroundManager";
 
 export const Whiteboard = ({ selected }: NodeProps) => {
   const { playground } = usePlaygroundManager();

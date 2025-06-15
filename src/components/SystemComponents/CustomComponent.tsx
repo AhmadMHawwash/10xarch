@@ -1,17 +1,13 @@
 import { useSystemDesigner } from "@/lib/hooks/_useSystemDesigner";
 import { type ComponentNodeProps } from "../ReactflowCustomNodes/SystemComponentNode";
-import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
 import { Muted, Small } from "../ui/typography";
-import { WithSettings } from "./Wrappers/WithSettings";
 
 export function CustomComponent({
   name,
   subtitle,
-  nodeId,
   Icon,
-  nodeSettingsRef,
 }: ComponentNodeProps) {
   return (
     <div className="flex flex-col items-center text-gray-800 dark:text-gray-200">

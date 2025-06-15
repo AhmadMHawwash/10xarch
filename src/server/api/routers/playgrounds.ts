@@ -390,6 +390,57 @@ export const playgroundsRouter = createTRPCRouter({
       return { users: foundUsers };
     }),
 
+  // Get users by IDs for sharing panel
+  getUsersByIds: protectedProcedure
+    .input(z.object({ userIds: z.array(z.string()) }))
+    .query(async ({ input }) => {
+      const { userId } = await auth();
+      if (!userId) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Not authenticated",
+        });
+      }
+
+      if (input.userIds.length === 0) {
+        return { users: [] };
+      }
+
+      // For this implementation, we'll use Clerk to get user details
+      const { clerkClient } = await import("@clerk/nextjs/server");
+      const client = await clerkClient();
+      
+      try {
+        const clerkUsers = await Promise.all(
+          input.userIds.map(async (id) => {
+            try {
+              const user = await client.users.getUser(id);
+              return {
+                id: user.id,
+                email: user.emailAddresses[0]?.emailAddress ?? '',
+                fullName: user.fullName ?? '',
+                imageUrl: user.imageUrl ?? '',
+              };
+            } catch (error) {
+              console.error(`Failed to fetch user ${id}:`, error);
+              return null;
+            }
+          })
+        );
+
+        // Filter out null values (users that couldn't be fetched)
+        const validUsers = clerkUsers.filter((user): user is NonNullable<typeof user> => user !== null);
+        
+        return { users: validUsers };
+      } catch (error) {
+        console.error('Error fetching users from Clerk:', error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to fetch user details",
+        });
+      }
+    }),
+
   // Update sharing permissions for a playground
   updateSharing: protectedProcedure
     .input(z.object({

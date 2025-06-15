@@ -5,10 +5,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/components/ui/use-toast';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { type Playground } from '@/server/db/schema';
 import { api } from '@/trpc/react';
 import { Mail, Search, Users, X } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 
 interface PlaygroundSharingPanelProps {
   playground: Playground;
@@ -18,6 +19,8 @@ interface PlaygroundSharingPanelProps {
 interface SharedUser {
   id: string;
   email: string;
+  fullName?: string;
+  imageUrl?: string;
   permission: 'viewer' | 'editor';
 }
 
@@ -25,22 +28,40 @@ export function PlaygroundSharingPanel({ playground, onUpdate }: PlaygroundShari
   const { toast } = useToast();
   const [searchEmail, setSearchEmail] = useState('');
   const [isSearching, setIsSearching] = useState(false);
+  const [sharedUsers, setSharedUsers] = useState<SharedUser[]>([]);
   const utils = api.useUtils();
 
-  // Get all shared users from playground data
-  const getSharedUsers = (): SharedUser[] => {
+  // Get all user IDs that need to be fetched
+  const allUserIds = useMemo(() => {
     const editorIds = playground.editorIds ?? [];
     const viewerIds = playground.viewerIds ?? [];
-    
-    // This is a simplified approach - in a real app you'd want to fetch user details
-    // For now, we'll show user IDs as email placeholders
-    const editors = editorIds.map(id => ({ id, email: `user-${id}@example.com`, permission: 'editor' as const }));
-    const viewers = viewerIds.map(id => ({ id, email: `user-${id}@example.com`, permission: 'viewer' as const }));
-    
-    return [...editors, ...viewers];
-  };
+    return [...editorIds, ...viewerIds];
+  }, [playground.editorIds, playground.viewerIds]);
 
-  const [sharedUsers, setSharedUsers] = useState<SharedUser[]>(getSharedUsers());
+  // Fetch user details from Clerk
+  const { data: usersData, isLoading: isLoadingUsers } = api.playgrounds.getUsersByIds.useQuery(
+    { userIds: allUserIds },
+    {
+      enabled: allUserIds.length > 0,
+      staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    }
+  );
+
+  // Update shared users when user data is loaded
+  useEffect(() => {
+    if (usersData?.users) {
+      const editorIds = playground.editorIds ?? [];
+      
+      const sharedUsersWithPermissions = usersData.users.map(user => ({
+        ...user,
+        permission: editorIds.includes(user.id) ? ('editor' as const) : ('viewer' as const)
+      }));
+      
+      setSharedUsers(sharedUsersWithPermissions);
+    } else if (allUserIds.length === 0) {
+      setSharedUsers([]);
+    }
+  }, [usersData, playground.editorIds, playground.viewerIds, allUserIds]);
 
   const updateSharingMutation = api.playgrounds.updateSharing.useMutation({
     onSuccess: (data) => {
@@ -127,6 +148,17 @@ export function PlaygroundSharingPanel({ playground, onUpdate }: PlaygroundShari
     );
   };
 
+  // Check if there are changes compared to original playground data
+  const hasChanges = () => {
+    const currentEditorIds = sharedUsers.filter(u => u.permission === 'editor').map(u => u.id).sort();
+    const currentViewerIds = sharedUsers.filter(u => u.permission === 'viewer').map(u => u.id).sort();
+    const originalEditorIds = [...(playground.editorIds ?? [])].sort();
+    const originalViewerIds = [...(playground.viewerIds ?? [])].sort();
+    
+    return JSON.stringify(currentEditorIds) !== JSON.stringify(originalEditorIds) ||
+           JSON.stringify(currentViewerIds) !== JSON.stringify(originalViewerIds);
+  };
+
   const handleSaveChanges = () => {
     const editorIds = sharedUsers.filter(u => u.permission === 'editor').map(u => u.id);
     const viewerIds = sharedUsers.filter(u => u.permission === 'viewer').map(u => u.id);
@@ -176,10 +208,15 @@ export function PlaygroundSharingPanel({ playground, onUpdate }: PlaygroundShari
       {/* Current shared users */}
       <div className="space-y-2">
         <Label className="text-sm font-medium">
-          Shared with ({sharedUsers.length})
+          Shared with ({isLoadingUsers ? '...' : sharedUsers.length})
         </Label>
         
-        {sharedUsers.length === 0 ? (
+        {isLoadingUsers ? (
+          <div className="flex items-center justify-center py-4">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+            <span className="ml-2 text-sm text-muted-foreground">Loading users...</span>
+          </div>
+        ) : sharedUsers.length === 0 ? (
           <p className="text-sm text-muted-foreground">
             This playground is not shared with anyone yet.
           </p>
@@ -187,9 +224,25 @@ export function PlaygroundSharingPanel({ playground, onUpdate }: PlaygroundShari
           <div className="space-y-2 max-h-48 overflow-y-auto">
             {sharedUsers.map((user) => (
               <div key={user.id} className="flex items-center justify-between p-2 border rounded-md">
-                <div className="flex items-center gap-2 flex-1 min-w-0">
+                <div className="flex items-center gap-3 flex-1 min-w-0">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={user.imageUrl} alt={user.fullName ?? user.email} />
+                    <AvatarFallback className="bg-primary/10 text-xs">
+                      {user.fullName ? 
+                        user.fullName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) :
+                        user.email.slice(0, 2).toUpperCase()
+                      }
+                    </AvatarFallback>
+                  </Avatar>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">{user.email}</p>
+                    <p className="text-sm font-medium truncate">
+                      {user.fullName ?? user.email}
+                    </p>
+                    {user.fullName && (
+                      <p className="text-xs text-muted-foreground truncate">
+                        {user.email}
+                      </p>
+                    )}
                   </div>
                 </div>
                 
@@ -225,9 +278,7 @@ export function PlaygroundSharingPanel({ playground, onUpdate }: PlaygroundShari
       </div>
 
       {/* Save button */}
-      {(sharedUsers.length !== getSharedUsers().length || 
-        JSON.stringify(sharedUsers.sort((a, b) => a.id.localeCompare(b.id))) !== 
-        JSON.stringify(getSharedUsers().sort((a, b) => a.id.localeCompare(b.id)))) && (
+      {hasChanges() && (
         <Button 
           onClick={handleSaveChanges}
           disabled={updateSharingMutation.isPending}

@@ -49,15 +49,23 @@ export const creditsRouter = createTRPCRouter({
       }),
     )
     .query(async ({ ctx }) => {
-      const { userId } = await auth();
+      const { userId, orgId } = await auth();
       if (!userId) {
         throw new TRPCError({
           code: "UNAUTHORIZED",
           message: "Not authenticated",
         });
       }
+
+      // Determine current context (org or personal) - same logic as getBalance
+      const ownerType = orgId ? "org" : "user";
+      const ownerId = orgId ?? userId;
+
       const transactions = await ctx.db.query.tokenLedger.findMany({
-        where: eq(tokenLedger.ownerId, userId),
+        where: and(
+          eq(tokenLedger.ownerType, ownerType),
+          eq(tokenLedger.ownerId, ownerId)
+        ),
         orderBy: (tokenLedger, { desc }) => [desc(tokenLedger.createdAt)],
         limit: 50,
       });

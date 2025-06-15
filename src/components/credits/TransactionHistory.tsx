@@ -14,7 +14,7 @@ import { type CreditTransactionInput } from "@/lib/validations/credits";
 import { api } from "@/trpc/react";
 
 export function TransactionHistory() {
-  const { userId } = useAuth();
+  const { userId, orgId } = useAuth();
 
   const { data: transactionData, isLoading: isLoadingTransactions } =
     api.credits.getTransactions.useQuery(undefined, {

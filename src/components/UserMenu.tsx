@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef, useMemo } from "react";
-import { useUser, useOrganization, useAuth, useClerk } from "@clerk/nextjs";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,23 +17,22 @@ import {
   SelectItem,
   SelectTrigger,
 } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useCredits } from "@/hooks/useCredits";
+import { cn } from "@/lib/utils";
+import { useAuth, useClerk, useOrganization, useUser } from "@clerk/nextjs";
 import {
   Building,
   ChevronDown,
+  Coins,
   LogOut,
   PlusCircle,
   RefreshCw,
   Settings,
-  User,
-  Coins,
-  CreditCard,
+  User
 } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { usePathname } from "next/navigation";
-import { useCredits } from "@/hooks/useCredits";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 export default function UserMenu() {
   const { user, isLoaded: isUserLoaded } = useUser();
@@ -42,8 +41,6 @@ export default function UserMenu() {
   const clerk = useClerk();
   const { openOrganizationProfile, openUserProfile } = clerk;
   const pathname = usePathname();
-  const isPricingPage = pathname.includes("/pricing");
-  const isCreditsPage = pathname.includes("/credits");
   const {
     expiringTokens,
     expiringTokensExpiry,
@@ -52,7 +49,7 @@ export default function UserMenu() {
     isLoading: isLoadingCredits,
     hasValidData,
   } = useCredits();
-  
+
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [orgs, setOrgs] = useState<Array<{ id: string; name: string }>>([]);
   const [isLoadingOrgs, setIsLoadingOrgs] = useState(false);
@@ -202,7 +199,8 @@ export default function UserMenu() {
       switch (action) {
         case "personal":
           await clerk.setActive({ organization: null });
-          setSelectedOrgId("personal");
+          // because of a bug, quickest way to refresh the page is to reload to show the correct context for subscription pricing table
+          window.location.reload();
           break;
         case "create":
           clerk.openCreateOrganization({
@@ -216,10 +214,9 @@ export default function UserMenu() {
         case "switch":
           if (orgId) {
             await clerk.setActive({ organization: orgId });
-            if (isPricingPage || isCreditsPage) {
-              // because of a bug, quickest way to refresh the page is to reload to show the correct context for subscription pricing table
-              window.location.reload();
-            }
+            // because of a bug, quickest way to refresh the page is to reload to show the correct context for subscription pricing table
+            window.location.reload();
+
             setSelectedOrgId(orgId);
           }
           break;
@@ -284,7 +281,7 @@ export default function UserMenu() {
             </AvatarFallback>
           </Avatar>
           <div className="flex flex-col items-start">
-            <span className="text-sm font-medium text-gray-900 dark:text-white max-w-32 truncate">
+            <span className="max-w-32 truncate text-sm font-medium text-gray-900 dark:text-white">
               {currentOrgInfo.name}
             </span>
             <span className="text-xs text-muted-foreground">
@@ -326,7 +323,6 @@ export default function UserMenu() {
             </div>
           </div>
         </DropdownMenuLabel>
-
 
         <DropdownMenuSeparator className="my-1 opacity-20" />
 
@@ -482,9 +478,9 @@ export default function UserMenu() {
         {/* Token Balance Section */}
         <DropdownMenuGroup>
           <div className="p-1">
-            <Link 
+            <Link
               href="/balance"
-              className="block rounded-lg bg-gradient-to-br from-blue-50/80 to-blue-100/80 dark:from-blue-900/20 dark:to-blue-800/20 p-3 transition-all duration-200 hover:from-blue-100/90 hover:to-blue-200/90 dark:hover:from-blue-900/30 dark:hover:to-blue-800/30"
+              className="block rounded-lg bg-gradient-to-br from-blue-50/80 to-blue-100/80 p-3 transition-all duration-200 hover:from-blue-100/90 hover:to-blue-200/90 dark:from-blue-900/20 dark:to-blue-800/20 dark:hover:from-blue-900/30 dark:hover:to-blue-800/30"
               onClick={() => setIsDropdownOpen(false)}
             >
               <div className="flex items-center justify-between">
@@ -496,18 +492,20 @@ export default function UserMenu() {
                 </div>
                 <ChevronDown className="h-3 w-3 -rotate-90 text-blue-600 dark:text-blue-400" />
               </div>
-              
+
               {isLoadingCredits || !hasValidData ? (
                 <div className="mt-2 flex items-center gap-2">
                   <RefreshCw className="h-3 w-3 animate-spin text-blue-600/70 dark:text-blue-400/70" />
-                  <span className="text-xs text-blue-700/70 dark:text-blue-300/70">Loading...</span>
+                  <span className="text-xs text-blue-700/70 dark:text-blue-300/70">
+                    Loading...
+                  </span>
                 </div>
               ) : (
                 <div className="mt-2 space-y-1">
                   <div className="text-lg font-bold text-blue-800 dark:text-blue-200">
                     {totalTokens.toLocaleString()} tokens
                   </div>
-                  
+
                   {(expiringTokens > 0 || nonexpiringTokens > 0) && (
                     <div className="space-y-0.5 text-xs">
                       {expiringTokens > 0 && (
@@ -517,17 +515,26 @@ export default function UserMenu() {
                             {expiringTokens.toLocaleString()}
                             {expiringTokensExpiry && (
                               <span className="ml-1 text-amber-600 dark:text-amber-400">
-                                ({new Date(expiringTokensExpiry).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})
+                                (
+                                {new Date(
+                                  expiringTokensExpiry,
+                                ).toLocaleDateString("en-US", {
+                                  month: "short",
+                                  day: "numeric",
+                                })}
+                                )
                               </span>
                             )}
                           </span>
                         </div>
                       )}
-                      
+
                       {nonexpiringTokens > 0 && (
                         <div className="flex justify-between text-green-700 dark:text-green-300">
                           <span>Permanent:</span>
-                          <span className="font-medium">{nonexpiringTokens.toLocaleString()}</span>
+                          <span className="font-medium">
+                            {nonexpiringTokens.toLocaleString()}
+                          </span>
                         </div>
                       )}
                     </div>
@@ -544,9 +551,9 @@ export default function UserMenu() {
         <DropdownMenuItem
           className={cn(
             "mx-1 cursor-pointer rounded-md p-2.5 text-sm transition-colors duration-200",
-            "text-white/80 bg-destructive/40",
+            "bg-destructive/40 text-white/80",
             "border border-destructive/20 shadow-sm",
-            "hover:!bg-destructive/60 hover:border-destructive/30 hover:shadow-md",
+            "hover:border-destructive/30 hover:!bg-destructive/60 hover:shadow-md",
             "focus:outline-none focus:ring-2 focus:ring-destructive/30",
             "font-medium",
           )}

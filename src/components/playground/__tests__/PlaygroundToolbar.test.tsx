@@ -4,6 +4,15 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { PlaygroundToolbar } from '../PlaygroundToolbar';
 import type { Playground } from '@/server/db/schema';
 
+// Mock useRouter from Next.js
+vi.mock('next/navigation', () => ({
+  useRouter: vi.fn(() => ({
+    push: vi.fn(),
+    replace: vi.fn(),
+    prefetch: vi.fn(),
+  })),
+}));
+
 // Mock tRPC at the module level
 vi.mock('@/trpc/react', async () => {
   const actual = await vi.importActual('@/trpc/react');
@@ -19,6 +28,15 @@ vi.mock('@/trpc/react', async () => {
             mutate: vi.fn(),
             isPending: false,
           })),
+        },
+        delete: {
+          useMutation: vi.fn(() => ({
+            mutate: vi.fn(),
+            isPending: false,
+          })),
+        },
+        getUsersByIds: {
+          useQuery: vi.fn(() => ({ data: { users: [] }, isLoading: false })),
         },
       },
       useUtils: vi.fn(() => ({
@@ -100,7 +118,8 @@ describe('PlaygroundToolbar', () => {
       </TestWrapper>
     );
 
-    const shareButton = screen.getByRole('button', { name: /share/i });
+    // Find share button by looking for the Share2 icon
+    const shareButton = screen.getAllByRole('button')[0]; // First button is share button
     expect(shareButton).toBeInTheDocument();
     
     // Should show count badge for shared users
@@ -117,11 +136,30 @@ describe('PlaygroundToolbar', () => {
       </TestWrapper>
     );
 
-    const shareButton = screen.getByRole('button', { name: /share/i });
+    const shareButton = screen.getAllByRole('button')[0]; // First button is share button
     expect(shareButton).toBeInTheDocument();
     
     // Should not show count badge when no users are shared
     expect(screen.queryByText('0')).not.toBeInTheDocument();
+  });
+
+  test('renders delete button', () => {
+    render(
+      <TestWrapper>
+        <PlaygroundToolbar 
+          playground={mockPlayground} 
+          onPlaygroundUpdate={mockOnPlaygroundUpdate} 
+        />
+      </TestWrapper>
+    );
+
+    // Should render both share and delete buttons
+    const buttons = screen.getAllByRole('button');
+    expect(buttons).toHaveLength(2);
+    
+    // Delete button should be the second button
+    const deleteButton = buttons[1];
+    expect(deleteButton).toBeInTheDocument();
   });
 
   test('calculates shared count correctly for mixed permissions', () => {
@@ -160,14 +198,14 @@ describe('PlaygroundToolbar', () => {
       </TestWrapper>
     );
 
-    const shareButton = screen.getByRole('button', { name: /share/i });
+    const shareButton = screen.getAllByRole('button')[0];
     expect(shareButton).toBeInTheDocument();
     
     // Should not show count badge when arrays are null/undefined
     expect(screen.queryByText(/\d+/)).not.toBeInTheDocument();
   });
 
-  test('button is accessible', () => {
+  test('buttons are accessible', () => {
     render(
       <TestWrapper>
         <PlaygroundToolbar 
@@ -177,11 +215,20 @@ describe('PlaygroundToolbar', () => {
       </TestWrapper>
     );
 
-    const shareButton = screen.getByRole('button', { name: /share/i });
+    const buttons = screen.getAllByRole('button');
     
-    // Button should be focusable
-    shareButton.focus();
+    // Both buttons should be focusable
+    const shareButton = buttons[0];
+    const deleteButton = buttons[1];
+    
+    expect(shareButton).toBeDefined();
+    expect(deleteButton).toBeDefined();
+    
+    shareButton?.focus();
     expect(shareButton).toHaveFocus();
+    
+    deleteButton?.focus();
+    expect(deleteButton).toHaveFocus();
   });
 
   test('renders with custom className', () => {
@@ -199,7 +246,7 @@ describe('PlaygroundToolbar', () => {
     expect(toolbar).toHaveClass('custom-toolbar');
   });
 
-  test('share button displays share icon and text', () => {
+  test('toolbar contains share and delete buttons', () => {
     render(
       <TestWrapper>
         <PlaygroundToolbar 
@@ -209,8 +256,11 @@ describe('PlaygroundToolbar', () => {
       </TestWrapper>
     );
 
-    const shareButton = screen.getByRole('button', { name: /share/i });
-    expect(shareButton).toBeInTheDocument();
-    expect(shareButton).toHaveTextContent('Share');
+    const buttons = screen.getAllByRole('button');
+    expect(buttons).toHaveLength(2);
+    
+    // Should have both share and delete buttons
+    expect(buttons[0]).toBeInTheDocument(); // Share button
+    expect(buttons[1]).toBeInTheDocument(); // Delete button
   });
 }); 

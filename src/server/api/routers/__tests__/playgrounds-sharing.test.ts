@@ -10,8 +10,6 @@
 import { describe, expect, test, vi, beforeEach } from 'vitest';
 import { TRPCError } from '@trpc/server';
 import { createTestCaller, createMockPlayground, createMockUser, setupTestEnvironment } from '../../__tests__/test-utils';
-import type { MockDb } from '../../__tests__/test-utils';
-import type { Playground } from '@/server/db/schema';
 
 // Setup test environment
 setupTestEnvironment();
@@ -190,6 +188,8 @@ describe('Playground Sharing Router Functions', () => {
       expect(result.playgrounds).toHaveLength(2);
     });
   });
+
+
 
   describe('getById with sharing permissions', () => {
     test('allows access to shared playground for editor', async () => {

@@ -1,8 +1,8 @@
-import { render, screen, fireEvent } from "@testing-library/react";
-import { vi, describe, it, expect, beforeEach } from "vitest";
-import { CustomEdge } from "../CustomEdge";
 import * as useSystemDesignerModule from "@/lib/hooks/_useSystemDesigner";
-import type { Node, Edge, EdgeProps, Position } from "reactflow";
+import { fireEvent, render, screen } from "@testing-library/react";
+import type { EdgeProps, Node, Position } from "reactflow";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { CustomEdge } from "../CustomEdge";
 
 // Mock the useSystemDesigner hook
 vi.mock("@/lib/hooks/_useSystemDesigner", () => ({

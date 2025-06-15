@@ -68,6 +68,10 @@ export const FlowManager: React.FC<FlowManagerProps> = ({
     return null; // or a loading placeholder
   }
 
+  if(!canEdit && !feedback) {
+    return null;
+  }
+
   return (
     <div
       id="flow-manager"

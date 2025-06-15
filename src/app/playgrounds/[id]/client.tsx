@@ -36,7 +36,10 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocalStorage, usePrevious } from "react-use";
 import { ReactFlowProvider, type Edge, type Node } from "reactflow";
-import { hasPlaygroundChanges, type PlaygroundState } from "@/lib/utils/playground-utils";
+import {
+  hasPlaygroundChanges,
+  type PlaygroundState,
+} from "@/lib/utils/playground-utils";
 
 const AUTO_SAVE_INTERVAL = 5000; // 20 seconds
 
@@ -89,7 +92,9 @@ function PageContent() {
   const [localTitle, setLocalTitle] = useState("");
   const [localDescription, setLocalDescription] = useState("");
   const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
-  const [pendingNavigation, setPendingNavigation] = useState<string | null>(null);
+  const [pendingNavigation, setPendingNavigation] = useState<string | null>(
+    null,
+  );
   const { toast } = useToast();
 
   const isInitialized = useRef(false);
@@ -277,19 +282,20 @@ function PageContent() {
 
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
       if (!isInitialized.current) return;
-      
+
       if (hasChanges()) {
         event.preventDefault();
         // Chrome requires returnValue to be set
-        event.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
-        return 'You have unsaved changes. Are you sure you want to leave?';
+        event.returnValue =
+          "You have unsaved changes. Are you sure you want to leave?";
+        return "You have unsaved changes. Are you sure you want to leave?";
       }
     };
 
-    window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener("beforeunload", handleBeforeUnload);
 
     return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
     };
   }, [hasChanges, canEdit]);
 
@@ -355,7 +361,8 @@ function PageContent() {
     if (!canEdit) {
       toast({
         title: "Access Denied",
-        description: "You don't have permission to run evaluations on this playground.",
+        description:
+          "You don't have permission to run evaluations on this playground.",
         variant: "destructive",
       });
       return;
@@ -425,9 +432,15 @@ function PageContent() {
       <ResizablePanelGroup direction="horizontal">
         <ResizablePanel defaultSize={25} minSize={3}>
           <div className="h-full bg-gray-50/50 p-4 dark:bg-gray-900/50">
+            {playground && (
+              <PlaygroundToolbar
+                className="mb-2 -mt-2"
+                playground={playground as any}
+              />
+            )}
             <Card className="h-full border-gray-200 dark:border-gray-800">
               <div className="flex items-center border-b border-gray-200 p-4 dark:border-gray-800">
-                <div className="flex items-center gap-2 flex-1">
+                <div className="flex flex-1 items-center gap-2">
                   {showEdgeSettings ? (
                     <span className="text-base font-medium">Connection</span>
                   ) : (
@@ -441,14 +454,6 @@ function PageContent() {
                     </>
                   )}
                 </div>
-                {!showNodeSettings && !showEdgeSettings && playground && (
-                  <PlaygroundToolbar 
-                    playground={playground as any}
-                    onPlaygroundUpdate={(updatedPlayground) => {
-                      console.log('Playground updated:', updatedPlayground);
-                    }}
-                  />
-                )}
               </div>
 
               <div className="space-y-4 p-4">
@@ -456,7 +461,12 @@ function PageContent() {
                   <>
                     <div className="space-y-2">
                       <Label htmlFor="title" className="text-sm font-medium">
-                        Title {!canEdit && <span className="text-xs text-gray-500">(Read Only)</span>}
+                        Title{" "}
+                        {!canEdit && (
+                          <span className="text-xs text-gray-500">
+                            (Read Only)
+                          </span>
+                        )}
                       </Label>
                       <Input
                         id="title"
@@ -472,7 +482,12 @@ function PageContent() {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="subtitle" className="text-sm font-medium">
-                        Subtitle {!canEdit && <span className="text-xs text-gray-500">(Read Only)</span>}
+                        Subtitle{" "}
+                        {!canEdit && (
+                          <span className="text-xs text-gray-500">
+                            (Read Only)
+                          </span>
+                        )}
                       </Label>
                       <Input
                         id="subtitle"
@@ -499,12 +514,17 @@ function PageContent() {
                           <Label className="text-sm font-medium">
                             Configuration
                           </Label>
-                          <ComponentSettings node={selectedNode} canEdit={canEdit} />
+                          <ComponentSettings
+                            node={selectedNode}
+                            canEdit={canEdit}
+                          />
                         </>
                       ) : (
                         <SystemContext
                           title={localTitle}
-                          onTitleChange={(e) => canEdit && setLocalTitle(e.target.value)}
+                          onTitleChange={(e) =>
+                            canEdit && setLocalTitle(e.target.value)
+                          }
                           description={localDescription}
                           onDescriptionChange={(e) =>
                             canEdit && setLocalDescription(e.target.value)

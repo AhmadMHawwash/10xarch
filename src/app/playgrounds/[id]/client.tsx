@@ -71,6 +71,7 @@ function PageContent() {
     checkSolution,
     answer: feedback,
     isLoadingAnswer,
+    isLoadingPlayground,
   } = usePlaygroundManager();
 
   // Check permissions
@@ -114,7 +115,7 @@ function PageContent() {
 
   // Show access error if user doesn't have view permission
   useEffect(() => {
-    if (isClient && playground && !canView) {
+    if (isClient && playground && !canView && !isLoadingPlayground) {
       toast({
         title: "Access Denied",
         description: "You don't have permission to view this playground.",
@@ -122,7 +123,7 @@ function PageContent() {
       });
       router.push("/");
     }
-  }, [isClient, playground, canView, toast, router]);
+  }, [isClient, playground, canView, toast, router, isLoadingPlayground]);
 
   // Client-side initialization
   useEffect(() => {

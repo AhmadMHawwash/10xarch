@@ -12,14 +12,18 @@ To create a comprehensive, interactive, and AI-powered system design building/do
 
 ### 🔥 High Priority (Next Up)
 
-- [ ] **Shared Playgrounds** - Implement sharing capabilities with "shared with me," "mine," and "share" options
+- [x] **Shared Playgrounds** - Implement sharing capabilities with "shared with me," "mine," and "share" options
 - [ ] **System design flow docs** - Implement interactive system design flow docs
 - [ ] **AI Generate a system design from a simple prompt**
   - [ ] agent mode
-  - [ ] chat mode
+  - [x] chat mode
 - [ ] **Choose your AI model** - Allow users to select different AI models for feedback
 - [ ] **User Feedback System** - Implement up/down voting for challenge feedback
 - [ ] **Enhanced AI Engine** - Improve AI feedback accuracy
+- [-] **Commit to GitHub** - commit changes to github for better recoverability
+  - [ ] User's own github repo
+  - [x] Our own github repo
+- [ ] **Convert code repo to diagram** - based on api requests we can determine the main components a repo is interacting with
 
 ### ⚡ Medium Priority (Core Features)
 

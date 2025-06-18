@@ -10,10 +10,37 @@ export interface PlaygroundPermissions {
 }
 
 export function usePlaygroundPermissions(playground?: Partial<Playground> | null): PlaygroundPermissions {
-  const { user } = useUser();
+  const { user, isLoaded: isUserLoaded } = useUser();
   const userId = user?.id;
 
+  // If user authentication is still loading, return restrictive permissions
+  // This prevents permission checks from running before auth state is ready
+  if (!isUserLoaded) {
+    return {
+      canEdit: false,
+      canView: false,
+      isOwner: false,
+      isEditor: false,
+      isViewer: false,
+    };
+  }
+
   if (!playground) {
+    return {
+      canEdit: false,
+      canView: false,
+      isOwner: false,
+      isEditor: false,
+      isViewer: false,
+    };
+  }
+
+  // Check if we have the minimum required fields for permission checking
+  const hasRequiredFields = playground.ownerType !== undefined && 
+    playground.ownerId !== undefined;
+
+  if (!hasRequiredFields) {
+    // Return restrictive permissions if we don't have complete data
     return {
       canEdit: false,
       canView: false,

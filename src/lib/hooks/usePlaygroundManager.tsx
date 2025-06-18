@@ -8,6 +8,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { type PlaygroundResponse } from "@/server/api/routers/checkAnswer";
 import { api } from "@/trpc/react";
 import { useParams } from "next/navigation";
+import { useMemo } from "react";
 import { type Edge, type Node } from "reactflow";
 import { useSystemDesigner } from "./_useSystemDesigner";
 
@@ -118,6 +119,16 @@ export const usePlaygroundManager = () => {
     }
   )?.edges;
 
+  // Memoize the playground object to prevent infinite re-renders
+  const playground = useMemo(() => {
+    if (!playgroundData?.playground) return undefined;
+    return {
+      ...playgroundData.playground,
+      nodes: dbSavedNodes,
+      edges: dbSavedEdges,
+    };
+  }, [playgroundData?.playground, dbSavedNodes, dbSavedEdges]);
+
   return {
     checkSolution,
     isLoadingAnswer: isPending,
@@ -127,11 +138,7 @@ export const usePlaygroundManager = () => {
     refetchPlayground,
     isLoadingPlayground,
     isUpdatingPlayground,
-    playground: {
-      ...playgroundData?.playground,
-      nodes: dbSavedNodes,
-      edges: dbSavedEdges,
-    },
+    playground,
   };
 };
 

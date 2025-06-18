@@ -1,15 +1,10 @@
 "use client";
 import { PanelChat } from "@/components/ai-chat/PanelChat";
 import { getSystemComponent } from "@/components/Gallery";
-import Gallery from "@/components/Gallery";
 import { ComponentSettings } from "@/components/playground/ComponentSettings";
 import { EdgeSettings } from "@/components/playground/EdgeSettings";
-import SystemContext from "@/components/playground/SystemContext";
 import { PlaygroundToolbar } from "@/components/playground/PlaygroundToolbar";
-import {
-  type WhiteboardNodeDataProps,
-  type SystemComponentNodeDataProps,
-} from "@/components/ReactflowCustomNodes/SystemComponentNode";
+import SystemContext from "@/components/playground/SystemContext";
 import { FlowManager } from "@/components/SolutionFlowManager";
 import SystemBuilder from "@/components/SystemDesigner";
 import { Button } from "@/components/ui/button";
@@ -31,15 +26,16 @@ import { ChatMessagesProvider } from "@/lib/hooks/useChatMessages_";
 import { usePlaygroundManager } from "@/lib/hooks/usePlaygroundManager";
 import { usePlaygroundPermissions } from "@/lib/hooks/usePlaygroundPermissions";
 import { type SystemComponentType } from "@/lib/levels/type";
-import { Bot, Info, X } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useLocalStorage, usePrevious } from "react-use";
-import { ReactFlowProvider, type Edge, type Node } from "reactflow";
 import {
   hasPlaygroundChanges,
   type PlaygroundState,
 } from "@/lib/utils/playground-utils";
+import { useUser } from "@clerk/nextjs";
+import { Bot, Info, X } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useLocalStorage, usePrevious } from "react-use";
+import { ReactFlowProvider } from "reactflow";
 
 const AUTO_SAVE_INTERVAL = 5000; // 20 seconds
 
@@ -75,10 +71,14 @@ function PageContent() {
     answer: feedback,
     isLoadingAnswer,
     isLoadingPlayground,
+    refetchPlayground,
   } = usePlaygroundManager();
 
   // Check permissions
   const { canEdit, canView } = usePlaygroundPermissions(playground);
+  
+  // Also get user loading state to prevent premature permission checks
+  const { isLoaded: isUserLoaded } = useUser();
 
   const [isFeedbackExpanded, setIsFeedbackExpanded] = useState(false);
   const [hideWelcomeGuide, setHideWelcomeGuide] = useLocalStorage(
@@ -120,7 +120,14 @@ function PageContent() {
 
   // Show access error if user doesn't have view permission
   useEffect(() => {
-    if (isClient && playground && !canView && !isLoadingPlayground) {
+    // Only check permissions if we have complete playground data AND user auth is loaded
+    const hasCompletePlaygroundData = playground?.ownerType !== undefined && 
+      playground.ownerId !== undefined &&
+      playground.editorIds !== undefined &&
+      playground.viewerIds !== undefined &&
+      playground.isPublic !== undefined;
+
+    if (isClient && hasCompletePlaygroundData && isUserLoaded && !canView && !isLoadingPlayground) {
       toast({
         title: "Access Denied",
         description: "You don't have permission to view this playground.",
@@ -128,7 +135,7 @@ function PageContent() {
       });
       router.push("/");
     }
-  }, [isClient, playground, canView, toast, router, isLoadingPlayground]);
+  }, [isClient, playground, canView, isUserLoaded, toast, router, isLoadingPlayground]);
 
   // Client-side initialization
   useEffect(() => {
@@ -188,8 +195,8 @@ function PageContent() {
   useEffect(() => {
     if (!playground?.nodes || !playground?.edges || isSaving) return;
 
+    loadPlaygroundData();
     if (!isInitialized.current) {
-      loadPlaygroundData();
       isInitialized.current = true;
     }
   }, [playground, isSaving, loadPlaygroundData]);
@@ -327,6 +334,7 @@ function PageContent() {
         title: currentState.title,
         description: currentState.description,
         jsonBlob: { nodes: currentState.nodes, edges: currentState.edges },
+        triggerBackup: true,
       });
 
       // Update last saved state after successful save

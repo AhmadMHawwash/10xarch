@@ -8,11 +8,13 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 
 import { describe, expect, test, vi, beforeEach } from 'vitest';
-import { TRPCError } from '@trpc/server';
-import { createTestCaller, createMockPlayground, createMockUser, setupTestEnvironment } from '../../__tests__/test-utils';
+import { setupTestEnvironment } from '../../__tests__/test-utils';
 
-// Setup test environment
+// Setup environment before any other imports that validate env
 setupTestEnvironment();
+
+import { TRPCError } from '@trpc/server';
+import { createTestCaller, createMockPlayground, createMockUser } from '../../__tests__/test-utils';
 
 describe('Playground Sharing Router Functions', () => {
   beforeEach(() => {
@@ -188,8 +190,6 @@ describe('Playground Sharing Router Functions', () => {
       expect(result.playgrounds).toHaveLength(2);
     });
   });
-
-
 
   describe('getById with sharing permissions', () => {
     test('allows access to shared playground for editor', async () => {

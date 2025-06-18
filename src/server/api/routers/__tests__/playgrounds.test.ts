@@ -19,6 +19,25 @@ import {
   createMockUser,
 } from '@/server/api/__tests__/test-utils';
 import { TRPCError } from '@trpc/server';
+import { getGitHubBackupService } from '@/server/api/services/github-backup';
+
+// Mock the github-backup service to prevent environment validation
+const mockGitHubService = {
+  getVersionHistory: vi.fn(),
+  restoreVersion: vi.fn(),
+  commitPlayground: vi.fn(),
+};
+
+vi.mock('@/server/api/services/github-backup', () => ({
+  getGitHubBackupService: vi.fn(() => mockGitHubService),
+}));
+
+// Mock the playground-backup service
+vi.mock('@/server/api/services/playground-backup', () => ({
+  playgroundBackupService: {
+    backupPlayground: vi.fn(),
+  },
+}));
 
 describe('playgroundsRouter', () => {
   const mockUserId = 'user_test_123';
@@ -290,26 +309,23 @@ describe('playgroundsRouter', () => {
   });
 
   describe('delete', () => {
-    beforeEach(() => {
-      mockPlayground = createMockPlayground(mockUserId);
-    });
-
     it('should delete a playground if user is the owner', async () => {
       const { caller, db: mockDb } = await createTestCaller(mockUserId);
-      mockDb.query.playgrounds.findFirst.mockResolvedValueOnce(mockPlayground); // For permission check
-      mockDb.returning.mockResolvedValueOnce([{ id: mockPlayground.id }]); // For the delete operation
+      mockDb.query.playgrounds.findFirst.mockResolvedValueOnce(mockPlayground);
+      mockDb.returning.mockResolvedValueOnce([mockPlayground]);
 
       const result = await caller.playgrounds.delete(mockPlayground.id);
       expect(result.success).toBe(true);
-      // expect(result.deletedId).toBe(mockPlayground.id); // Commented out due to router change
+      expect(result.deletedId).toBe(mockPlayground.id);
       expect(mockDb.delete).toHaveBeenCalledWith(playgrounds);
       expect(mockDb.where).toHaveBeenCalled();
       expect(mockDb.returning).toHaveBeenCalled();
     });
 
-    it('should throw NOT_FOUND if playground to delete does not exist', async () => {
+    it('should throw NOT_FOUND if playground does not exist', async () => {
       const { caller, db: mockDb } = await createTestCaller(mockUserId);
       mockDb.query.playgrounds.findFirst.mockResolvedValueOnce(null);
+
       try {
         await caller.playgrounds.delete(mockPlayground.id);
       } catch (error) {
@@ -319,15 +335,375 @@ describe('playgroundsRouter', () => {
     });
 
     it('should throw FORBIDDEN if user is not the owner', async () => {
-      const { caller, db: mockDb } = await createTestCaller(mockUserId); // Current user
-      otherUserPlayground = createMockPlayground(otherUserId); // Owned by someone else
+      const { caller, db: mockDb } = await createTestCaller(mockUserId);
+      otherUserPlayground = createMockPlayground(otherUserId);
       mockDb.query.playgrounds.findFirst.mockResolvedValueOnce(otherUserPlayground);
+
       try {
         await caller.playgrounds.delete(otherUserPlayground.id);
       } catch (error) {
         expect(error).toBeInstanceOf(TRPCError);
         expect((error as TRPCError).code).toBe('FORBIDDEN');
       }
+    });
+  });
+
+  describe('getVersionHistory', () => {
+    const mockVersionHistory = [
+      {
+        commitSha: 'commit1',
+        message: 'Update playground: Test Playground',
+        author: 'Test User',
+        date: '2024-01-01T00:00:00Z',
+        url: 'https://github.com/test-owner/test-repo/commit/commit1',
+      },
+      {
+        commitSha: 'commit2',
+        message: 'Create playground: Test Playground',
+        author: 'Test User',
+        date: '2023-12-31T00:00:00Z',
+        url: 'https://github.com/test-owner/test-repo/commit/commit2',
+      },
+    ];
+
+    beforeEach(() => {
+      // Configure the GitHub service mock
+      mockGitHubService.getVersionHistory.mockResolvedValue(mockVersionHistory);
+    });
+
+    it('should return version history for playground owner', async () => {
+      const { caller, db: mockDb } = await createTestCaller(mockUserId);
+      mockDb.query.playgrounds.findFirst.mockResolvedValueOnce(mockPlayground);
+
+      const result = await caller.playgrounds.getVersionHistory({
+        playgroundId: mockPlayground.id,
+        limit: 20,
+      });
+
+      expect(result.versions).toEqual(mockVersionHistory);
+      expect(mockDb.query.playgrounds.findFirst).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.anything(),
+        })
+      );
+    });
+
+    it('should return version history for playground with edit access', async () => {
+      const { caller, db: mockDb } = await createTestCaller('editor_user_id');
+      editablePlayground = { ...createMockPlayground(mockUserId), editorIds: ['editor_user_id'] };
+      mockDb.query.playgrounds.findFirst.mockResolvedValueOnce(editablePlayground);
+
+      const result = await caller.playgrounds.getVersionHistory({
+        playgroundId: editablePlayground.id,
+        limit: 20,
+      });
+
+      expect(result.versions).toEqual(mockVersionHistory);
+    });
+
+    it('should return version history for public playground', async () => {
+      const { caller, db: mockDb } = await createTestCaller(mockUserId);
+      publicPlayground = { ...createMockPlayground(otherUserId), isPublic: 1 };
+      mockDb.query.playgrounds.findFirst.mockResolvedValueOnce(publicPlayground);
+
+      const result = await caller.playgrounds.getVersionHistory({
+        playgroundId: publicPlayground.id,
+        limit: 20,
+      });
+
+      expect(result.versions).toEqual(mockVersionHistory);
+    });
+
+    it('should throw NOT_FOUND if playground does not exist', async () => {
+      const { caller, db: mockDb } = await createTestCaller(mockUserId);
+      const nonExistentId = crypto.randomUUID(); // Use valid UUID
+      mockDb.query.playgrounds.findFirst.mockResolvedValueOnce(null);
+
+      try {
+        await caller.playgrounds.getVersionHistory({
+          playgroundId: nonExistentId,
+          limit: 20,
+        });
+      } catch (error) {
+        expect(error).toBeInstanceOf(TRPCError);
+        expect((error as TRPCError).code).toBe('NOT_FOUND');
+      }
+    });
+
+    it('should throw FORBIDDEN if user does not have access', async () => {
+      const { caller, db: mockDb } = await createTestCaller(mockUserId);
+      otherUserPlayground = { ...createMockPlayground(otherUserId), isPublic: 0 };
+      mockDb.query.playgrounds.findFirst.mockResolvedValueOnce(otherUserPlayground);
+
+      try {
+        await caller.playgrounds.getVersionHistory({
+          playgroundId: otherUserPlayground.id,
+          limit: 20,
+        });
+      } catch (error) {
+        expect(error).toBeInstanceOf(TRPCError);
+        expect((error as TRPCError).code).toBe('FORBIDDEN');
+      }
+    });
+
+    it('should throw SERVICE_UNAVAILABLE if GitHub backup service is not available', async () => {
+      // Mock getGitHubBackupService to return null for this test
+      vi.mocked(getGitHubBackupService).mockReturnValueOnce(null);
+
+      const { caller, db: mockDb } = await createTestCaller(mockUserId);
+      mockDb.query.playgrounds.findFirst.mockResolvedValueOnce(mockPlayground);
+
+      try {
+        await caller.playgrounds.getVersionHistory({
+          playgroundId: mockPlayground.id,
+          limit: 20,
+        });
+      } catch (error) {
+        expect(error).toBeInstanceOf(TRPCError);
+        expect((error as TRPCError).code).toBe('SERVICE_UNAVAILABLE');
+      }
+    });
+
+    it('should return empty array if GitHub service returns empty history', async () => {
+      // Configure the mock to return empty array for this test
+      mockGitHubService.getVersionHistory.mockResolvedValueOnce([]);
+
+      const { caller, db: mockDb } = await createTestCaller(mockUserId);
+      mockDb.query.playgrounds.findFirst.mockResolvedValueOnce(mockPlayground);
+
+      const result = await caller.playgrounds.getVersionHistory({
+        playgroundId: mockPlayground.id,
+        limit: 20,
+      });
+
+      expect(result.versions).toEqual([]);
+    });
+
+    it('should use default limit when not specified', async () => {
+      const { caller, db: mockDb } = await createTestCaller(mockUserId);
+      mockDb.query.playgrounds.findFirst.mockResolvedValueOnce(mockPlayground);
+
+      await caller.playgrounds.getVersionHistory({
+        playgroundId: mockPlayground.id,
+      });
+
+      expect(mockGitHubService.getVersionHistory).toHaveBeenCalledWith(
+        mockPlayground.ownerId,
+        mockPlayground.id,
+        20 // default limit
+      );
+    });
+  });
+
+  describe('restoreVersion', () => {
+    const mockRestoredData = {
+      id: 'test-playground-id',
+      title: 'Restored Playground Title',
+      description: 'Restored playground description',
+      nodes: [
+        {
+          id: 'restored-node1',
+          type: 'SystemComponentNode',
+          position: { x: 200, y: 200 },
+          data: { label: 'Restored Node' },
+        },
+      ],
+      edges: [
+        {
+          id: 'restored-edge1',
+          source: 'restored-node1',
+          target: 'restored-node2',
+        },
+      ],
+      metadata: {
+        ownerId: mockUserId,
+        ownerType: 'user',
+        updatedBy: mockUserId,
+        updatedAt: '2024-01-01T00:00:00Z',
+        isPublic: false,
+        tags: 'restored,test',
+      },
+    };
+
+    const restoredPlayground = {
+      ...mockPlayground,
+      title: mockRestoredData.title,
+      description: mockRestoredData.description,
+      jsonBlob: { nodes: mockRestoredData.nodes, edges: mockRestoredData.edges },
+      lastBackupCommitSha: 'commit-sha-123',
+      backupStatus: 'success' as const,
+      updatedAt: expect.any(Date) as Date,
+      updatedBy: mockUserId,
+    };
+
+    beforeEach(() => {
+      // Configure the GitHub service mock for restore version
+      mockGitHubService.restoreVersion.mockResolvedValue(mockRestoredData);
+    });
+
+    it('should successfully restore playground for owner', async () => {
+      const { caller, db: mockDb } = await createTestCaller(mockUserId);
+      mockDb.query.playgrounds.findFirst.mockResolvedValueOnce(mockPlayground);
+      
+      // Mock the transaction to return the expected result
+      mockDb.transaction.mockImplementationOnce(async (fn: any) => {
+        // Simulate the transaction callback returning the restored playground
+        return restoredPlayground;
+      });
+
+      const result = await caller.playgrounds.restoreVersion({
+        playgroundId: mockPlayground.id,
+        commitSha: 'commit-sha-123',
+      });
+
+      expect(result.playground).toEqual(restoredPlayground);
+      expect(mockDb.transaction).toHaveBeenCalled();
+    });
+
+    it('should successfully restore playground for user with edit access', async () => {
+      const { caller, db: mockDb } = await createTestCaller('editor_user_id');
+      editablePlayground = { ...createMockPlayground(mockUserId), editorIds: ['editor_user_id'] };
+      mockDb.query.playgrounds.findFirst.mockResolvedValueOnce(editablePlayground);
+      const restoredEditablePlayground = { ...restoredPlayground, ...editablePlayground };
+      
+      // Mock the transaction to return the expected result
+      mockDb.transaction.mockImplementationOnce(async (fn: any) => {
+        return restoredEditablePlayground;
+      });
+
+      const result = await caller.playgrounds.restoreVersion({
+        playgroundId: editablePlayground.id,
+        commitSha: 'commit-sha-123',
+      });
+
+      expect(result.playground).toEqual(restoredEditablePlayground);
+    });
+
+    it('should throw NOT_FOUND if playground does not exist', async () => {
+      const { caller, db: mockDb } = await createTestCaller(mockUserId);
+      const nonExistentId = crypto.randomUUID(); // Use valid UUID
+      mockDb.query.playgrounds.findFirst.mockResolvedValueOnce(null);
+
+      try {
+        await caller.playgrounds.restoreVersion({
+          playgroundId: nonExistentId,
+          commitSha: 'commit-sha-123',
+        });
+      } catch (error) {
+        expect(error).toBeInstanceOf(TRPCError);
+        expect((error as TRPCError).code).toBe('NOT_FOUND');
+      }
+    });
+
+    it('should throw FORBIDDEN if user does not have edit access', async () => {
+      const { caller, db: mockDb } = await createTestCaller(mockUserId);
+      otherUserPlayground = createMockPlayground(otherUserId);
+      mockDb.query.playgrounds.findFirst.mockResolvedValueOnce(otherUserPlayground);
+
+      try {
+        await caller.playgrounds.restoreVersion({
+          playgroundId: otherUserPlayground.id,
+          commitSha: 'commit-sha-123',
+        });
+      } catch (error) {
+        expect(error).toBeInstanceOf(TRPCError);
+        expect((error as TRPCError).code).toBe('FORBIDDEN');
+      }
+    });
+
+    it('should throw SERVICE_UNAVAILABLE if GitHub backup service is not available', async () => {
+      // Mock getGitHubBackupService to return null for this test
+      vi.mocked(getGitHubBackupService).mockReturnValueOnce(null);
+
+      const { caller, db: mockDb } = await createTestCaller(mockUserId);
+      mockDb.query.playgrounds.findFirst.mockResolvedValueOnce(mockPlayground);
+
+      try {
+        await caller.playgrounds.restoreVersion({
+          playgroundId: mockPlayground.id,
+          commitSha: 'commit-sha-123',
+        });
+      } catch (error) {
+        expect(error).toBeInstanceOf(TRPCError);
+        expect((error as TRPCError).code).toBe('SERVICE_UNAVAILABLE');
+      }
+    });
+
+    it('should throw NOT_FOUND if version cannot be restored', async () => {
+      // Configure the mock to return null for this test
+      mockGitHubService.restoreVersion.mockResolvedValueOnce(null);
+
+      const { caller, db: mockDb } = await createTestCaller(mockUserId);
+      mockDb.query.playgrounds.findFirst.mockResolvedValueOnce(mockPlayground);
+
+      try {
+        await caller.playgrounds.restoreVersion({
+          playgroundId: mockPlayground.id,
+          commitSha: 'invalid-commit-sha',
+        });
+      } catch (error) {
+        expect(error).toBeInstanceOf(TRPCError);
+        expect((error as TRPCError).code).toBe('NOT_FOUND');
+        expect((error as TRPCError).message).toBe('Version not found or could not be restored');
+      }
+    });
+
+    it('should throw INTERNAL_SERVER_ERROR if database update fails', async () => {
+      const { caller, db: mockDb } = await createTestCaller(mockUserId);
+      mockDb.query.playgrounds.findFirst.mockResolvedValueOnce(mockPlayground);
+      
+      // Mock the transaction to return null (simulating failed update)
+      mockDb.transaction.mockImplementationOnce(async (fn: any) => {
+        return null;
+      });
+
+      try {
+        await caller.playgrounds.restoreVersion({
+          playgroundId: mockPlayground.id,
+          commitSha: 'commit-sha-123',
+        });
+      } catch (error) {
+        expect(error).toBeInstanceOf(TRPCError);
+        expect((error as TRPCError).code).toBe('INTERNAL_SERVER_ERROR');
+        expect((error as TRPCError).message).toBe('Failed to update playground with restored data');
+      }
+    });
+
+    it('should handle GitHub service errors gracefully', async () => {
+      // Configure the mock to reject for this test
+      mockGitHubService.restoreVersion.mockRejectedValueOnce(new Error('GitHub API Error'));
+
+      const { caller, db: mockDb } = await createTestCaller(mockUserId);
+      mockDb.query.playgrounds.findFirst.mockResolvedValueOnce(mockPlayground);
+
+      try {
+        await caller.playgrounds.restoreVersion({
+          playgroundId: mockPlayground.id,
+          commitSha: 'commit-sha-123',
+        });
+      } catch (error) {
+        expect(error).toBeInstanceOf(TRPCError);
+        expect((error as TRPCError).code).toBe('INTERNAL_SERVER_ERROR');
+        expect((error as TRPCError).message).toBe('Failed to restore version');
+      }
+    });
+
+    it('should use transaction for database updates', async () => {
+      const { caller, db: mockDb } = await createTestCaller(mockUserId);
+      mockDb.query.playgrounds.findFirst.mockResolvedValueOnce(mockPlayground);
+      
+      // Mock the transaction to return the expected result
+      mockDb.transaction.mockImplementationOnce(async (fn: any) => {
+        return restoredPlayground;
+      });
+
+      await caller.playgrounds.restoreVersion({
+        playgroundId: mockPlayground.id,
+        commitSha: 'commit-sha-123',
+      });
+
+      // Verify transaction was used
+      expect(mockDb.transaction).toHaveBeenCalled();
     });
   });
 }); 

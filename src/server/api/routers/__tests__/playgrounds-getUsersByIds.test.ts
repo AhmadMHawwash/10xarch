@@ -5,11 +5,13 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 
 import { describe, expect, test, vi, beforeEach } from 'vitest';
-import { TRPCError } from '@trpc/server';
-import { createTestCaller, setupTestEnvironment } from '../../__tests__/test-utils';
+import { setupTestEnvironment } from '../../__tests__/test-utils';
 
-// Setup test environment
+// Setup environment before any other imports that validate env
 setupTestEnvironment();
+
+import { TRPCError } from '@trpc/server';
+import { createTestCaller } from '../../__tests__/test-utils';
 
 describe('getUsersByIds', () => {
   beforeEach(() => {

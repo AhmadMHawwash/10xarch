@@ -112,6 +112,8 @@ describe('PlaygroundSharingPanel', () => {
     isPublic: 0,
     tags: null,
     description: null,
+    lastBackupCommitSha: null,
+    backupStatus: null,
   };
 
   beforeEach(() => {

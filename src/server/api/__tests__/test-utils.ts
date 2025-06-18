@@ -151,6 +151,7 @@ export interface MockDb {
   set: MockedFunction<() => MockDb>;
   where: MockedFunction<() => MockDb>;
   delete: MockedFunction<() => MockDb>;
+  transaction: MockedFunction<(fn: (tx: any) => Promise<any>) => Promise<any>>;
 }
 
 // Function to create a NEW mock DB instance each time
@@ -166,6 +167,23 @@ export const createMockDb = (): MockDb => ({
   set: vi.fn().mockReturnThis(),
   where: vi.fn().mockReturnThis(),
   delete: vi.fn().mockReturnThis(),
+  transaction: vi.fn().mockImplementation(async (fn: (tx: any) => Promise<any>) => {
+    // Create a mock transaction object that shares the same mock functions
+    // This way test expectations work properly
+    const mockTx = {
+      update: vi.fn().mockReturnValue({
+        set: vi.fn().mockReturnValue({
+          where: vi.fn().mockReturnValue({
+            returning: vi.fn().mockResolvedValue([]), // This will be overridden by test setup
+          }),
+        }),
+      }),
+    };
+    
+    const result = await fn(mockTx);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return result; // Explicitly cast to any for mock purposes
+  }),
 });
 
 // Create mock context
@@ -201,7 +219,9 @@ export const createMockPlayground = (userId: string): Playground => ({
   tags: null,
   lastEvaluationAt: null,
   evaluationScore: null,
-  evaluationFeedback: null,
+        evaluationFeedback: null,
+      lastBackupCommitSha: null,
+      backupStatus: null,
 });
 
 // Create a mock user
@@ -218,12 +238,19 @@ export const createMockUser = (userId: string): User => ({
 export const setupTestEnvironment = () => {
   process.env = {
     ...process.env,
+    DATABASE_URL: 'postgresql://test:test@localhost:5432/test',
     OPENAI_API_KEY: 'test-openai-key',
+    CLERK_SECRET_KEY: 'test-clerk-secret',
+    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: 'test-clerk-publishable',
+    NEXT_PUBLIC_CLERK_SIGN_IN_URL: '/sign-in',
+    NEXT_PUBLIC_CLERK_SIGN_UP_URL: '/sign-up',
     STRIPE_SECRET_KEY: 'test-stripe-key',
     NEXT_PUBLIC_APP_URL: 'http://localhost:3000',
     BYPASS_TOKEN: 'test-bypass-token',
     UPSTASH_REDIS_REST_URL: 'test-redis-url',
     UPSTASH_REDIS_REST_TOKEN: 'test-redis-token',
+    GITHUB_BACKUP_TOKEN: 'test-github-token',
+    GITHUB_BACKUP_REPO: 'test-owner/test-repo',
   };
 };
 

@@ -503,6 +503,68 @@ describe('usePlaygroundPermissions', () => {
         expect(result.current.canEdit).toBe(false);
         expect(result.current.canView).toBe(false);
       });
+
+      it('should return restrictive permissions when user auth is loading', () => {
+        const playground: Partial<Playground> = {
+          id: 'playground_1',
+          ownerType: 'user',
+          ownerId: mockUserId,
+          isPublic: 0,
+        };
+
+        // Simulate authentication still loading (initial page load/refresh scenario)
+        mockUseUser.mockReturnValue({
+          user: null,
+          isLoaded: false,
+          isSignedIn: false,
+        } as any);
+
+        const { result } = renderHook(() => usePlaygroundPermissions(playground));
+
+        // Should return restrictive permissions while auth is loading
+        expect(result.current).toEqual({
+          canEdit: false,
+          canView: false,
+          isOwner: false,
+          isEditor: false,
+          isViewer: false,
+        });
+      });
+
+      it('should update permissions once user auth is loaded', () => {
+        const playground: Partial<Playground> = {
+          id: 'playground_1',
+          ownerType: 'user',
+          ownerId: mockUserId,
+          isPublic: 0,
+        };
+
+        // Start with loading state
+        mockUseUser.mockReturnValue({
+          user: null,
+          isLoaded: false,
+          isSignedIn: false,
+        } as any);
+
+        const { result, rerender } = renderHook(() => usePlaygroundPermissions(playground));
+
+        // Should be restrictive while loading
+        expect(result.current.canView).toBe(false);
+        expect(result.current.isOwner).toBe(false);
+
+        // Simulate auth loaded with user
+        mockUseUser.mockReturnValue({
+          user: mockUser,
+          isLoaded: true,
+          isSignedIn: true,
+        } as any);
+
+        rerender();
+
+        // Should now have proper permissions
+        expect(result.current.canView).toBe(true);
+        expect(result.current.isOwner).toBe(true);
+      });
     });
   });
 }); 

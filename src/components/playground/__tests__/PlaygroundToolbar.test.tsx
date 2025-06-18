@@ -96,6 +96,8 @@ describe('PlaygroundToolbar', () => {
     isPublic: 0,
     tags: null,
     description: null,
+    lastBackupCommitSha: null,
+    backupStatus: null,
   };
 
   const mockEmptyPlayground: Playground = {
@@ -153,9 +155,9 @@ describe('PlaygroundToolbar', () => {
       </TestWrapper>
     );
 
-    // Should render both share and delete buttons
+    // Should render share, version history, and delete buttons
     const buttons = screen.getAllByRole('button');
-    expect(buttons).toHaveLength(2);
+    expect(buttons).toHaveLength(3);
     
     // Delete button should be the second button
     const deleteButton = buttons[1];
@@ -257,9 +259,9 @@ describe('PlaygroundToolbar', () => {
     );
 
     const buttons = screen.getAllByRole('button');
-    expect(buttons).toHaveLength(2);
+    expect(buttons).toHaveLength(3);
     
-    // Should have both share and delete buttons
+    // Should have share, version history, and delete buttons
     expect(buttons[0]).toBeInTheDocument(); // Share button
     expect(buttons[1]).toBeInTheDocument(); // Delete button
   });

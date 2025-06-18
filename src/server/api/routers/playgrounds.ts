@@ -4,6 +4,8 @@ import { auth } from "@clerk/nextjs/server";
 import { TRPCError } from "@trpc/server";
 import { and, desc, eq, or, sql } from "drizzle-orm";
 import { z } from "zod";
+import { playgroundBackupService } from "@/server/api/services/playground-backup";
+import { getGitHubBackupService } from "@/server/api/services/github-backup";
 
 // Shared schemas
 const playgroundIdSchema = z.string().uuid();
@@ -31,6 +33,7 @@ const updatePlaygroundSchema = z.object({
   isPublic: z.number().optional(),
   description: z.string().optional(),
   tags: z.string().optional(),
+  triggerBackup: z.boolean().optional().default(false), // For user-triggered saves
 });
 
 // Schema for listing playgrounds
@@ -303,6 +306,26 @@ export const playgroundsRouter = createTRPCRouter({
             message: "Failed to update playground",
           });
         }
+
+        // Trigger GitHub backup if requested (for user-triggered saves)
+        if (input.triggerBackup) {
+          try {
+            const backupResult = await playgroundBackupService.backupPlayground(
+              ctx.db,
+              updatedPlayground,
+              userId
+            );
+            
+            if (!backupResult.success) {
+              console.warn(`Playground backup failed for ${updatedPlayground.id}:`, backupResult.error);
+              // Note: We don't fail the request if backup fails, just log it
+            }
+          } catch (error) {
+            console.error(`Playground backup error for ${updatedPlayground.id}:`, error);
+            // Note: We don't fail the request if backup fails, just log it
+          }
+        }
+
         return { playground: updatedPlayground };
       } else {
         // No actual data fields to update, return the existing playground
@@ -498,5 +521,165 @@ export const playgroundsRouter = createTRPCRouter({
       }
 
       return { playground: updatedPlayground };
+    }),
+
+  // Get version history for a playground
+  getVersionHistory: protectedProcedure
+    .input(z.object({
+      playgroundId: playgroundIdSchema,
+      limit: z.number().min(1).max(50).default(20),
+    }))
+    .query(async ({ ctx, input }) => {
+      const { userId } = await auth();
+      if (!userId) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Not authenticated",
+        });
+      }
+
+      const existingPlayground = await ctx.db.query.playgrounds.findFirst({
+        where: eq(playgrounds.id, input.playgroundId),
+      });
+
+      if (!existingPlayground) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Playground not found",
+        });
+      }
+
+      // Check if user has access to view this playground
+      const hasAccess = 
+        existingPlayground.ownerId === userId ||
+        (existingPlayground.editorIds?.includes(userId) ?? false) ||
+        (existingPlayground.viewerIds?.includes(userId) ?? false) ||
+        existingPlayground.isPublic === 1;
+
+      if (!hasAccess) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You don't have permission to view this playground's history",
+        });
+      }
+
+      // Get version history from GitHub backup service
+      const githubService = getGitHubBackupService();
+      if (!githubService) {
+        return { versions: [] };
+      }
+
+      try {
+        const versions = await githubService.getVersionHistory(
+          existingPlayground.ownerId,
+          existingPlayground.id,
+          input.limit
+        );
+        return { versions };
+      } catch (error) {
+        console.error('Failed to get version history:', error);
+        return { versions: [] };
+      }
+    }),
+
+  // Restore playground from a specific version
+  restoreVersion: protectedProcedure
+    .input(z.object({
+      playgroundId: playgroundIdSchema,
+      commitSha: z.string(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const { userId } = await auth();
+      if (!userId) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Not authenticated",
+        });
+      }
+
+      const existingPlayground = await ctx.db.query.playgrounds.findFirst({
+        where: eq(playgrounds.id, input.playgroundId),
+      });
+
+      if (!existingPlayground) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Playground not found",
+        });
+      }
+
+      // Check if user has edit access
+      const canEdit = 
+        existingPlayground.ownerId === userId ||
+        (existingPlayground.editorIds?.includes(userId) ?? false);
+
+      if (!canEdit) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You don't have permission to restore this playground",
+        });
+      }
+
+      // Restore from GitHub backup service
+      const githubService = getGitHubBackupService();
+      if (!githubService) {
+        throw new TRPCError({
+          code: "SERVICE_UNAVAILABLE",
+          message: "GitHub backup service not available",
+        });
+      }
+
+      try {
+        const restoredData = await githubService.restoreVersion(
+          existingPlayground.ownerId,
+          existingPlayground.id,
+          input.commitSha
+        );
+
+        if (!restoredData) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Version not found or could not be restored",
+          });
+        }
+        // Update the playground with restored data        
+        const updateResult = await ctx.db.transaction(async (tx) => {
+          const [updated] = await tx
+            .update(playgrounds)
+            .set({
+              title: restoredData.title,
+              description: restoredData.description,
+              jsonBlob: { nodes: restoredData.nodes, edges: restoredData.edges },
+              lastBackupCommitSha: input.commitSha,
+              backupStatus: 'success',
+              updatedAt: new Date(),
+              updatedBy: userId,
+            })
+            .where(eq(playgrounds.id, input.playgroundId))
+            .returning();
+
+          return updated;
+        });
+
+        if (!updateResult) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to update playground with restored data",
+          });
+        }
+
+        const updatedPlayground = updateResult;
+
+        return { playground: updatedPlayground };
+      } catch (error) {
+        console.error('❌ Failed to restore version:', error);
+        if (error instanceof TRPCError) {
+          throw error;
+        }
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to restore version",
+        });
+      }
     }),
 });

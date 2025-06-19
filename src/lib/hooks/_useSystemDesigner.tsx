@@ -1,10 +1,16 @@
 "use client";
 import {
-  type WhiteboardNodeDataProps,
   type SystemComponentNodeDataProps,
+  type WhiteboardNodeDataProps,
 } from "@/components/ReactflowCustomNodes/SystemComponentNode";
 import { useToast } from "@/components/ui/use-toast";
 import { noop } from "@/lib/utils";
+import {
+  createWhiteboardDeletionNotifier,
+  findNodesToUpdateAfterDeletion,
+  scheduleNodeInternalsUpdate,
+  updateNodesFromEdgeChanges
+} from "@/lib/utils/system-designer-utils";
 import { usePathname } from "next/navigation";
 import {
   createContext,
@@ -45,13 +51,6 @@ import {
   updateComponentConfig,
   updateEdgeLabel as updateEdgeLabelPure,
 } from "./systemDesignerUtils";
-import {
-  handleSystemDesignerKeyDown,
-  createWhiteboardDeletionNotifier,
-  updateNodesFromEdgeChanges,
-  scheduleNodeInternalsUpdate,
-  findNodesToUpdateAfterDeletion,
-} from "@/lib/utils/system-designer-utils";
 import useLocalStorageState from "./useLocalStorageState";
 
 interface SystemDesignerState {
@@ -59,7 +58,7 @@ interface SystemDesignerState {
   edges: Edge[];
   initInstance: (instance: ReactFlowInstance) => void;
   initWrapper: (wrapper: HTMLDivElement) => void;
-  updateNodes: (nodes: Node[]) => void;
+  updateNodes: (nodes: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[]) => void;
   updateEdges: (edges: Edge[]) => void;
   updateEdgeLabel: (edgeId: string, label: string, data?: Record<string, unknown>) => void;
   onConnect: OnConnect;
@@ -131,6 +130,29 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
   // For playgrounds, use regular state; for challenges, use local storage
   const [playgroundNodes, setPlaygroundNodes] = useState<Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[]>(defaultStartingNodes);
   const [playgroundEdges, setPlaygroundEdges] = useState<Edge[]>([]);
+  
+  // Track when playground nodes have been processed to apply deserializer logic
+  const playgroundNodesProcessedRef = useRef(false);
+  
+  // Reset processed flag when pathname changes (different playground)
+  useEffect(() => {
+    playgroundNodesProcessedRef.current = false;
+  }, [pathname]);
+  
+  // Apply deserializer logic to playground nodes when they're loaded from database
+  useEffect(() => {
+    if (isPlayground && playgroundNodes.length > 0 && playgroundNodes !== defaultStartingNodes && !playgroundNodesProcessedRef.current) {
+      // Apply the same deserializer logic used in challenges to ensure proper component counting
+      const serializedNodes = JSON.stringify(playgroundNodes);
+      const deserializedNodes = deserializeNodes(serializedNodes);
+      
+      // If deserialization was successful and we have nodes, use them
+      if (deserializedNodes.length > 0) {
+        setPlaygroundNodes(deserializedNodes);
+        playgroundNodesProcessedRef.current = true;
+      }
+    }
+  }, [isPlayground, playgroundNodes]);
   
   const [challengeNodes, setChallengeNodes] = useLocalStorageState<
     Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[]
@@ -237,9 +259,9 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
     [reactFlowInstance, nodes],
   );
 
-  const updateNodes = useCallback((nodes: Node[]) => {
+  const updateNodes = useCallback((nodes: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[]) => {
     setNodes(nodes);
-  }, []);
+  }, [setNodes]);
 
   const updateEdges = useCallback((edges: Edge[]) => {
     setEdges(edges);

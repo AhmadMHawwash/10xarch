@@ -1,5 +1,5 @@
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
-import { playgrounds, users } from "@/server/db/schema";
+import { playgrounds, users, backupHistory } from "@/server/db/schema";
 import { auth } from "@clerk/nextjs/server";
 import { TRPCError } from "@trpc/server";
 import { and, desc, eq, or, sql } from "drizzle-orm";
@@ -34,6 +34,7 @@ const updatePlaygroundSchema = z.object({
   description: z.string().optional(),
   tags: z.string().optional(),
   triggerBackup: z.boolean().optional().default(false), // For user-triggered saves
+  commitMessage: z.string().optional(), // Custom commit message for GitHub backup
 });
 
 // Schema for listing playgrounds
@@ -310,10 +311,29 @@ export const playgroundsRouter = createTRPCRouter({
         // Trigger GitHub backup if requested (for user-triggered saves)
         if (input.triggerBackup) {
           try {
+            // Get user info for GitHub commit
+            const { clerkClient } = await import("@clerk/nextjs/server");
+            const client = await clerkClient();
+            let userEmail: string | undefined;
+            let userName: string | undefined;
+            
+            try {
+              const user = await client.users.getUser(userId);
+              userEmail = user.primaryEmailAddress?.emailAddress;
+              userName = user.fullName ?? user.firstName ?? user.username ?? undefined;
+            } catch (error) {
+              console.warn('Failed to get user info for GitHub commit:', error);
+            }
+
             const backupResult = await playgroundBackupService.backupPlayground(
               ctx.db,
               updatedPlayground,
-              userId
+              userId,
+              {
+                commitMessage: input.commitMessage,
+                authorEmail: userEmail,
+                authorName: userName,
+              }
             );
             
             if (!backupResult.success) {
@@ -563,18 +583,42 @@ export const playgroundsRouter = createTRPCRouter({
         });
       }
 
-      // Get version history from GitHub backup service
+      // Get version history from GitHub backup service and local backup history
       const githubService = getGitHubBackupService();
       if (!githubService) {
         return { versions: [] };
       }
 
       try {
-        const versions = await githubService.getVersionHistory(
-          existingPlayground.ownerId,
-          existingPlayground.id,
-          input.limit
+        // Get GitHub history and local backup history
+        const [githubVersions, localBackupHistory] = await Promise.all([
+          githubService.getVersionHistory(
+            existingPlayground.ownerId,
+            existingPlayground.id,
+            input.limit
+          ),
+          ctx.db.query.backupHistory.findMany({
+            where: eq(backupHistory.playgroundId, input.playgroundId),
+            orderBy: [desc(backupHistory.createdAt)],
+            limit: input.limit,
+          })
+        ]);
+
+        // Create a map of commit SHA to local backup history for custom commit messages
+        const localBackupMap = new Map(
+          localBackupHistory.map(backup => [backup.commitSha, backup])
         );
+
+        // Combine GitHub history with local commit messages
+        const versions = githubVersions.map(version => {
+          const localBackup = localBackupMap.get(version.commitSha);
+          return {
+            ...version,
+            // Use custom commit message from local backup if available, otherwise use GitHub message
+            message: localBackup?.commitMessage ?? version.message,
+          };
+        });
+
         return { versions };
       } catch (error) {
         console.error('Failed to get version history:', error);

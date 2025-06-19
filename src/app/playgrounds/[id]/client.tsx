@@ -7,6 +7,7 @@ import { PlaygroundToolbar } from "@/components/playground/PlaygroundToolbar";
 import SystemContext from "@/components/playground/SystemContext";
 import { FlowManager } from "@/components/SolutionFlowManager";
 import SystemBuilder from "@/components/SystemDesigner";
+import { CommitMessageDialog } from "@/components/playground/CommitMessageDialog";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -91,10 +92,7 @@ function PageContent() {
   const [isSaving, setIsSaving] = useState(false);
   const [localTitle, setLocalTitle] = useState("");
   const [localDescription, setLocalDescription] = useState("");
-  const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
-  const [pendingNavigation, setPendingNavigation] = useState<string | null>(
-    null,
-  );
+  const [showCommitDialog, setShowCommitDialog] = useState(false);
   const { toast } = useToast();
 
   const isInitialized = useRef(false);
@@ -215,7 +213,7 @@ function PageContent() {
 
   // Auto-save functionality - only for editors
   useEffect(() => {
-    if (!isInitialized.current || isSaving || !canEdit) {
+    if (!isInitialized.current || isSaving || !canEdit || showCommitDialog) {
       return;
     }
 
@@ -229,8 +227,8 @@ function PageContent() {
     }
 
     autoSaveTimeoutRef.current = setTimeout(() => {
-      // Double-check for changes before saving
-      if (!hasChanges()) {
+      // Double-check for changes and commit dialog state before saving
+      if (!hasChanges() || showCommitDialog) {
         return;
       }
 
@@ -281,6 +279,7 @@ function PageContent() {
     hasChanges,
     canEdit,
     toast,
+    showCommitDialog,
   ]);
 
   // Warn user before leaving page if there are unsaved changes - only for editors
@@ -306,7 +305,7 @@ function PageContent() {
     };
   }, [hasChanges, canEdit]);
 
-  const handleManualSave = useCallback(async () => {
+  const handleManualSave = useCallback(async (commitMessage?: string) => {
     if (!canEdit) {
       toast({
         title: "Access Denied",
@@ -335,6 +334,7 @@ function PageContent() {
         description: currentState.description,
         jsonBlob: { nodes: currentState.nodes, edges: currentState.edges },
         triggerBackup: true,
+        commitMessage,
       });
 
       // Update last saved state after successful save
@@ -342,7 +342,9 @@ function PageContent() {
 
       toast({
         title: "Saved",
-        description: "Your changes have been saved",
+        description: commitMessage 
+          ? "Your changes have been saved with commit message"
+          : "Your changes have been saved",
       });
     } catch (error) {
       console.error("Manual save failed:", error);
@@ -378,41 +380,25 @@ function PageContent() {
     void checkSolution(localTitle, localDescription);
   }, [checkSolution, localTitle, localDescription, canEdit, toast]);
 
+  const handleSaveWithCommitDialog = useCallback(() => {
+    setShowCommitDialog(true);
+  }, []);
+
+  const handleCommit = useCallback((commitMessage: string) => {
+    setShowCommitDialog(false);
+    void handleManualSave(commitMessage);
+  }, [handleManualSave]);
+
+  const handleCloseCommitDialog = useCallback(() => {
+    setShowCommitDialog(false);
+  }, []);
+
   const handleCloseWelcomeGuide = (dontShowAgain: boolean) => {
     setShowWelcomeGuide(false);
     if (dontShowAgain) {
       setHideWelcomeGuide(true);
     }
   };
-
-  const handleConfirmNavigation = useCallback(async () => {
-    if (pendingNavigation) {
-      setShowUnsavedWarning(false);
-      // Clear the unsaved state to allow navigation
-      lastSavedStateRef.current = {
-        title: localTitle || "Untitled Playground",
-        description: localDescription,
-        nodes,
-        edges,
-      };
-      // Navigate to the pending URL
-      window.location.href = pendingNavigation;
-    }
-  }, [pendingNavigation, localTitle, localDescription, nodes, edges]);
-
-  const handleCancelNavigation = useCallback(() => {
-    setShowUnsavedWarning(false);
-    setPendingNavigation(null);
-  }, []);
-
-  const handleSaveAndNavigate = useCallback(async () => {
-    if (pendingNavigation) {
-      await handleManualSave();
-      setShowUnsavedWarning(false);
-      // Navigate after saving
-      window.location.href = pendingNavigation;
-    }
-  }, [pendingNavigation, handleManualSave]);
 
   const selectedNodeName: SystemComponentType | undefined = selectedNode?.data
     ?.name as SystemComponentType | undefined;
@@ -559,7 +545,7 @@ function PageContent() {
                 onOpen={() => setIsFeedbackExpanded(true)}
                 onClose={() => setIsFeedbackExpanded(false)}
                 isSaving={isSaving}
-                onSave={canEdit ? handleManualSave : undefined}
+                onSave={canEdit ? handleSaveWithCommitDialog : undefined}
                 canEdit={canEdit}
               />
             )}
@@ -611,6 +597,15 @@ function PageContent() {
           />
         </div>
       )}
+
+      {/* Commit Message Dialog */}
+      <CommitMessageDialog
+        isOpen={showCommitDialog}
+        onClose={handleCloseCommitDialog}
+        onCommit={handleCommit}
+        isCommitting={isSaving}
+        playgroundTitle={localTitle || "Untitled Playground"}
+      />
     </>
   );
 }

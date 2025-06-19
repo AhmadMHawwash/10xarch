@@ -13,7 +13,12 @@ interface PlaygroundBackupService {
   backupPlayground(
     db: PostgresJsDatabase<typeof schema>,
     playground: Playground,
-    userId: string
+    userId: string,
+    options?: {
+      commitMessage?: string;
+      authorEmail?: string;
+      authorName?: string;
+    }
   ): Promise<BackupResult>;
 }
 
@@ -23,7 +28,12 @@ class PlaygroundBackupServiceImpl implements PlaygroundBackupService {
   async backupPlayground(
     db: PostgresJsDatabase<typeof schema>,
     playground: Playground,
-    userId: string
+    userId: string,
+    options?: {
+      commitMessage?: string;
+      authorEmail?: string;
+      authorName?: string;
+    }
   ): Promise<BackupResult> {
     const githubService = getGitHubBackupService();
     
@@ -58,7 +68,10 @@ class PlaygroundBackupServiceImpl implements PlaygroundBackupService {
         updatedAt: playground.updatedAt.toISOString(),
         tags: playground.tags ?? undefined,
         isPublic: playground.isPublic === 1,
-      }
+      },
+      commitMessage: options?.commitMessage,
+      authorEmail: options?.authorEmail,
+      authorName: options?.authorName,
     };
 
     // Attempt backup with retry logic
@@ -81,7 +94,8 @@ class PlaygroundBackupServiceImpl implements PlaygroundBackupService {
             playground.id,
             result.commitSha,
             result.commitUrl,
-            userId
+            userId,
+            backupData.commitMessage
           );
           
           console.log(`GitHub backup successful for playground ${playground.id}: ${result.commitUrl}`);
@@ -157,7 +171,8 @@ class PlaygroundBackupServiceImpl implements PlaygroundBackupService {
     playgroundId: string,
     commitSha: string,
     commitUrl: string,
-    userId: string
+    userId: string,
+    commitMessage?: string
   ): Promise<void> {
     // Update playground status
     await db
@@ -176,7 +191,7 @@ class PlaygroundBackupServiceImpl implements PlaygroundBackupService {
         playgroundId,
         commitSha,
         commitUrl,
-        commitMessage: `Update playground backup`,
+        commitMessage: commitMessage ?? `Update playground backup`,
         status: 'success',
         createdBy: userId,
       });

@@ -28,6 +28,9 @@ export interface PlaygroundBackupData {
     tags?: string;
     isPublic: boolean;
   };
+  commitMessage?: string;
+  authorEmail?: string;
+  authorName?: string;
 }
 
 export interface BackupResult {
@@ -253,14 +256,14 @@ export class GitHubBackupService {
       }) as GitHubTreeResponse;
 
       // Create a new commit
-      const commitMessage = this.generateCommitMessage(data);
+      const commitMessage = data.commitMessage ?? this.generateCommitMessage(data);
       const newCommit = await this.client.post(`/repos/${this.config.repo}/git/commits`, {
         message: commitMessage,
         tree: newTree.sha,
         parents: [baseSha],
         author: {
-          name: 'System Design Playground',
-          email: 'noreply@10xarch.com',
+          name: data.authorName ?? 'System Design Playground',
+          email: data.authorEmail ?? 'noreply@10xarch.com',
           date: new Date().toISOString(),
         },
       }) as GitHubCreateCommitResponse;

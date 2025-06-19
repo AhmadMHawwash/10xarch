@@ -374,6 +374,9 @@ describe('playgroundsRouter', () => {
     it('should return version history for playground owner', async () => {
       const { caller, db: mockDb } = await createTestCaller(mockUserId);
       mockDb.query.playgrounds.findFirst.mockResolvedValueOnce(mockPlayground);
+      
+      // Mock the backup history query to return empty array (no custom commit messages)
+      (mockDb.query as any).backupHistory = { findMany: vi.fn().mockResolvedValue([]) };
 
       const result = await caller.playgrounds.getVersionHistory({
         playgroundId: mockPlayground.id,
@@ -392,6 +395,9 @@ describe('playgroundsRouter', () => {
       const { caller, db: mockDb } = await createTestCaller('editor_user_id');
       editablePlayground = { ...createMockPlayground(mockUserId), editorIds: ['editor_user_id'] };
       mockDb.query.playgrounds.findFirst.mockResolvedValueOnce(editablePlayground);
+      
+      // Mock the backup history query to return empty array (no custom commit messages)
+      (mockDb.query as any).backupHistory = { findMany: vi.fn().mockResolvedValue([]) };
 
       const result = await caller.playgrounds.getVersionHistory({
         playgroundId: editablePlayground.id,
@@ -405,6 +411,9 @@ describe('playgroundsRouter', () => {
       const { caller, db: mockDb } = await createTestCaller(mockUserId);
       publicPlayground = { ...createMockPlayground(otherUserId), isPublic: 1 };
       mockDb.query.playgrounds.findFirst.mockResolvedValueOnce(publicPlayground);
+      
+      // Mock the backup history query to return empty array (no custom commit messages)
+      (mockDb.query as any).backupHistory = { findMany: vi.fn().mockResolvedValue([]) };
 
       const result = await caller.playgrounds.getVersionHistory({
         playgroundId: publicPlayground.id,
@@ -470,6 +479,9 @@ describe('playgroundsRouter', () => {
 
       const { caller, db: mockDb } = await createTestCaller(mockUserId);
       mockDb.query.playgrounds.findFirst.mockResolvedValueOnce(mockPlayground);
+      
+      // Mock the backup history query to return empty array
+      (mockDb.query as any).backupHistory = { findMany: vi.fn().mockResolvedValue([]) };
 
       const result = await caller.playgrounds.getVersionHistory({
         playgroundId: mockPlayground.id,
@@ -482,6 +494,9 @@ describe('playgroundsRouter', () => {
     it('should use default limit when not specified', async () => {
       const { caller, db: mockDb } = await createTestCaller(mockUserId);
       mockDb.query.playgrounds.findFirst.mockResolvedValueOnce(mockPlayground);
+      
+      // Mock the backup history query
+      (mockDb.query as any).backupHistory = { findMany: vi.fn().mockResolvedValue([]) };
 
       await caller.playgrounds.getVersionHistory({
         playgroundId: mockPlayground.id,
@@ -492,6 +507,41 @@ describe('playgroundsRouter', () => {
         mockPlayground.id,
         20 // default limit
       );
+    });
+
+    it('should combine GitHub history with custom commit messages from local backup history', async () => {
+      const { caller, db: mockDb } = await createTestCaller(mockUserId);
+      mockDb.query.playgrounds.findFirst.mockResolvedValueOnce(mockPlayground);
+      
+      // Mock backup history with custom commit messages
+      const mockBackupHistory = [
+        {
+          commitSha: 'commit1',
+          commitMessage: 'Custom commit message for commit1',
+          status: 'success',
+          createdAt: new Date(),
+        },
+      ];
+      (mockDb.query as any).backupHistory = { findMany: vi.fn().mockResolvedValue(mockBackupHistory) };
+
+      const result = await caller.playgrounds.getVersionHistory({
+        playgroundId: mockPlayground.id,
+        limit: 20,
+      });
+
+      // Expect the first commit to have the custom message, second to keep GitHub message
+      const expectedVersions = [
+        {
+          ...mockVersionHistory[0],
+          message: 'Custom commit message for commit1', // Custom message from backup history
+        },
+        {
+          ...mockVersionHistory[1],
+          message: 'Create playground: Test Playground', // Original GitHub message
+        },
+      ];
+
+      expect(result.versions).toEqual(expectedVersions);
     });
   });
 

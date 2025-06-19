@@ -6,10 +6,13 @@ A modern web application for documenting, practicing and learning system design 
 
 This project is part of a charitable initiative. All profits generated from commercial use of this software will be donated to Children of Palestine through trusted organisations ❤️.
 
+## 🎥 See It In Action!
 
-## YouTube video explaining the playgrounds feature with AI assisstance
+**Watch our comprehensive demo** showcasing the playgrounds feature with AI assistance:
 
-https://youtu.be/AQdlksZkuDg
+[![System Design Playground Demo](https://img.youtube.com/vi/AQdlksZkuDg/maxresdefault.jpg)](https://youtu.be/AQdlksZkuDg)
+
+*Discover how to build, iterate, and get intelligent feedback on your system designs in real-time!*
 
 ## Features ✨
 

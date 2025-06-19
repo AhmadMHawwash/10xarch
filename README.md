@@ -1,6 +1,8 @@
 # 10×arch 🏗️
 
-A modern web application for documenting, practicing and learning system design concepts and getting AI feedback using chat assistent or dedicated feedback feature.
+A modern web application for building, documenting, practicing and learning system design concepts and getting instant AI feedback using chat assistent or dedicated feedback feature.
+
+![demo2](https://github.com/user-attachments/assets/74d76591-da06-480f-b1a3-9407703357bb)
 
 ## Our Mission 🇵🇸
 

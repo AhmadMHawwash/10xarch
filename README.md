@@ -2,7 +2,7 @@
 
 A modern web application for building, documenting, practicing and learning system design concepts and getting AI feedback using chat assistent or dedicated feedback feature.
 
-![demo](https://github.com/user-attachments/assets/7b053477-9da3-428e-84bb-9975e3cbc5a2.gif)
+![demo2](https://github.com/user-attachments/assets/99f888e7-b4f0-4634-a671-46f855182d6b)
 
 
 ## Our Mission 🇵🇸

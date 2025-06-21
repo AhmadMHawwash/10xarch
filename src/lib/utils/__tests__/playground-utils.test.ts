@@ -93,6 +93,7 @@ describe("playground-utils", () => {
         description: "Test Description",
         nodes,
         edges,
+        docsData: { items: [], currentPath: [] },
       };
 
       const result = getImportantDetails(state);
@@ -118,6 +119,7 @@ describe("playground-utils", () => {
         description: "Test",
         nodes: [node],
         edges: [],
+        docsData: { items: [], currentPath: [] },
       };
 
       const result = getImportantDetails(state);
@@ -143,6 +145,7 @@ describe("playground-utils", () => {
         description: "Test",
         nodes: [],
         edges: [edge],
+        docsData: { items: [], currentPath: [] },
       };
 
       const result = getImportantDetails(state);
@@ -161,6 +164,7 @@ describe("playground-utils", () => {
       description: "Test Description",
       nodes: [],
       edges: [],
+      docsData: { items: [], currentPath: [] },
       ...overrides,
     });
 

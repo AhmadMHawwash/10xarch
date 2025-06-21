@@ -94,6 +94,7 @@ describe('Unsaved Changes Warning', () => {
         description: 'Test Description',
         nodes: [],
         edges: [],
+        docsData: { items: [], currentPath: [] },
       };
 
       const lastSavedState: PlaygroundState = {
@@ -101,6 +102,7 @@ describe('Unsaved Changes Warning', () => {
         description: 'Test Description',
         nodes: [],
         edges: [],
+        docsData: { items: [], currentPath: [] },
       };
 
       mockHasPlaygroundChanges.mockReturnValue(false);
@@ -115,6 +117,7 @@ describe('Unsaved Changes Warning', () => {
         description: 'Test Description',
         nodes: [],
         edges: [],
+        docsData: { items: [], currentPath: [] },
       };
 
       const lastSavedState: PlaygroundState = {
@@ -122,6 +125,7 @@ describe('Unsaved Changes Warning', () => {
         description: 'Test Description',
         nodes: [],
         edges: [],
+        docsData: { items: [], currentPath: [] },
       };
 
       mockHasPlaygroundChanges.mockReturnValue(true);
@@ -136,6 +140,7 @@ describe('Unsaved Changes Warning', () => {
         description: 'Updated Description',
         nodes: [],
         edges: [],
+        docsData: { items: [], currentPath: [] },
       };
 
       const lastSavedState: PlaygroundState = {
@@ -143,6 +148,7 @@ describe('Unsaved Changes Warning', () => {
         description: 'Test Description',
         nodes: [],
         edges: [],
+        docsData: { items: [], currentPath: [] },
       };
 
       mockHasPlaygroundChanges.mockReturnValue(true);
@@ -164,6 +170,7 @@ describe('Unsaved Changes Warning', () => {
         description: 'Test Description',
         nodes: [newNode],
         edges: [],
+        docsData: { items: [], currentPath: [] },
       };
 
       const lastSavedState: PlaygroundState = {
@@ -171,6 +178,7 @@ describe('Unsaved Changes Warning', () => {
         description: 'Test Description',
         nodes: [],
         edges: [],
+        docsData: { items: [], currentPath: [] },
       };
 
       mockHasPlaygroundChanges.mockReturnValue(true);
@@ -191,6 +199,7 @@ describe('Unsaved Changes Warning', () => {
         description: 'Test Description',
         nodes: [],
         edges: [newEdge],
+        docsData: { items: [], currentPath: [] },
       };
 
       const lastSavedState: PlaygroundState = {
@@ -198,6 +207,7 @@ describe('Unsaved Changes Warning', () => {
         description: 'Test Description',
         nodes: [],
         edges: [],
+        docsData: { items: [], currentPath: [] },
       };
 
       mockHasPlaygroundChanges.mockReturnValue(true);
@@ -325,6 +335,7 @@ describe('Unsaved Changes Warning', () => {
         description: 'Updated Description',
         nodes: [],
         edges: [],
+        docsData: { items: [], currentPath: [] },
       };
 
       // Simulate successful save

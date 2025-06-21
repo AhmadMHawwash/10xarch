@@ -5,6 +5,7 @@ import { ComponentSettings } from "@/components/playground/ComponentSettings";
 import { EdgeSettings } from "@/components/playground/EdgeSettings";
 import { PlaygroundToolbar } from "@/components/playground/PlaygroundToolbar";
 import SystemContext from "@/components/playground/SystemContext";
+import DocsFileSystem, { type DocsFileSystemData } from "@/components/playground/DocsFileSystem";
 import { FlowManager } from "@/components/SolutionFlowManager";
 import SystemBuilder from "@/components/SystemDesigner";
 import { CommitMessageDialog } from "@/components/playground/CommitMessageDialog";
@@ -32,7 +33,7 @@ import {
   type PlaygroundState,
 } from "@/lib/utils/playground-utils";
 import { useUser } from "@clerk/nextjs";
-import { Bot, Info, X } from "lucide-react";
+import { BookIcon, Bot, Info, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocalStorage, usePrevious } from "react-use";
@@ -77,7 +78,7 @@ function PageContent() {
 
   // Check permissions
   const { canEdit, canView } = usePlaygroundPermissions(playground);
-  
+
   // Also get user loading state to prevent premature permission checks
   const { isLoaded: isUserLoaded } = useUser();
 
@@ -93,8 +94,11 @@ function PageContent() {
   const [localTitle, setLocalTitle] = useState("");
   const [localDescription, setLocalDescription] = useState("");
   const [showCommitDialog, setShowCommitDialog] = useState(false);
+  const [showDocsFileSystem, setShowDocsFileSystem] = useState(false);
+  const [docsData, setDocsData] = useState<DocsFileSystemData>({ items: [], currentPath: [] });
   const { toast } = useToast();
 
+  console.log("docsData", docsData);
   const isInitialized = useRef(false);
   const prevFeedback = usePrevious(feedback);
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -103,6 +107,7 @@ function PageContent() {
     description: string;
     nodes: typeof nodes;
     edges: typeof edges;
+    docsData: DocsFileSystemData;
   } | null>(null);
 
   const [title, setTitle] = useSystemComponentConfigSlice<string>(
@@ -119,13 +124,20 @@ function PageContent() {
   // Show access error if user doesn't have view permission
   useEffect(() => {
     // Only check permissions if we have complete playground data AND user auth is loaded
-    const hasCompletePlaygroundData = playground?.ownerType !== undefined && 
+    const hasCompletePlaygroundData =
+      playground?.ownerType !== undefined &&
       playground.ownerId !== undefined &&
       playground.editorIds !== undefined &&
       playground.viewerIds !== undefined &&
       playground.isPublic !== undefined;
 
-    if (isClient && hasCompletePlaygroundData && isUserLoaded && !canView && !isLoadingPlayground) {
+    if (
+      isClient &&
+      hasCompletePlaygroundData &&
+      isUserLoaded &&
+      !canView &&
+      !isLoadingPlayground
+    ) {
       toast({
         title: "Access Denied",
         description: "You don't have permission to view this playground.",
@@ -133,7 +145,15 @@ function PageContent() {
       });
       router.push("/");
     }
-  }, [isClient, playground, canView, isUserLoaded, toast, router, isLoadingPlayground]);
+  }, [
+    isClient,
+    playground,
+    canView,
+    isUserLoaded,
+    toast,
+    router,
+    isLoadingPlayground,
+  ]);
 
   // Client-side initialization
   useEffect(() => {
@@ -180,12 +200,25 @@ function PageContent() {
     setLocalTitle(title);
     setLocalDescription(description);
 
+    // Initialize docs data from playground jsonBlob
+    const playgroundJsonBlob = playground.jsonBlob as {
+      nodes?: typeof nodes;
+      edges?: typeof edges;
+      docsData?: DocsFileSystemData;
+    };
+    if (playgroundJsonBlob?.docsData) {
+      setDocsData(playgroundJsonBlob.docsData);
+    } else {
+      setDocsData({ items: [], currentPath: [] });
+    }
+
     // Set initial saved state
     lastSavedStateRef.current = {
       title,
       description,
       nodes: processedNodes,
       edges: playground.edges,
+      docsData,
     };
   }, [playground, setNodes, setEdges]);
 
@@ -206,10 +239,11 @@ function PageContent() {
       description: localDescription,
       nodes,
       edges,
+      docsData,
     };
 
     return hasPlaygroundChanges(currentState, lastSavedStateRef.current);
-  }, [localTitle, localDescription, nodes, edges]);
+  }, [localTitle, localDescription, nodes, edges, docsData]);
 
   // Auto-save functionality - only for editors
   useEffect(() => {
@@ -238,13 +272,18 @@ function PageContent() {
         description: localDescription,
         nodes,
         edges,
+        docsData,
       };
 
       updatePlayground({
         id: playgroundId,
         title: currentState.title,
         description: currentState.description,
-        jsonBlob: { nodes: currentState.nodes, edges: currentState.edges },
+        jsonBlob: { 
+          nodes: currentState.nodes, 
+          edges: currentState.edges,
+          docsData
+        },
       })
         .then(() => {
           // Update last saved state after successful save
@@ -276,6 +315,7 @@ function PageContent() {
     isSaving,
     localTitle,
     localDescription,
+    docsData,
     hasChanges,
     canEdit,
     toast,
@@ -305,67 +345,76 @@ function PageContent() {
     };
   }, [hasChanges, canEdit]);
 
-  const handleManualSave = useCallback(async (commitMessage?: string) => {
-    if (!canEdit) {
-      toast({
-        title: "Access Denied",
-        description: "You don't have permission to edit this playground.",
-        variant: "destructive",
-      });
-      return;
-    }
+  const handleManualSave = useCallback(
+    async (commitMessage?: string) => {
+      if (!canEdit) {
+        toast({
+          title: "Access Denied",
+          description: "You don't have permission to edit this playground.",
+          variant: "destructive",
+        });
+        return;
+      }
 
-    if (autoSaveTimeoutRef.current) {
-      clearTimeout(autoSaveTimeoutRef.current); // Prevent auto-save race condition
-    }
-    setIsSaving(true);
+      if (autoSaveTimeoutRef.current) {
+        clearTimeout(autoSaveTimeoutRef.current); // Prevent auto-save race condition
+      }
+      setIsSaving(true);
 
-    const currentState = {
-      title: localTitle || "Untitled Playground",
-      description: localDescription,
+      const currentState = {
+        title: localTitle || "Untitled Playground",
+        description: localDescription,
+        nodes,
+        edges,
+        docsData,
+      };
+
+      try {
+        await updatePlayground({
+          id: playgroundId,
+          title: currentState.title,
+          description: currentState.description,
+          jsonBlob: { 
+            nodes: currentState.nodes, 
+            edges: currentState.edges,
+            docsData 
+          },
+          triggerBackup: true,
+          commitMessage,
+        });
+
+        // Update last saved state after successful save
+        lastSavedStateRef.current = currentState;
+
+        toast({
+          title: "Saved",
+          description: commitMessage
+            ? "Your changes have been saved with commit message"
+            : "Your changes have been saved",
+        });
+      } catch (error) {
+        console.error("Manual save failed:", error);
+        toast({
+          title: "Save Failed",
+          description: "You don't have permission to edit this playground.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsSaving(false);
+      }
+    },
+    [
+      playgroundId,
       nodes,
       edges,
-    };
-
-    try {
-      await updatePlayground({
-        id: playgroundId,
-        title: currentState.title,
-        description: currentState.description,
-        jsonBlob: { nodes: currentState.nodes, edges: currentState.edges },
-        triggerBackup: true,
-        commitMessage,
-      });
-
-      // Update last saved state after successful save
-      lastSavedStateRef.current = currentState;
-
-      toast({
-        title: "Saved",
-        description: commitMessage 
-          ? "Your changes have been saved with commit message"
-          : "Your changes have been saved",
-      });
-    } catch (error) {
-      console.error("Manual save failed:", error);
-      toast({
-        title: "Save Failed",
-        description: "You don't have permission to edit this playground.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSaving(false);
-    }
-  }, [
-    playgroundId,
-    nodes,
-    edges,
-    updatePlayground,
-    localTitle,
-    localDescription,
-    toast,
-    canEdit,
-  ]);
+      updatePlayground,
+      localTitle,
+      localDescription,
+      docsData,
+      toast,
+      canEdit,
+    ],
+  );
 
   const handleCheckSolution = useCallback(() => {
     if (!canEdit) {
@@ -384,10 +433,13 @@ function PageContent() {
     setShowCommitDialog(true);
   }, []);
 
-  const handleCommit = useCallback((commitMessage: string) => {
-    setShowCommitDialog(false);
-    void handleManualSave(commitMessage);
-  }, [handleManualSave]);
+  const handleCommit = useCallback(
+    (commitMessage: string) => {
+      setShowCommitDialog(false);
+      void handleManualSave(commitMessage);
+    },
+    [handleManualSave],
+  );
 
   const handleCloseCommitDialog = useCallback(() => {
     setShowCommitDialog(false);
@@ -428,13 +480,13 @@ function PageContent() {
           <div className="h-full bg-gray-50/50 p-4 dark:bg-gray-900/50">
             {playground && (
               <PlaygroundToolbar
-                className="mb-2 -mt-2"
+                className="-mt-2 mb-2"
                 playground={playground as any}
               />
             )}
             <Card className="h-full border-gray-200 dark:border-gray-800">
               <div className="flex items-center border-b border-gray-200 p-4 dark:border-gray-800">
-                <div className="flex flex-1 items-center gap-2">
+                <div className="flex flex-1 items-center justify-between gap-2">
                   {showEdgeSettings ? (
                     <span className="text-base font-medium">Connection</span>
                   ) : (
@@ -447,6 +499,16 @@ function PageContent() {
                       </span>
                     </>
                   )}
+                  {isSystemNodeSelected ? (
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="gap-2"
+                      onClick={() => setShowDocsFileSystem(!showDocsFileSystem)}
+                    >
+                      Docs <BookIcon className="h-4 w-4" />
+                    </Button>
+                  ) : null}
                 </div>
               </div>
 
@@ -513,6 +575,12 @@ function PageContent() {
                             canEdit={canEdit}
                           />
                         </>
+                      ) : showDocsFileSystem ? (
+                        <DocsFileSystem
+                          data={docsData}
+                          onDataChange={setDocsData}
+                          canEdit={canEdit}
+                        />
                       ) : (
                         <SystemContext
                           title={localTitle}

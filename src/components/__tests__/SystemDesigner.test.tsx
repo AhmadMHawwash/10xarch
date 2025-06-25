@@ -21,37 +21,40 @@ interface MockMouseEvent {
 }
 
 // Create a partial mock of the state returned by useSystemDesigner
-type PartialSystemDesignerState = {
+interface MockSystemDesignerState {
   nodes: Node[];
   edges: Edge[];
-  setNodes: ReturnType<typeof vi.fn>;
-  onConnectStart: ReturnType<typeof vi.fn>;
-  onConnectEnd: ReturnType<typeof vi.fn>;
-  onConnect: ReturnType<typeof vi.fn>;
-  onSelectNode: ReturnType<typeof vi.fn>;
-  onSelectEdge: ReturnType<typeof vi.fn>;
   initInstance: ReturnType<typeof vi.fn>;
-  onEdgesChange: ReturnType<typeof vi.fn>;
-  onNodesChange: ReturnType<typeof vi.fn>;
   initWrapper: ReturnType<typeof vi.fn>;
-  onDragOver: ReturnType<typeof vi.fn>;
-  onDrop: ReturnType<typeof vi.fn>;
   updateNodes: ReturnType<typeof vi.fn>;
   updateEdges: ReturnType<typeof vi.fn>;
   updateEdgeLabel: ReturnType<typeof vi.fn>;
+  onConnect: ReturnType<typeof vi.fn>;
+  onDragOver: ReturnType<typeof vi.fn>;
+  onDrop: ReturnType<typeof vi.fn>;
+  onNodesChange: ReturnType<typeof vi.fn>;
+  onEdgesChange: ReturnType<typeof vi.fn>;
+  onConnectStart: ReturnType<typeof vi.fn>;
+  onConnectEnd: ReturnType<typeof vi.fn>;
   onSave: ReturnType<typeof vi.fn>;
   onRestore: ReturnType<typeof vi.fn>;
-  setEdges: ReturnType<typeof vi.fn>; 
+  isEdgeBeingConnected: boolean;
+  setNodes: ReturnType<typeof vi.fn>;
+  setEdges: ReturnType<typeof vi.fn>;
+  onSelectNode: ReturnType<typeof vi.fn>;
+  onSelectEdge: ReturnType<typeof vi.fn>;
   selectedNode: Node | null;
   selectedEdge: Edge | null;
   useSystemComponentConfigSlice: ReturnType<typeof vi.fn>;
   handleCopy: ReturnType<typeof vi.fn>;
   handlePaste: ReturnType<typeof vi.fn>;
-  connectionMode: 'loose';
-  selectionMode: 'partial';
-  panOnScrollMode: 'free';
-  instance: null;
-};
+  // Linking functionality
+  linkingTextAreaId: string | null;
+  linkingSelection: { nodes: Node[]; edges: Edge[] };
+  startLinking: ReturnType<typeof vi.fn>;
+  stopLinking: ReturnType<typeof vi.fn>;
+  isLinkingMode: boolean;
+}
 
 // Mock the useSystemDesigner hook
 vi.mock('@/lib/hooks/_useSystemDesigner', () => ({
@@ -104,7 +107,7 @@ describe('SystemDesigner', () => {
     window.mockReactFlowProps = null;
     
     // Setup the mock implementation for useSystemDesigner with a partial mock
-    const mockState: PartialSystemDesignerState = {
+    const mockState: MockSystemDesignerState = {
       nodes: mockNodes,
       edges: mockEdges,
       setNodes: mockSetNodes,
@@ -132,10 +135,12 @@ describe('SystemDesigner', () => {
       useSystemComponentConfigSlice: vi.fn(),
       handleCopy: vi.fn(),
       handlePaste: vi.fn(),
-      connectionMode: 'loose', 
-      selectionMode: 'partial',
-      panOnScrollMode: 'free',
-      instance: null
+      isEdgeBeingConnected: false,
+      linkingTextAreaId: null,
+      linkingSelection: { nodes: [], edges: [] },
+      startLinking: vi.fn(),
+      stopLinking: vi.fn(),
+      isLinkingMode: false
     };
     
     vi.mocked(useSystemDesignerModule.useSystemDesigner).mockReturnValue(mockState);
@@ -249,12 +254,17 @@ describe('SystemDesigner', () => {
     expect(mockOnSelectNode).toHaveBeenCalledWith(mockNodes[2]);
   });
 
-  it('deselects all nodes when an edge is clicked', () => {
+  it('selects edge when clicked without modifier keys', () => {
     render(<SystemBuilder PassedFlowManager={MockPassedFlowManager} />);
     
     const props = window.mockReactFlowProps;
-    // Create a simple mock event with just the methods we need
-    const mockEvent: MockMouseEvent = { preventDefault: vi.fn() };
+    
+    // Clear initial calls from component mount (the useEffect that selects whiteboard node)
+    mockOnSelectNode.mockClear();
+    mockOnSelectEdge.mockClear();
+    
+    // Create a simple mock event with just the methods we need (without modifier keys)
+    const mockEvent: MockMouseEvent = { preventDefault: vi.fn(), ctrlKey: false, metaKey: false };
     const mockEdge = mockEdges[0];
     
     // Directly call the onEdgeClick handler with type assertion
@@ -263,19 +273,49 @@ describe('SystemDesigner', () => {
       props.onEdgeClick(mockEvent, mockEdge);
     }
     
-    // Verify that setNodes was called with all nodes deselected
-    expect(mockSetNodes).toHaveBeenCalledWith(
-      expect.arrayContaining([
-        expect.objectContaining({ id: 'node-1', selected: false }),
-        expect.objectContaining({ id: 'node-2', selected: false }),
-        expect.objectContaining({ id: 'node-3', selected: false })
-      ])
-    );
+    // Verify that setNodes was NOT called (no manual node deselection)
+    expect(mockSetNodes).not.toHaveBeenCalled();
     
     // Verify onSelectEdge was called with the edge
     expect(mockOnSelectEdge).toHaveBeenCalledWith(mockEdge);
     
-    // Verify onSelectNode was called with null to clear node selection
-    expect(mockOnSelectNode).toHaveBeenCalledWith(null);
+    // Verify onSelectNode was NOT called (don't clear node selection for mixed selections)
+    expect(mockOnSelectNode).not.toHaveBeenCalled();
+  });
+
+  it('does not interfere with multi-selection when modifier keys are pressed', () => {
+    render(<SystemBuilder PassedFlowManager={MockPassedFlowManager} />);
+    
+    const props = window.mockReactFlowProps;
+    
+    // Clear initial calls from component mount (the useEffect that selects whiteboard node)
+    mockOnSelectNode.mockClear();
+    mockOnSelectEdge.mockClear();
+    
+    // Create mock events with modifier keys
+    const mockEventWithCtrl: MockMouseEvent = { preventDefault: vi.fn(), ctrlKey: true, metaKey: false };
+    const mockEventWithMeta: MockMouseEvent = { preventDefault: vi.fn(), ctrlKey: false, metaKey: true };
+    const mockNode = mockNodes[0];
+    const mockEdge = mockEdges[0];
+    
+    // Test node click with Ctrl key
+    if (props?.onNodeClick && mockNode) {
+      // @ts-expect-error - Simplified mock event for testing
+      props.onNodeClick(mockEventWithCtrl, mockNode);
+    }
+    
+    // Verify selection handlers were NOT called (allowing ReactFlow's multi-selection)
+    expect(mockOnSelectNode).not.toHaveBeenCalled();
+    expect(mockOnSelectEdge).not.toHaveBeenCalled();
+    
+    // Test edge click with Meta key
+    if (props?.onEdgeClick && mockEdge) {
+      // @ts-expect-error - Simplified mock event for testing
+      props.onEdgeClick(mockEventWithMeta, mockEdge);
+    }
+    
+    // Verify selection handlers were still NOT called
+    expect(mockOnSelectNode).not.toHaveBeenCalled();
+    expect(mockOnSelectEdge).not.toHaveBeenCalled();
   });
 });

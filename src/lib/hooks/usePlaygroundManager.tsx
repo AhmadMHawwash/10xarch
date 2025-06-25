@@ -11,6 +11,8 @@ import { useParams } from "next/navigation";
 import { useMemo } from "react";
 import { type Edge, type Node } from "reactflow";
 import { useSystemDesigner } from "./_useSystemDesigner";
+import { EdgeData } from "./useChallengeManager";
+import { CustomEdge } from "@/types/system";
 
 export const SYSTEM_COMPONENT_NODE = "SystemComponentNode";
 
@@ -147,11 +149,7 @@ const getSystemDesignPrompt = ({
   edges,
 }: {
   nodes: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[];
-  edges: Edge<{
-    label?: string;
-    apiDefinition?: string;
-    requestFlow?: string;
-  }>[];
+  edges: CustomEdge[];
 }): string => {
   const extractRequirements = (
     nodes: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[],

@@ -251,7 +251,7 @@ describe('Token Server Utilities', () => {
                 findFirst: vi.fn().mockResolvedValue(null),
               }
             },
-            insert: vi.fn().mockImplementation((table: any) => ({
+            insert: vi.fn().mockImplementation((_table: any) => ({
               values: vi.fn().mockImplementation((values: any) => {
                 if (values.expiringTokensExpiry) {
                   tokenExpiry = values.expiringTokensExpiry;
@@ -294,7 +294,7 @@ describe('Token Server Utilities', () => {
             },
             insert: vi.fn().mockReturnThis(),
             values: vi.fn().mockReturnThis(),
-            update: vi.fn().mockImplementation((table: any) => ({
+            update: vi.fn().mockImplementation((_table: any) => ({
               set: vi.fn().mockImplementation((values: any) => {
                 updateValues = values;
                 return {
@@ -339,7 +339,7 @@ describe('Token Server Utilities', () => {
                 findFirst: vi.fn().mockResolvedValue(existingBalance),
               }
             },
-            insert: vi.fn().mockImplementation((table: any) => ({
+            insert: vi.fn().mockImplementation((_table: any) => ({
               values: vi.fn().mockImplementation((values: any) => {
                 if (values.reason?.includes('tier_upgrade')) {
                   ledgerEntry = values;
@@ -347,7 +347,7 @@ describe('Token Server Utilities', () => {
                 return mockTx;
               })
             })),
-            update: vi.fn().mockImplementation((table: any) => ({
+            update: vi.fn().mockImplementation((_table: any) => ({
               set: vi.fn().mockImplementation((values: any) => {
                 updateValues = values;
                 return {
@@ -501,7 +501,7 @@ describe('Token Server Utilities', () => {
                 findFirst: vi.fn().mockResolvedValue(null), // No existing balance
               }
             },
-            insert: vi.fn().mockImplementation((table: any) => ({
+            insert: vi.fn().mockImplementation((_table: any) => ({
               values: vi.fn().mockImplementation((values: any) => {
                 if (values.expiringTokens !== undefined) {
                   insertedValues = values;
@@ -549,7 +549,7 @@ describe('Token Server Utilities', () => {
                 findFirst: vi.fn().mockResolvedValue(existingBalance),
               }
             },
-            insert: vi.fn().mockImplementation((table: any) => ({
+            insert: vi.fn().mockImplementation((_table: any) => ({
               values: vi.fn().mockImplementation((values: any) => {
                 if (values.reason?.includes('tier_upgrade')) {
                   ledgerEntry = values;
@@ -595,7 +595,7 @@ describe('Token Server Utilities', () => {
                 findFirst: vi.fn().mockResolvedValue(existingBalance),
               }
             },
-            insert: vi.fn().mockImplementation((table: any) => ({
+            insert: vi.fn().mockImplementation((_table: any) => ({
               values: vi.fn().mockImplementation((values: any) => {
                 if (values.reason?.includes('tier_downgrade')) {
                   ledgerEntry = values;
@@ -706,7 +706,7 @@ describe('deductTokensFromAccount', () => {
               findFirst: vi.fn().mockResolvedValue(existingBalance),
             }
           },
-          insert: vi.fn().mockImplementation((table: any) => ({
+          insert: vi.fn().mockImplementation((_table: any) => ({
             values: vi.fn().mockImplementation((values: any) => {
               if (values.reason) {
                 ledgerEntries.push(values);
@@ -714,7 +714,7 @@ describe('deductTokensFromAccount', () => {
               return mockTx;
             })
           })),
-          update: vi.fn().mockImplementation((table: any) => ({
+          update: vi.fn().mockImplementation((_table: any) => ({
             set: vi.fn().mockImplementation((values: any) => {
               updateValues = values;
               return {
@@ -759,7 +759,7 @@ describe('deductTokensFromAccount', () => {
               findFirst: vi.fn().mockResolvedValue(existingBalance),
             }
           },
-          insert: vi.fn().mockImplementation((table: any) => ({
+          insert: vi.fn().mockImplementation((_table: any) => ({
             values: vi.fn().mockImplementation((values: any) => {
               if (values.reason) {
                 ledgerEntries.push(values);
@@ -767,7 +767,7 @@ describe('deductTokensFromAccount', () => {
               return mockTx;
             })
           })),
-          update: vi.fn().mockImplementation((table: any) => ({
+          update: vi.fn().mockImplementation((_table: any) => ({
             set: vi.fn().mockImplementation((values: any) => {
               updateValues = values;
               return {
@@ -809,10 +809,10 @@ describe('deductTokensFromAccount', () => {
               findFirst: vi.fn().mockResolvedValue(existingBalance),
             }
           },
-          insert: vi.fn().mockImplementation((table: any) => ({
+          insert: vi.fn().mockImplementation((_table: any) => ({
             values: vi.fn().mockReturnThis()
           })),
-          update: vi.fn().mockImplementation((table: any) => ({
+          update: vi.fn().mockImplementation((_table: any) => ({
             set: vi.fn().mockImplementation((values: any) => {
               updateValues = values;
               return {

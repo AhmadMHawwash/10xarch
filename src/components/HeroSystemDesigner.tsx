@@ -1,7 +1,7 @@
 "use client";
 import { useHeroSystemDesigner } from "@/lib/hooks/useHeroSystemDesigner";
 import { Bot, ChevronDown, ChevronUp } from "lucide-react";
-import { useEffect, useState, type ComponentType } from "react";
+import { useState, type ComponentType } from "react";
 import ReactFlow, {
   Background,
   BackgroundVariant,
@@ -15,7 +15,7 @@ import ReactFlow, {
 } from "reactflow";
 import "reactflow/dist/base.css";
 import "reactflow/dist/style.css";
-import { CustomEdge } from "./CustomEdge";
+import { CustomEdgeComponent } from "./CustomEdge";
 import HeroSystemComponentNode from "./ReactflowCustomNodes/HeroSystemComponentNode";
 
 const nodeTypes: Record<string, ComponentType<NodeProps>> = {
@@ -23,7 +23,7 @@ const nodeTypes: Record<string, ComponentType<NodeProps>> = {
 };
 
 const edgeTypes: Record<string, ComponentType<EdgeProps>> = {
-  CustomEdge,
+  CustomEdge: CustomEdgeComponent,
 };
 
 function HeroAIFeedback() {

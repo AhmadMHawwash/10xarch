@@ -8,9 +8,9 @@ import {
   Position,
 } from "reactflow";
 import { useSystemDesigner } from "@/lib/hooks/_useSystemDesigner";
-import { type CustomEdgeData } from "@/types/system";
+import { type CustomEdge, type CustomEdgeData } from "@/types/system";
 
-export const CustomEdge: FC<EdgeProps<CustomEdgeData>> = ({
+export const CustomEdgeComponent: FC<EdgeProps<CustomEdgeData>> = ({
   sourceX,
   sourceY,
   targetX,
@@ -28,8 +28,7 @@ export const CustomEdge: FC<EdgeProps<CustomEdgeData>> = ({
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const { updateEdgeLabel, onSelectEdge, onSelectNode, onEdgesChange, nodes, setNodes } =
-    useSystemDesigner();
+  const { updateEdgeLabel, onSelectEdge } = useSystemDesigner();
 
   // Check if this is a self-connection (edge connecting a node to itself)
   const isSelfConnection = source === target;
@@ -126,26 +125,21 @@ export const CustomEdge: FC<EdgeProps<CustomEdgeData>> = ({
   };
 
   const handleEdgeClick = (e: React.MouseEvent) => {
-    // Open the edge settings panel
-    e.stopPropagation();
-    const edge: Edge<CustomEdgeData> = {
-      id,
-      data: data ?? {},
-      source: source ?? "",
-      target: target ?? "",
-      sourceHandle: sourceHandleId,
-      targetHandle: targetHandleId,
-    };
-    
-    // Deselect all nodes
-    const deselectedNodes = nodes.map((node) => ({
-      ...node,
-      selected: false,
-    }));
-    setNodes(deselectedNodes);
-    
-    onSelectEdge(edge);
-    onSelectNode(null);
+    // Open the edge settings panel only if not multi-selecting
+    if (!e.ctrlKey && !e.metaKey) {
+      e.stopPropagation();
+      const edge: CustomEdge = {
+        id,
+        data: data ?? {},
+        source: source ?? "",
+        target: target ?? "",
+        sourceHandle: sourceHandleId,
+        targetHandle: targetHandleId,
+      };
+      
+      onSelectEdge(edge);
+      // Don't clear node selection - let user mix selections freely
+    }
   };
 
   return (

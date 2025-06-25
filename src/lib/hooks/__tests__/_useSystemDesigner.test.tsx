@@ -389,4 +389,221 @@ describe('useSystemDesigner', () => {
     );
     expect(serverHasConnectedHandle).toBe(true);
   });
+
+  describe('Linking functionality', () => {
+    it('should start linking mode and clear selections', () => {
+      const { result } = renderHook(() => useSystemDesigner(), {
+        wrapper: Wrapper,
+      });
+
+      // Add some nodes with selections
+      const selectedNode: Node<SystemComponentNodeDataProps> = {
+        id: 'test-node',
+        type: 'service',
+        position: { x: 100, y: 100 },
+        selected: true,
+        data: { 
+          name: 'Server',
+          icon: (() => 'IconMock') as unknown as typeof PiIcon,
+          id: 'test-node',
+          configs: {},
+          targetHandles: [],
+          sourceHandles: [],
+        },
+      };
+
+      const selectedEdge: Edge = {
+        id: 'test-edge',
+        source: 'node1',
+        target: 'node2',
+        selected: true,
+      };
+
+      // Set up initial state with selected items
+      void act(() => {
+        result.current.setNodes([...defaultStartingNodes, selectedNode]);
+        result.current.setEdges([selectedEdge]);
+      });
+
+      // Verify initial state
+      expect(result.current.isLinkingMode).toBe(false);
+      expect(result.current.linkingTextAreaId).toBeNull();
+
+      // Start linking
+      void act(() => {
+        result.current.startLinking('test-textarea-id');
+      });
+
+      // Verify linking mode is active
+      expect(result.current.isLinkingMode).toBe(true);
+      expect(result.current.linkingTextAreaId).toBe('test-textarea-id');
+
+      // Verify all selections were cleared
+      const nodeWithSelection = result.current.nodes.find(node => node.selected);
+      const edgeWithSelection = result.current.edges.find(edge => edge.selected);
+      
+      expect(nodeWithSelection).toBeUndefined();
+      expect(edgeWithSelection).toBeUndefined();
+    });
+
+    it('should stop linking mode and clear linking state', () => {
+      const { result } = renderHook(() => useSystemDesigner(), {
+        wrapper: Wrapper,
+      });
+
+      // Start linking first
+      void act(() => {
+        result.current.startLinking('test-textarea-id');
+      });
+
+      // Verify linking is active
+      expect(result.current.isLinkingMode).toBe(true);
+      expect(result.current.linkingTextAreaId).toBe('test-textarea-id');
+
+      // Stop linking
+      void act(() => {
+        result.current.stopLinking();
+      });
+
+      // Verify linking mode is inactive
+      expect(result.current.isLinkingMode).toBe(false);
+      expect(result.current.linkingTextAreaId).toBeNull();
+      expect(result.current.linkingSelection.nodes).toEqual([]);
+      expect(result.current.linkingSelection.edges).toEqual([]);
+    });
+
+    it('should update linking selection when nodes/edges are selected during linking', () => {
+      const { result } = renderHook(() => useSystemDesigner(), {
+        wrapper: Wrapper,
+      });
+
+      // Add some nodes first
+      const node1: Node<SystemComponentNodeDataProps> = {
+        id: 'node1',
+        type: 'service',
+        position: { x: 100, y: 100 },
+        selected: false,
+        data: { 
+          name: 'Server',
+          icon: (() => 'IconMock') as unknown as typeof PiIcon,
+          id: 'node1',
+          configs: {},
+          targetHandles: [],
+          sourceHandles: [],
+        },
+      };
+
+      const node2: Node<SystemComponentNodeDataProps> = {
+        id: 'node2',
+        type: 'service',
+        position: { x: 200, y: 200 },
+        selected: false,
+        data: { 
+          name: 'Database',
+          icon: (() => 'IconMock') as unknown as typeof PiIcon,
+          id: 'node2',
+          configs: {},
+          targetHandles: [],
+          sourceHandles: [],
+        },
+      };
+
+      const edge1: Edge = {
+        id: 'edge1',
+        source: 'node1',
+        target: 'node2',
+        selected: false,
+      };
+
+      void act(() => {
+        result.current.setNodes([...defaultStartingNodes, node1, node2]);
+        result.current.setEdges([edge1]);
+      });
+
+      // Start linking
+      void act(() => {
+        result.current.startLinking('test-textarea-id');
+      });
+
+      // Select some nodes and edges
+      void act(() => {
+        const updatedNodes = result.current.nodes.map(node => 
+          node.id === 'node1' ? { ...node, selected: true } : node
+        );
+        const updatedEdges = result.current.edges.map(edge => 
+          edge.id === 'edge1' ? { ...edge, selected: true } : edge
+        );
+        
+        result.current.setNodes(updatedNodes);
+        result.current.setEdges(updatedEdges);
+      });
+
+      // Wait for effect to update linking selection
+      // The useEffect should automatically update linkingSelection
+      expect(result.current.linkingSelection.nodes).toHaveLength(1);
+      expect(result.current.linkingSelection.edges).toHaveLength(1);
+      expect(result.current.linkingSelection.nodes[0]?.id).toBe('node1');
+      expect(result.current.linkingSelection.edges[0]?.id).toBe('edge1');
+    });
+
+    it('should not update linking selection when not in linking mode', () => {
+      const { result } = renderHook(() => useSystemDesigner(), {
+        wrapper: Wrapper,
+      });
+
+      // Add some nodes without starting linking
+      const selectedNode: Node<SystemComponentNodeDataProps> = {
+        id: 'test-node',
+        type: 'service',
+        position: { x: 100, y: 100 },
+        selected: true,
+        data: { 
+          name: 'Server',
+          icon: (() => 'IconMock') as unknown as typeof PiIcon,
+          id: 'test-node',
+          configs: {},
+          targetHandles: [],
+          sourceHandles: [],
+        },
+      };
+
+      void act(() => {
+        result.current.setNodes([...defaultStartingNodes, selectedNode]);
+      });
+
+      // Verify linking selection remains empty when not in linking mode
+      expect(result.current.linkingSelection.nodes).toEqual([]);
+      expect(result.current.linkingSelection.edges).toEqual([]);
+    });
+
+    it('should handle multiple linking sessions', () => {
+      const { result } = renderHook(() => useSystemDesigner(), {
+        wrapper: Wrapper,
+      });
+
+      // Start first linking session
+      void act(() => {
+        result.current.startLinking('textarea-1');
+      });
+
+      expect(result.current.linkingTextAreaId).toBe('textarea-1');
+
+      // Start second linking session (should clear previous)
+      void act(() => {
+        result.current.startLinking('textarea-2');
+      });
+
+      expect(result.current.linkingTextAreaId).toBe('textarea-2');
+      expect(result.current.linkingSelection.nodes).toEqual([]);
+      expect(result.current.linkingSelection.edges).toEqual([]);
+
+      // Stop linking
+      void act(() => {
+        result.current.stopLinking();
+      });
+
+      expect(result.current.isLinkingMode).toBe(false);
+      expect(result.current.linkingTextAreaId).toBeNull();
+    });
+  });
 }); 

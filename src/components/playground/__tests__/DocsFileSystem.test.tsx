@@ -415,7 +415,11 @@ describe('DocsFileSystem', () => {
             expect.objectContaining({
               type: 'file',
               name: 'New file',
-              content: ''
+              contentSections: expect.arrayContaining([
+                expect.objectContaining({
+                  content: ''
+                })
+              ])
             })
           ])
         })

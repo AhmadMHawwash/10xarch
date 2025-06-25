@@ -18,6 +18,7 @@ import { useSystemDesigner } from "./_useSystemDesigner";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/components/ui/use-toast";
 import { extractAPIDefinitions } from "@/components/ai-chat/ChatUI";
+import { CustomEdge } from "@/types/system";
 
 export const SYSTEM_COMPONENT_NODE = "SystemComponentNode";
 
@@ -147,7 +148,7 @@ export const useChallengeManager = () => {
   };
 };
 
-interface EdgeData {
+export interface EdgeData {
   label?: string;
   apiDefinition?: string;
   requestFlow?: string;
@@ -158,7 +159,7 @@ export const getChallengePrompt = ({
   edges,
 }: {
   nodes: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[];
-  edges: Edge<EdgeData>[];
+  edges: CustomEdge[];
 }): ((
   challenge: Challenge,
   currentStage: Challenge["stages"][number],

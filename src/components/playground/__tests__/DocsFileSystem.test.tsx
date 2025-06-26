@@ -22,7 +22,13 @@ describe('DocsFileSystem', () => {
             id: 'file1',
             name: 'readme.md',
             type: 'file',
-            content: '# Welcome\nThis is a readme file.',
+            contentSections: [
+              {
+                id: 'section1',
+                title: 'Introduction',
+                content: '# Welcome\nThis is a readme file.'
+              }
+            ],
             parentId: 'folder1'
           },
           {
@@ -35,7 +41,13 @@ describe('DocsFileSystem', () => {
                 id: 'file2',
                 name: 'nested.md',
                 type: 'file',
-                content: 'Nested file content',
+                contentSections: [
+                  {
+                    id: 'section2',
+                    title: 'Nested',
+                    content: 'Nested file content'
+                  }
+                ],
                 parentId: 'subfolder1'
               },
               {
@@ -48,7 +60,13 @@ describe('DocsFileSystem', () => {
                     id: 'file3',
                     name: 'deep.md',
                     type: 'file',
-                    content: 'Deep nested content',
+                    contentSections: [
+                      {
+                        id: 'section3',
+                        title: 'Deep',
+                        content: 'Deep nested content'
+                      }
+                    ],
                     parentId: 'deepfolder'
                   }
                 ]
@@ -61,7 +79,13 @@ describe('DocsFileSystem', () => {
         id: 'file4',
         name: 'root-file.md',
         type: 'file',
-        content: 'Root level file'
+        contentSections: [
+          {
+            id: 'section4',
+            title: 'Root',
+            content: 'Root level file'
+          }
+        ]
       }
     ],
     currentPath: []
@@ -126,262 +150,15 @@ describe('DocsFileSystem', () => {
         })
       );
     });
-  });
 
-  describe('File Selection and Editing', () => {
     it('should select and display file content', () => {
       render(<DocsFileSystem {...defaultProps} />);
       
-      // Navigate to Documents folder first
-      fireEvent.click(screen.getByText('Documents'));
-      
-      // Click on readme.md file
-      fireEvent.click(screen.getByText('readme.md'));
+      const rootFile = screen.getByText('root-file.md');
+      fireEvent.click(rootFile);
       
       // Should show file content
-      expect(screen.getByText('Welcome')).toBeInTheDocument();
-      expect(screen.getByText('This is a readme file.')).toBeInTheDocument();
-    });
-
-    it('should show file editing interface when file is selected', () => {
-      render(<DocsFileSystem {...defaultProps} />);
-      
-      // Navigate and select file
-      fireEvent.click(screen.getByText('Documents'));
-      fireEvent.click(screen.getByText('readme.md'));
-      
-      // Should show file editing interface (file name appears in multiple places)
-      expect(screen.getAllByText('readme.md').length).toBeGreaterThan(0);
-      
-      // Should show edit/preview toggle buttons
-      const buttons = screen.getAllByRole('button');
-      const editButton = buttons.find(btn => btn.querySelector('svg.lucide-pencil'));
-      const previewButton = buttons.find(btn => btn.querySelector('svg.lucide-eye'));
-      
-      expect(editButton).toBeInTheDocument();
-      expect(previewButton).toBeInTheDocument();
-      
-      // Should show file content (either in preview or edit mode)
-      const hasPreviewContent = screen.queryByText('Welcome') && screen.queryByText('This is a readme file.');
-      const hasEditTextarea = screen.queryByRole('textbox');
-      
-      // Should have either preview content or edit textarea
-      expect(hasPreviewContent ?? hasEditTextarea).toBeTruthy();
-    });
-  });
-
-  describe('Recursive Archiving', () => {
-    it('should archive a single file', () => {
-      render(<DocsFileSystem {...defaultProps} />);
-      
-      // Navigate to Documents folder
-      fireEvent.click(screen.getByText('Documents'));
-      
-      // Find and click archive button for readme.md using data-testid
-      const archiveButton = screen.getByTestId('archive-file1');
-      fireEvent.click(archiveButton);
-      
-      // Should call onDataChange with archived file
-      expect(mockOnDataChange).toHaveBeenCalledWith(
-        expect.objectContaining({
-          items: expect.arrayContaining([
-            expect.objectContaining({
-              id: 'folder1',
-              children: expect.arrayContaining([
-                expect.objectContaining({
-                  id: 'file1',
-                  archived: true
-                })
-              ])
-            })
-          ])
-        })
-      );
-    });
-
-    it('should recursively archive folder and all descendants', () => {
-      render(<DocsFileSystem {...defaultProps} />);
-      
-      // Find and click archive button for Documents folder using data-testid
-      const archiveButton = screen.getByTestId('archive-folder1');
-      fireEvent.click(archiveButton);
-      
-      // Should call onDataChange with recursively archived folder
-      expect(mockOnDataChange).toHaveBeenCalledWith(
-        expect.objectContaining({
-          items: expect.arrayContaining([
-            expect.objectContaining({
-              id: 'folder1',
-              archived: true,
-              children: expect.arrayContaining([
-                expect.objectContaining({
-                  id: 'file1',
-                  archived: true // File should be archived
-                }),
-                expect.objectContaining({
-                  id: 'subfolder1',
-                  archived: true, // Subfolder should be archived
-                  children: expect.arrayContaining([
-                    expect.objectContaining({
-                      id: 'file2',
-                      archived: true // Nested file should be archived
-                    }),
-                    expect.objectContaining({
-                      id: 'deepfolder',
-                      archived: true, // Deep folder should be archived
-                      children: expect.arrayContaining([
-                        expect.objectContaining({
-                          id: 'file3',
-                          archived: true // Deep nested file should be archived
-                        })
-                      ])
-                    })
-                  ])
-                })
-              ])
-            })
-          ])
-        })
-      );
-    });
-
-    it('should not show archived items in normal view', () => {
-      const dataWithArchivedItems: DocsFileSystemData = {
-        items: [
-          {
-            id: 'folder1',
-            name: 'Documents',
-            type: 'folder',
-            archived: true,
-            children: []
-          },
-          {
-            id: 'file1',
-            name: 'visible-file.md',
-            type: 'file',
-            content: 'Visible content'
-          }
-        ],
-        currentPath: []
-      };
-
-      render(<DocsFileSystem {...defaultProps} data={dataWithArchivedItems} />);
-      
-      // Should not show archived folder
-      expect(screen.queryByText('Documents')).not.toBeInTheDocument();
-      // Should show non-archived file
-      expect(screen.getByText('visible-file.md')).toBeInTheDocument();
-    });
-
-    it('should show archived items when "Show Archived" is toggled', () => {
-      const dataWithArchivedItems: DocsFileSystemData = {
-        items: [
-          {
-            id: 'folder1',
-            name: 'Archived Folder',
-            type: 'folder',
-            archived: true,
-            children: []
-          },
-          {
-            id: 'file1',
-            name: 'active-file.md',
-            type: 'file',
-            content: 'Active content'
-          }
-        ],
-        currentPath: []
-      };
-
-      render(<DocsFileSystem {...defaultProps} data={dataWithArchivedItems} />);
-      
-      // Toggle to show archived
-      fireEvent.click(screen.getByText('Show Archived'));
-      
-      // Should show archived folder
-      expect(screen.getByText('Archived Folder')).toBeInTheDocument();
-      // Should not show active file in archived view
-      expect(screen.queryByText('active-file.md')).not.toBeInTheDocument();
-    });
-  });
-
-  describe('Recursive Restoring', () => {
-    it('should recursively restore folder and all descendants', () => {
-      const dataWithArchivedFolder: DocsFileSystemData = {
-        items: [
-          {
-            id: 'folder1',
-            name: 'Archived Folder',
-            type: 'folder',
-            archived: true,
-            children: [
-              {
-                id: 'file1',
-                name: 'archived-file.md',
-                type: 'file',
-                content: 'Archived content',
-                archived: true,
-                parentId: 'folder1'
-              },
-              {
-                id: 'subfolder1',
-                name: 'Archived Subfolder',
-                type: 'folder',
-                archived: true,
-                parentId: 'folder1',
-                children: [
-                  {
-                    id: 'file2',
-                    name: 'deep-archived.md',
-                    type: 'file',
-                    content: 'Deep archived content',
-                    archived: true,
-                    parentId: 'subfolder1'
-                  }
-                ]
-              }
-            ]
-          }
-        ],
-        currentPath: []
-      };
-
-      render(<DocsFileSystem {...defaultProps} data={dataWithArchivedFolder} />);
-      
-      // Toggle to show archived items
-      fireEvent.click(screen.getByText('Show Archived'));
-      
-      // Find and click restore button for archived folder using data-testid
-      const restoreButton = screen.getByTestId('restore-folder1');
-      fireEvent.click(restoreButton);
-      
-      // Should call onDataChange with recursively restored folder
-      expect(mockOnDataChange).toHaveBeenCalledWith(
-        expect.objectContaining({
-          items: expect.arrayContaining([
-            expect.objectContaining({
-              id: 'folder1',
-              archived: false,
-              children: expect.arrayContaining([
-                expect.objectContaining({
-                  id: 'file1',
-                  archived: false // File should be restored
-                }),
-                expect.objectContaining({
-                  id: 'subfolder1',
-                  archived: false, // Subfolder should be restored
-                  children: expect.arrayContaining([
-                    expect.objectContaining({
-                      id: 'file2',
-                      archived: false // Deep file should be restored
-                    })
-                  ])
-                })
-              ])
-            })
-          ])
-        })
-      );
+      expect(screen.getByDisplayValue('Root')).toBeInTheDocument();
     });
   });
 

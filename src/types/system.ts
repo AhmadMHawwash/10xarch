@@ -1,3 +1,4 @@
+import { type EdgeData } from "@/lib/hooks/useChallengeManager";
 import { type RefObject } from "react";
 import { type Edge } from "reactflow";
 
@@ -17,10 +18,10 @@ export type NodeSettingsRefObject = RefObject<NodeSettingsRef>;
 /**
  * Specific data structure for custom edges
  */
-export interface CustomEdgeData {
+export interface CustomEdgeData extends EdgeData {
+  label?: string;
   apiDefinition?: string;
   requestFlow?: string;
-  label?: string;
   [key: string]: unknown;
 }
 

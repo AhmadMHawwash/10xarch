@@ -11,6 +11,7 @@ import {
   scheduleNodeInternalsUpdate,
   updateNodesFromEdgeChanges
 } from "@/lib/utils/system-designer-utils";
+import { type CustomEdge } from "@/types/system";
 import { usePathname } from "next/navigation";
 import {
   createContext,
@@ -55,7 +56,7 @@ import useLocalStorageState from "./useLocalStorageState";
 
 interface SystemDesignerState {
   nodes: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[];
-  edges: Edge[];
+  edges: CustomEdge[];
   initInstance: (instance: ReactFlowInstance) => void;
   initWrapper: (wrapper: HTMLDivElement) => void;
   updateNodes: (nodes: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[]) => void;
@@ -88,6 +89,15 @@ interface SystemDesignerState {
   ) => [T, (configValue: T) => void];
   handleCopy: () => void;
   handlePaste: () => void;
+  // Linking functionality
+  linkingTextAreaId: string | null;
+  linkingSelection: {
+    nodes: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[];
+    edges: CustomEdge[];
+  };
+  startLinking: (textAreaId: string) => void;
+  stopLinking: () => void;
+  isLinkingMode: boolean;
 }
 
 const SystemDesignerContext = createContext<SystemDesignerState>({
@@ -116,6 +126,11 @@ const SystemDesignerContext = createContext<SystemDesignerState>({
   useSystemComponentConfigSlice: noop,
   handleCopy: noop,
   handlePaste: noop,
+  linkingTextAreaId: null,
+  linkingSelection: { nodes: [], edges: [] },
+  startLinking: noop,
+  stopLinking: noop,
+  isLinkingMode: false,
 });
 
 
@@ -193,6 +208,39 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
     edges: Edge[];
   } | null>(null);
   const updateNodeInternals = useUpdateNodeInternals();
+
+  // Linking state
+  const [linkingTextAreaId, setLinkingTextAreaId] = useState<string | null>(null);
+  const [linkingSelection, setLinkingSelection] = useState<{
+    nodes: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[];
+    edges: Edge[];
+  }>({ nodes: [], edges: [] });
+
+  // Linking functionality
+  const startLinking = useCallback((textAreaId: string) => {
+    // Clear any existing selections when starting linking
+    const clearedNodes = nodes.map(node => ({ ...node, selected: false }));
+    const clearedEdges = edges.map(edge => ({ ...edge, selected: false }));
+    
+    setNodes(clearedNodes);
+    setEdges(clearedEdges);
+    setLinkingSelection({ nodes: [], edges: [] });
+    setLinkingTextAreaId(textAreaId);
+  }, [nodes, edges, setNodes, setEdges]);
+
+  const stopLinking = useCallback(() => {
+    setLinkingTextAreaId(null);
+    setLinkingSelection({ nodes: [], edges: [] });
+  }, []);
+
+  // Update linking selection when nodes/edges change during linking
+  useEffect(() => {
+    if (linkingTextAreaId) {
+      const selectedNodes = nodes.filter(node => node.selected);
+      const selectedEdges = edges.filter(edge => edge.selected);
+      setLinkingSelection({ nodes: selectedNodes, edges: selectedEdges });
+    }
+  }, [nodes, edges, linkingTextAreaId]);
 
   const onConnect: OnConnect = useCallback(
     (params) => {
@@ -282,7 +330,6 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
     
     const result = handleNodesChange(changes, nodes, edges, notifyWhiteboardDeletion);
     
-    // Update both edges and nodes
     queueMicrotask(() => {
       setEdges(result.updatedEdges);
       setNodes(result.updatedNodes);
@@ -302,6 +349,7 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
 
   const onEdgesChange: OnEdgesChange = useCallback((changes) => {
     const result = handleEdgesChange(changes, edges, nodes);
+    
     queueMicrotask(() => {
       setNodes(nodes => {
         // Update the nodes with the updated data
@@ -451,6 +499,11 @@ export const SystemDesignerProvider = ({ children }: PropsWithChildren) => {
         useSystemComponentConfigSlice,
         handleCopy,
         handlePaste,
+        linkingTextAreaId,
+        linkingSelection,
+        startLinking,
+        stopLinking,
+        isLinkingMode: linkingTextAreaId !== null,
       }}
     >
       {children}

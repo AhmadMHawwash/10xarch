@@ -1,5 +1,9 @@
-import type { Node, Edge } from "reactflow";
-import type { SystemComponentNodeDataProps, WhiteboardNodeDataProps } from "@/components/ReactflowCustomNodes/SystemComponentNode";
+import type {
+  SystemComponentNodeDataProps,
+  WhiteboardNodeDataProps,
+} from "@/components/ReactflowCustomNodes/SystemComponentNode";
+import { type DocsFileSystemData } from "@/components/playground/DocsFileSystem";
+import type { Edge, Node } from "reactflow";
 
 // Types for extracted functions
 export interface PlaygroundState {
@@ -7,6 +11,7 @@ export interface PlaygroundState {
   description: string;
   nodes: Node<SystemComponentNodeDataProps | WhiteboardNodeDataProps>[];
   edges: Edge[];
+  docsData: DocsFileSystemData;
 }
 
 export interface ImportantDetails {
@@ -21,8 +26,8 @@ export interface ImportantDetails {
       title?: unknown;
       subtitle?: unknown;
     };
-          width?: number | null;
-      height?: number | null;
+    width?: number | null;
+    height?: number | null;
     selected: boolean;
     dragging: boolean;
   }>;
@@ -112,12 +117,19 @@ export function deepCompare(obj1: unknown, obj2: unknown): boolean {
  */
 export function hasPlaygroundChanges(
   currentState: PlaygroundState,
-  lastSavedState: PlaygroundState | null
+  lastSavedState: PlaygroundState | null,
 ): boolean {
   if (!lastSavedState) return false;
+
+  if (
+    JSON.stringify(currentState.docsData.items) !==
+    JSON.stringify(lastSavedState.docsData.items)
+  ) {
+    return true;
+  }
 
   const currentDetails = getImportantDetails(currentState);
   const savedDetails = getImportantDetails(lastSavedState);
 
   return !deepCompare(currentDetails, savedDetails);
-} 
+}

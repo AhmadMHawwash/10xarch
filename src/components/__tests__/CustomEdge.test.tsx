@@ -2,7 +2,7 @@ import * as useSystemDesignerModule from "@/lib/hooks/_useSystemDesigner";
 import { fireEvent, render, screen } from "@testing-library/react";
 import type { EdgeProps, Node, Position } from "reactflow";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { CustomEdge } from "../CustomEdge";
+import { CustomEdgeComponent } from "../CustomEdge";
 
 // Mock the useSystemDesigner hook
 vi.mock("@/lib/hooks/_useSystemDesigner", () => ({
@@ -23,7 +23,7 @@ vi.mock("reactflow", () => ({
   },
 }));
 
-describe("CustomEdge", () => {
+describe("CustomEdgeComponent", () => {
   // Mock nodes and edges
   const mockNodes: Node[] = [
     { id: "node-1", position: { x: 0, y: 0 }, data: {}, selected: true },
@@ -95,7 +95,7 @@ describe("CustomEdge", () => {
   });
 
   it("renders with the provided props", () => {
-    const { container } = render(<CustomEdge {...mockEdgeProps} />);
+    const { container } = render(<CustomEdgeComponent {...mockEdgeProps} />);
 
     // Check that the edge paths are rendered
     expect(container.querySelector(".react-flow__edge-path")).not.toBeNull();
@@ -107,20 +107,17 @@ describe("CustomEdge", () => {
     expect(screen.getByText("Test Connection")).toBeInTheDocument();
   });
 
-  it("deselects all nodes when clicking on the edge", () => {
-    const { container } = render(<CustomEdge {...mockEdgeProps} />);
+  it("selects the edge when clicking on it without modifier keys", () => {
+    const { container } = render(<CustomEdgeComponent {...mockEdgeProps} />);
 
-    // Find the edge path and click it
+    // Find the edge path and click it (without modifier keys)
     const edgePath = container.querySelector(".react-flow__edge-path");
     if (edgePath) {
-      fireEvent.click(edgePath);
+      fireEvent.click(edgePath, { ctrlKey: false, metaKey: false });
     }
 
-    // Verify that setNodes was called with all nodes deselected
-    expect(mockSetNodes).toHaveBeenCalledWith([
-      { ...mockNodes[0], selected: false },
-      { ...mockNodes[1], selected: false },
-    ]);
+    // Verify that setNodes was NOT called (no manual node deselection)
+    expect(mockSetNodes).not.toHaveBeenCalled();
 
     // Verify onSelectEdge was called with the correct edge data
     expect(mockOnSelectEdge).toHaveBeenCalledWith(
@@ -133,22 +130,19 @@ describe("CustomEdge", () => {
       }),
     );
 
-    // Verify onSelectNode was called with null to clear node selection
-    expect(mockOnSelectNode).toHaveBeenCalledWith(null);
+    // Verify onSelectNode was NOT called (don't clear node selection for mixed selections)
+    expect(mockOnSelectNode).not.toHaveBeenCalled();
   });
 
-  it("deselects all nodes when clicking on the edge label", () => {
-    render(<CustomEdge {...mockEdgeProps} />);
+  it("selects the edge when clicking on the edge label without modifier keys", () => {
+    render(<CustomEdgeComponent {...mockEdgeProps} />);
 
-    // Find the edge label and click it
+    // Find the edge label and click it (without modifier keys)
     const edgeLabel = screen.getByText("Test Connection");
-    fireEvent.click(edgeLabel);
+    fireEvent.click(edgeLabel, { ctrlKey: false, metaKey: false });
 
-    // Verify that setNodes was called with all nodes deselected
-    expect(mockSetNodes).toHaveBeenCalledWith([
-      { ...mockNodes[0], selected: false },
-      { ...mockNodes[1], selected: false },
-    ]);
+    // Verify that setNodes was NOT called (no manual node deselection)
+    expect(mockSetNodes).not.toHaveBeenCalled();
 
     // Verify onSelectEdge was called with the correct edge data
     expect(mockOnSelectEdge).toHaveBeenCalledWith(
@@ -161,13 +155,13 @@ describe("CustomEdge", () => {
       }),
     );
 
-    // Verify onSelectNode was called with null to clear node selection
-    expect(mockOnSelectNode).toHaveBeenCalledWith(null);
+    // Verify onSelectNode was NOT called (don't clear node selection for mixed selections)
+    expect(mockOnSelectNode).not.toHaveBeenCalled();
   });
 
   // New test for self-connection rendering
   it("renders self-connections with custom path", () => {
-    const { container } = render(<CustomEdge {...mockSelfConnectionEdgeProps} />);
+    const { container } = render(<CustomEdgeComponent {...mockSelfConnectionEdgeProps} />);
     
     // Check that paths are rendered
     expect(container.querySelector(".react-flow__edge-path")).not.toBeNull();
@@ -179,7 +173,7 @@ describe("CustomEdge", () => {
 
   // New test for selected edge styling
   it("applies special styling for selected edges", () => {
-    const { container } = render(<CustomEdge {...mockSelectedEdgeProps} />);
+    const { container } = render(<CustomEdgeComponent {...mockSelectedEdgeProps} />);
     
     const edgePath = container.querySelector(".react-flow__edge-path");
     
@@ -196,7 +190,7 @@ describe("CustomEdge", () => {
 
   // Test for edit mode
   it("switches to edit mode on double-click and updates label on enter", () => {
-    render(<CustomEdge {...mockEdgeProps} />);
+    render(<CustomEdgeComponent {...mockEdgeProps} />);
 
     // Find the label and double click it
     const edgeLabel = screen.getByText("Test Connection");
@@ -221,7 +215,7 @@ describe("CustomEdge", () => {
 
   // Test for blur to save edits
   it("saves label edits on blur", () => {
-    render(<CustomEdge {...mockEdgeProps} />);
+    render(<CustomEdgeComponent {...mockEdgeProps} />);
 
     // Find the label and double click it
     const edgeLabel = screen.getByText("Test Connection");
@@ -238,5 +232,28 @@ describe("CustomEdge", () => {
     
     // Should call updateEdgeLabel with the new value
     expect(mockUpdateEdgeLabel).toHaveBeenCalledWith("edge-1", "Blurred Connection");
+  });
+
+  it("does not trigger selection handlers when clicking with modifier keys (for multi-selection)", () => {
+    const { container } = render(<CustomEdgeComponent {...mockEdgeProps} />);
+
+    // Find the edge path and click it with Ctrl key (simulating multi-selection)
+    const edgePath = container.querySelector(".react-flow__edge-path");
+    if (edgePath) {
+      fireEvent.click(edgePath, { ctrlKey: true });
+    }
+
+    // Verify that selection handlers were NOT called (allowing ReactFlow's multi-selection)
+    expect(mockOnSelectEdge).not.toHaveBeenCalled();
+    expect(mockOnSelectNode).not.toHaveBeenCalled();
+
+    // Test with Meta key as well (for macOS)
+    if (edgePath) {
+      fireEvent.click(edgePath, { metaKey: true });
+    }
+
+    // Verify that selection handlers were still NOT called
+    expect(mockOnSelectEdge).not.toHaveBeenCalled();
+    expect(mockOnSelectNode).not.toHaveBeenCalled();
   });
 });

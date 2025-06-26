@@ -15,9 +15,10 @@ import ReactFlow, {
   type OnConnectStart,
   type OnConnectEnd,
 } from "reactflow";
+import { Button } from "@/components/ui/button";
 import "reactflow/dist/base.css";
 import "reactflow/dist/style.css";
-import { CustomEdge } from "./CustomEdge";
+import { CustomEdgeComponent as CustomEdge } from "./CustomEdge";
 import Gallery from "./Gallery";
 import SystemComponentNode from "./ReactflowCustomNodes/SystemComponentNode";
 import { Whiteboard } from "./SystemComponents/Whiteboard";
@@ -35,9 +36,11 @@ const edgeTypes: Record<string, ComponentType<EdgeProps>> = {
 const SystemDesigner = ({
   PassedFlowManager,
   canEdit = true,
+  onSaveLinking,
 }: {
   PassedFlowManager: () => React.ReactNode;
   canEdit?: boolean;
+  onSaveLinking?: () => void;
 }) => {
   const {
     nodes,
@@ -54,7 +57,18 @@ const SystemDesigner = ({
     onSelectNode,
     onSelectEdge,
     setNodes,
+    // Linking functionality from context
+    linkingTextAreaId,
+    linkingSelection,
+    stopLinking,
+    isLinkingMode,
   } = useSystemDesigner();
+
+  // Track selection changes for linking - simplified to use React Flow's built-in selection
+  useEffect(() => {
+    // React Flow handles selection internally, the context tracks it automatically
+    // No additional logic needed here since the context useEffect handles selection tracking
+  }, []);
 
   const handleConnect: OnConnect = (params) => {
     if (!canEdit) return; // Prevent connections in view-only mode
@@ -68,7 +82,7 @@ const SystemDesigner = ({
 
   useEffect(() => {
     onSelectNode(whiteboardNode);
-  }, []);
+  }, [onSelectNode, whiteboardNode]);
 
   // Handler to deselect all nodes when starting a connection
   const handleConnectStart: OnConnectStart = (event, params) => {
@@ -120,34 +134,49 @@ const SystemDesigner = ({
         onDragOver={canEdit ? onDragOver : undefined}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
-        onNodeClick={(_, node) => {
-          onSelectNode(node);
-          onSelectEdge(null);
-        }}
-        onEdgeClick={(_, edge) => {
-          // Deselect all nodes by updating their selected property
-          const deselectedNodes = nodes.map((node) => ({
-            ...node,
-            selected: false,
-          }));
-          setNodes(deselectedNodes);
+        onNodeClick={(event, node) => {
+          // During linking mode, allow React Flow's built-in selection behavior
+          if (linkingTextAreaId) {
+            // Let React Flow handle the selection, the context will track it automatically
+            return;
+          }
           
-          onSelectEdge(edge);
-          onSelectNode(null);
+          // Only set focused element for UI panels if not multi-selecting
+          if (!event.ctrlKey && !event.metaKey) {
+            onSelectNode(node);
+            // Don't clear edge selection - let user mix selections freely
+          }
         }}
-        onNodeDragStart={canEdit ? (_, node) => {
-          onSelectNode(node);
-          onSelectEdge(null);
-        } : undefined}
+        onEdgeClick={(event, edge) => {
+          // During linking mode, allow React Flow's built-in selection behavior
+          if (linkingTextAreaId) {
+            // Let React Flow handle the selection, the context will track it automatically
+            return;
+          }
+          
+          // Only set focused element for UI panels if not multi-selecting
+          if (!event.ctrlKey && !event.metaKey) {
+            onSelectEdge(edge);
+            // Don't clear node selection - let user mix selections freely
+          }
+        }}
+        onNodeDragStart={
+          canEdit
+            ? (_, node) => {
+                onSelectNode(node);
+                // Don't clear edge selection - let user mix selections freely
+              }
+            : undefined
+        }
         onSelectionStart={() => {
           onSelectNode(whiteboardNode);
-          onSelectEdge(null);
+          // Don't clear edge selection - let user mix selections freely
         }}
         onNodesDelete={canEdit ? () => onSelectNode(whiteboardNode) : undefined}
         onEdgesDelete={canEdit ? () => onSelectEdge(null) : undefined}
         onPaneClick={() => {
           onSelectNode(whiteboardNode);
-          onSelectEdge(null);
+          onSelectEdge(null); // Pane click should clear all selections - this is expected behavior
         }}
         defaultEdgeOptions={{
           markerEnd: { type: MarkerType.ArrowClosed },
@@ -179,6 +208,38 @@ const SystemDesigner = ({
         <Panel position="bottom-center">
           <PassedFlowManager />
         </Panel>
+        {linkingTextAreaId && (
+          <Panel position="top-center">
+            <div className="rounded-lg border border-gray-200 bg-white px-4 py-3 shadow-lg dark:border-gray-700 dark:bg-gray-800">
+              <div className="flex items-center justify-between gap-4">
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Command/Ctrl + click to link 1+ element (node or edge) to the
+                  selected textarea
+                </span>
+                <div className="flex items-center gap-2">
+                  {onSaveLinking && (
+                    <Button
+                      variant="default"
+                      size="sm"
+                      onClick={onSaveLinking}
+                      className="h-8 bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+                      Save Links
+                    </Button>
+                  )}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={stopLinking}
+                    className="h-8"
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </Panel>
+        )}
         <Panel position="top-right" className="m-auto flex">
           <div className="component-gallery">
             <Gallery canEdit={canEdit} />
@@ -193,9 +254,17 @@ const SystemDesigner = ({
 export default function SystemBuilder({
   PassedFlowManager,
   canEdit = true,
+  onSaveLinking,
 }: {
   PassedFlowManager: () => React.ReactNode;
   canEdit?: boolean;
+  onSaveLinking?: () => void;
 }) {
-  return <SystemDesigner PassedFlowManager={PassedFlowManager} canEdit={canEdit} />;
+    return (
+    <SystemDesigner 
+      PassedFlowManager={PassedFlowManager} 
+      canEdit={canEdit}
+      onSaveLinking={onSaveLinking}
+    />
+  );
 }

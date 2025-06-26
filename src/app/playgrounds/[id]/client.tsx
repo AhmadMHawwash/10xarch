@@ -5,6 +5,9 @@ import { ComponentSettings } from "@/components/playground/ComponentSettings";
 import { EdgeSettings } from "@/components/playground/EdgeSettings";
 import { PlaygroundToolbar } from "@/components/playground/PlaygroundToolbar";
 import SystemContext from "@/components/playground/SystemContext";
+import DocsFileSystem, {
+  type DocsFileSystemData,
+} from "@/components/playground/DocsFileSystem";
 import { FlowManager } from "@/components/SolutionFlowManager";
 import SystemBuilder from "@/components/SystemDesigner";
 import { CommitMessageDialog } from "@/components/playground/CommitMessageDialog";
@@ -32,7 +35,7 @@ import {
   type PlaygroundState,
 } from "@/lib/utils/playground-utils";
 import { useUser } from "@clerk/nextjs";
-import { Bot, Info, X } from "lucide-react";
+import { BookIcon, Bot, Info, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocalStorage, usePrevious } from "react-use";
@@ -62,6 +65,10 @@ function PageContent() {
     setEdges,
     nodes,
     edges,
+    linkingTextAreaId,
+    linkingSelection,
+    startLinking,
+    stopLinking,
   } = useSystemDesigner();
 
   const {
@@ -72,12 +79,11 @@ function PageContent() {
     answer: feedback,
     isLoadingAnswer,
     isLoadingPlayground,
-    refetchPlayground,
   } = usePlaygroundManager();
 
   // Check permissions
   const { canEdit, canView } = usePlaygroundPermissions(playground);
-  
+
   // Also get user loading state to prevent premature permission checks
   const { isLoaded: isUserLoaded } = useUser();
 
@@ -93,6 +99,11 @@ function PageContent() {
   const [localTitle, setLocalTitle] = useState("");
   const [localDescription, setLocalDescription] = useState("");
   const [showCommitDialog, setShowCommitDialog] = useState(false);
+  const [showDocsFileSystem, setShowDocsFileSystem] = useState(false);
+  const [docsData, setDocsData] = useState<DocsFileSystemData>({
+    items: [],
+    currentPath: [],
+  });
   const { toast } = useToast();
 
   const isInitialized = useRef(false);
@@ -103,6 +114,7 @@ function PageContent() {
     description: string;
     nodes: typeof nodes;
     edges: typeof edges;
+    docsData: DocsFileSystemData;
   } | null>(null);
 
   const [title, setTitle] = useSystemComponentConfigSlice<string>(
@@ -119,13 +131,20 @@ function PageContent() {
   // Show access error if user doesn't have view permission
   useEffect(() => {
     // Only check permissions if we have complete playground data AND user auth is loaded
-    const hasCompletePlaygroundData = playground?.ownerType !== undefined && 
+    const hasCompletePlaygroundData =
+      playground?.ownerType !== undefined &&
       playground.ownerId !== undefined &&
       playground.editorIds !== undefined &&
       playground.viewerIds !== undefined &&
       playground.isPublic !== undefined;
 
-    if (isClient && hasCompletePlaygroundData && isUserLoaded && !canView && !isLoadingPlayground) {
+    if (
+      isClient &&
+      hasCompletePlaygroundData &&
+      isUserLoaded &&
+      !canView &&
+      !isLoadingPlayground
+    ) {
       toast({
         title: "Access Denied",
         description: "You don't have permission to view this playground.",
@@ -133,7 +152,15 @@ function PageContent() {
       });
       router.push("/");
     }
-  }, [isClient, playground, canView, isUserLoaded, toast, router, isLoadingPlayground]);
+  }, [
+    isClient,
+    playground,
+    canView,
+    isUserLoaded,
+    toast,
+    router,
+    isLoadingPlayground,
+  ]);
 
   // Client-side initialization
   useEffect(() => {
@@ -180,12 +207,25 @@ function PageContent() {
     setLocalTitle(title);
     setLocalDescription(description);
 
+    // Initialize docs data from playground jsonBlob
+    const playgroundJsonBlob = playground.jsonBlob as {
+      nodes?: typeof nodes;
+      edges?: typeof edges;
+      docsData?: DocsFileSystemData;
+    };
+    if (playgroundJsonBlob?.docsData) {
+      setDocsData(playgroundJsonBlob.docsData);
+    } else {
+      setDocsData({ items: [], currentPath: [] });
+    }
+
     // Set initial saved state
     lastSavedStateRef.current = {
       title,
       description,
       nodes: processedNodes,
       edges: playground.edges,
+      docsData,
     };
   }, [playground, setNodes, setEdges]);
 
@@ -206,10 +246,11 @@ function PageContent() {
       description: localDescription,
       nodes,
       edges,
+      docsData,
     };
 
     return hasPlaygroundChanges(currentState, lastSavedStateRef.current);
-  }, [localTitle, localDescription, nodes, edges]);
+  }, [localTitle, localDescription, nodes, edges, docsData]);
 
   // Auto-save functionality - only for editors
   useEffect(() => {
@@ -238,13 +279,18 @@ function PageContent() {
         description: localDescription,
         nodes,
         edges,
+        docsData,
       };
 
       updatePlayground({
         id: playgroundId,
         title: currentState.title,
         description: currentState.description,
-        jsonBlob: { nodes: currentState.nodes, edges: currentState.edges },
+        jsonBlob: {
+          nodes: currentState.nodes,
+          edges: currentState.edges,
+          docsData,
+        },
       })
         .then(() => {
           // Update last saved state after successful save
@@ -276,6 +322,7 @@ function PageContent() {
     isSaving,
     localTitle,
     localDescription,
+    docsData,
     hasChanges,
     canEdit,
     toast,
@@ -305,67 +352,76 @@ function PageContent() {
     };
   }, [hasChanges, canEdit]);
 
-  const handleManualSave = useCallback(async (commitMessage?: string) => {
-    if (!canEdit) {
-      toast({
-        title: "Access Denied",
-        description: "You don't have permission to edit this playground.",
-        variant: "destructive",
-      });
-      return;
-    }
+  const handleManualSave = useCallback(
+    async (commitMessage?: string) => {
+      if (!canEdit) {
+        toast({
+          title: "Access Denied",
+          description: "You don't have permission to edit this playground.",
+          variant: "destructive",
+        });
+        return;
+      }
 
-    if (autoSaveTimeoutRef.current) {
-      clearTimeout(autoSaveTimeoutRef.current); // Prevent auto-save race condition
-    }
-    setIsSaving(true);
+      if (autoSaveTimeoutRef.current) {
+        clearTimeout(autoSaveTimeoutRef.current); // Prevent auto-save race condition
+      }
+      setIsSaving(true);
 
-    const currentState = {
-      title: localTitle || "Untitled Playground",
-      description: localDescription,
+      const currentState = {
+        title: localTitle || "Untitled Playground",
+        description: localDescription,
+        nodes,
+        edges,
+        docsData,
+      };
+
+      try {
+        await updatePlayground({
+          id: playgroundId,
+          title: currentState.title,
+          description: currentState.description,
+          jsonBlob: {
+            nodes: currentState.nodes,
+            edges: currentState.edges,
+            docsData,
+          },
+          triggerBackup: true,
+          commitMessage,
+        });
+
+        // Update last saved state after successful save
+        lastSavedStateRef.current = currentState;
+
+        toast({
+          title: "Saved",
+          description: commitMessage
+            ? "Your changes have been saved with commit message"
+            : "Your changes have been saved",
+        });
+      } catch (error) {
+        console.error("Manual save failed:", error);
+        toast({
+          title: "Save Failed",
+          description: "You don't have permission to edit this playground.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsSaving(false);
+      }
+    },
+    [
+      playgroundId,
       nodes,
       edges,
-    };
-
-    try {
-      await updatePlayground({
-        id: playgroundId,
-        title: currentState.title,
-        description: currentState.description,
-        jsonBlob: { nodes: currentState.nodes, edges: currentState.edges },
-        triggerBackup: true,
-        commitMessage,
-      });
-
-      // Update last saved state after successful save
-      lastSavedStateRef.current = currentState;
-
-      toast({
-        title: "Saved",
-        description: commitMessage 
-          ? "Your changes have been saved with commit message"
-          : "Your changes have been saved",
-      });
-    } catch (error) {
-      console.error("Manual save failed:", error);
-      toast({
-        title: "Save Failed",
-        description: "You don't have permission to edit this playground.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSaving(false);
-    }
-  }, [
-    playgroundId,
-    nodes,
-    edges,
-    updatePlayground,
-    localTitle,
-    localDescription,
-    toast,
-    canEdit,
-  ]);
+      updatePlayground,
+      localTitle,
+      localDescription,
+      docsData,
+      toast,
+      canEdit,
+    ],
+  );
 
   const handleCheckSolution = useCallback(() => {
     if (!canEdit) {
@@ -384,14 +440,168 @@ function PageContent() {
     setShowCommitDialog(true);
   }, []);
 
-  const handleCommit = useCallback((commitMessage: string) => {
-    setShowCommitDialog(false);
-    void handleManualSave(commitMessage);
-  }, [handleManualSave]);
+  const handleCommit = useCallback(
+    (commitMessage: string) => {
+      setShowCommitDialog(false);
+      void handleManualSave(commitMessage);
+    },
+    [handleManualSave],
+  );
 
   const handleCloseCommitDialog = useCallback(() => {
     setShowCommitDialog(false);
   }, []);
+
+  const handleStartLinking = useCallback((textAreaId: string) => {
+    startLinking(textAreaId);
+  }, [startLinking]);
+
+  const handleStopLinking = useCallback(() => {
+    stopLinking();
+  }, [stopLinking]);
+
+  const handleSelectionChange = useCallback(
+    (selectedNodes: typeof nodes, selectedEdges: typeof edges) => {
+      // This function is no longer needed since the context handles selection tracking
+      // Keep it for compatibility but it doesn't need to do anything
+    },
+    [linkingTextAreaId],
+  );
+
+  const handleSaveLinking = useCallback(() => {
+    if (!linkingTextAreaId || linkingSelection.nodes.length === 0 && linkingSelection.edges.length === 0) return;
+
+    // Parse textAreaId to get fileId and sectionId
+    const [fileLabel, fileId, sectionLabel, sectionId] = linkingTextAreaId.split("_");
+
+    // Create linked elements array from current selection
+    const linkedElements = [
+      ...linkingSelection.nodes.map((node) => ({
+        id: node.id,
+        type: "node" as const,
+        name: node.data.title ?? node.data.name ?? node.id,
+      })),
+      ...linkingSelection.edges.map((edge) => ({
+        id: edge.id,
+        type: "edge" as const,
+        name: edge.data?.label ?? `${edge.source} → ${edge.target}`,
+      })),
+    ];
+
+    // Update docsData with linked elements
+    const updateItems = (
+      items: DocsFileSystemData["items"],
+    ): DocsFileSystemData["items"] => {
+      return items.map((item) => {
+        if (item.id === fileLabel+"_"+fileId) {
+          const updatedSections = (item.contentSections ?? []).map(
+            (section) => {
+              if (section.id === sectionLabel+"_"+sectionId) {
+                const existingLinked = section.linkedElements ?? [];
+                const newLinked = linkedElements.filter(
+                  (newEl) =>
+                    !existingLinked.some(
+                      (existing) => existing.id === newEl.id,
+                    ),
+                );
+                return {
+                  ...section,
+                  linkedElements: [...existingLinked, ...newLinked],
+                };
+              }
+              return section;
+            },
+          );
+          return { ...item, contentSections: updatedSections };
+        }
+        if (item.children) {
+          return { ...item, children: updateItems(item.children) };
+        }
+        return item;
+      });
+    };
+
+    const newDocsData = {
+      ...docsData,
+      items: updateItems(docsData.items),
+    };
+
+    setDocsData(newDocsData);
+
+    // Immediately save to database after linking
+    if (canEdit) {
+      setIsSaving(true);
+      const currentState = {
+        title: localTitle || "Untitled Playground",
+        description: localDescription,
+        nodes,
+        edges,
+        docsData: newDocsData, // Use the updated docsData
+      };
+
+      updatePlayground({
+        id: playgroundId,
+        title: currentState.title,
+        description: currentState.description,
+        jsonBlob: {
+          nodes: currentState.nodes,
+          edges: currentState.edges,
+          docsData: currentState.docsData,
+        },
+      })
+        .then(() => {
+          // Update last saved state after successful save
+          lastSavedStateRef.current = currentState;
+          toast({
+            title: "Saved",
+            description: "Elements linked and saved successfully.",
+            variant: "default",
+          });
+          // Stop linking after successful save
+          stopLinking();
+        })
+        .catch((error) => {
+          console.error("Save failed:", error);
+          toast({
+            title: "Save Failed",
+            description: "Failed to save linked elements.",
+            variant: "destructive",
+          });
+        })
+        .finally(() => {
+          setIsSaving(false);
+        });
+    }
+  }, [linkingTextAreaId, linkingSelection, docsData, setDocsData, nodes, edges, canEdit, setIsSaving, localTitle, localDescription, updatePlayground, playgroundId, lastSavedStateRef, toast, stopLinking]);
+
+  const handleLinkElements = useCallback(
+    (selectedNodes: typeof nodes, selectedEdges: typeof edges) => {
+      // This function is no longer needed since the context handles selection tracking
+      // Keep it for compatibility but it doesn't need to do anything
+    },
+    [],
+  );
+
+  // Handle selecting linked elements when clicking on text areas
+  const handleSelectLinkedElements = useCallback((nodeIds: string[], edgeIds: string[]) => {
+    // Clear all current selections
+    const clearedNodes = nodes.map(node => ({ ...node, selected: false }));
+    const clearedEdges = edges.map(edge => ({ ...edge, selected: false }));
+    
+    // Select the specified nodes and edges
+    const updatedNodes = clearedNodes.map(node => ({
+      ...node,
+      selected: nodeIds.includes(node.id)
+    }));
+    
+    const updatedEdges = clearedEdges.map(edge => ({
+      ...edge,
+      selected: edgeIds.includes(edge.id)
+    }));
+    
+    setNodes(updatedNodes);
+    setEdges(updatedEdges);
+  }, [nodes, edges, setNodes, setEdges]);
 
   const handleCloseWelcomeGuide = (dontShowAgain: boolean) => {
     setShowWelcomeGuide(false);
@@ -409,8 +619,9 @@ function PageContent() {
   const Icon = comp?.icon ?? (() => null);
   const isSystemNodeSelected =
     !selectedNode?.data?.id || selectedNode?.type === "Whiteboard";
-  const showEdgeSettings = selectedEdge !== null;
-  const showNodeSettings = selectedNode !== null && !isSystemNodeSelected;
+  const showEdgeSettings = selectedEdge !== null && !linkingTextAreaId;
+  const showNodeSettings =
+    selectedNode !== null && !isSystemNodeSelected && !linkingTextAreaId;
 
   // Don't render anything if user doesn't have view permission
   if (!canView && isClient) {
@@ -428,13 +639,13 @@ function PageContent() {
           <div className="h-full bg-gray-50/50 p-4 dark:bg-gray-900/50">
             {playground && (
               <PlaygroundToolbar
-                className="mb-2 -mt-2"
+                className="-mt-2 mb-2"
                 playground={playground as any}
               />
             )}
             <Card className="h-full border-gray-200 dark:border-gray-800">
               <div className="flex items-center border-b border-gray-200 p-4 dark:border-gray-800">
-                <div className="flex flex-1 items-center gap-2">
+                <div className="flex flex-1 items-center justify-between gap-2">
                   {showEdgeSettings ? (
                     <span className="text-base font-medium">Connection</span>
                   ) : (
@@ -447,6 +658,16 @@ function PageContent() {
                       </span>
                     </>
                   )}
+                  {isSystemNodeSelected ? (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="gap-2"
+                      onClick={() => setShowDocsFileSystem(!showDocsFileSystem)}
+                    >
+                      Docs <BookIcon className="h-4 w-4" />
+                    </Button>
+                  ) : null}
                 </div>
               </div>
 
@@ -513,6 +734,20 @@ function PageContent() {
                             canEdit={canEdit}
                           />
                         </>
+                      ) : showDocsFileSystem ? (
+                        <DocsFileSystem
+                          data={docsData}
+                          onDataChange={setDocsData}
+                          canEdit={canEdit}
+                          linkingTextAreaId={linkingTextAreaId}
+                          onStartLinking={handleStartLinking}
+                          onStopLinking={handleStopLinking}
+                          currentSelection={
+                            linkingTextAreaId ? linkingSelection : undefined
+                          }
+                          onSaveLinking={handleSaveLinking}
+                          onSelectLinkedElements={handleSelectLinkedElements}
+                        />
                       ) : (
                         <SystemContext
                           title={localTitle}
@@ -550,6 +785,7 @@ function PageContent() {
               />
             )}
             canEdit={canEdit}
+            onSaveLinking={handleSaveLinking}
           />
         </ResizablePanel>
         {isChatPanelOpen && (

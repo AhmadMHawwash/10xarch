@@ -9,6 +9,7 @@ import { useSystemDesigner } from "@/lib/hooks/_useSystemDesigner";
 import { useChatMessages } from "@/lib/hooks/useChatMessages_";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
+import { type CustomEdge } from "@/types/system";
 import { useAuth, useOrganization } from "@clerk/nextjs";
 import { useQueryClient } from "@tanstack/react-query";
 import { Send } from "lucide-react";
@@ -48,11 +49,7 @@ interface WhiteboardConfigs {
 }
 
 export const extractAPIDefinitions = (
-  edges: Edge<{
-    label?: string;
-    apiDefinition?: string;
-    requestFlow?: string;
-  }>[],
+  edges: CustomEdge[],
 ) => {
   return edges
     ?.filter(

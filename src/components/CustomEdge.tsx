@@ -4,7 +4,6 @@ import {
   getBezierPath,
   EdgeLabelRenderer,
   type EdgeProps,
-  type Edge,
   Position,
 } from "reactflow";
 import { useSystemDesigner } from "@/lib/hooks/_useSystemDesigner";
@@ -109,7 +108,7 @@ export const CustomEdgeComponent: FC<EdgeProps<CustomEdgeData>> = ({
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     // Stop propagation for all keys to prevent ReactFlow from handling them
     e.stopPropagation();
-    
+
     if (e.key === "Enter") {
       setIsEditing(false);
       updateEdgeLabel(id, e.currentTarget.value);
@@ -127,7 +126,6 @@ export const CustomEdgeComponent: FC<EdgeProps<CustomEdgeData>> = ({
   const handleEdgeClick = (e: React.MouseEvent) => {
     // Open the edge settings panel only if not multi-selecting
     if (!e.ctrlKey && !e.metaKey) {
-      e.stopPropagation();
       const edge: CustomEdge = {
         id,
         data: data ?? {},
@@ -136,7 +134,7 @@ export const CustomEdgeComponent: FC<EdgeProps<CustomEdgeData>> = ({
         sourceHandle: sourceHandleId,
         targetHandle: targetHandleId,
       };
-      
+
       onSelectEdge(edge);
       // Don't clear node selection - let user mix selections freely
     }

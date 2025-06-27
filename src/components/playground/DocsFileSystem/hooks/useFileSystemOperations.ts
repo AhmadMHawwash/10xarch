@@ -31,7 +31,7 @@ export const useFileSystemOperations = (
     } else if (file.content) {
       return [
         {
-          id: `section_${Date.now()}`,
+          id: `section_${file.id}_migration`, // Use file ID to ensure consistency
           title: "Content", // DEFAULT title for migrated content
           content: file.content,
         },
@@ -39,7 +39,7 @@ export const useFileSystemOperations = (
     } else {
       return [
         {
-          id: `section_${Date.now()}`,
+          id: `section_${file.id}_default`, // Use file ID to ensure consistency
           title: "Introduction", // BETTER default title
           content: "",
         },

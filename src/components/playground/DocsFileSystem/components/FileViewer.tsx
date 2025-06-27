@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Eye, EyeOff, Plus, X } from "lucide-react";
@@ -57,7 +57,9 @@ export const FileViewer: React.FC<FileViewerProps> = ({
 
   const fileSystemOps = useFileSystemOperations(data, onDataChange, canEdit);
 
-  const contentSections = fileSystemOps.getContentSections(selectedFile);
+  const contentSections = useMemo(() => {
+    return fileSystemOps.getContentSections(selectedFile);
+  }, [fileSystemOps, selectedFile]);
 
   // Select linked elements for a section
   const handleSelectLinkedElements = (sectionId: string) => {

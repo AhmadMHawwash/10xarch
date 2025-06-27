@@ -28,6 +28,16 @@ const DocsFileSystem = ({
 
   const fileSystemOps = useFileSystemOperations(data, onDataChange, canEdit);
 
+  // Update selectedFile when data changes to ensure it's always current
+  useEffect(() => {
+    if (selectedFile) {
+      const updatedFile = fileSystemOps.findFileById(selectedFile.id);
+      if (updatedFile && updatedFile !== selectedFile) {
+        setSelectedFile(updatedFile);
+      }
+    }
+  }, [data, selectedFile, fileSystemOps]);
+
   // Update data when path changes
   useEffect(() => {
     if (data.currentPath !== currentPath) {

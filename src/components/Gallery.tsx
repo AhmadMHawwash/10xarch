@@ -78,28 +78,6 @@ const components: Record<SystemComponentType, SystemComponent> = {
     icon: Box,
     content: "# Custom Component\nA configurable component that can represent any system element you need in your architecture.",
   },
-//   Whiteboard: {
-//     description:
-//       "Whiteboard is your area to write your notes and thoughts about the system.",
-//     name: "Whiteboard",
-//     icon: PresentationIcon,
-//     content: `# Whiteboard
-// Is your digital area where you can write down your notes and thoughts about the system.
-
-// It includes 3 main areas:
-// - **Requirements**: where you define functional and non-functional requirements of the system.
-// - **System API**: where you define the API endpoints and their expected behavior.
-// - **Capacity estimations**: where you define the expected traffic, storage, memory, and bandwidth requirements of the system.
-
-// Defining these 3 areas at the beginning will help you design the system in a thoughtful and considerable way.
-//     `,
-//   },
-};
-
-const componentCategories = {
-  "Basic Components": ["Client", "Server", "Database"],
-  "Advanced Components": ["Load Balancer", "Cache", "CDN", "Message Queue"],
-  "Custom Components": ["Custom Component"],
 };
 
 const Gallery = ({ canEdit = true }: { canEdit?: boolean }) => {

@@ -21,6 +21,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { CreationModal } from '../../components/playground/CreationModal';
 
 interface PlaygroundsClientProps {
   initialPlaygrounds: Playground[];
@@ -46,6 +47,7 @@ export default function PlaygroundsClient({ initialPlaygrounds }: PlaygroundsCli
   const [playgroundToDelete, setPlaygroundToDelete] = useState<string | null>(null);
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
   const [sharingPlaygroundId, setSharingPlaygroundId] = useState<string | null>(null);
+  const [showCreationModal, setShowCreationModal] = useState(false);
 
   const { data, isLoading, refetch } = api.playgrounds.getAll.useQuery(
     { filter: activeFilter },
@@ -61,8 +63,12 @@ export default function PlaygroundsClient({ initialPlaygrounds }: PlaygroundsCli
         title: 'Success',
         description: 'Playground created successfully',
       });
-      // Redirect to the new playground
-      router.push(`/playgrounds/${data.playground.id}`);
+      // Redirect based on creation type
+      if (data.playground.title === 'GitHub Analysis') {
+        router.push(`/playgrounds/${data.playground.id}/analyse`);
+      } else {
+        router.push(`/playgrounds/${data.playground.id}`);
+      }
     },
     onError: (error) => {
       toast({
@@ -92,14 +98,31 @@ export default function PlaygroundsClient({ initialPlaygrounds }: PlaygroundsCli
   });
 
   const handleCreatePlayground = async () => {
+    setShowCreationModal(true);
+  };
+
+  const handleCreateFromScratch = async () => {
+    setShowCreationModal(false);
     createPlaygroundMutation.mutate({
       title: 'Untitled Playground',
       jsonBlob: {
         nodes: defaultStartingNodes,
         edges: [] as Edge[],
-      }, // Initialize with empty diagram
+      },
       ownerType: 'user',
-      // ownerId will be set to the current user on the server
+    });
+  };
+
+  const handleCreateFromGitHub = async () => {
+    setShowCreationModal(false);
+    // First create an empty playground
+    createPlaygroundMutation.mutate({
+      title: 'GitHub Analysis',
+      jsonBlob: {
+        nodes: [],
+        edges: [],
+      },
+      ownerType: 'user',
     });
   };
 
@@ -356,6 +379,15 @@ export default function PlaygroundsClient({ initialPlaygrounds }: PlaygroundsCli
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Creation Modal */}
+      <CreationModal 
+        isOpen={showCreationModal}
+        onClose={() => setShowCreationModal(false)}
+        onCreateFromScratch={handleCreateFromScratch}
+        onCreateFromGitHub={handleCreateFromGitHub}
+        isCreating={createPlaygroundMutation.isPending}
+      />
     </div>
   );
 }

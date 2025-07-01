@@ -53,6 +53,69 @@ export const users = createTable("users", {
 
 export type User = typeof users.$inferSelect;
 
+// GitHub integration tables
+export const userGitHubTokens = createTable("user_github_tokens", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: text("user_id").references(() => users.id).notNull(),
+  encryptedToken: text("encrypted_token").notNull(),
+  tokenType: text("token_type").notNull().default("personal_access_token"),
+  scopes: text("scopes").array(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  lastUsedAt: timestamp("last_used_at"),
+  isActive: integer("is_active").notNull().default(1),
+});
+
+export type UserGitHubToken = typeof userGitHubTokens.$inferSelect;
+
+export const repositoryAnalysisEnum = pgEnum("analysis_status", [
+  "pending",
+  "analyzing", 
+  "completed",
+  "failed",
+  "cancelled"
+]);
+
+export const repositoryAnalyses = createTable("repository_analyses", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  playgroundId: uuid("playground_id").references(() => playgrounds.id).notNull(),
+  userId: text("user_id").references(() => users.id).notNull(),
+  repositoryUrl: text("repository_url").notNull(),
+  repositoryFullName: text("repository_full_name").notNull(), // e.g., "facebook/react"
+  branch: text("branch").default("main"),
+  isPrivate: integer("is_private").notNull().default(0),
+  privacyMode: integer("privacy_mode").notNull().default(0), // Don't send to LLM training
+  
+  // Analysis metadata
+  status: repositoryAnalysisEnum("status").notNull().default("pending"),
+  currentExpert: text("current_expert"), // Which expert is currently analyzing
+  progressPercentage: integer("progress_percentage").notNull().default(0),
+  
+  // Cost and token tracking
+  estimatedTokens: integer("estimated_tokens"),
+  actualTokensUsed: integer("actual_tokens_used"),
+  
+  // Repository information
+  detectedLanguages: text("detected_languages").array(),
+  detectedFrameworks: text("detected_frameworks").array(),
+  architectureType: text("architecture_type"), // monolith, microservices, serverless
+  
+  // Analysis results
+  identifiedComponents: jsonb("identified_components"), // Array of component objects
+  expertAnalyses: jsonb("expert_analyses"), // Analysis results from each expert
+  analysisLog: jsonb("analysis_log"), // Detailed log of analysis steps
+  
+  // Error handling
+  errorMessage: text("error_message"),
+  retryCount: integer("retry_count").notNull().default(0),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  completedAt: timestamp("completed_at"),
+});
+
+export type RepositoryAnalysis = typeof repositoryAnalyses.$inferSelect;
+
 // Subscription status enum
 export const subscriptionStatusEnum = pgEnum("subscription_status", [
   "incomplete",

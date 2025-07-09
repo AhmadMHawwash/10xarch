@@ -41,7 +41,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocalStorage, usePrevious } from "react-use";
 import { ReactFlowProvider } from "reactflow";
 
-const AUTO_SAVE_INTERVAL = 5000; // 20 seconds
+const AUTO_SAVE_INTERVAL = 10000 * 60; // 10 minutes
 
 export default function PlaygroundClient() {
   return (

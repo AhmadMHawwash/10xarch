@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -76,6 +76,30 @@ export const ContentSection: React.FC<ContentSectionProps> = ({
 }) => {
   const [editingSectionTitle, setEditingSectionTitle] = useState<boolean>(false);
   const [tempSectionTitle, setTempSectionTitle] = useState("");
+  
+  // Local state for content to prevent re-renders on every keystroke
+  const [localContent, setLocalContent] = useState(section.content);
+
+  // Sync local state with prop changes (when section changes externally)
+  useEffect(() => {
+    setLocalContent(section.content);
+  }, [section.content]);
+
+  // Handle saving content changes on blur
+  const handleContentSave = () => {
+    if (localContent !== section.content) {
+      onUpdateSectionContent(localContent);
+    }
+  };
+
+  // Save on unmount to prevent data loss
+  useEffect(() => {
+    return () => {
+      if (localContent !== section.content) {
+        onUpdateSectionContent(localContent);
+      }
+    };
+  }, [localContent, section.content, onUpdateSectionContent]);
 
   const startEditingSectionTitle = () => {
     if (!canEdit) return;
@@ -233,13 +257,16 @@ export const ContentSection: React.FC<ContentSectionProps> = ({
           // Edit mode: Show textarea with markdown hints
           <div className="space-y-2">
             <Textarea
-              value={section.content}
-              onChange={(e) => onUpdateSectionContent(e.target.value)}
+              value={localContent}
+              onChange={(e) => {
+                setLocalContent(e.target.value);
+              }}
               onFocus={() => {
                 onFocusSection(section.id);
                 onSelectLinkedElementsForSection?.(section.id);
               }}
               onBlur={() => {
+                handleContentSave();
                 onBlurSection();
                 onClearSelections?.();
               }}

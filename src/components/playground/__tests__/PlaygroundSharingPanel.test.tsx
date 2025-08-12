@@ -114,6 +114,8 @@ describe('PlaygroundSharingPanel', () => {
     description: null,
     lastBackupCommitSha: null,
     backupStatus: null,
+    associatedRepositoryUrl: null,
+    associatedAnalysisId: null,
   };
 
   beforeEach(() => {

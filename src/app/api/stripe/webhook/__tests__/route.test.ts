@@ -129,7 +129,7 @@ describe('Stripe Webhook Route', () => {
     });
     
     // Set up default successful webhook verification
-    mockStripe.webhooks.constructEvent.mockImplementation((body: string, signature: string, secret: string) => {
+    mockStripe.webhooks.constructEvent.mockImplementation((body: string, _signature: string, _secret: string) => {
       // Try to parse the body to return the appropriate event
       try {
         const parsedBody = JSON.parse(body);
@@ -576,7 +576,7 @@ describe('Stripe Webhook Route', () => {
       mockStripe.webhooks.constructEvent.mockReturnValue(paymentSucceededEvent as any);
       
       // Mock the subscription query for invoice.payment_succeeded
-      mockDb.query.subscriptions.findFirst.mockImplementation((query: any) => {
+      mockDb.query.subscriptions.findFirst.mockImplementation((_query: any) => {
         // Return the subscription for the invoice lookup
         return Promise.resolve({
           id: 'existing_sub',
@@ -625,7 +625,7 @@ describe('Stripe Webhook Route', () => {
       mockStripe.webhooks.constructEvent.mockReturnValue(tierChangeInvoiceEvent as any);
       
       // Make sure to clear the previous mock implementation
-      mockDb.query.subscriptions.findFirst.mockImplementation((query: any) => {
+      mockDb.query.subscriptions.findFirst.mockImplementation((_query: any) => {
         return Promise.resolve({
           id: 'existing_sub',
           tier: 'premium',

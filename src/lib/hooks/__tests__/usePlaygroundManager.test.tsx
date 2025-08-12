@@ -132,9 +132,11 @@ describe('usePlaygroundManager', () => {
     tags: null,
     lastEvaluationAt: null,
     evaluationScore: null,
-          evaluationFeedback: null,
-      lastBackupCommitSha: null,
-      backupStatus: null,
+    evaluationFeedback: null,
+    lastBackupCommitSha: null,
+    backupStatus: null,
+    associatedRepositoryUrl: null,
+    associatedAnalysisId: null,
   };
 
   const mockGetByIdDataReturnValue = {

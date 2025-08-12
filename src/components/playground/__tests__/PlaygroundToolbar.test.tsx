@@ -98,6 +98,8 @@ describe('PlaygroundToolbar', () => {
     description: null,
     lastBackupCommitSha: null,
     backupStatus: null,
+    associatedRepositoryUrl: null,
+    associatedAnalysisId: null,
   };
 
   const mockEmptyPlayground: Playground = {
@@ -157,7 +159,7 @@ describe('PlaygroundToolbar', () => {
 
     // Should render share, version history, and delete buttons
     const buttons = screen.getAllByRole('button');
-    expect(buttons).toHaveLength(3);
+    expect(buttons).toHaveLength(4);
     
     // Delete button should be the second button
     const deleteButton = buttons[1];
@@ -259,7 +261,7 @@ describe('PlaygroundToolbar', () => {
     );
 
     const buttons = screen.getAllByRole('button');
-    expect(buttons).toHaveLength(3);
+    expect(buttons).toHaveLength(4);
     
     // Should have share, version history, and delete buttons
     expect(buttons[0]).toBeInTheDocument(); // Share button

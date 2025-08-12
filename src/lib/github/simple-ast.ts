@@ -135,16 +135,18 @@ export class SimpleASTAnalyzer {
       
       if (nodeType === 'import_statement') {
         const nodeText = cursor.currentNode.text;
-        const importMatch = nodeText.match(/from\s+['"`]([^'"`]+)['"`]/);
-        if (importMatch) {
-          analysis.imports.push(importMatch[1]);
+        const importMatch = nodeText.match(/from\s+['"`]([^'"`]+)['"`]/) as RegExpMatchArray | null;
+        if (importMatch && typeof importMatch[1] === 'string') {
+          const moduleName: string = importMatch[1];
+          analysis.imports.push(moduleName);
         }
       } else if (nodeType === 'call_expression') {
         const nodeText = cursor.currentNode.text;
         if (nodeText.startsWith('require(')) {
-          const requireMatch = nodeText.match(/require\(['"`]([^'"`]+)['"`]\)/);
-          if (requireMatch) {
-            analysis.imports.push(requireMatch[1]);
+          const requireMatch = nodeText.match(/require\(['"`]([^'"`]+)['"`]\)/) as RegExpMatchArray | null;
+          if (requireMatch && typeof requireMatch[1] === 'string') {
+            const moduleName: string = requireMatch[1];
+            analysis.imports.push(moduleName);
           }
         }
       }

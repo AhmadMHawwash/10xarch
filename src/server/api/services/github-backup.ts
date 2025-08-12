@@ -150,10 +150,7 @@ export class GitHubBackupService {
   private config: GitHubBackupConfig;
 
   constructor(config: GitHubBackupConfig, client?: GitHubApiClient) {
-    this.config = {
-      branch: 'main',
-      ...config,
-    };
+    this.config = { ...config };
     this.client = client ?? new GitHubApiClientImpl(config.token);
   }
 
@@ -182,29 +179,35 @@ export class GitHubBackupService {
         description: data.description,
         metadata: data.metadata,
       }, null, 2);
-
+      
       const readmeContent = this.generateReadmeContent(data);
 
-             // Get the current commit SHA for the branch
-       let branchRef: GitHubRef;
-       let actualBranch = this.config.branch;
-       
-       try {
-         branchRef = await this.client.get(
-           `/repos/${this.config.repo}/git/refs/heads/${this.config.branch}`
-         ) as GitHubRef;
-       } catch (error) {
-         // If main branch doesn't exist, try master
-         if (this.config.branch === 'main') {
-           console.log('Main branch not found, trying master branch...');
-           branchRef = await this.client.get(
-             `/repos/${this.config.repo}/git/refs/heads/master`
-           ) as GitHubRef;
-           actualBranch = 'master';
-         } else {
-           throw error;
-         }
-       }
+      // Determine branch to use: prefer configured, else default branch from repo
+      let actualBranch = this.config.branch;
+      if (!actualBranch) {
+        const repoInfo = await this.client.get(`/repos/${this.config.repo}`) as { default_branch?: string };
+        actualBranch = repoInfo.default_branch ?? 'main';
+      }
+
+      // Get the current commit SHA for the branch; if missing, fall back to default branch
+      let branchRef: GitHubRef;
+      try {
+        branchRef = await this.client.get(
+          `/repos/${this.config.repo}/git/refs/heads/${actualBranch}`
+        ) as GitHubRef;
+      } catch (error) {
+        const repoInfo = await this.client.get(`/repos/${this.config.repo}`) as { default_branch?: string };
+        const defaultBranch = repoInfo.default_branch ?? 'main';
+        if (actualBranch !== defaultBranch) {
+          console.log(`Branch ${actualBranch} not found, retrying with default branch ${defaultBranch}...`);
+          actualBranch = defaultBranch;
+          branchRef = await this.client.get(
+            `/repos/${this.config.repo}/git/refs/heads/${actualBranch}`
+          ) as GitHubRef;
+        } else {
+          throw error as Error;
+        }
+      }
        
        const baseSha = branchRef.object.sha;
 

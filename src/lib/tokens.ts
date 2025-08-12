@@ -88,7 +88,7 @@ export const GPT_TOKEN_COSTS = {
     input: 0.01,
     output: 0.03,
   },
-  "gpt-4.1-mini": {
+  "gpt-5-nano": {
     input: 0.015,
     output: 0.04,
   },

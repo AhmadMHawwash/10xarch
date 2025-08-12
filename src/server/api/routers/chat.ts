@@ -422,7 +422,7 @@ Keep these requirements in mind when providing assistance. Guide the user withou
         const estimatedCost = calculateGPTCost(
           inputTokens,
           estimatedOutputTokens,
-          "gpt-4.1-mini",
+          "gpt-5-nano",
         );
         const requiredTokens = costToCredits(estimatedCost);
 
@@ -444,7 +444,7 @@ Keep these requirements in mind when providing assistance. Guide the user withou
 
       // Make the API call
       const completion = await openai.chat.completions.create({
-        model: "gpt-4.1-mini",
+        model: "gpt-5-nano",
         messages: messageArray,
         temperature: 0.1,
         max_tokens: 400,
@@ -458,7 +458,7 @@ Keep these requirements in mind when providing assistance. Guide the user withou
       const actualCost = calculateGPTCost(
         inputTokens,
         outputTokens,
-        "gpt-4.1-mini",
+        "gpt-5-nano",
       );
       const actualTokens = costToCredits(actualCost);
 

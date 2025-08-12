@@ -155,7 +155,7 @@ export const challengesRouter = createTRPCRouter({
         const actualCost = calculateGPTCost(
           promptTokens,
           outputTokens,
-          "gpt-4.1-mini",
+          "gpt-5-nano",
         );
         const actualTokens = costToCredits(actualCost);
 

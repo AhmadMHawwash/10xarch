@@ -1,11 +1,12 @@
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
-import { playgrounds, users, backupHistory } from "@/server/db/schema";
+import { playgrounds, users, backupHistory, repositoryAnalyses } from "@/server/db/schema";
 import { auth } from "@clerk/nextjs/server";
 import { TRPCError } from "@trpc/server";
 import { and, desc, eq, or, sql } from "drizzle-orm";
 import { z } from "zod";
 import { playgroundBackupService } from "@/server/api/services/playground-backup";
 import { getGitHubBackupService } from "@/server/api/services/github-backup";
+import type { AnalysisResults, AnalysisNode, AnalysisEdge } from "@/types/analysis";
 
 // Shared schemas
 const playgroundIdSchema = z.string().uuid();
@@ -243,6 +244,148 @@ export const playgroundsRouter = createTRPCRouter({
       }
     }),
 
+  // Create playground from analysis results
+  createFromAnalysis: protectedProcedure
+    .input(z.object({
+      analysisId: z.string().uuid(),
+      title: z.string().min(1).max(100),
+      description: z.string().optional(),
+      selectedComponents: z.array(z.string()).optional(),
+      selectedConnections: z.array(z.string()).optional(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const { userId } = await auth();
+      if (!userId) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Not authenticated",
+        });
+      }
+
+      // Get the analysis details
+      const analysis = await ctx.db.query.repositoryAnalyses.findFirst({
+        where: eq(repositoryAnalyses.id, input.analysisId),
+      });
+
+      if (!analysis) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Analysis not found",
+        });
+      }
+
+      if (analysis.status !== 'completed') {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Analysis is not completed yet",
+        });
+      }
+
+             // Parse analysis results with proper typing
+       let nodes: AnalysisNode[] = [];
+       let edges: AnalysisEdge[] = [];
+       
+       try {
+         if (analysis.expertAnalyses) {
+           const results = typeof analysis.expertAnalyses === 'string' 
+             ? JSON.parse(analysis.expertAnalyses) 
+             : analysis.expertAnalyses;
+           
+           // Cast to AnalysisResults type for safe access
+           const typedResults = results as AnalysisResults;
+           
+           if (typedResults?.nodes && Array.isArray(typedResults.nodes)) {
+             nodes = typedResults.nodes;
+           }
+           if (typedResults?.edges && Array.isArray(typedResults.edges)) {
+             edges = typedResults.edges;
+           }
+         }
+       } catch (error) {
+         console.warn('Failed to parse analysis results:', error);
+       }
+
+       // Filter selected components and connections
+       const selectedNodes = input.selectedComponents 
+         ? nodes.filter((_, index) => input.selectedComponents!.includes(`component-${index}`))
+         : nodes;
+       
+       const selectedEdges = input.selectedConnections
+         ? edges.filter((_, index) => input.selectedConnections!.includes(`connection-${index}`))
+         : edges;
+
+       // Create the playground with selected analysis data
+       const playgroundJson = {
+         nodes: selectedNodes.map((node, index) => ({
+           id: `node-${index + 1}`,
+           type: node.name ?? 'custom',
+           position: { x: 100 + (index % 4) * 200, y: 100 + Math.floor(index / 4) * 150 },
+           data: {
+             label: node.displayName ?? node.title ?? node.name ?? 'Component',
+             subtitle: node.subtitle,
+             confidence: node.confidence,
+             evidence: node.evidence,
+             originalAnalysisData: node,
+           },
+         })),
+         edges: selectedEdges.map((edge, index) => ({
+           id: `edge-${index + 1}`,
+           source: `node-${selectedNodes.findIndex(n => n.name === edge.source) + 1}`,
+           target: `node-${selectedNodes.findIndex(n => n.name === edge.target) + 1}`,
+           type: 'smoothstep',
+           data: {
+             label: edge.data?.label,
+             apiDefinition: edge.data?.apiDefinition,
+             confidence: edge.confidence,
+             evidence: edge.evidence,
+             originalAnalysisData: edge,
+           },
+         })).filter(edge => edge.source !== 'node-0' && edge.target !== 'node-0'), // Remove edges with invalid nodes
+       };
+
+      try {
+        const [newPlayground] = await ctx.db
+          .insert(playgrounds)
+          .values({
+            title: input.title,
+            jsonBlob: playgroundJson,
+            ownerType: 'user',
+            ownerId: userId,
+            createdBy: userId,
+            updatedBy: userId,
+            editorIds: [],
+            viewerIds: [],
+            currentVisitorIds: [userId],
+            isPublic: 0,
+            description: input.description ?? `System design playground created from ${analysis.repositoryFullName} repository analysis`,
+            tags: `analysis,${analysis.repositoryFullName}`,
+            associatedRepositoryUrl: analysis.repositoryUrl,
+            associatedAnalysisId: analysis.id,
+          })
+          .returning();
+
+        if (!newPlayground) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to create playground",
+          });
+        }
+
+        return { 
+          playground: newPlayground,
+          componentsAdded: selectedNodes.length,
+          connectionsAdded: selectedEdges.length,
+        };
+      } catch (error) {
+        console.error("Error creating playground from analysis:", error);
+        if (error instanceof TRPCError) throw error;
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "An error occurred while creating the playground",
+        });
+      }
+    }),
+
   update: protectedProcedure
     .input(updatePlaygroundSchema)
     .mutation(async ({ ctx, input }) => {
@@ -388,6 +531,17 @@ export const playgroundsRouter = createTRPCRouter({
       }
       // Add more complex permission for org-owned playgrounds if necessary
 
+      // First, delete any associated repository analyses
+      await ctx.db
+        .delete(repositoryAnalyses)
+        .where(eq(repositoryAnalyses.playgroundId, input));
+
+      // Also delete any backup history
+      await ctx.db
+        .delete(backupHistory)
+        .where(eq(backupHistory.playgroundId, input));
+
+      // Now delete the playground
       const deletedItems = await ctx.db
         .delete(playgrounds)
         .where(eq(playgrounds.id, input))
@@ -725,5 +879,66 @@ export const playgroundsRouter = createTRPCRouter({
           message: "Failed to restore version",
         });
       }
+    }),
+
+  // Associate a repository analysis with a playground
+  associateRepository: protectedProcedure
+    .input(z.object({
+      playgroundId: playgroundIdSchema,
+      repositoryUrl: z.string().url(),
+      analysisId: z.string().uuid(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const { userId } = await auth();
+      if (!userId) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Not authenticated",
+        });
+      }
+
+      const existingPlayground = await ctx.db.query.playgrounds.findFirst({
+        where: eq(playgrounds.id, input.playgroundId),
+      });
+
+      if (!existingPlayground) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Playground not found",
+        });
+      }
+
+      // Check if user has edit access
+      const canEdit = 
+        existingPlayground.ownerId === userId ||
+        (existingPlayground.editorIds?.includes(userId) ?? false);
+
+      if (!canEdit) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You don't have permission to associate a repository with this playground",
+        });
+      }
+
+      // Update the playground with repository association
+      const [updatedPlayground] = await ctx.db
+        .update(playgrounds)
+        .set({
+          associatedRepositoryUrl: input.repositoryUrl,
+          associatedAnalysisId: input.analysisId,
+          updatedAt: new Date(),
+          updatedBy: userId,
+        })
+        .where(eq(playgrounds.id, input.playgroundId))
+        .returning();
+
+      if (!updatedPlayground) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to associate repository with playground",
+        });
+      }
+
+      return { playground: updatedPlayground };
     }),
 });

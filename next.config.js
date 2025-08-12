@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /**
  * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially useful
  * for Docker builds.
@@ -90,11 +92,6 @@ const config = {
   },
 
   // Webpack configuration to handle tree-sitter native dependencies
-  /**
-   * @param {any} config
-   * @param {{ isServer: boolean }} ctx
-   * @returns {any}
-   */
   webpack: (config, { isServer }) => {
     if (!isServer) {
       // Exclude tree-sitter from client-side bundle (it's server-side only)
@@ -116,6 +113,7 @@ const config = {
     }
     config.externals = existingExternals;
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return config;
   },
 };

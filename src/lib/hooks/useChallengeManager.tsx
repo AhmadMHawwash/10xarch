@@ -18,7 +18,7 @@ import { useSystemDesigner } from "./_useSystemDesigner";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/components/ui/use-toast";
 import { extractAPIDefinitions } from "@/components/ai-chat/ChatUI";
-import { CustomEdge } from "@/types/system";
+import { type CustomEdge } from "@/types/system";
 
 export const SYSTEM_COMPONENT_NODE = "SystemComponentNode";
 

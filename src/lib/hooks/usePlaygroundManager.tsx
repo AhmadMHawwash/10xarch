@@ -12,7 +12,7 @@ import { useMemo } from "react";
 import { type Edge, type Node } from "reactflow";
 import { useSystemDesigner } from "./_useSystemDesigner";
 import { EdgeData } from "./useChallengeManager";
-import { CustomEdge } from "@/types/system";
+import { type CustomEdge } from "@/types/system";
 
 export const SYSTEM_COMPONENT_NODE = "SystemComponentNode";
 

@@ -292,17 +292,17 @@ export default function CreatePlaygroundPage() {
                     <div
                       key={index}
                       className={`border rounded-lg p-4 cursor-pointer transition-colors ${
-                        selectedComponents.includes(` + "`component-${index}`" + `)
+                        selectedComponents.includes(`component-${index}`)
                           ? "border-blue-500 bg-blue-50 dark:bg-blue-950"
                           : "border-gray-200 hover:border-gray-300"
                       }`}
-                      onClick={() => handleComponentToggle(` + "`component-${index}`" + `)}
+                      onClick={() => handleComponentToggle(`component-${index}`)}
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex items-center gap-3 min-w-0">
                           <Checkbox
-                            checked={selectedComponents.includes(` + "`component-${index}`" + `)}
-                            onChange={() => handleComponentToggle(` + "`component-${index}`" + `)}
+                            checked={selectedComponents.includes(`component-${index}`)}
+                            onChange={() => handleComponentToggle(`component-${index}`)}
                             className="shrink-0"
                           />
                           <div className="min-w-0">
@@ -386,17 +386,17 @@ export default function CreatePlaygroundPage() {
                     <div
                       key={index}
                       className={`border rounded-lg p-4 cursor-pointer transition-colors ${
-                        selectedConnections.includes(` + "`connection-${index}`" + `)
+                        selectedConnections.includes(`connection-${index}`)
                           ? "border-blue-500 bg-blue-50 dark:bg-blue-950"
                           : "border-gray-200 hover-border-gray-300"
                       }`}
-                      onClick={() => handleConnectionToggle(` + "`connection-${index}`" + `)}
+                      onClick={() => handleConnectionToggle(`connection-${index}`)}
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex items-center gap-3 min-w-0">
                           <Checkbox
-                            checked={selectedConnections.includes(` + "`connection-${index}`" + `)}
-                            onChange={() => handleConnectionToggle(` + "`connection-${index}`" + `)}
+                            checked={selectedConnections.includes(`connection-${index}`)}
+                            onChange={() => handleConnectionToggle(`connection-${index}`)}
                             className="shrink-0"
                           />
                           <div className="min-w-0">

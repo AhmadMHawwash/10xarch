@@ -94,7 +94,7 @@ export class SingleExpertAnalysisService {
         throw new Error('No response content from LLM');
       }
       
-      console.log(`[SINGLE_EXPERT] Response received, tokens: ${response.usage?.total_tokens || 'unknown'}`);
+      console.log(`[SINGLE_EXPERT] Response received, tokens: ${response.usage?.total_tokens ?? 'unknown'}`);
       
       const results = JSON.parse(content) as SingleExpertResults;
       

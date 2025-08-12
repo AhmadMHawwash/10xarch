@@ -298,9 +298,10 @@ export class SimpleASTAnalyzer {
     const importMatches = content.match(/(?:import.*?from\s+['"`]([^'"`]+)['"`]|require\(['"`]([^'"`]+)['"`]\))/g);
     if (importMatches) {
       importMatches.forEach(match => {
-        const moduleMatch = match.match(/['"`]([^'"`]+)['"`]/);
-        if (moduleMatch) {
-          analysis.imports.push(moduleMatch[1]);
+        const moduleMatch = match.match(/['"`]([^'"`]+)['"`]/) as RegExpMatchArray | null;
+        if (moduleMatch && typeof moduleMatch[1] === 'string') {
+          const moduleName: string = moduleMatch[1];
+          analysis.imports.push(moduleName);
         }
       });
     }

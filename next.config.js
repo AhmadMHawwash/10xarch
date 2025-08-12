@@ -91,9 +91,9 @@ const config = {
 
   // Webpack configuration to handle tree-sitter native dependencies
   /**
-   * @param {import('webpack').Configuration} config
+   * @param {any} config
    * @param {{ isServer: boolean }} ctx
-   * @returns {import('webpack').Configuration}
+   * @returns {any}
    */
   webpack: (config, { isServer }) => {
     if (!isServer) {

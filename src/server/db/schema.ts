@@ -83,11 +83,13 @@ export const repositoryAnalyses = createTable("repository_analyses", {
   repositoryUrl: text("repository_url").notNull(),
   repositoryFullName: text("repository_full_name").notNull(), // e.g., "facebook/react"
   branch: text("branch").default("main"),
+  analyzedCommitSha: text("analyzed_commit_sha"), // The commit SHA that was analyzed
   isPrivate: integer("is_private").notNull().default(0),
   privacyMode: integer("privacy_mode").notNull().default(0), // Don't send to LLM training
   
   // Analysis metadata
   status: repositoryAnalysisEnum("status").notNull().default("pending"),
+  analysisDepth: text("analysis_depth").notNull().default("standard"), // quick, standard, deep
   currentExpert: text("current_expert"), // Which expert is currently analyzing
   progressPercentage: integer("progress_percentage").notNull().default(0),
   
@@ -115,6 +117,17 @@ export const repositoryAnalyses = createTable("repository_analyses", {
 });
 
 export type RepositoryAnalysis = typeof repositoryAnalyses.$inferSelect;
+
+export const repositoryAnalysesRelations = relations(repositoryAnalyses, ({ one }) => ({
+  playground: one(playgrounds, {
+    fields: [repositoryAnalyses.playgroundId],
+    references: [playgrounds.id],
+  }),
+  user: one(users, {
+    fields: [repositoryAnalyses.userId],
+    references: [users.id],
+  }),
+}));
 
 // Subscription status enum
 export const subscriptionStatusEnum = pgEnum("subscription_status", [
@@ -179,6 +192,9 @@ export const playgrounds = createTable("playgrounds", {
   // GitHub backup fields
   lastBackupCommitSha: text("last_backup_commit_sha"),
   backupStatus: backupStatusEnum("backup_status"),
+  // Repository integration fields
+  associatedRepositoryUrl: text("associated_repository_url"),
+  associatedAnalysisId: uuid("associated_analysis_id"),
 });
 
 export type Playground = typeof playgrounds.$inferSelect;
@@ -190,6 +206,12 @@ export const playgroundsRelations = relations(playgrounds, ({ one, many }) => ({
     relationName: "userOwnedPlaygrounds",
   }),
   backupHistory: many(backupHistory),
+  repositoryAnalyses: many(repositoryAnalyses),
+  associatedAnalysis: one(repositoryAnalyses, {
+    fields: [playgrounds.associatedAnalysisId],
+    references: [repositoryAnalyses.id],
+    relationName: "playgroundAssociatedAnalysis",
+  }),
 }));
 
 export const backupHistory = createTable("backup_history", {

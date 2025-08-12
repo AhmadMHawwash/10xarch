@@ -1,0 +1,1 @@
+ALTER TABLE "sdp_repository_analyses" ADD COLUMN "analyzed_commit_sha" text;

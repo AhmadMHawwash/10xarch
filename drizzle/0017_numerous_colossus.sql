@@ -1,0 +1,1 @@
+ALTER TABLE "sdp_repository_analyses" ADD COLUMN "analysis_depth" text DEFAULT 'standard' NOT NULL;

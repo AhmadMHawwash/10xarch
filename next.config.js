@@ -88,6 +88,27 @@ const config = {
     deviceSizes: [640, 750, 828, 1080, 1200], // Fewer sizes = fewer variants to generate
     imageSizes: [16, 32, 48, 64, 96], // Fewer sizes = fewer variants to generate
   },
+
+  // Webpack configuration to handle tree-sitter native dependencies
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      // Exclude tree-sitter from client-side bundle (it's server-side only)
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        'tree-sitter': false,
+        'tree-sitter-javascript': false,
+        'tree-sitter-typescript': false,
+      };
+    }
+
+    // Mark these as external to prevent bundling
+    config.externals = config.externals || [];
+    if (isServer) {
+      config.externals.push('tree-sitter', 'tree-sitter-javascript', 'tree-sitter-typescript');
+    }
+
+    return config;
+  },
 };
 
 export default config;

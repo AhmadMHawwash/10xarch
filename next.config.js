@@ -90,11 +90,17 @@ const config = {
   },
 
   // Webpack configuration to handle tree-sitter native dependencies
+  /**
+   * @param {import('webpack').Configuration} config
+   * @param {{ isServer: boolean }} ctx
+   * @returns {import('webpack').Configuration}
+   */
   webpack: (config, { isServer }) => {
     if (!isServer) {
       // Exclude tree-sitter from client-side bundle (it's server-side only)
+      config.resolve = config.resolve || {};
       config.resolve.fallback = {
-        ...config.resolve.fallback,
+        ...(config.resolve.fallback || {}),
         'tree-sitter': false,
         'tree-sitter-javascript': false,
         'tree-sitter-typescript': false,
@@ -102,10 +108,13 @@ const config = {
     }
 
     // Mark these as external to prevent bundling
-    config.externals = config.externals || [];
+    const existingExternals = Array.isArray(config.externals)
+      ? config.externals
+      : [];
     if (isServer) {
-      config.externals.push('tree-sitter', 'tree-sitter-javascript', 'tree-sitter-typescript');
+      existingExternals.push('tree-sitter', 'tree-sitter-javascript', 'tree-sitter-typescript');
     }
+    config.externals = existingExternals;
 
     return config;
   },

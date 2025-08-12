@@ -298,7 +298,7 @@ export class SimpleASTAnalyzer {
     const importMatches = content.match(/(?:import.*?from\s+['"`]([^'"`]+)['"`]|require\(['"`]([^'"`]+)['"`]\))/g);
     if (importMatches) {
       importMatches.forEach(match => {
-        const moduleMatch = match.match(/['"`]([^'"`]+)['"`]/) as RegExpMatchArray | null;
+        const moduleMatch = match.match(/['"`]([^'"`]+)['"`]/);
         if (moduleMatch && typeof moduleMatch[1] === 'string') {
           const moduleName: string = moduleMatch[1];
           analysis.imports.push(moduleName);

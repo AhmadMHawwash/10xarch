@@ -20,6 +20,8 @@ import {
   Share2,
   Trash2,
   Users,
+  Github,
+  GitBranch,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -106,6 +108,12 @@ export function PlaygroundToolbar({
 
   const backupStatus = getBackupStatus();
 
+  const handleRepositoryIntegration = () => {
+    router.push(`/playgrounds/${playground.id}/repository-integration`);
+  };
+
+  const hasAssociatedRepository = !!playground.associatedRepositoryUrl;
+
   return (
     <div className={`flex items-center justify-between gap-2 ${className}`}>
       <div className="flex items-center gap-2 flex-row">
@@ -137,6 +145,25 @@ export function PlaygroundToolbar({
             />
           </DialogContent>
         </Dialog>
+        
+        <Button
+          variant="outline"
+          size="sm"
+          className="flex items-center gap-2"
+          onClick={handleRepositoryIntegration}
+          title={hasAssociatedRepository ? "View Repository Integration" : "Add Repository Integration"}
+        >
+          {hasAssociatedRepository ? (
+            <>
+              <GitBranch className="h-4 w-4 text-green-600" />
+              <span className="rounded-full bg-green-100 px-1.5 py-0.5 text-xs font-medium text-green-800">
+                ✓
+              </span>
+            </>
+          ) : (
+            <Github className="h-4 w-4" />
+          )}
+        </Button>
         <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
           <DialogTrigger asChild>
             <Button

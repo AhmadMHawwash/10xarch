@@ -14,9 +14,11 @@ import {
   BookOpenCheck,
   CheckCircle,
   Code,
+  GitBranch,
   IterationCcw,
   Layers,
-  PenTool
+  PenTool,
+  Zap
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -300,6 +302,114 @@ export default function HomeClient() {
                   prefetch={false}
                 >
                   <span className="mr-2">Try a Challenge</span>
+                  <ArrowRight className="transition-transform group-hover:translate-x-1" />
+                </Link>
+              </div>
+            </div>
+          </>
+        )}
+      </section>
+
+      {/* Repository Analysis Section */}
+      <section className="mb-16 grid gap-8 md:grid-cols-2">
+        {activeTab === "design" ? (
+          <>
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 p-8 shadow-lg transition-all hover:shadow-xl dark:from-gray-800 dark:to-blue-900">
+              {/* Decorative elements */}
+              <div className="absolute -right-20 -top-20 h-40 w-40 rounded-full bg-blue-100 opacity-50 blur-3xl dark:bg-blue-800"></div>
+              <div className="absolute -bottom-20 -left-20 h-40 w-40 rounded-full bg-purple-100 opacity-50 blur-3xl dark:bg-purple-800"></div>
+
+              <div className="relative">
+                <h2 className="mb-4 flex items-center text-3xl font-bold text-gray-900 dark:text-white">
+                  <Zap className="mr-3 h-8 w-8 text-blue-600 dark:text-blue-400" />
+                  Repository Analysis
+                </h2>
+                <p className="mb-6 text-lg text-gray-600 dark:text-gray-300">
+                  Analyze your codebase to identify potential issues,
+                  performance bottlenecks, and architectural improvements.
+                </p>
+                <Link
+                  href="/analysis"
+                  className="group relative inline-flex items-center overflow-hidden rounded-full bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-3 text-white transition-all hover:from-blue-700 hover:to-purple-700"
+                  prefetch={false}
+                >
+                  <span className="mr-2">Analyze Your Code</span>
+                  <ArrowRight className="transition-transform group-hover:translate-x-1" />
+                </Link>
+              </div>
+            </div>
+
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 p-8 shadow-lg transition-all hover:shadow-xl dark:from-gray-800 dark:to-blue-900">
+              {/* Decorative elements */}
+              <div className="absolute -right-20 -top-20 h-40 w-40 rounded-full bg-blue-100 opacity-50 blur-3xl dark:bg-blue-800"></div>
+              <div className="absolute -bottom-20 -left-20 h-40 w-40 rounded-full bg-purple-100 opacity-50 blur-3xl dark:bg-purple-800"></div>
+
+              <div className="relative">
+                <h2 className="mb-4 flex items-center text-3xl font-bold text-gray-900 dark:text-white">
+                  <GitBranch className="mr-3 h-8 w-8 text-blue-600 dark:text-blue-400" />
+                  Codebase Overview
+                </h2>
+                <p className="mb-6 text-lg text-gray-600 dark:text-gray-300">
+                  Get a high-level view of your project&apos;s structure,
+                  dependencies, and key files.
+                </p>
+                <Link
+                  href="/codebase-overview"
+                  className="group relative inline-flex items-center overflow-hidden rounded-full bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-3 text-white transition-all hover:from-blue-700 hover:to-purple-700"
+                  prefetch={false}
+                >
+                  <span className="mr-2">View Codebase</span>
+                  <ArrowRight className="transition-transform group-hover:translate-x-1" />
+                </Link>
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 p-8 shadow-lg transition-all hover:shadow-xl dark:from-gray-800 dark:to-blue-900">
+              {/* Decorative elements */}
+              <div className="absolute -right-20 -top-20 h-40 w-40 rounded-full bg-blue-100 opacity-50 blur-3xl dark:bg-blue-800"></div>
+              <div className="absolute -bottom-20 -left-20 h-40 w-40 rounded-full bg-purple-100 opacity-50 blur-3xl dark:bg-purple-800"></div>
+
+              <div className="relative">
+                <h2 className="mb-4 flex items-center text-3xl font-bold text-gray-900 dark:text-white">
+                  <GitBranch className="mr-3 h-8 w-8 text-blue-600 dark:text-blue-400" />
+                  Create from Analysis
+                </h2>
+                <p className="mb-6 text-lg text-gray-600 dark:text-gray-300">
+                  Transform repository analysis into interactive system design playgrounds with auto-generated components.
+                </p>
+                <Link
+                  href="/analysis"
+                  className="group relative inline-flex items-center overflow-hidden rounded-full bg-white/10 px-8 py-3 text-gray-700 ring-1 ring-gray-900/5 transition-all hover:bg-white/20 dark:text-gray-200 dark:ring-white/10"
+                  prefetch={false}
+                >
+                  <span className="mr-2">Try Analysis</span>
+                  <ArrowRight className="transition-transform group-hover:translate-x-1" />
+                </Link>
+              </div>
+            </div>
+
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 p-8 shadow-lg transition-all hover:shadow-xl dark:from-gray-800 dark:to-blue-900">
+              {/* Decorative elements */}
+              <div className="absolute -right-20 -top-20 h-40 w-40 rounded-full bg-blue-100 opacity-50 blur-3xl dark:bg-blue-800"></div>
+              <div className="absolute -bottom-20 -left-20 h-40 w-40 rounded-full bg-purple-100 opacity-50 blur-3xl dark:bg-purple-800"></div>
+
+              <div className="relative">
+                <h2 className="mb-4 flex items-center text-3xl font-bold text-gray-900 dark:text-white">
+                  <GitBranch className="mr-3 h-8 w-8 text-blue-600 dark:text-blue-400" />
+                  Codebase Overview
+                </h2>
+                <p className="mb-6 text-lg text-gray-600 dark:text-gray-300">
+                  Get a high-level view of your project&apos;s structure,
+                  dependencies, and key files.
+                </p>
+                <Link
+                  href="/codebase-overview"
+                  className="group relative inline-flex items-center overflow-hidden rounded-full bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-3 text-white transition-all hover:from-blue-700 hover:to-purple-700"
+                  prefetch={false}
+                >
+                  <span className="mr-2">View Codebase</span>
                   <ArrowRight className="transition-transform group-hover:translate-x-1" />
                 </Link>
               </div>

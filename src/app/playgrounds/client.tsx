@@ -65,7 +65,7 @@ export default function PlaygroundsClient({ initialPlaygrounds }: PlaygroundsCli
       });
       // Redirect based on creation type
       if (data.playground.title === 'GitHub Analysis') {
-        router.push(`/playgrounds/${data.playground.id}/analyse`);
+        router.push(`/playgrounds/${data.playground.id}/repository-integration`);
       } else {
         router.push(`/playgrounds/${data.playground.id}`);
       }

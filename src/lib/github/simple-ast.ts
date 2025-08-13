@@ -171,10 +171,12 @@ export class SimpleASTAnalyzer {
     const nextAppMatch = analysis.filePath.match(/^(?:.*\/)?(?:src\/)?app\/api\/(.+)\/route\.(?:ts|js)$/);
     if (nextAppMatch) {
       const routePath = `/api/${nextAppMatch[1]}`;
+      const seen = new Set<string>();
       for (const method of httpMethods) {
         const hasFn = new RegExp(`export\\s+(?:async\\s+)?function\\s+${method}\\b`).test(content);
         const hasConst = new RegExp(`export\\s+const\\s+${method}\\b`).test(content);
-        if (hasFn || hasConst) {
+        if ((hasFn || hasConst) && !seen.has(method)) {
+          seen.add(method);
           analysis.apiEndpoints.push({ method, path: routePath, framework: 'nextjs' });
         }
       }
@@ -232,6 +234,11 @@ export class SimpleASTAnalyzer {
   }
 
   private extractFrameworks(content: string, analysis: FileAnalysis) {
+    // Heuristic: if we already detected Next.js route handlers, mark Next.js
+    if (analysis.apiEndpoints.some(e => e.framework === 'nextjs') && !analysis.frameworks.includes('next.js')) {
+      analysis.frameworks.push('next.js');
+    }
+
     const frameworks = [
       { name: 'react', patterns: ['useState', 'useEffect', 'React.'] },
       { name: 'next.js', patterns: ['next/', 'getServerSideProps', 'getStaticProps'] },

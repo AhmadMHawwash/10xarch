@@ -412,7 +412,7 @@ export default function RepositoryAnalysisView({ owner: ownerProp, repo: repoPro
                       className="flex-1"
                     />
                     <Button onClick={handleStartNewAnalysis} disabled={!state.repositoryUrl || !validateGitHubUrl(state.repositoryUrl)}>
-                      Analyze
+                      New analysis
                     </Button>
                   </div>
                   {state.repositoryUrl && !validateGitHubUrl(state.repositoryUrl) && (
@@ -528,7 +528,7 @@ export default function RepositoryAnalysisView({ owner: ownerProp, repo: repoPro
 
                 <div className="text-center mt-6">
                   <Button variant="outline" onClick={handleStartNewAnalysis}>
-                    Run New Analysis
+                    New analysis
                   </Button>
                 </div>
               </div>
@@ -669,11 +669,12 @@ export default function RepositoryAnalysisView({ owner: ownerProp, repo: repoPro
                   </div>
                 )}
               </div>
-              <div className="flex justify-center gap-4">
+                <div className="flex justify-center gap-4">
                 <Button variant="outline" onClick={handleBackToMain}>
                   Back
                 </Button>
-                <Button onClick={() => handleCreatePlayground(state.selectedAnalysisId!)}>Create Playground</Button>
+                  <Button onClick={handleStartNewAnalysis} variant="secondary">New analysis</Button>
+                  <Button onClick={() => handleCreatePlayground(state.selectedAnalysisId!)}>Create Playground</Button>
               </div>
             </div>
 

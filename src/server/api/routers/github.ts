@@ -211,6 +211,42 @@ async function getCanonicalRepositoryInfo(owner: string, repo: string, token?: s
 }
 
 export const githubRouter = createTRPCRouter({
+  // List my analyzed repositories (latest per repo), most recent first
+  listMyAnalyzedRepos: protectedProcedure
+    .input(z.object({ limit: z.number().int().min(1).max(100).optional(), all: z.boolean().optional() }).optional())
+    .query(async ({ ctx, input }) => {
+      const { userId } = await auth();
+      if (!userId) {
+        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Not authenticated' });
+      }
+
+      const limit = input?.all ? undefined : (input?.limit ?? 10);
+
+      // Fetch recent analyses for this user, newest first
+      const rows = await ctx.db.query.repositoryAnalyses.findMany({
+        where: eq(repositoryAnalyses.userId, userId),
+        orderBy: (tbl, { desc }) => [desc(tbl.createdAt)],
+      });
+
+      // Deduplicate by repositoryFullName, keeping the latest
+      const seen = new Set<string>();
+      const deduped: Array<{ fullName: string; lastAnalyzedAt: Date; latestStatus: string; isPrivate: boolean }>= [];
+      for (const r of rows) {
+        const fullName = r.repositoryFullName;
+        if (!fullName || seen.has(fullName)) continue;
+        seen.add(fullName);
+        deduped.push({
+          fullName,
+          lastAnalyzedAt: r.createdAt,
+          latestStatus: r.status,
+          isPrivate: (r.isPrivate ?? 0) === 1,
+        });
+        if (limit && deduped.length >= limit) break;
+      }
+
+      const hasMore = rows.some(r => !seen.has(r.repositoryFullName));
+      return { repos: deduped, hasMore };
+    }),
   // List distinct repos that have analyses for a given owner
   listReposByOwner: protectedProcedure
     .input(z.object({ owner: z.string() }))

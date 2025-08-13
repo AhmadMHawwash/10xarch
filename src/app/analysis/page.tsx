@@ -12,12 +12,9 @@ import {
   Shield, 
   Loader2,
   Code2,
-  Search,
-  TrendingUp,
-  Star,
-  
 } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
+import { api } from "@/trpc/react";
 
 // Debounce utility function
 function useDebounce<T>(value: T, delay: number): T {
@@ -42,10 +39,8 @@ export default function AnalysisIndexPage() {
   const { isSignedIn, isLoaded } = useUser();
 
   const [repositoryUrl, setRepositoryUrl] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
-
-  // Debounced search query (potential future use)
-  useDebounce(searchQuery, 300);
+  // Reserve for future debounce needs
+  useDebounce(repositoryUrl, 200);
 
   // Helper functions
   const validateGitHubUrl = (url: string) => {
@@ -85,23 +80,12 @@ export default function AnalysisIndexPage() {
     router.push(`/analysis/${repoRoute}`);
   };
 
-  const handleQuickSearch = (query: string) => {
-    // Handle common repo formats like "facebook/react" or just "react"
-    if (query.includes('/')) {
-      const [owner, repo] = query.split('/');
-      if (owner && repo) {
-        const repoRoute = createRepoRoute(owner, repo);
-        router.push(`/analysis/${repoRoute}`);
-      }
-    } else if (query.trim()) {
-      // For single terms, you might want to implement GitHub search API
-      toast({
-        title: "Search Format",
-        description: "Please use format: owner/repository (e.g., facebook/react)",
-        variant: "default",
-      });
-    }
-  };
+  // Load user's analyzed repositories (latest per repo)
+  const { data: myRepos, isLoading: myReposLoading, error: myReposError, refetch } = api.github.listMyAnalyzedRepos.useQuery({ limit: 10 });
+  const [showAll, setShowAll] = useState(false);
+  const { data: allRepos, isLoading: allReposLoading, error: allReposError } = api.github.listMyAnalyzedRepos.useQuery({ all: true }, { enabled: showAll });
+
+  // No quick search: URL only per product decision
 
   // Show loading while checking authentication
   if (!isLoaded) {
@@ -169,44 +153,8 @@ export default function AnalysisIndexPage() {
             </p>
           </div>
 
-          {/* Quick Search */}
-          <Card className="max-w-2xl mx-auto">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Search className="h-5 w-5" />
-                Quick Repository Search
-              </CardTitle>
-              <p className="text-sm text-muted-foreground">
-                Search for repositories using format: owner/repository (e.g., facebook/react)
-              </p>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex gap-3">
-                  <Input
-                    placeholder="facebook/react"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="flex-1"
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        handleQuickSearch(searchQuery);
-                      }
-                    }}
-                  />
-                  <Button 
-                    onClick={() => handleQuickSearch(searchQuery)}
-                    disabled={!searchQuery.trim()}
-                  >
-                    <Search className="h-4 w-4 mr-2" />
-                    Search
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          {/* Analyze Repository URL */}
 
-          {/* URL Analysis */}
           <Card className="max-w-2xl mx-auto">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -246,46 +194,87 @@ export default function AnalysisIndexPage() {
             </CardContent>
           </Card>
 
-          {/* Popular Examples */}
+          {/* Your analyzed repositories */}
           <div className="max-w-4xl mx-auto">
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5" />
-                  Popular Repositories to Analyze
-                </CardTitle>
-                <p className="text-muted-foreground">
-                  Try analyzing these popular open-source projects
-                </p>
+                <CardTitle>Your analyzed repositories</CardTitle>
+                <p className="text-sm text-muted-foreground">Most recent first</p>
               </CardHeader>
               <CardContent>
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {[
-                    { name: "facebook/react", description: "JavaScript library for building user interfaces", stars: "227k" },
-                    { name: "microsoft/vscode", description: "Visual Studio Code editor", stars: "162k" },
-                    { name: "vercel/next.js", description: "React framework for production", stars: "124k" },
-                    { name: "nodejs/node", description: "Node.js JavaScript runtime", stars: "106k" },
-                    { name: "elastic/elasticsearch", description: "Distributed search and analytics engine", stars: "69k" },
-                    { name: "kubernetes/kubernetes", description: "Container orchestration platform", stars: "109k" },
-                  ].map((repo) => (
-                    <Card key={repo.name} className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => {
-                       const [owner, repoName] = repo.name.split('/');
-                       const repoRoute = createRepoRoute(owner!, repoName!);
-                       router.push(`/analysis/${repoRoute}`);
-                    }}>
-                      <CardContent className="p-4">
-                        <div className="flex items-center justify-between mb-2">
-                          <h3 className="font-medium text-sm">{repo.name}</h3>
-                          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                            <Star className="h-3 w-3" />
-                            {repo.stars}
+                {myReposLoading && (
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Loader2 className="h-4 w-4 animate-spin" /> Loading…
+                  </div>
+                )}
+                {myReposError && (
+                  <div className="text-sm text-red-600">Failed to load repositories</div>
+                )}
+                {myRepos && myRepos.repos.length === 0 && (
+                  <div className="text-sm text-muted-foreground">
+                    You have no analyzed repositories yet. Paste a GitHub URL above to start.
+                  </div>
+                )}
+                {myRepos && myRepos.repos.length > 0 && (
+                  <div className="divide-y rounded-md border">
+                    {(showAll ? (allRepos?.repos ?? []) : myRepos.repos).map((r) => {
+                      const [owner, repo] = r.fullName.split("/");
+                      const status = String(r.latestStatus).toLowerCase();
+                      const statusClass = (() => {
+                        switch (status) {
+                          case "completed":
+                            return "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 dark:border-emerald-800";
+                          case "failed":
+                            return "bg-red-50 text-red-700 border-red-200 dark:bg-red-950 dark:text-red-300 dark:border-red-800";
+                          case "analyzing":
+                          case "pending":
+                            return "bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950 dark:text-amber-300 dark:border-amber-800";
+                          case "cancelled":
+                            return "bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-950 dark:text-gray-300 dark:border-gray-800";
+                          default:
+                            return "bg-secondary text-secondary-foreground border-muted";
+                        }
+                      })();
+                      return (
+                        <button
+                          key={r.fullName}
+                          className="w-full text-left px-4 py-3 hover:bg-muted/50 focus:outline-none"
+                          onClick={() => router.push(`/analysis/${encodeURIComponent(owner!)}/${encodeURIComponent(repo!)}`)}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <Github className="h-4 w-4" />
+                              <span className="font-medium">{r.fullName}</span>
+                            </div>
+                            <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                              <span>{new Date(r.lastAnalyzedAt).toLocaleString()}</span>
+                              <span className={`inline-flex items-center rounded border px-2 py-0.5 text-xs capitalize ${statusClass}`}>
+                                {status}
+                              </span>
+                              {r.isPrivate && (
+                                <span className="inline-flex items-center rounded border px-2 py-0.5 text-xs">
+                                  <Shield className="h-3 w-3 mr-1" /> private
+                                </span>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                        <p className="text-xs text-muted-foreground">{repo.description}</p>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {myRepos && myRepos.hasMore && !showAll && (
+                  <div className="mt-3">
+                    <Button variant="secondary" onClick={() => setShowAll(true)} disabled={allReposLoading}>
+                      {allReposLoading ? (
+                        <span className="inline-flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Loading all…</span>
+                      ) : (
+                        'Load all'
+                      )}
+                    </Button>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>

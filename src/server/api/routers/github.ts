@@ -142,13 +142,66 @@ async function runEnhancedAnalysis(
         })()
       : {};
     
+    // Compose additional dependency graph and repo summaries for downstream LLM
+    const depStats = dependencyTrackerGraph?.statistics;
+    const topHubs = depStats ? depStats.hubNodes.slice(0, 20) : [];
+    const entryPointsSummary = entryPointAnalysis?.entryPoints?.map(e => ({ path: e.path, type: e.type, importance: e.importance })) ?? [];
+    // Directory summary (top-level dirs by file count)
+    const dirCounts: Record<string, number> = {};
+    for (const f of analysis.files) {
+      const dir = f.path.split('/').slice(0, 2).join('/') || '.';
+      dirCounts[dir] = (dirCounts[dir] ?? 0) + 1;
+    }
+    const directorySummary = Object.entries(dirCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 20)
+      .map(([dir, count]) => ({ dir, count }));
+    const hasElectronSignals = analysis.files.some(f => /electron|preload|main\.(ts|js)|electron-builder\.yml|electron\.vite/i.test(f.path));
+
     const enhancedContext = {
       ...baseContext,
       astInsights,
       frameworksDetected: astInsights.frameworks,
       apiEndpointsFound: astInsights.apiEndpoints,
       databaseUsage: astInsights.hasDatabase,
-      environmentVariables: astInsights.environmentVars
+      trpcRouters: (() => {
+        try {
+          return analysis.files
+            .map(f => f.path)
+            .filter(p => /^src\/server\/api\/routers\/.+\.ts$/i.test(p))
+            .map(p => p.split('/').pop()!.replace(/\.ts$/, ''))
+            .slice(0, 20);
+        } catch { return []; }
+      })(),
+      staticDataFlow: (() => {
+        try {
+          return (dependencyGraph?.dataFlow ?? []).map(df => ({
+            from: df.from?.name ?? '',
+            to: df.to?.name ?? '',
+            via: df.via,
+            confidence: df.confidence,
+          }));
+        } catch { return []; }
+      })(),
+      serviceBoundaries: (() => {
+        try {
+          return (dependencyGraph?.serviceBoundaries ?? []).map(b => ({
+            name: b.name,
+            files: (b.files ?? []).length,
+            purpose: b.purpose,
+          }));
+        } catch { return []; }
+      })(),
+      environmentVariables: astInsights.environmentVars,
+      dependencyGraphSummary: depStats ? {
+        totalNodes: depStats.totalNodes,
+        totalEdges: depStats.totalEdges,
+        maxDepth: depStats.maxDepth,
+        topHubs,
+        entryPoints: entryPointsSummary,
+      } : undefined,
+      directorySummary,
+      hasElectronSignals,
     };
     
     return {

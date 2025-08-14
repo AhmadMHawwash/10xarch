@@ -19,6 +19,10 @@ const COMPONENT_TYPE_MAPPING: Record<string, ValidSystemComponentName> = {
   // Direct matches
   "client": "Client",
   "server": "Server", 
+  "electron": "Server",
+  "main_process": "Server",
+  "renderer": "Client",
+  "ipc": "Custom Component",
   "database": "Database",
   "cache": "Cache",
   "cdn": "CDN",
@@ -45,6 +49,10 @@ const COMPONENT_TYPE_MAPPING: Record<string, ValidSystemComponentName> = {
   "rabbitmq": "Message Queue",
   "kafka": "Message Queue",
   "sqs": "Message Queue",
+  "endpoint_group": "Custom Component",
+  "external": "Custom Component",
+  "framework": "Custom Component",
+  "plugin": "Custom Component",
   
   // Generic fallbacks
   "service": "Server",
@@ -87,9 +95,11 @@ function generateNodePositions(nodes: AnalysisNode[]): Record<string, { x: numbe
     client: [] as AnalysisNode[],
     loadBalancer: [] as AnalysisNode[],
     server: [] as AnalysisNode[],
+    api: [] as AnalysisNode[],
     cache: [] as AnalysisNode[],
     database: [] as AnalysisNode[],
     external: [] as AnalysisNode[],
+    framework: [] as AnalysisNode[],
   };
   
   // Categorize nodes into layers
@@ -101,12 +111,19 @@ function generateNodePositions(nodes: AnalysisNode[]): Record<string, { x: numbe
       layers.client.push(node);
     } else if (componentType === "Load Balancer") {
       layers.loadBalancer.push(node);
-    } else if (componentType === "Server" || lowerName.includes("api") || lowerName.includes("service")) {
+    } else if (componentType === "Server" || (lowerName.includes("service") && !lowerName.includes("api"))) {
       layers.server.push(node);
     } else if (componentType === "Cache") {
       layers.cache.push(node);
     } else if (componentType === "Database" || lowerName.includes("storage")) {
       layers.database.push(node);
+    } else if (lowerName.startsWith("api") || lowerName.includes("endpoint") || lowerName.includes("route")) {
+      layers.api.push(node);
+    } else if (lowerName.includes("external") || lowerName.includes("stripe") || lowerName.includes("sentry") || lowerName.includes("supabase")) {
+      layers.external.push(node);
+    } else if (lowerName.includes("framework")) {
+      // De-emphasize framework nodes by moving them to external lane so they don't clutter core topology
+      layers.external.push(node);
     } else {
       layers.external.push(node);
     }
@@ -117,7 +134,7 @@ function generateNodePositions(nodes: AnalysisNode[]): Record<string, { x: numbe
   let currentY = 50;
   
   // Position each layer
-  Object.entries(layers).forEach(([layerName, layerNodes]) => {
+  Object.entries(layers).forEach(([_, layerNodes]) => {
     if (layerNodes.length === 0) return;
     
     const layerWidth = Math.max(1, layerNodes.length) * NODE_SPACING;
@@ -204,9 +221,26 @@ function generateDeterministicNodeId(name: string, componentType: ValidSystemCom
  */
 export async function convertEdgesToReactFlow(edges: AnalysisEdge[], validNodeIds: Set<string>, nodes: Node<SystemComponentNodeDataProps>[]): Promise<Edge<CustomEdgeData>[]> {
   console.log('🔄 Converting edges with deterministic validation...');
+  const totalEdges = edges.length;
   
   // Filter edges to only include those with valid node references
-  const validEdges = edges.filter(edge => {
+  const tryResolve = (id: string): string | null => {
+    const trimmed = id.trim();
+    if (validNodeIds.has(trimmed)) return trimmed;
+    // attempt to match by displayName/title
+    const byDisplay = nodes.find(n => (
+      (n.data.displayName && n.data.displayName.toLowerCase() === trimmed.toLowerCase()) ??
+      (n.data.title && n.data.title.toLowerCase() === trimmed.toLowerCase())
+    ));
+    if (byDisplay) return byDisplay.id;
+    return null;
+  };
+
+  const validEdges = edges.map(edge => {
+    const resolvedSource = tryResolve(edge.source) ?? edge.source.trim();
+    const resolvedTarget = tryResolve(edge.target) ?? edge.target.trim();
+    return { ...edge, source: resolvedSource, target: resolvedTarget };
+  }).filter(edge => {
     const normalizedSource = edge.source.trim();
     const normalizedTarget = edge.target.trim();
     const sourceExists = validNodeIds.has(normalizedSource);
@@ -223,6 +257,11 @@ export async function convertEdgesToReactFlow(edges: AnalysisEdge[], validNodeId
     
     return true;
   });
+
+  const droppedEdges = totalEdges - validEdges.length;
+  if (droppedEdges > 0) {
+    console.warn(`⚠️ Edge coverage: kept ${validEdges.length}/${totalEdges} (${Math.round((validEdges.length/Math.max(1,totalEdges))*100)}%), dropped ${droppedEdges}`);
+  }
   
   const convertedEdges = validEdges.map((edge, index) => ({
     id: `edge-${edge.source}-${edge.target}-${index}`,
@@ -252,6 +291,22 @@ export async function convertAnalysisToReactFlow(results: AnalysisResults): Prom
   const validNodeIds = new Set(nodes.map(node => node.id));
   
   const edges = results.edges ? await convertEdgesToReactFlow(results.edges, validNodeIds, nodes) : [];
+
+  // Orphan node telemetry: nodes with zero incident edges
+  try {
+    const incident = new Map<string, number>();
+    for (const n of nodes) incident.set(n.id, 0);
+    for (const e of edges) {
+      incident.set(e.source, (incident.get(e.source) ?? 0) + 1);
+      incident.set(e.target, (incident.get(e.target) ?? 0) + 1);
+    }
+    const orphanNodes = Array.from(incident.entries()).filter(([, c]) => c === 0).map(([id]) => id);
+    if (orphanNodes.length > 0) {
+      console.warn(`⚠️ Orphan nodes with no edges: ${orphanNodes.length}`, orphanNodes);
+    }
+  } catch (e) {
+    console.warn('Failed to compute orphan nodes', e);
+  }
   
   // Create mapping for reference
   const componentMapping: Record<string, ValidSystemComponentName> = {};

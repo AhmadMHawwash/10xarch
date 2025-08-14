@@ -59,6 +59,15 @@ export default function SystemComponentNode({
     data.name === "Custom Component"
       ? (data.configs.title as string) || "Custom Component"
       : (data.configs.title as string);
+  const details: string | undefined = (() => {
+    // If this is an API node and we have attached examples/trpc, render a compact detail line
+    const examples = (data as unknown as { examples?: string[] }).examples ?? [];
+    const trpc = (data as unknown as { trpcRouters?: string[] }).trpcRouters ?? [];
+    const parts: string[] = [];
+    if (examples.length) parts.push(examples.join(', '));
+    if (trpc.length) parts.push(`tRPC: ${trpc.join(', ')}`);
+    return parts.length ? parts.join(' • ') : undefined;
+  })();
 
   // Calculate positions for target handles
   const targetHandles = data.targetHandles ?? [];
@@ -114,7 +123,7 @@ export default function SystemComponentNode({
           nodeId={data.id}
           Icon={data.icon}
           nodeSettingsRef={nodeSettingsRef}
-          subtitle={data.configs.subtitle as string}
+          subtitle={(details ?? (data.configs.subtitle)) as string}
         />
         {content && (
           <WithMarkdownDetails
